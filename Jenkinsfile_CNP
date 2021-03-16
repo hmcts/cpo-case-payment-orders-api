@@ -2,10 +2,15 @@
 
 @Library("Infrastructure")
 
+import uk.gov.hmcts.contino.GradleBuilder
+
 def type = "java"
 def product = "cpo"
 def component = "case-payment-orders-api"
 
+GradleBuilder builder = new GradleBuilder(this, product)
+
 withPipeline(type, product, component) {
+    enableAksStagingDeployment()
     disableLegacyDeployment()
 }
