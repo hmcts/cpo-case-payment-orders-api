@@ -11,6 +11,9 @@ def component = "case-payment-orders-api"
 GradleBuilder builder = new GradleBuilder(this, product)
 
 withPipeline(type, product, component) {
-    enableAksStagingDeployment()
-    disableLegacyDeployment()
+  after('test') {
+      builder.gradle('integration')
+    }
+  enableAksStagingDeployment()
+  disableLegacyDeployment()
 }
