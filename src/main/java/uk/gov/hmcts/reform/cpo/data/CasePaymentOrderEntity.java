@@ -24,22 +24,22 @@ public class CasePaymentOrderEntity {
     @Column(name = "created_timestamp")
     private Date createdTimestamp;
 
-    @Column(name = "effective_from")
+    @Column(name = "effective_from", nullable = false)
     private Date effectiveFrom;
 
-    @Column(name = "case_id", length = 16)
+    @Column(name = "case_id", length = 16, nullable = false)
     private String caseId;
 
-    @Column(name = "casetype_id", length = 70)
+    @Column(name = "casetype_id", length = 70, nullable = false)
     private String caseTypeId;
 
-    @Column(length = 70)
+    @Column(length = 70, nullable = false)
     private String action;
 
-    @Column(name = "responsible_party", length = 1024)
+    @Column(name = "responsible_party", length = 1024, nullable = false)
     private String responsibleParty;
 
-    @Column(name = "order_reference", length = 70)
+    @Column(name = "order_reference", length = 70, nullable = false)
     private String orderReference;
 
     @Column(name = "created_by", length = 70)
