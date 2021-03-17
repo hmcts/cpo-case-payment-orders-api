@@ -6,9 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.http.ResponseEntity.ok;
 
-/**
- * Default endpoints per application.
- */
 @RestController
 public class RootController {
 
