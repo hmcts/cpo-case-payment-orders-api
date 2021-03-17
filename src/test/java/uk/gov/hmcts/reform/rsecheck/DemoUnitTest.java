@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class DemoUnitTest {
+public class DemoUnitTest {
 
     @Test
-    void exampleOfTest() {
+    public void exampleOfTest() {
         assertTrue(System.currentTimeMillis() > 0, "Example of Unit Test");
     }
 }
