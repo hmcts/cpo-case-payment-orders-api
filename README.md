@@ -1,5 +1,7 @@
 # cpo-case-payment-orders-api
 
+[![API Docs](https://hmcts.github.io/reform-api-docs/swagger.html?url=https://hmcts.github.io/reform-api-docs/specs/cpo-case-payment-orders-api.json)
+
 [![Build Status](https://travis-ci.org/hmcts/cpo-case-payment-orders-api.svg?branch=master)](https://travis-ci.org/hmcts/cpo-case-payment-orders-api)
 
 ## Notes
