@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.cpo.service.mapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 
@@ -12,17 +10,17 @@ import java.util.UUID;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
-@SpringBootTest
 public class CasePaymentOrderMapperTest {
 
-    @Autowired
-    private CasePaymentOrderMapper mapper;
+    private CasePaymentOrderMapperImpl mapper;
 
     private CasePaymentOrder casePaymentOrder;
     private CasePaymentOrderEntity entity;
 
     @BeforeEach
     public void setUp() {
+        mapper = new CasePaymentOrderMapperImpl();
+
         UUID id = UUID.randomUUID();
         LocalDateTime date = LocalDateTime.now();
 
