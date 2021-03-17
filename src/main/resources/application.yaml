@@ -56,7 +56,7 @@ idam:
   api:
     url: ${IDAM_API_URL:http://localhost:5000}
   s2s-authorised:
-    services:
+    services: ${CPO_S2S_AUTHORISED_SERVICES:xui_webapp}
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
