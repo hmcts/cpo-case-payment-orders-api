@@ -9,3 +9,9 @@ java:
 #      secrets:
 #        - AppInsightsInstrumentationKey
   environment:
+    CPO_CASE_PAYMENT_ORDERS_DB_HOST: cpo-case-payment-orders-api-postgres-db-{{ .Values.global.environment }}.postgres.database.azure.com
+    CPO_CASE_PAYMENT_ORDERS_DB_PORT: 5432
+    CPO_CASE_PAYMENT_ORDERS_DB_NAME: cpo
+    CPO_CASE_PAYMENT_ORDERS_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
+    CPO_CASE_PAYMENT_ORDERS_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
+    CPO_CASE_PAYMENT_ORDERS_DB_OPTIONS: "?stringtype=unspecified&gssEncMode=disable"
