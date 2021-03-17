@@ -77,19 +77,19 @@ resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
   key_vault_id = module.key-vault.key_vault_id
 }
 
-resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
+resource "azurerm_key_vault_secret" "POSTGRES-HOST" {
   name         = "${var.component}-POSTGRES-HOST"
   value        = module.cpo-case-payments-db.host_name
   key_vault_id = module.key-vault.key_vault_id
 }
 
-resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
+resource "azurerm_key_vault_secret" "POSTGRES-PORT" {
   name         = "${var.component}-POSTGRES-PORT"
   value        = module.cpo-case-payments-db.postgresql_listen_port
   key_vault_id = module.key-vault.key_vault_id
 }
 
-resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
+resource "azurerm_key_vault_secret" "POSTGRES-DATABASE" {
   name         = "${var.component}-POSTGRES-DATABASE"
   value        = module.cpo-case-payments-db.postgresql_database
   key_vault_id = module.key-vault.key_vault_id
