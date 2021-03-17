@@ -5,8 +5,6 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.Column;
-import javax.persistence.GenerationType;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -20,7 +18,6 @@ import java.util.UUID;
 public class CasePaymentOrderEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
 
     @CreationTimestamp
