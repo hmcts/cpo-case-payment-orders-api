@@ -112,17 +112,6 @@ sonarqube {
   }
 }
 
-def versions = [
-  junit           : '5.7.1',
-  junitPlatform   : '1.7.1',
-  lombok          : '1.18.8',
-  mapstruct       : '1.4.2.Final',
-  reformLogging   : '5.1.7',
-  springBoot      : springBoot.class.package.implementationVersion,
-  springCloud     : '2020.0.1',
-  springfoxSwagger: '3.0.0'
-]
-
 // before committing a change, make sure task still works
 dependencyUpdates {
   def isNonStable = { String version ->
@@ -152,9 +141,6 @@ dependencyManagement {
       entry 'tomcat-embed-websocket'
     }
   }
-  imports {
-    mavenBom "org.springframework.cloud:spring-cloud-dependencies:${versions.springCloud}"
-  }
 }
 
 repositories {
@@ -165,6 +151,14 @@ repositories {
   jcenter()
   mavenCentral()
 }
+
+def versions = [
+  junit           : '5.7.1',
+  junitPlatform   : '1.7.1',
+  reformLogging   : '5.1.7',
+  springBoot      : springBoot.class.package.implementationVersion,
+  springfoxSwagger: '3.0.0'
+]
 
 ext.libraries = [
   junit5: [
