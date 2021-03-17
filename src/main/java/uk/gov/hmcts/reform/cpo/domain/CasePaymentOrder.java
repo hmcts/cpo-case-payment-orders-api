@@ -1,19 +1,20 @@
 package uk.gov.hmcts.reform.cpo.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
-@Data
+@Builder
+@Getter
 public class CasePaymentOrder {
 
-    @JsonIgnore
-    private Long id;
+    private UUID id;
 
-    private Date createdTimestamp;
+    private LocalDateTime createdTimestamp;
 
-    private Date effectiveFrom;
+    private LocalDateTime effectiveFrom;
 
     private String caseId;
 
