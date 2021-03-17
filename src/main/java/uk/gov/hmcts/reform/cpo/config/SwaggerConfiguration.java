@@ -36,8 +36,8 @@ public class SwaggerConfiguration {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-            .title("Mange case assignment API")
-            .description("Mange case access")
+            .title("Case Payment Orders API")
+            .description("Case payment orders")
             .version("1.0.0")
             .contact(new Contact("CDM",
                                  "https://tools.hmcts.net/confluence/display/RCCD/Reform%3A+Core+Case+Data+Home",
