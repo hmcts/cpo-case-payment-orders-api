@@ -17,6 +17,10 @@ spring:
     import: "optional:configtree:/mnt/secrets/"
   application:
     name: Spring Boot Template
+  cache:
+    cache-names: userInfoCache
+    caffeine:
+      spec: expireAfterAccess=1800s
 #  datasource:
 #    driver-class-name: org.postgresql.Driver
 #    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_OPTIONS:}
@@ -38,6 +42,19 @@ spring:
 #          lob:
 #            # silence the 'wall-of-text' - unnecessary exception throw about blob types
 #            non_contextual_creation: true
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: ${IDAM_OIDC_URL:http://localhost:5000}/o
+        registration:
+          oidc:
+            client-id: internal
+            client-secret: internal
+
+oidc:
+  issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
 azure:
   application-insights:
