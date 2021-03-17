@@ -10,7 +10,7 @@ plugins {
   id 'uk.gov.hmcts.java' version '0.12.2'
 }
 
-ext['spring-security.version'] = '5.3.4.RELEASE'
+ext['spring-security.version'] = '5.3.8.RELEASE'
 
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
@@ -184,10 +184,10 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
 
-  implementation "org.springframework.security:spring-security-web"
-  implementation "org.springframework.security:spring-security-config"
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
+  implementation "org.springframework.security:spring-security-web:5.3.8.RELEASE"
+  implementation "org.springframework.security:spring-security-config:5.3.8.RELEASE"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.3.8.RELEASE"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.3.8.RELEASE"
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
 

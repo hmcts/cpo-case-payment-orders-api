@@ -42,5 +42,4 @@ public class JwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection
             .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toList());
     }
-
 }

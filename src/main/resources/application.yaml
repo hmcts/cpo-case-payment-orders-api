@@ -52,7 +52,11 @@ spring:
           oidc:
             client-id: internal
             client-secret: internal
-
+idam:
+  api:
+    url: ${IDAM_API_URL:http://localhost:5000}
+  s2s-authorised:
+    services:
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
