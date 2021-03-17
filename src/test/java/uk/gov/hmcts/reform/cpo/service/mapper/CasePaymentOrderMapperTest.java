@@ -10,7 +10,7 @@ import java.util.UUID;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
-public class CasePaymentOrderMapperTest {
+class CasePaymentOrderMapperTest {
 
     private CasePaymentOrderMapperImpl mapper;
 
@@ -28,7 +28,7 @@ public class CasePaymentOrderMapperTest {
             .id(id)
             .createdTimestamp(date)
             .effectiveFrom(date)
-            .caseId("1234123412341234")
+            .caseId(1_234_123_412_341_234L)
             .caseTypeId("Probate")
             .action("Case Creation")
             .responsibleParty("The executor on the will")
@@ -40,7 +40,7 @@ public class CasePaymentOrderMapperTest {
         entity.setId(id);
         entity.setCreatedTimestamp(date);
         entity.setEffectiveFrom(date);
-        entity.setCaseId("1234123412341234");
+        entity.setCaseId(1_234_123_412_341_234L);
         entity.setCaseTypeId("Probate");
         entity.setAction("Case Creation");
         entity.setResponsibleParty("The executor on the will");
@@ -49,7 +49,7 @@ public class CasePaymentOrderMapperTest {
     }
 
     @Test
-    public void successfulEntityMapping() {
+    void successfulEntityMapping() {
         CasePaymentOrderEntity mappedEntity = mapper.toEntity(casePaymentOrder);
         assertEquals("Mapped entity id should equals mocked entity id",
                      entity.getId(), mappedEntity.getId());
@@ -72,7 +72,7 @@ public class CasePaymentOrderMapperTest {
     }
 
     @Test
-    public void successfulDomainMapping() {
+    void successfulDomainMapping() {
         CasePaymentOrder mappedDomainObject = mapper.toDomainModel(entity);
         assertEquals("Mapped domain model id should equals mocked domain model id",
                      casePaymentOrder.getId(), mappedDomainObject.getId());

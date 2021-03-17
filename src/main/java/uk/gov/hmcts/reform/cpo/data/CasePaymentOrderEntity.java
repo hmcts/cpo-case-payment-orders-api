@@ -29,7 +29,7 @@ public class CasePaymentOrderEntity {
     private LocalDateTime effectiveFrom;
 
     @Column(length = 16, nullable = false)
-    private String caseId;
+    private Long caseId;
 
     @Column(length = 70, nullable = false)
     private String caseTypeId;

@@ -16,7 +16,7 @@ public class CasePaymentOrder {
 
     private LocalDateTime effectiveFrom;
 
-    private String caseId;
+    private Long caseId;
 
     private String caseTypeId;
 
