@@ -10,7 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.TestIdamConfiguration;
 
 import static org.mockito.Mockito.when;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 })
 @AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureWireMock(port = 0, stubs = "classpath:/wiremock-stubs")
-@TestPropertySource("/integration-test.properties")
+@ActiveProfiles("itest")
 public class BaseTest {
 
     @Value("${wiremock.server.port}")
