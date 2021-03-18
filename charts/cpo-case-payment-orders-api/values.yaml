@@ -9,3 +9,4 @@ java:
 #      secrets:
 #        - AppInsightsInstrumentationKey
   environment:
+    FLYWAY_NOOP_STRATEGY: true
