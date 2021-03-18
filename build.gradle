@@ -120,7 +120,8 @@ def versions = [
   reformLogging   : '5.1.7',
   springBoot      : springBoot.class.package.implementationVersion,
   springCloud     : '2020.0.1',
-  springfoxSwagger: '3.0.0'
+  springfoxSwagger: '3.0.0',
+  testcontainers  : '1.15.2'
 ]
 
 // before committing a change, make sure task still works
@@ -211,6 +212,8 @@ dependencies {
   compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.43'
   compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.43'
 
+  runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.19'
+
   testImplementation libraries.junit5
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
     exclude group: 'junit', module: 'junit'
@@ -221,6 +224,9 @@ dependencies {
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
+  integrationTestImplementation group: 'org.testcontainers', name: 'testcontainers', version: versions.testcontainers
+  integrationTestImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
+  integrationTestImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
 
