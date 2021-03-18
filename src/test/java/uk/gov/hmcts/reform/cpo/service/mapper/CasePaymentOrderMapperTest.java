@@ -25,6 +25,18 @@ class CasePaymentOrderMapperTest {
         UUID id = UUID.randomUUID();
         LocalDateTime date = LocalDateTime.now();
 
+        casePaymentOrder = CasePaymentOrder.builder()
+            .id(id)
+            .createdTimestamp(date)
+            .effectiveFrom(date)
+            .caseId(1_234_123_412_341_234L)
+            .caseTypeId("Probate")
+            .action("Case Creation")
+            .responsibleParty("The executor on the will")
+            .orderReference("Bob123")
+            .createdBy("Bob")
+            .build();
+
         entity = new CasePaymentOrderEntity();
         entity.setId(id);
         entity.setCreatedTimestamp(date);
@@ -35,18 +47,6 @@ class CasePaymentOrderMapperTest {
         entity.setResponsibleParty("The executor on the will");
         entity.setOrderReference("Bob123");
         entity.setCreatedBy("Bob");
-
-        casePaymentOrder = CasePaymentOrder.builder()
-            .id(id)
-            .createdTimestamp(entity.getCreatedTimestamp())
-            .effectiveFrom(date)
-            .caseId(1_234_123_412_341_234L)
-            .caseTypeId("Probate")
-            .action("Case Creation")
-            .responsibleParty("The executor on the will")
-            .orderReference("Bob123")
-            .createdBy("Bob")
-            .build();
     }
 
     @Test
