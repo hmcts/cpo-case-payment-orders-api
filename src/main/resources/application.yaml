@@ -17,6 +17,10 @@ spring:
     import: "optional:configtree:/mnt/secrets/"
   application:
     name: Spring Boot Template
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  main:
+    allow-bean-definition-overriding: true
 #  datasource:
 #    driver-class-name: org.postgresql.Driver
 #    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_OPTIONS:}
