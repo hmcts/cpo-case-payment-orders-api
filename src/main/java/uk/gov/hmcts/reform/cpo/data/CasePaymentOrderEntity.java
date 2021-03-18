@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo.data;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,8 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Table;
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.UUID;
 
 @Getter
@@ -24,6 +23,7 @@ public class CasePaymentOrderEntity {
     @GeneratedValue
     private UUID id;
 
+    @Setter(AccessLevel.NONE)
     @Column(nullable = false)
     private LocalDateTime createdTimestamp = LocalDateTime.now(Clock.systemUTC());
 
@@ -47,10 +47,4 @@ public class CasePaymentOrderEntity {
 
     @Column(length = 70)
     private String createdBy;
-
-    public void setCreatedTimestamp(LocalDateTime createdTimestamp) {
-        this.createdTimestamp = createdTimestamp.atZone(ZoneId.systemDefault())
-            .withZoneSameInstant(ZoneOffset.UTC)
-            .toLocalDateTime();
-    }
 }
