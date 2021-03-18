@@ -230,7 +230,7 @@ dependencies {
 
   smokeTestImplementation sourceSets.main.runtimeClasspath
 
-  runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.16'
+  runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.19'
 
 }
 
