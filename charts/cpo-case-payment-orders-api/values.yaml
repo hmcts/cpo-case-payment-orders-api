@@ -3,9 +3,9 @@ java:
   image: 'hmctspublic.azurecr.io/cpo/case-payment-orders-api:latest'
   ingressHost: cpo-case-payment-orders-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   aadIdentityName: cpo
-#  Uncomment once the vault containing the app insights key has been set up
-#  keyVaults:
-#    cpo:
-#      secrets:
-#        - AppInsightsInstrumentationKey
+  keyVaults:
+    cpo:
+      secrets:
+        - name: AppInsightsInstrumentationKey
+          alias: azure.application-insights.instrumentation-key
   environment:
