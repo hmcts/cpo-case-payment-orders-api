@@ -10,10 +10,97 @@ def component = "case-payment-orders-api"
 
 GradleBuilder builder = new GradleBuilder(this, product)
 
+def secrets = [
+  'rpx-${env}': [
+    secret('mc-idam-client-secret', 'BEFTA_OAUTH2_CLIENT_SECRET_OF_XUIWEBAPP')
+  ],
+  'ccd-${env}': [
+    // BEFTA user: Common_User_For_Request
+    secret('ccd-caseworker-autotest-email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
+    secret('ccd-caseworker-autotest-password', 'CCD_CASEWORKER_AUTOTEST_PASSWORD')
+
+  ],
+  's2s-${env}': [
+    secret('microservicekey-xui-webapp', 'BEFTA_S2S_CLIENT_SECRET_OF_XUI_WEBAPP')
+  ]
+]
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+  [$class     : 'AzureKeyVaultSecret',
+    secretType : 'Secret',
+    name       : secretName,
+    version    : '',
+    envVariable: envVar
+  ]
+}
+
+def vaultOverrides = [
+  'preview' : 'aat'
+]
+
+
+def setBeftaEnvVariables() = {
+
+  // IDAM client auth
+  env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
+  // :: for `"userTokenClientId": "xuiwebapp"`
+  env.BEFTA_OAUTH2_CLIENT_ID_OF_XUIWEBAPP = "xuiwebapp"
+  env.BEFTA_OAUTH2_REDIRECT_URI_OF_XUIWEBAPP = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
+  env.BEFTA_OAUTH2_ACCESS_TOKEN_TYPE_OF_XUIWEBAPP = "OIDC"
+  env.BEFTA_OAUTH2_SCOPE_VARIABLES_OF_XUIWEBAPP = "profile openid roles manage-user create-user"
+  // :: configure `xui_webapp` as the default value for `s2sClientId`
+  env.OAUTH2_CLIENT_ID = env.BEFTA_OAUTH2_CLIENT_ID_OF_XUIWEBAPP
+  env.OAUTH2_REDIRECT_URI = env.BEFTA_OAUTH2_REDIRECT_URI_OF_XUIWEBAPP
+  env.OAUTH2_ACCESS_TOKEN_TYPE = env.BEFTA_OAUTH2_ACCESS_TOKEN_TYPE_OF_XUIWEBAPP
+  env.OAUTH2_SCOPE_VARIABLES = env.BEFTA_OAUTH2_SCOPE_VARIABLES_OF_XUIWEBAPP
+  env.OAUTH2_CLIENT_SECRET = env.BEFTA_OAUTH2_CLIENT_SECRET_OF_XUIWEBAPP
+
+
+  // S2S auth
+  env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+  // :: for `"s2sClientId": "xui_webapp"`
+  env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
+  // :: configure `xui_webapp` as the default value for `s2sClientId`
+  env.BEFTA_S2S_CLIENT_ID = env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP
+  env.BEFTA_S2S_CLIENT_SECRET = env.BEFTA_S2S_CLIENT_SECRET_OF_XUI_WEBAPP
+
+
+  env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
+  env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
+}
+
+
 withPipeline(type, product, component) {
   after('test') {
-      builder.gradle('integration')
-    }
+    builder.gradle('integration')
+
+    // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
+
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
+  }
+
+  overrideVaultEnvironments(vaultOverrides)
+  loadVaultSecrets(secrets)
+
+  setBeftaEnvVariables()
+
   enableAksStagingDeployment()
   disableLegacyDeployment()
+
+  after('smoketest:preview') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
+  }
+
+  after('smoketest:aat') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
+  }
+
+  after('functionalTest:preview') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
+  }
+
+  after('functionalTest:aat') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
+  }
 }

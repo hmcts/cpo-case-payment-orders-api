@@ -5,11 +5,16 @@ management:
   endpoint:
     health:
       show-details: "always"
+      cache:
+        time-to-live: 1000ms
   endpoints:
     web:
       base-path: /
       exposure:
         include: health, info, prometheus
+  health:
+    probes:
+      enabled: true
 
 #If you use a database then uncomment below lines and update db properties accordingly
 spring:

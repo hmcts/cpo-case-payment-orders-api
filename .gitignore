@@ -20,3 +20,6 @@ bin/main/application.yaml
 *.ipr
 
 .DS_Store
+
+/BEFTA Report for Smoke Tests/
+/BEFTA Report for Functional Tests/

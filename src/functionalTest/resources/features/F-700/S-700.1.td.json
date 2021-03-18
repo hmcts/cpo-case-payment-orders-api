@@ -1,0 +1,66 @@
+{
+	"_guid_": "S-700.1",
+	"title": "must return a successful response when hitting Case Payment Orders Healthcheck Operation",
+
+	"productName": "Case Payment Orders API",
+	"operationName": "Healthcheck",
+
+	"method": "GET",
+	"uri": "/health",
+
+	"specs": [
+		"an active profile in CCD",
+		"has the 200 OK code"
+	],
+
+	"users": {
+		"invokingUser": {
+			"_extends_": "Common_User_For_Request"
+		}
+	},
+
+	"request": {
+		"extends": "Common_Request"
+	},
+
+	"expectedResponse": {
+		"_extends_": "CPO_200_Response",
+		"headers": {
+			"Content-Type": "application/vnd.spring-boot.actuator.v3+json"
+		},
+		"body": {
+			"status": "UP",
+			"components": {
+				"db" : {
+				  "status" : "UP",
+				  "details" : {
+					"database" : "PostgreSQL",
+					"validationQuery" : "isValid()"
+				  }
+				},
+				"diskSpace": {
+					"status": "UP",
+					"details": {
+						"total": "[[ANYTHING_PRESENT]]",
+						"free": "[[ANYTHING_PRESENT]]",
+						"threshold": "[[ANYTHING_PRESENT]]",
+						"exists": true
+					}
+				},
+				"livenessState": {
+					"status": "UP"
+				},
+				"ping": {
+					"status": "UP"
+				},
+				"readinessState": {
+					"status": "UP"
+				}
+			},
+			"groups": [
+				"liveness",
+				"readiness"
+			]
+		}
+	}
+}

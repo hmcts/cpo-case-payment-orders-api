@@ -89,6 +89,68 @@ docker image rm <image-id>
 
 There is no need to remove postgres and java or similar core images.
 
+
+## Developing
+
+### Unit tests
+To run all unit tests execute the following command:
+```bash
+./gradlew test
+```
+
+### Integration tests
+To run all integration tests execute the following command:
+```bash
+./gradlew integration
+```
+
+### Functional tests
+The tests are written using befta-fw library. To find out more about BEFTA Framework, see the
+ [BEFTA-FW repository and its README](https://github.com/hmcts/befta-fw).
+
+These tests can be run using:
+```bash
+export TEST_URL=http://localhost:4457
+./gradlew functional
+```
+
+> Note: These are the tests run against an environment.  This environment must include access to
+> IDAM and Service Auth Provider services.  All can be made available by installing and running the
+> CCD stack as advised in [ccd-docker](https://github.com/hmcts/ccd-docker), with the minimum
+> enabled services `sidam sidam-local sidam-local-ccd`.
+>
+> If you would like to test your local environment you'll need to export variables on your
+> `.bash_profile` script.  The [ccd-docker](https://github.com/hmcts/ccd-docker) repository
+> contains its own scripts to set the required environment variables.  Otherwise, the details of
+> the required minimum set of variables can be found by reviewing the contents of this project's
+> [Jenkinsfile_CNP](./Jenkinsfile_CNP) script (particularly the `secrets` mappings, and the
+> variables set by the `setBeftaEnvVariables` routine).
+>
+> Note: For details of the emails and passwords to use in a local environment see the
+> [Create users and roles](https://github.com/hmcts/ccd-docker#3-create-users-and-roles) steps in
+> [ccd-docker](https://github.com/hmcts/ccd-docker) project.
+
+### Code quality checks
+We use [checkstyle](http://checkstyle.sourceforge.net/) and [PMD](https://pmd.github.io/).
+
+To run all checks execute the following command:
+
+```bash
+./gradlew clean checkstyleMain checkstyleTest checkstyleIntegrationTest pmdMain pmdTest pmdIntegrationTest
+```
+
+To run all checks alongside the unit tests execute the following command:
+
+```bash
+./gradlew checks
+```
+
+or to run all checks, all tests and generate a code coverage report execute the following command:
+
+```bash
+./gradlew check integration functional jacocoTestReport
+```
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details

@@ -6,6 +6,7 @@ plugins {
   id 'org.springframework.boot' version '2.4.3'
   id 'org.owasp.dependencycheck' version '6.1.2'
   id 'com.github.ben-manes.versions' version '0.38.0'
+  id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.21'
   id 'org.sonarqube' version '3.1.1'
   id 'uk.gov.hmcts.java' version '0.12.2'
 }
@@ -34,15 +35,6 @@ sourceSets {
     }
     resources.srcDir file('src/integrationTest/resources')
   }
-
-  smokeTest {
-    java {
-      compileClasspath += main.output
-      runtimeClasspath += main.output
-      srcDir file('src/smokeTest/java')
-    }
-    resources.srcDir file('src/smokeTest/resources')
-  }
 }
 
 tasks.withType(JavaCompile) {
@@ -66,6 +58,40 @@ task functional(type: Test) {
   group = "Verification"
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
+
+  generateCucumberReports.enabled = false
+
+  doLast {
+    generateCucumberReports.enabled = true
+
+    javaexec {
+      main = "uk.gov.hmcts.reform.cpo.befta.CasePaymentOrdersBeftaMain"
+      classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+      args = [
+               '--strict',
+               '--threads', '10',
+               '--plugin', "json:${rootDir}/target/cucumber.json",
+               '--tags', 'not @Ignore',
+               '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
+             ]
+      // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
+      jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
+    }
+  }
+
+  finalizedBy {
+    generateCucumberReports {
+      doLast{
+        delete "${rootDir}/BEFTA Report for Functional Tests/"
+        new File("${rootDir}/BEFTA Report for Functional Tests").mkdirs()
+        file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Functional Tests"))
+
+        logger.quiet("Functional test report moved to ---> file://${rootDir}/BEFTA%20Report%20for%20Functional%20Tests/overview-features.html")
+      }
+    }
+  }
+
+  outputs.upToDateWhen { false }
 }
 
 task integration(type: Test) {
@@ -77,14 +103,60 @@ task integration(type: Test) {
 }
 
 task smoke(type: Test) {
-  description = "Runs Smoke Tests"
-  testClassesDirs = sourceSets.smokeTest.output.classesDirs
-  classpath = sourceSets.smokeTest.runtimeClasspath
+  description = "Runs smoke tests"
+  group = "Verification"
+  testClassesDirs = sourceSets.functionalTest.output.classesDirs
+  classpath = sourceSets.functionalTest.runtimeClasspath
+
+  generateCucumberReports.enabled = false
+
+  doLast {
+    generateCucumberReports.enabled = true
+    javaexec {
+      main = "uk.gov.hmcts.reform.cpo.befta.CasePaymentOrdersBeftaMain"
+      classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+      args = [
+               '--strict',
+               '--plugin', "json:${rootDir}/target/cucumber.json",
+               '--tags', '@Smoke and not @Ignore',
+               '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
+             ]
+      // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
+      jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
+    }
+  }
+
+  finalizedBy {
+    generateCucumberReports {
+      doLast{
+        delete "${rootDir}/BEFTA Report for Smoke Tests/"
+        new File("${rootDir}/BEFTA Report for Smoke Tests").mkdirs()
+        file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Smoke Tests"))
+
+        logger.quiet("Smoke test report moved to ---> file://${rootDir}/BEFTA%20Report%20for%20Smoke%20Tests/overview-features.html")
+      }
+    }
+  }
+
+  outputs.upToDateWhen { false }
 }
+
+cucumberReports {
+  outputDir = file("${rootDir}/target/cucumber")
+  reports = files("${rootDir}/target/cucumber.json")
+}
+
+task customCleanBeftaReports(type:Delete) {
+  delete "${rootDir}/BEFTA Report for Smoke Tests/"
+  delete "${rootDir}/BEFTA Report for Functional Tests/"
+  delete "${rootDir}/target/cucumber"
+  delete "${rootDir}/target/cucumber.json"
+}
+tasks.clean.dependsOn(tasks.customCleanBeftaReports)
 
 pmd {
   toolVersion = "6.18.0"
-  sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest, sourceSets.smokeTest]
+  sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest]
   reportsDir = file("$project.buildDir/reports/pmd")
   // https://github.com/pmd/pmd/issues/876
   ruleSets = []
@@ -203,13 +275,18 @@ dependencies {
     exclude group: 'junit', module: 'junit'
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
+    
+  // groovy v3.* added to avoid 'WARNING: Illegal reflective access by org.codehaus.groovy.reflection.CachedClass'
+  // in groovy:2.5.* when running functional/befta tests
+  testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.3'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  functionalTestImplementation sourceSets.main.runtimeClasspath
+  testImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '7.0.0-RDM-10539-1'
 
-  smokeTestImplementation sourceSets.main.runtimeClasspath
+  functionalTestImplementation sourceSets.main.runtimeClasspath
+  functionalTestImplementation sourceSets.test.runtimeClasspath
 }
 
 mainClassName = 'uk.gov.hmcts.reform.cpo.Application'
