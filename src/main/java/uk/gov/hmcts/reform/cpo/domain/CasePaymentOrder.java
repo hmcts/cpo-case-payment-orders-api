@@ -16,6 +16,7 @@ public class CasePaymentOrder {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-ddTHH:mm:ssZ")
     private LocalDateTime createdTimestamp;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-ddTHH:mm:ssZ")
     private LocalDateTime effectiveFrom;
 
     private Long caseId;
