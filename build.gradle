@@ -8,6 +8,7 @@ plugins {
   id 'com.github.ben-manes.versions' version '0.38.0'
   id 'org.sonarqube' version '3.1.1'
   id 'uk.gov.hmcts.java' version '0.12.6'
+  id 'org.flywaydb.flyway' version '7.7.0'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -244,16 +245,5 @@ bootJar {
 
 wrapper {
     distributionType = Wrapper.DistributionType.ALL
-}
-
-task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
-  baselineOnMigrate = true
-  baselineVersion = '0001'
-  outOfOrder = true
-  ignoreMissingMigrations = true
-  if (project.hasProperty("dburl")) {
-    url = "jdbc:postgresql://${dburl}"
-  }
-  locations = "filesystem:${projectDir}/src/main/resources/db/migration".split(',')
 }
 

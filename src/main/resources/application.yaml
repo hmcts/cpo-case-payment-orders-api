@@ -36,6 +36,14 @@ spring:
           oidc:
             client-id: internal
             client-secret: internal
+  jpa:
+    database: postgresql
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+    flyway:
+      out-of-order: true
+      ignore-missing-migrations: true
 
 idam:
   api:
@@ -46,12 +54,6 @@ idam:
     services: ${CPO_S2S_AUTHORISED_SERVICES:xui_webapp}
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
-    name: Case Payment Orders API
-
-
-flyway:
-  noop:
-    strategy: ${FLYWAY_NOOP_STRATEGY:false}
 
 azure:
   application-insights:
