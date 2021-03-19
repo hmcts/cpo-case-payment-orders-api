@@ -13,6 +13,3 @@ java:
     OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443/openam/oauth2/hmcts
     CPO_S2S_AUTHORISED_SERVICES: xui_webapp
     S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-
-
-    FLYWAY_NOOP_STRATEGY: true
