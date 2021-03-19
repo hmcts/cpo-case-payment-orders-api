@@ -13,7 +13,7 @@ management:
 
 spring:
   config:
-    import: "optional:configtree:/mnt/secrets/cpo"
+    import: "optional:configtree:/mnt/secrets/cpo/"
   application:
     name: Case Payment Orders
   jackson:
