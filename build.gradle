@@ -109,6 +109,8 @@ sonarqube {
     property "sonar.projectName", "Reform :: cpo-case-payment-orders-api"
     property "sonar.projectKey", "uk.gov.hmcts.reform:cpo-case-payment-orders-api"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
+    property "sonar.exclusions","**/config/SecurityConfiguration.java"
+
   }
 }
 
