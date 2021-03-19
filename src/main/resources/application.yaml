@@ -21,8 +21,8 @@ spring:
     caffeine:
       spec: expireAfterAccess=1800s
   datasource:
-    url: jdbc:postgresql://${CPO_CASE_PAYMENT_ORDERS_DB_HOST:localhost}:${CPO_CASE_PAYMENT_ORDERS_DB_PORT:6968}/${CPO_CASE_PAYMENT_ORDERS_DB_NAME:cpo_case_payment_orders}${CPO_CASE_PAYMENT_ORDERS_DB_OPTIONS:}
     driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${CPO_CASE_PAYMENT_ORDERS_DB_HOST:localhost}:${CPO_CASE_PAYMENT_ORDERS_DB_PORT:6968}/${CPO_CASE_PAYMENT_ORDERS_DB_NAME:cpo_case_payment_orders}${CPO_CASE_PAYMENT_ORDERS_DB_OPTIONS:}
     username: ${CPO_CASE_PAYMENT_ORDERS_DB_USERNAME:cpo}
     password: ${CPO_CASE_PAYMENT_ORDERS_DB_PASSWORD:cpo}
     type: com.zaxxer.hikari.HikariDataSource
@@ -44,6 +44,7 @@ spring:
           oidc:
             client-id: internal
             client-secret: internal
+
 idam:
   api:
     url: ${IDAM_API_URL:http://localhost:5000}
