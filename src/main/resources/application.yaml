@@ -15,22 +15,39 @@ spring:
   config:
     import: "optional:configtree:/mnt/secrets/"
   application:
-    name: Case Payment Orders API
+    name: Case Payment Orders
+  cache:
+    cache-names: userInfoCache
+    caffeine:
+      spec: expireAfterAccess=1800s
   datasource:
+    driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${CPO_CASE_PAYMENT_ORDERS_DB_HOST:localhost}:${CPO_CASE_PAYMENT_ORDERS_DB_PORT:6968}/${CPO_CASE_PAYMENT_ORDERS_DB_NAME:cpo_case_payment_orders}${CPO_CASE_PAYMENT_ORDERS_DB_OPTIONS:}
     username: ${CPO_CASE_PAYMENT_ORDERS_DB_USERNAME:cpo}
     password: ${CPO_CASE_PAYMENT_ORDERS_DB_PASSWORD:cpo}
     type: com.zaxxer.hikari.HikariDataSource
-  jpa:
-    database: postgresql
-    show-sql: false
-    hibernate:
-      ddl-auto: none
-  flyway:
-    baseline-on-migrate: true
-    baseline-version: 0001
-    out-of-order: true
-    ignore-missing-migrations: true
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: ${IDAM_OIDC_URL:http://localhost:5000}/o
+        registration:
+          oidc:
+            client-id: internal
+            client-secret: internal
+
+idam:
+  api:
+    url: ${IDAM_API_URL:http://localhost:5000}
+  s2s-auth:
+    url: ${S2S_URL:http://localhost:4502}
+  s2s-authorised:
+    services: ${CPO_S2S_AUTHORISED_SERVICES:xui_webapp}
+oidc:
+  issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
+    name: Case Payment Orders API
+
 
 flyway:
   noop:
