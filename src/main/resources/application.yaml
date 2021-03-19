@@ -31,6 +31,30 @@ spring:
     baseline-version: 0001
     out-of-order: true
     ignore-missing-migrations: true
+  cache:
+    cache-names: userInfoCache
+    caffeine:
+      spec: expireAfterAccess=1800s
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: ${IDAM_OIDC_URL:http://localhost:5000}/o
+        registration:
+          oidc:
+            client-id: internal
+            client-secret: internal
+
+idam:
+  api:
+    url: ${IDAM_API_URL:http://localhost:5000}
+  s2s-auth:
+    url: ${S2S_URL:http://localhost:4502}
+  s2s-authorised:
+    services: ${CPO_S2S_AUTHORISED_SERVICES:xui_webapp}
+oidc:
+  issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
 flyway:
   noop:
