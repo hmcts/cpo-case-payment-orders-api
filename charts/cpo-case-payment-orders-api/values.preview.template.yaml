@@ -11,7 +11,7 @@ java:
     CPO_CASE_PAYMENT_ORDERS_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
     CPO_CASE_PAYMENT_ORDERS_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
     CPO_CASE_PAYMENT_ORDERS_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
-    CPO_CASE_PAYMENT_ORDERS_DB_OPTIONS: "?stringtype=unspecified&sslmode=require&gssEncMode=disable"
+    CPO_CASE_PAYMENT_ORDERS_DB_OPTIONS: "?stringtype=unspecified"
     CPO_CASE_PAYMENT_ORDERS_DB_PORT: 5432
   postgresql:
     enabled: true
