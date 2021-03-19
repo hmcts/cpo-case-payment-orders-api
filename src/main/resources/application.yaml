@@ -44,7 +44,6 @@ spring:
           oidc:
             client-id: internal
             client-secret: internal
-
 idam:
   api:
     url: ${IDAM_API_URL:http://localhost:5000}
