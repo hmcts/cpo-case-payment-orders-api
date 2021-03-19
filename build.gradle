@@ -200,10 +200,8 @@ dependencies {
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   implementation group: 'org.mapstruct', name: 'mapstruct', version: versions.mapstruct
 
-  annotationProcessor group:'org.mapstruct', name: 'mapstruct-processor', version: versions.mapstruct
+  annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: versions.mapstruct
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-
-  runtime group: 'org.postgresql', name: 'postgresql', version: '.Values.postgresql.postgresqlDatabase'
 
   testImplementation libraries.junit5
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
@@ -224,7 +222,6 @@ dependencies {
   smokeTestImplementation sourceSets.main.runtimeClasspath
 
   runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.19'
-
 }
 
 mainClassName = 'uk.gov.hmcts.reform.cpo.Application'
