@@ -34,10 +34,6 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
   ]
 }
 
-def vaultOverrides = [
-  'preview' : 'aat'
-]
-
 
 def setBeftaEnvVariables() {
 
@@ -80,7 +76,6 @@ withPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
   }
 
-  overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
 
   setBeftaEnvVariables()
