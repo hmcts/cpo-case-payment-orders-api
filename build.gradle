@@ -10,6 +10,8 @@ plugins {
   id 'uk.gov.hmcts.java' version '0.12.2'
 }
 
+ext['spring-security.version'] = '5.3.8.RELEASE'
+
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
@@ -107,6 +109,9 @@ sonarqube {
     property "sonar.projectName", "Reform :: cpo-case-payment-orders-api"
     property "sonar.projectKey", "uk.gov.hmcts.reform:cpo-case-payment-orders-api"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
+    property "sonar.coverage.exclusions", "**/security/SecurityUtils.java"
+    property "sonar.exclusions","**/config/SecurityConfiguration.java"
+
   }
 }
 
@@ -118,7 +123,8 @@ def versions = [
   reformLogging   : '5.1.7',
   springBoot      : springBoot.class.package.implementationVersion,
   springCloud     : '2020.0.1',
-  springfoxSwagger: '3.0.0'
+  springfoxSwagger: '3.0.0',
+  testcontainers  : '1.15.2'
 ]
 
 // before committing a change, make sure task still works
@@ -180,11 +186,22 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
+
+  implementation "org.springframework.security:spring-security-web:5.3.8.RELEASE"
+  implementation "org.springframework.security:spring-security-config:5.3.8.RELEASE"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.3.8.RELEASE"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.3.8.RELEASE"
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
 
   implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
   implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
+
+  implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2'
+  implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '1.5.5'
+
+  implementation "com.github.ben-manes.caffeine:caffeine:2.7.0"
 
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   implementation group: 'org.mapstruct', name: 'mapstruct', version: versions.mapstruct
@@ -198,14 +215,21 @@ dependencies {
   compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.43'
   compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.43'
 
+  runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.19'
+
   testImplementation libraries.junit5
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
     exclude group: 'junit', module: 'junit'
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
 
+  testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '2.2.2.RELEASE'
+
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
+  integrationTestImplementation group: 'org.testcontainers', name: 'testcontainers', version: versions.testcontainers
+  integrationTestImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
+  integrationTestImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
 
