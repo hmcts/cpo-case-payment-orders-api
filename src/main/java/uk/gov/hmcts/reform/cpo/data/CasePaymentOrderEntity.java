@@ -1,15 +1,14 @@
 package uk.gov.hmcts.reform.cpo.data;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Table;
-import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -23,9 +22,8 @@ public class CasePaymentOrderEntity {
     @GeneratedValue
     private UUID id;
 
-    @Setter(AccessLevel.NONE)
-    @Column(nullable = false)
-    private LocalDateTime createdTimestamp = LocalDateTime.now(Clock.systemUTC());
+    @CreationTimestamp
+    private LocalDateTime createdTimestamp;
 
     @Column(nullable = false)
     private LocalDateTime effectiveFrom;

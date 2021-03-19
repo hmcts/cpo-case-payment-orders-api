@@ -27,6 +27,7 @@ class CasePaymentOrderMapperTest {
 
         entity = new CasePaymentOrderEntity();
         entity.setId(id);
+        entity.setCreatedTimestamp(date);
         entity.setEffectiveFrom(date);
         entity.setCaseId(1_234_123_412_341_234L);
         entity.setCaseTypeId("Probate");
