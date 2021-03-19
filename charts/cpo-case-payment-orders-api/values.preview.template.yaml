@@ -2,10 +2,10 @@ java:
   # Don't modify below here
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
-  # empty vault definition to over-ride parent key vault section (defined in values.yaml)
   keyVaults:
     cpo:
       secrets:
+        - AppInsightsInstrumentationKey
   environment:
     CPO_CASE_PAYMENT_ORDERS_DB_HOST: "{{ .Release.Name }}-postgresql"
     CPO_CASE_PAYMENT_ORDERS_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
