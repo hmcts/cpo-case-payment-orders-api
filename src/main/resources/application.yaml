@@ -5,17 +5,24 @@ management:
   endpoint:
     health:
       show-details: "always"
+      cache:
+        time-to-live: 1000ms
   endpoints:
     web:
       base-path: /
       exposure:
         include: health, info, prometheus
+  health:
+    probes:
+      enabled: true
 
 spring:
-  config:
-    import: "optional:configtree:/mnt/secrets/cpo/"
   application:
     name: Case Payment Orders
+  banner:
+    location: classpath:case-payment-orders-banner.txt
+  config:
+    import: "optional:configtree:/mnt/secrets/cpo/"
   jackson:
     property-naming-strategy: SNAKE_CASE
   main:
