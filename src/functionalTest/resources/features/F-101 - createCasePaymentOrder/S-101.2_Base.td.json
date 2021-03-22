@@ -1,0 +1,16 @@
+{
+  "_guid_" : "S-102_Base",
+  "_extends_" : "createCasePaymentOrderBase",
+
+  "specs": [
+    "does not contain one or more of the mandatory parameters"
+  ],
+
+  "request" : {
+    "_extends_": "Common_Request"
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "400_Response"
+  }
+}

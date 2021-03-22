@@ -1,0 +1,20 @@
+{
+  "_guid_" : "S-101.3.2",
+  "_extends_" : "createCasePaymentOrderBase",
+
+  "specs": [
+    "an invalid mandatory parameter",
+    "an invalid datetime format"
+  ],
+
+  "request" : {
+    "body" : {
+      "_extends_" : "Base_CPO_Data",
+      "effective_from" : "18-03-2021 15:56:55"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "400_Response"
+  }
+}

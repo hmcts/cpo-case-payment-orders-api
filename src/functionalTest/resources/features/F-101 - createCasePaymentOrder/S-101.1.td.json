@@ -1,0 +1,21 @@
+{
+  "_guid_" : "S-101.1",
+  "_extends_" : "createCasePaymentOrderBase",
+
+  "specs": [
+    "contains all the mandatory parameters",
+    "contains a 200 success OK code",
+    "contains a valid UUID of the case order record"
+  ],
+
+  "request" : {
+    "_extends_": "Common_Request",
+    "body": {
+      "_extends_" : "Base_CPO_Data"
+    }
+  },
+
+  "expectedResponse" : {
+
+  }
+}

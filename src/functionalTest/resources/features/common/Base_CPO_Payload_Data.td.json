@@ -1,0 +1,9 @@
+{
+  "_guid_" : "Base_CPO_Data",
+    "effective_from" : "2021-01-01T00:00:00Z",
+    "case_id" : "1615819590019905",
+    "case_type_id" : "FT_MasterCaseType",
+    "action" : "payday",
+    "responsible_party" : "party1",
+    "order_reference" : "order1"
+}
