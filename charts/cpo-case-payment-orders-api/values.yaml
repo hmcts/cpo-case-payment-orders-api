@@ -9,15 +9,15 @@ java:
       secrets:
         - name: AppInsightsInstrumentationKey
           alias: azure.application-insights.instrumentation-key
-        - name: cpo-case-payment-orders-api-POSTGRES-USER
+        - name: case-payment-orders-api-POSTGRES-USER
           alias: CPO_CASE_PAYMENT_ORDERS_DB_USERNAME
-        - name: cpo-case-payment-orders-api-POSTGRES-PASS
+        - name: case-payment-orders-api-POSTGRES-PASS
           alias: CPO_CASE_PAYMENT_ORDERS_DB_PASSWORD
-        - name: cpo-case-payment-orders-api-POSTGRES-HOST
+        - name: case-payment-orders-api-POSTGRES-HOST
           alias: CPO_CASE_PAYMENT_ORDERS_DB_HOST
-        - name: cpo-case-payment-orders-api-POSTGRES-PORT
+        - name: case-payment-orders-api-POSTGRES-PORT
           alias: CPO_CASE_PAYMENT_ORDERS_DB_PORT
-        - name: cpo-case-payment-orders-api-POSTGRES-DATABASE
+        - name: case-payment-orders-api-POSTGRES-DATABASE
           alias: CPO_CASE_PAYMENT_ORDERS_DB_NAME
 
   environment:
