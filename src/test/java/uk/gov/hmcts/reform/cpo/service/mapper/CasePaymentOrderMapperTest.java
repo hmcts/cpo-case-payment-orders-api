@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.UUID;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
@@ -22,11 +21,9 @@ class CasePaymentOrderMapperTest {
     public void setUp() {
         mapper = new CasePaymentOrderMapperImpl();
 
-        UUID id = UUID.randomUUID();
         LocalDateTime date = LocalDateTime.now();
 
         entity = new CasePaymentOrderEntity();
-        entity.setId(id);
         entity.setCreatedTimestamp(date);
         entity.setEffectiveFrom(date);
         entity.setCaseId(1_234_123_412_341_234L);
@@ -37,7 +34,6 @@ class CasePaymentOrderMapperTest {
         entity.setCreatedBy("Bob");
 
         casePaymentOrder = CasePaymentOrder.builder()
-            .id(id)
             .createdTimestamp(entity.getCreatedTimestamp())
             .effectiveFrom(date)
             .caseId(1_234_123_412_341_234L)
@@ -52,8 +48,6 @@ class CasePaymentOrderMapperTest {
     @Test
     void successfulEntityMapping() {
         CasePaymentOrderEntity mappedEntity = mapper.toEntity(casePaymentOrder);
-        assertEquals("Mapped entity id should equals mocked entity id",
-                     entity.getId(), mappedEntity.getId());
         assertEquals("Mapped entity created timestamp should equals mocked entity created timestamp",
                      entity.getCreatedTimestamp().truncatedTo(ChronoUnit.SECONDS),
                      mappedEntity.getCreatedTimestamp().truncatedTo(ChronoUnit.SECONDS));
@@ -76,8 +70,6 @@ class CasePaymentOrderMapperTest {
     @Test
     void successfulDomainMapping() {
         CasePaymentOrder mappedDomainObject = mapper.toDomainModel(entity);
-        assertEquals("Mapped domain model id should equals mocked domain model id",
-                     casePaymentOrder.getId(), mappedDomainObject.getId());
         assertEquals("Mapped domain model created timestamp should equals mocked domain model created timestamp",
                      casePaymentOrder.getCreatedTimestamp(), mappedDomainObject.getCreatedTimestamp());
         assertEquals("Mapped domain model effective from should equals mocked domain model effective from",
