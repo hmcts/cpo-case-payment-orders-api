@@ -199,10 +199,10 @@ dependencies {
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   implementation group: 'org.mapstruct', name: 'mapstruct', version: versions.mapstruct
 
-  annotationProcessor group:'org.mapstruct', name: 'mapstruct-processor', version: versions.mapstruct
-  annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  compile group: 'org.flywaydb', name: 'flyway-core', version: '7.7.0'
 
-  runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.19'
+  annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: versions.mapstruct
+  annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   testImplementation libraries.junit5
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
@@ -221,6 +221,8 @@ dependencies {
   functionalTestImplementation sourceSets.main.runtimeClasspath
 
   smokeTestImplementation sourceSets.main.runtimeClasspath
+
+  runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.19'
 }
 
 mainClassName = 'uk.gov.hmcts.reform.cpo.Application'
@@ -238,3 +240,4 @@ bootJar {
 wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
+
