@@ -5,18 +5,24 @@ management:
   endpoint:
     health:
       show-details: "always"
+      cache:
+        time-to-live: 1000ms
   endpoints:
     web:
       base-path: /
       exposure:
         include: health, info, prometheus
+  health:
+    probes:
+      enabled: true
 
-#If you use a database then uncomment below lines and update db properties accordingly
 spring:
-  config:
-    import: "optional:configtree:/mnt/secrets/cpo"
   application:
     name: Case Payment Orders
+  banner:
+    location: classpath:case-payment-orders-banner.txt
+  config:
+    import: "optional:configtree:/mnt/secrets/cpo/"
   jackson:
     property-naming-strategy: SNAKE_CASE
   main:
@@ -27,25 +33,22 @@ spring:
       spec: expireAfterAccess=1800s
   datasource:
     driver-class-name: org.postgresql.Driver
-#    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_OPTIONS:}
-#    username: ${DB_USER_NAME}
-#    password: ${DB_PASSWORD}
-#    properties:
-#      charSet: UTF-8
-#    hikari:
-#      minimumIdle: 2
-#      maximumPoolSize: 10
-#      idleTimeout: 10000
-#      poolName: {to-be-defined}HikariCP
-#      maxLifetime: 7200000
-#      connectionTimeout: 30000
-#  jpa:
-#    properties:
-#      hibernate:
-#        jdbc:
-#          lob:
-#            # silence the 'wall-of-text' - unnecessary exception throw about blob types
-#            non_contextual_creation: true
+    url: jdbc:postgresql://${CPO_CASE_PAYMENT_ORDERS_DB_HOST:localhost}:${CPO_CASE_PAYMENT_ORDERS_DB_PORT:6968}/${CPO_CASE_PAYMENT_ORDERS_DB_NAME:cpo_case_payment_orders}${CPO_CASE_PAYMENT_ORDERS_DB_OPTIONS:}
+    username: ${CPO_CASE_PAYMENT_ORDERS_DB_USERNAME:cpo}
+    password: ${CPO_CASE_PAYMENT_ORDERS_DB_PASSWORD:cpo}
+    type: com.zaxxer.hikari.HikariDataSource
+  jpa:
+    database: postgresql
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    out-of-order: true
+    ignore-missing-migrations: true
   security:
     oauth2:
       client:

@@ -4,6 +4,10 @@
 *.class
 bin/main/application.yaml
 
+# BEFTA temp locations
+target/
+definition_files/
+
 ### STS ###
 .apt_generated
 .classpath
@@ -20,3 +24,6 @@ bin/main/application.yaml
 *.ipr
 
 .DS_Store
+
+/BEFTA Report for Smoke Tests/
+/BEFTA Report for Functional Tests/

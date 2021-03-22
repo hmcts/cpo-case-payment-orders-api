@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.time.temporal.ChronoUnit;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
@@ -21,23 +21,9 @@ class CasePaymentOrderMapperTest {
     public void setUp() {
         mapper = new CasePaymentOrderMapperImpl();
 
-        UUID id = UUID.randomUUID();
         LocalDateTime date = LocalDateTime.now();
 
-        casePaymentOrder = CasePaymentOrder.builder()
-            .id(id)
-            .createdTimestamp(date)
-            .effectiveFrom(date)
-            .caseId(1_234_123_412_341_234L)
-            .caseTypeId("Probate")
-            .action("Case Creation")
-            .responsibleParty("The executor on the will")
-            .orderReference("Bob123")
-            .createdBy("Bob")
-            .build();
-
         entity = new CasePaymentOrderEntity();
-        entity.setId(id);
         entity.setCreatedTimestamp(date);
         entity.setEffectiveFrom(date);
         entity.setCaseId(1_234_123_412_341_234L);
@@ -46,15 +32,25 @@ class CasePaymentOrderMapperTest {
         entity.setResponsibleParty("The executor on the will");
         entity.setOrderReference("Bob123");
         entity.setCreatedBy("Bob");
+
+        casePaymentOrder = CasePaymentOrder.builder()
+            .createdTimestamp(entity.getCreatedTimestamp())
+            .effectiveFrom(date)
+            .caseId(1_234_123_412_341_234L)
+            .caseTypeId("Probate")
+            .action("Case Creation")
+            .responsibleParty("The executor on the will")
+            .orderReference("Bob123")
+            .createdBy("Bob")
+            .build();
     }
 
     @Test
     void successfulEntityMapping() {
         CasePaymentOrderEntity mappedEntity = mapper.toEntity(casePaymentOrder);
-        assertEquals("Mapped entity id should equals mocked entity id",
-                     entity.getId(), mappedEntity.getId());
         assertEquals("Mapped entity created timestamp should equals mocked entity created timestamp",
-                     entity.getCreatedTimestamp(), mappedEntity.getCreatedTimestamp());
+                     entity.getCreatedTimestamp().truncatedTo(ChronoUnit.SECONDS),
+                     mappedEntity.getCreatedTimestamp().truncatedTo(ChronoUnit.SECONDS));
         assertEquals("Mapped entity effective from should equals mocked entity effective from",
                      entity.getEffectiveFrom(), mappedEntity.getEffectiveFrom());
         assertEquals("Mapped entity case id should equals mocked entity case id",
@@ -74,8 +70,6 @@ class CasePaymentOrderMapperTest {
     @Test
     void successfulDomainMapping() {
         CasePaymentOrder mappedDomainObject = mapper.toDomainModel(entity);
-        assertEquals("Mapped domain model id should equals mocked domain model id",
-                     casePaymentOrder.getId(), mappedDomainObject.getId());
         assertEquals("Mapped domain model created timestamp should equals mocked domain model created timestamp",
                      casePaymentOrder.getCreatedTimestamp(), mappedDomainObject.getCreatedTimestamp());
         assertEquals("Mapped domain model effective from should equals mocked domain model effective from",
