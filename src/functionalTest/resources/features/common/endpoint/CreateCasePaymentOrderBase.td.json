@@ -1,0 +1,25 @@
+{
+  "_guid_" : "createCasePaymentOrderBase",
+
+  "productName": "Case Payment Orders Microservice",
+  "operationName": "createCasePaymentOrder",
+
+  "method": "POST",
+  "uri": "***TODO***",
+
+  "specs": [
+    "intends to Create a case payment order"
+  ],
+
+  "users": {
+
+  },
+
+  "s2sClientId": "TODO",
+  "userTokenClientId": "TODO",
+
+  "request" : {
+    "_extends_": "Common_Request"
+  }
+
+}

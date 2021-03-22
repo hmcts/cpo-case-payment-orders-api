@@ -1,0 +1,20 @@
+{
+  "_guid_" : "S-101.3.1",
+  "_extends_" : "createCasePaymentOrderBase",
+
+  "specs": [
+    "an invalid mandatory parameter",
+    "an incorrect caseid format"
+  ],
+
+  "request" : {
+    "body" : {
+      "_extends_" : "Base_CPO_Data",
+      "case_id" : "1234567890123456"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "400_Response"
+  }
+}

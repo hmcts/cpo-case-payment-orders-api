@@ -1,0 +1,23 @@
+{
+  "_guid_" : "S-101.2.1",
+  "_extends_" : "S-102_Base",
+
+  "specs": [
+    "does not contain the effective_from parameter"
+  ],
+
+  "request" : {
+    "_extends_": "Common_Request",
+    "body": {
+      "case_id" : "1615819590019905",
+      "case_type_id" : "FT_MasterCaseType",
+      "action" : "payday",
+      "responsible_party" : "party1",
+      "order_reference" : "order1"
+    }
+  },
+
+  "expectedResponse" : {
+
+  }
+}

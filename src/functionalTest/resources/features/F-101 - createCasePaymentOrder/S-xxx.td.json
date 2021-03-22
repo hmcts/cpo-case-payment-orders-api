@@ -1,0 +1,15 @@
+{
+  "_guid_" : "S-101",
+  "_extends_" : "createCasePaymentOrderBase",
+
+  "specs": [
+  ],
+
+  "request" : {
+    "_extends_": "Common_Request"
+  },
+
+  "expectedResponse" : {
+
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "_guid_" : "Prerequisite_Create_CPO",
+  "_extends_" : "createCasePaymentOrderBase",
+
+  "specs" : "to create a case payment order for the created case",
+
+  "request" : {
+    "body" : {
+      "_extends_" : "Base_CPO_Data"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_201_Response"
+  }
+}

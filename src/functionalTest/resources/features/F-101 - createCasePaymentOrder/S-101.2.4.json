@@ -1,0 +1,23 @@
+{
+  "_guid_" : "S-101.2.4",
+  "_extends_" : "S-102_Base",
+
+  "specs": [
+    "does not contain the action parameter"
+  ],
+
+  "request" : {
+    "_extends_": "Common_Request",
+    "body": {
+      "effective_from" : "2021-01-01T00:00:00Z",
+      "case_id" : "1615819590019905",
+      "case_type_id" : "FT_MasterCaseType",
+      "responsible_party" : "party1",
+      "order_reference" : "order1"
+    }
+  },
+
+  "expectedResponse" : {
+
+  }
+}

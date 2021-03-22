@@ -1,0 +1,17 @@
+{
+  "_guid_" : "S-101.4",
+  "_extends_" : "createCasePaymentOrderBase",
+
+  "specs": [
+    "all the mandatory parameters",
+    "the same order_reference as used in the previously created CPO for the same case id"
+  ],
+
+  "request" : {
+    "_extends_" : "Base_CPO_Data"
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "400_Response"
+  }
+}
