@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo.data;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -20,6 +21,7 @@ public class CasePaymentOrderEntity {
 
     @Id
     @GeneratedValue
+    @Setter(AccessLevel.NONE)
     private UUID id;
 
     @CreationTimestamp

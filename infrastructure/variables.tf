@@ -23,3 +23,54 @@ variable "tenant_id" {
 variable "jenkins_AAD_objectId" {
   description = "(Required) The Azure AD object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies."
 }
+
+variable "subscription" {
+}
+
+
+////////////////////////////////
+// Database
+////////////////////////////////
+
+// Define the default values for optional parameters (see https://github.com/hmcts/cnp-module-postgres)
+variable "sku_name" {
+  default = "GP_Gen5_2"
+}
+
+variable "sku_tier" {
+  default = "GeneralPurpose"
+}
+
+variable "storage_mb" {
+  default = "51200"
+}
+
+variable "sku_capacity" {
+  default = "2"
+}
+
+variable "ssl_enforcement" {
+  default = "Enabled"
+}
+
+variable "backup_retention_days" {
+  default = "35"
+}
+
+variable "georedundant_backup" {
+  default = "Enabled"
+}
+
+// Define the values for mandatory/required parameters (see https://github.com/hmcts/cnp-module-postgres)
+
+variable "postgresql_user" {
+  default = "cpo"
+}
+
+variable "database_name" {
+  default = "cpo_case_payment_orders"
+}
+
+variable "postgresql_version" {
+  default = "11"
+}
