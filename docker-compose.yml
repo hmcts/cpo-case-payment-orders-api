@@ -6,7 +6,11 @@ services:
     image: "hmctspublic.azurecr.io/cpo/case-payment-orders-api:latest"
     container_name: case-payment-orders-api
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://cpo-db:5432/cpo
+      CPO_CASE_PAYMENT_ORDERS_DB_HOST: cpo-db
+      CPO_CASE_PAYMENT_ORDERS_DB_PORT: 5432
+      CPO_CASE_PAYMENT_ORDERS_DB_NAME: ${DB_NAME}
+      CPO_CASE_PAYMENT_ORDERS_DB_USERNAME: ${DB_USERNAME}
+      CPO_CASE_PAYMENT_ORDERS_DB_PASSWORD: ${DB_PASSWORD}
       CPO_S2S_AUTHORISED_SERVICES: xui_webapp
       IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
@@ -20,11 +24,11 @@ services:
     image: postgres:11.11
     restart: always
     environment:
-      - POSTGRES_DB=cpo
-      - POSTGRES_USER=cpo
-      - POSTGRES_PASSWORD=cpo
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     ports:
-      - 5678:5432
+      - 6968:5432
     volumes:
       - cpo-database-data:/var/lib/postgresql/data
 

@@ -113,7 +113,7 @@ export TEST_URL=http://localhost:4457
 ```
 
 > Note: These are the tests run against an environment.
-> Please see cpo-docker/README.md for local environment testing.
+> Please see [cpo-docker/README.md](./cpo-docker/README.md) for local environment testing.
 >
 > If you would like to test against AAT dependencies then run `docker-compose up`.
 > Also set the required environment variables that can be found by reviewing the contents of this project's

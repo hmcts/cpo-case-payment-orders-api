@@ -7,9 +7,13 @@ services:
     container_name: case-payment-orders-api
     environment:
       SERVER_PORT: 4457
+      CPO_CASE_PAYMENT_ORDERS_DB_HOST: cpo-db
+      CPO_CASE_PAYMENT_ORDERS_DB_PORT: 5432
+      CPO_CASE_PAYMENT_ORDERS_DB_NAME: ${DB_NAME}
+      CPO_CASE_PAYMENT_ORDERS_DB_USERNAME: ${DB_USERNAME}
+      CPO_CASE_PAYMENT_ORDERS_DB_PASSWORD: ${DB_PASSWORD}
       IDAM_API_URL: "${IDAM_STUB_SERVICE_NAME:-http://idam-api:5000}"
       IDAM_OIDC_URL: "${IDAM_STUB_SERVICE_NAME:-http://idam-api:5000}"
-      SPRING_DATASOURCE_URL: jdbc:postgresql://cpo-db:5432/cpo
       S2S_URL: http://service-auth-provider-api:8080
       CPO_S2S_AUTHORISED_SERVICES: xui_webapp
     ports:
@@ -23,11 +27,11 @@ services:
     image: postgres:11.11
     restart: always
     environment:
-      - POSTGRES_DB=cpo
-      - POSTGRES_USER=cpo
-      - POSTGRES_PASSWORD=cpo
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     ports:
-      - 5678:5432
+      - 6968:5432
     networks:
       - ccd-network
     volumes:
