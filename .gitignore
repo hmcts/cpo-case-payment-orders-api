@@ -4,6 +4,10 @@
 *.class
 bin/main/application.yaml
 
+# BEFTA temp locations
+target/
+definition_files/
+
 ### STS ###
 .apt_generated
 .classpath

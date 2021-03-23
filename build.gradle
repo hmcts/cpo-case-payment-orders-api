@@ -71,6 +71,7 @@ task functional(type: Test) {
                '--strict',
                '--threads', '10',
                '--plugin', "json:${rootDir}/target/cucumber.json",
+               '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
                '--tags', 'not @Ignore',
                '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
              ]
@@ -118,6 +119,7 @@ task smoke(type: Test) {
       args = [
                '--strict',
                '--plugin', "json:${rootDir}/target/cucumber.json",
+               '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
                '--tags', '@Smoke and not @Ignore',
                '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
              ]
@@ -252,6 +254,7 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
 
   implementation "org.springframework.security:spring-security-web"
   implementation "org.springframework.security:spring-security-config"

@@ -10,14 +10,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import uk.gov.hmcts.reform.cpo.payload.CasePaymentOrderRequest;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestHeader;
+import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
+import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 
 
-import java.util.UUID;
-
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
@@ -80,8 +81,9 @@ public class CasePaymentOrdersController {
         )
     })
 
-    public UUID createPaymentOrder(@RequestBody CasePaymentOrderRequest requestPayload) {
-        LOG.info(String.valueOf(requestPayload)); //add fields to log
-        return casePaymentOrdersService.createCasePaymentOrder(requestPayload);
+    public CasePaymentOrder createCasePaymentOrderRequest(@RequestBody CreateCasePaymentOrderRequest requestPayload,
+                                                          @RequestHeader(AUTHORIZATION) String authorizationHeader) {
+        LOG.info(String.valueOf(requestPayload), authorizationHeader);
+        return casePaymentOrdersService.createCasePaymentOrder(requestPayload, authorizationHeader);
     }
 }

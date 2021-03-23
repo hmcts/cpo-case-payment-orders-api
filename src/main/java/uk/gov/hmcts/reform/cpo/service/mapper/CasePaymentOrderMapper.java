@@ -1,11 +1,10 @@
 package uk.gov.hmcts.reform.cpo.service.mapper;
 
 import org.mapstruct.Mapper;
-import uk.gov.hmcts.reform.cpo.payload.CasePaymentOrderRequest;
+import org.mapstruct.Mapping;
+import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
-
-import java.time.LocalDateTime;
 
 @Mapper(componentModel = "spring")
 public interface CasePaymentOrderMapper {
@@ -14,6 +13,9 @@ public interface CasePaymentOrderMapper {
 
     CasePaymentOrder toDomainModel(CasePaymentOrderEntity casePaymentOrderEntity);
 
-    CasePaymentOrder toRequest(CasePaymentOrderRequest casePaymentOrderRequest, String createdBy,
-                               LocalDateTime createdTimestamp);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdTimestamp", ignore = true)
+    CasePaymentOrder fromCreateCasePaymentOrder(CreateCasePaymentOrderRequest createCasePaymentOrderRequest,
+                                                String createdBy);
 }
