@@ -17,7 +17,7 @@ services:
       - cpo-db
 
   cpo-db:
-    image: postgres:9.6
+    image: postgres:11.11
     restart: always
     environment:
       - POSTGRES_DB=cpo
