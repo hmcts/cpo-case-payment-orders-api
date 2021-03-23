@@ -7,10 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
-import uk.gov.hmcts.reform.cpo.security.IdamRepository;
+import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapperImpl;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -36,7 +37,7 @@ class CasePaymentOrdersServiceImplTest {
     private CasePaymentOrder casePaymentOrderIncoming;
 
     @Mock
-    private IdamRepository idamRepository;
+    private SecurityUtils securityUtils;
 
     @Mock
     private CreateCasePaymentOrderRequest createCasePaymentOrderRequest;
@@ -44,65 +45,92 @@ class CasePaymentOrdersServiceImplTest {
     @Mock
     private UserInfo userInfo;
 
+    @Mock
+    CasePaymentOrderEntity requestEntity;
+
+    @Mock
+    CasePaymentOrderEntity savedEntity;
+
     private LocalDateTime effectiveFrom = LocalDateTime.of(2021, Month.MARCH, 24, 11, 48,
-                                                            32);
-    private Long caseId = 1122334455667788L;
-    private String caseTypeId = "caseType";
-    private String action = "action";
-    private String responsibleParty = "responsibleParty";
-    private String orderReference = "orderReference";
-    private UUID id = UUID.randomUUID();
-    private String createdBy = "createdBy";
-    private LocalDateTime date = LocalDateTime.now();
-    private String userToken = "userToken";
+                                                           32);
+    private static final Long CASE_ID = 1122334455667788L;
+    private static final String CASE_TYPE_ID = "caseType";
+    private static final String ACTION = "action";
+    private static final String RESPONSIBLE_PARTY = "responsibleParty";
+    private static final String ORDER_REFERENCE = "orderReference";
+    private static final UUID ID = UUID.randomUUID();
+    private static final String CREATED_BY = "createdBy";
+    private static final LocalDateTime CREATED_TIMESTAMP = LocalDateTime.now();
 
     @BeforeEach
     public void setUp() {
-
-
         MockitoAnnotations.openMocks(this);
-
-        userInfo = UserInfo.builder()
-            .uid(createdBy)
-            .build();
-
-        casePaymentOrdersService = new CasePaymentOrdersServiceImpl(casePaymentOrdersRepository, mapper,
-                                                                    idamRepository);
-        createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(
-            effectiveFrom,
-            caseId,
-            caseTypeId,
-            action,
-            responsibleParty,
-            orderReference
-        );
-
-        casePaymentOrderIncoming = CasePaymentOrder.builder()
-            .effectiveFrom(effectiveFrom)
-            .caseId(caseId)
-            .caseTypeId(caseTypeId)
-            .action(action)
-            .responsibleParty(responsibleParty)
-            .orderReference(orderReference)
-            .createdBy(createdBy)
-            .id(id)
-            .createdTimestamp(date)
-            .build();
     }
 
     @Nested
     @DisplayName("Create Case Payment Order")
     class CreateCasePaymentOrder {
 
+        @BeforeEach
+        public void setUp() {
+
+
+            userInfo = UserInfo.builder()
+                .uid(CREATED_BY)
+                .build();
+
+            casePaymentOrdersService = new CasePaymentOrdersServiceImpl(casePaymentOrdersRepository, mapper,
+                                                                        securityUtils);
+            createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(
+                effectiveFrom,
+                CASE_ID,
+                CASE_TYPE_ID,
+                ACTION,
+                RESPONSIBLE_PARTY,
+                ORDER_REFERENCE
+            );
+
+            casePaymentOrderIncoming = CasePaymentOrder.builder()
+                .effectiveFrom(effectiveFrom)
+                .caseId(CASE_ID)
+                .caseTypeId(CASE_TYPE_ID)
+                .action(ACTION)
+                .responsibleParty(RESPONSIBLE_PARTY)
+                .orderReference(ORDER_REFERENCE)
+                .createdBy(CREATED_BY)
+                .id(ID)
+                .createdTimestamp(CREATED_TIMESTAMP)
+                .build();
+
+            requestEntity.setEffectiveFrom(effectiveFrom);
+            requestEntity.setCaseId(CASE_ID);
+            requestEntity.setCaseTypeId(CASE_TYPE_ID);
+            requestEntity.setAction(ACTION);
+            requestEntity.setResponsibleParty(RESPONSIBLE_PARTY);
+            requestEntity.setOrderReference(ORDER_REFERENCE);
+            requestEntity.setCreatedBy(CREATED_BY);
+
+            savedEntity.setEffectiveFrom(effectiveFrom);
+            savedEntity.setCaseId(CASE_ID);
+            savedEntity.setCaseTypeId(CASE_TYPE_ID);
+            savedEntity.setAction(ACTION);
+            savedEntity.setResponsibleParty(RESPONSIBLE_PARTY);
+            savedEntity.setOrderReference(ORDER_REFERENCE);
+            savedEntity.setCreatedBy(CREATED_BY);
+            savedEntity.setCreatedTimestamp(CREATED_TIMESTAMP);
+        }
+
         @Test
         @DisplayName("Should create CasePaymentOrder successfully")
         void shouldCreateCasePaymentOrder() {
-            given(idamRepository.getUserInfo(userToken)).willReturn(userInfo);
-            given(casePaymentOrdersService.createCasePaymentOrder(createCasePaymentOrderRequest,userToken))
-                .willReturn(casePaymentOrderIncoming);
+            given(securityUtils.getUserInfo()).willReturn(userInfo);
+            given(mapper.toEntity(createCasePaymentOrderRequest, CREATED_BY)).willReturn(requestEntity);
+            given(casePaymentOrdersRepository.save(requestEntity)).willReturn(savedEntity);
+            given(mapper.toDomainModel(savedEntity)).willReturn(casePaymentOrderIncoming);
             CasePaymentOrder caseOrderReturn = casePaymentOrdersService
-                .createCasePaymentOrder(createCasePaymentOrderRequest, userToken);
-            assertThat("UUID does not match", caseOrderReturn.getId().equals(id));
+                .createCasePaymentOrder(createCasePaymentOrderRequest);
+            assertThat("UUID does not match expected", caseOrderReturn.getId().equals(ID));
+            assertThat("Returned entity does not match expected", caseOrderReturn.equals(casePaymentOrderIncoming));
         }
     }
 }

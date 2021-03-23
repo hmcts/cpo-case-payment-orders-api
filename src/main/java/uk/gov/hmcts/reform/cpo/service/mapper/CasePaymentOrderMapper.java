@@ -11,11 +11,10 @@ public interface CasePaymentOrderMapper {
 
     CasePaymentOrderEntity toEntity(CasePaymentOrder casePaymentOrder);
 
-    CasePaymentOrder toDomainModel(CasePaymentOrderEntity casePaymentOrderEntity);
-
-
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdTimestamp", ignore = true)
-    CasePaymentOrder fromCreateCasePaymentOrder(CreateCasePaymentOrderRequest createCasePaymentOrderRequest,
+    CasePaymentOrderEntity toEntity(CreateCasePaymentOrderRequest createCasePaymentOrderRequest,
                                                 String createdBy);
+
+    CasePaymentOrder toDomainModel(CasePaymentOrderEntity casePaymentOrderEntity);
 }

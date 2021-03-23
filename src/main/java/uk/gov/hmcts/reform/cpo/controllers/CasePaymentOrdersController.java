@@ -12,13 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestHeader;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
-
-
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import javax.validation.Valid;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
@@ -81,9 +78,8 @@ public class CasePaymentOrdersController {
         )
     })
 
-    public CasePaymentOrder createCasePaymentOrderRequest(@RequestBody CreateCasePaymentOrderRequest requestPayload,
-                                                          @RequestHeader(AUTHORIZATION) String authorizationHeader) {
-        LOG.info(String.valueOf(requestPayload), authorizationHeader);
-        return casePaymentOrdersService.createCasePaymentOrder(requestPayload, authorizationHeader);
+    public CasePaymentOrder createCasePaymentOrderRequest(@Valid @RequestBody CreateCasePaymentOrderRequest
+                                                                  requestPayload) {
+        return casePaymentOrdersService.createCasePaymentOrder(requestPayload);
     }
 }
