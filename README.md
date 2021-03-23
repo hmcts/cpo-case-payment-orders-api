@@ -1,16 +1,15 @@
-# cpo-case-payment-orders-api
+# Case Payment Orders API
+
+This micro-service provides a set of APIs to manage case payment orders.
 
 [![API Docs](https://img.shields.io/badge/API%20Docs-site-e140ad.svg)](https://hmcts.github.io/reform-api-docs/swagger.html?url=https://hmcts.github.io/reform-api-docs/specs/cpo-case-payment-orders-api.json)
 
 [![Build Status](https://travis-ci.org/hmcts/cpo-case-payment-orders-api.svg?branch=master)](https://travis-ci.org/hmcts/cpo-case-payment-orders-api)
 
-## Notes
+## Getting Started
 
-Since Spring Boot 2.1 bean overriding is disabled. If you want to enable it you will need to set `spring.main.allow-bean-definition-overriding` to `true`.
-
-JUnit 5 is now enabled by default in the project. Please refrain from using JUnit4 and use the next generation
-
-## Building and deploying the application
+### Prerequisites
+- [JDK 11](https://java.com)
 
 ### Building the application
 
@@ -88,7 +87,6 @@ docker image rm <image-id>
 ```
 
 There is no need to remove postgres and java or similar core images.
-
 
 ## Developing
 
