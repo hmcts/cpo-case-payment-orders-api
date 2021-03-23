@@ -1,0 +1,25 @@
+{
+  "_guid_": "S-705.3",
+  "_extends_": "F-705-Base",
+
+  "title": "Must successfully allow access of the DeleteCasePaymentOrder API for a CRUD whitelisted service",
+
+  "method": "DELETE",
+
+  "specs": [
+    "a new Case-Payment-Order microservice has been established",
+    "a CRUD whitelist exists for the invoking service",
+    "intends to delete a new payment order",
+    "contains all the mandatory parameters"
+  ],
+
+  "request": {
+    "queryParams": {
+      "ids": "${[scenarioContext][childContexts][F-705_Prerequisite_Case_Payment_Order_Creation][testData][actualResponse][body][id]"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "_guid_": "S-705.1",
+  "_extends_": "F-705-Base",
+
+  "title": "Must successfully allow access of the AddCasePaymentOrder API for a CRUD whitelisted service",
+
+  "operationName": "Get Assignments in My Organisation",
+
+  "method": "POST",
+
+  "specs": [
+    "a new Case-Payment-Order microservice has been established",
+    "a CRUD whitelist exists for the invoking service",
+    "intends to create a new payment order",
+    "contains all the mandatory parameters"
+  ],
+
+  "request": {
+    "body": {
+      "_extends_": "Base_Case_Payment_Order"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "id": "[[ANY_STRING_NOT_NULLABLE]]",
+      "created_timestamp": "[[ANYTHING_PRESENT]]",
+      "effective_from": "2021-02-10T03:02:30Z",
+      "case_id": "1612345678123456",
+      "action": "Pay up",
+      "responsible_party": "John Doe",
+      "order_reference": "2021-918425346",
+      "created_by": "[[ANY_STRING_NOT_NULLABLE]]"
+    }
+  }
+}

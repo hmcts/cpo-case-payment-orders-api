@@ -1,0 +1,20 @@
+{
+  "_guid_": "F-705-Base",
+
+  "productName": "Case Payment Order API",
+
+  "uri": "/case-payment-orders",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": ""
+    }
+  },
+
+  "s2sClientId": "TODO",
+  "userTokenClientId": "TODO",
+
+  "request": {
+    "_extends_": "Common_Request"
+  }
+}

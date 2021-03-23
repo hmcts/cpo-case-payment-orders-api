@@ -1,0 +1,28 @@
+{
+  "_guid_": "S-705.4",
+  "_extends_": "F-705-Base",
+
+  "title": "Must refuse access of the AddCasePaymentOrder API for a Non-CRUD whitelisted service",
+
+  "method": "POST",
+
+  "specs": [
+    "a new Case-Payment-Order microservice has been established",
+    "a CRUD whitelist exists for the invoking service",
+    "intends to create a new payment order",
+    "contains all the mandatory parameters"
+  ],
+
+  "request": {
+    "body": {
+      "_extends_": "Base_Case_Payment_Order"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "body": {
+      "message": "Service does not possess the required CRUD permissions to access this resource"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "_guid_": "S-705.6",
+  "_extends_": "F-705-Base",
+
+  "title": "Must refuse access of the DeleteCasePaymentOrder API for a Non-CRUD whitelisted service",
+
+  "method": "DELETE",
+
+  "specs": [
+    "a new Case-Payment-Order microservice has been established",
+    "a CRUD whitelist exists for the invoking service",
+    "intends to delete a payment order",
+    "contains all the mandatory parameters"
+  ],
+
+  "request": {
+    "queryParams": {
+      "ids": "${[scenarioContext][childContexts][F-705_Prerequisite_Case_Payment_Order_Creation][testData][actualResponse][body][id]"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "body": {
+      "message": "Service does not possess the required CRUD permissions to access this resource"
+    }
+  }
+}

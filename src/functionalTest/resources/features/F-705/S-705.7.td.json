@@ -1,0 +1,28 @@
+{
+  "_guid_": "S-705.7",
+  "_extends_": "F-705-Base",
+
+  "title": "Must successfully allow READ access of the GetCasePaymentOrder API for a R permissions service (ExUI)",
+
+  "method": "GET",
+
+  "specs": [
+    "a new Case-Payment-Order microservice has been established",
+    "a CRUD whitelist exists for the invoking service",
+    "intends to get payment orders",
+    "contains all the mandatory parameters"
+  ],
+
+  "request": {
+    "queryParams": {
+      "ids": "${[scenarioContext][childContexts][F-705_Prerequisite_Case_Payment_Order_Creation][testData][actualResponse][body][id]"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+
+    }
+  }
+}

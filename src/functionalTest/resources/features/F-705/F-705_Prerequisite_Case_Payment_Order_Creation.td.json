@@ -1,0 +1,31 @@
+{
+  "_guid_": "F-705_Prerequisite_Case_Payment_Order_Creation",
+  "title": "",
+
+  "method": "POST",
+  "uri": "/case-payment-orders",
+
+  "s2sClientId": "TODO",
+  "userTokenClientId": "TODO",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "_extends_": "Base_Case_Payment_Order"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "id": "[[ANY_STRING_NOT_NULLABLE]]",
+      "created_timestamp": "[[ANYTHING_PRESENT]]",
+      "effective_from": "2021-02-10T03:02:30Z",
+      "case_id": "1612345678123456",
+      "action": "Pay up",
+      "responsible_party": "John Doe",
+      "order_reference": "2021-918425346",
+      "created_by": "[[ANY_STRING_NOT_NULLABLE]]"
+    }
+  }
+}

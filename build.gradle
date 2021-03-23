@@ -188,6 +188,7 @@ sonarqube {
 }
 
 def versions = [
+  commonsLang3    : '3.11',
   junit           : '5.7.1',
   junitPlatform   : '1.7.1',
   lombok          : '1.18.8',
@@ -273,6 +274,9 @@ dependencies {
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   implementation group: 'org.mapstruct', name: 'mapstruct', version: versions.mapstruct
 
+  implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+  implementation group: 'org.apache.commons', name: 'commons-lang3', version: versions.commonsLang3
+
   compile group: 'org.flywaydb', name: 'flyway-core', version: '7.7.0'
 
   annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: versions.mapstruct
@@ -283,7 +287,7 @@ dependencies {
     exclude group: 'junit', module: 'junit'
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
-    
+
   // groovy v3.* added to avoid 'WARNING: Illegal reflective access by org.codehaus.groovy.reflection.CachedClass'
   // in groovy:2.5.* when running functional/befta tests
   testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.3'
