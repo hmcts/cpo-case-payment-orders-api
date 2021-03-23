@@ -17,7 +17,10 @@ see [Run `ccd-docker` containers](#Run-ccd-docker-containers) for details
     cd cpo-docker/bin
     source env_variables_all.txt
   ```
-
+> Note: For details of the emails and passwords to use in a local environment see the
+> [Create users and roles](https://github.com/hmcts/ccd-docker#3-create-users-and-roles) steps in
+> [ccd-docker](https://github.com/hmcts/ccd-docker) project.
+>
 ### Run `ccd-docker` containers
 - Install and run CCD stack as advised [here](https://github.com/hmcts/ccd-docker).
 
@@ -25,7 +28,7 @@ see [Run `ccd-docker` containers](#Run-ccd-docker-containers) for details
     ./ccd enable backend sidam sidam-local sidam-local-ccd
     ```
 
-## CPO
+### CPO
 
 Please run cpo docker as follows.
 ```
