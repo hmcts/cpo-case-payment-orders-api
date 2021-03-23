@@ -46,6 +46,11 @@ spring:
       hibernate:
         jdbc:
           time_zone: UTC
+      org:
+        hibernate:
+          envers:
+            audit_table_suffix: _audit
+
   flyway:
     out-of-order: true
     ignore-missing-migrations: true

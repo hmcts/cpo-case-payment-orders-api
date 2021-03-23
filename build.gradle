@@ -273,6 +273,8 @@ dependencies {
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   implementation group: 'org.mapstruct', name: 'mapstruct', version: versions.mapstruct
 
+  implementation group: 'org.hibernate', name: 'hibernate-envers', version: '5.4.30.Final'
+
   compile group: 'org.flywaydb', name: 'flyway-core', version: '7.7.0'
 
   annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: versions.mapstruct
