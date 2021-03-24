@@ -5,11 +5,9 @@ import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.RevisionType;
 import org.hibernate.envers.query.AuditEntity;
-import org.junit.ClassRule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.testcontainers.containers.PostgreSQLContainer;
 import uk.gov.hmcts.reform.cpo.BaseTest;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
@@ -27,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static uk.gov.hmcts.reform.cpo.repository.PostgresqlContainer.getInstance;
 
 @SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage", "PMD.DataflowAnomalyAnalysis"})
 public class CasePaymentOrdersAuditTest extends BaseTest {
@@ -37,9 +34,6 @@ public class CasePaymentOrdersAuditTest extends BaseTest {
 
     @Autowired
     private CasePaymentOrderMapper casePaymentOrderMapper;
-
-    @ClassRule
-    public PostgreSQLContainer postgreSQLContainer = getInstance();
 
     @Autowired
     EntityManagerFactory entityManagerFactory;
