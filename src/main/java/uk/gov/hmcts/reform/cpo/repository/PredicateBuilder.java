@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 @Getter
 public class PredicateBuilder {
 
-    final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter;
-    final List<Predicate> predicates = new ArrayList<Predicate>();
+    private final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter;
+    private final List<Predicate> predicates = new ArrayList<Predicate>();
     private static final String CASE_ID = "caseId";
     private static final String IDS = "id";
     private Predicate currentPredicate;
