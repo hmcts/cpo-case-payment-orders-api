@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.cpo.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.TextCodec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -11,6 +10,7 @@ import uk.gov.hmcts.reform.cpo.exception.UnauthorisedServiceException;
 
 import java.util.Date;
 
+import static io.jsonwebtoken.impl.TextCodec.BASE64;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -33,7 +33,8 @@ public class SecurityUtilsTest {
 
     @Test
     public void isReadOnlyServiceShouldThrowException() {
-        assertThrows(UnauthorisedServiceException.class, () -> securityUtils.isReadOnlyService(generateDummyS2SToken(READ_ONLY_SERVICE)));
+        assertThrows(UnauthorisedServiceException.class, () ->
+            securityUtils.isReadOnlyService(generateDummyS2SToken(READ_ONLY_SERVICE)));
     }
 
     @Test
@@ -50,7 +51,7 @@ public class SecurityUtilsTest {
         return Jwts.builder()
             .setSubject(serviceName)
             .setIssuedAt(new Date())
-            .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
+            .signWith(SignatureAlgorithm.HS256, BASE64.encode("AA"))
             .compact();
     }
 }
