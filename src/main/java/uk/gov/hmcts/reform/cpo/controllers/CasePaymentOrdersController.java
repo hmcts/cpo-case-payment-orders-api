@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
+import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,21 +24,30 @@ public class CasePaymentOrdersController {
     }
 
 
-    @GetMapping(value = "cases/payments/orders", produces = {"application/json"})
+    @GetMapping(value = "case-payment-orders", produces = {"application/json"})
     public List<CasePaymentOrder> getCasePaymentOrders(@ApiParam(value = "list of ids")
                                                        @RequestParam("ids") Optional<List<String>> ids,
                                                        @ApiParam(value = "list of ids")
-                                                       @RequestParam("ids") Optional<List<String>> casesId,
-                                                       @RequestParam("ids") Optional<Integer> pageSize,
-                                                       @RequestParam("ids") Optional<Integer> pageNumber
+                                                       @RequestParam("casesId") Optional<List<String>> casesId,
+                                                       @RequestParam("pageSize") Optional<Integer> pageSize,
+                                                       @RequestParam("pageNumber") Optional<Integer> pageNumber
 
     ){
-        return casePaymentOrdersServiceImpl.getCasePaymentOrders(
-            ids,
-            casesId,
-            pageSize.orElse(CasePaymentOrdersServiceImpl.DEFAULT_PAGE_SIZE),
-            pageNumber.orElse(CasePaymentOrdersServiceImpl.DEFAULT_PAGE_NUMBER)
-        );
+        final List<String> listOfIds = ids.orElse(Collections.emptyList());
+        final List<String> listOfCasesIds = casesId.orElse(Collections.emptyList());
+        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
+            .listOfIds(listOfIds)
+            .listOfCasesIds(listOfCasesIds)
+            .pageNumber(pageNumber.orElse(CasePaymentOrdersServiceImpl.DEFAULT_PAGE_NUMBER))
+            .pageSize(pageSize.orElse(CasePaymentOrdersServiceImpl.DEFAULT_PAGE_SIZE))
+            .build();
+
+        return casePaymentOrdersServiceImpl.getCasePaymentOrders(casePaymentOrderQueryFilter);
     }
 
+    //TODO this is not going to be included in final pr
+    @GetMapping(value = "case-payment-orders-test-data", produces = {"application/json"})
+    public void createData(){
+        casePaymentOrdersServiceImpl.create();
+    }
 }
