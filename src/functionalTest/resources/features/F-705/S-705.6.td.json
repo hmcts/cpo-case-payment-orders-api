@@ -13,6 +13,9 @@
     "contains all the mandatory parameters"
   ],
 
+  "s2sClientId": "xui_webapp",
+  "userTokenClientId": "xuiwebapp",
+
   "request": {
     "queryParams": {
       "ids": "${[scenarioContext][childContexts][F-705_Prerequisite_Case_Payment_Order_Creation][testData][actualResponse][body][id]"

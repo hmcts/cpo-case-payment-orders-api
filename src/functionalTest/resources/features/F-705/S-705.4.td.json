@@ -13,6 +13,9 @@
     "contains all the mandatory parameters"
   ],
 
+  "s2sClientId": "xui_webapp",
+  "userTokenClientId": "xuiwebapp",
+
   "request": {
     "body": {
       "_extends_": "Base_Case_Payment_Order"

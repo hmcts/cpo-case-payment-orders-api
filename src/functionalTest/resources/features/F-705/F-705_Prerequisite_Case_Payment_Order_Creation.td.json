@@ -1,12 +1,18 @@
 {
   "_guid_": "F-705_Prerequisite_Case_Payment_Order_Creation",
-  "title": "",
+  "title": "Create Case Payment Order that can later be fetched, altered or deleted",
 
   "method": "POST",
   "uri": "/case-payment-orders",
 
   "s2sClientId": "TODO",
   "userTokenClientId": "TODO",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "Common_User_For_Request"
+    }
+  },
 
   "request": {
     "_extends_": "Common_Request",

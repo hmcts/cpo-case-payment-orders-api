@@ -13,8 +13,11 @@
     "contains all the mandatory parameters"
   ],
 
-  "request": {
+  "s2sClientId": "xui_webapp",
+  "userTokenClientId": "xuiwebapp",
 
+  "request": {
+    "body": "TBC"
   },
 
   "expectedResponse": {
