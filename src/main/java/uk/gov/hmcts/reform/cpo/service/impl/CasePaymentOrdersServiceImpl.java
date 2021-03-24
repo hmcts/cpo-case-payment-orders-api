@@ -31,7 +31,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     }
 
     public List<CasePaymentOrder> getCasePaymentOrders(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
-        final List<CasePaymentOrderEntity> result = casePaymentOrdersQueryBuilder.find(casePaymentOrderQueryFilter);
+        final List<CasePaymentOrderEntity> result = casePaymentOrdersQueryBuilder.findCasePaymentOrderByCriteria(casePaymentOrderQueryFilter);
         return convertListToDomainModel(result);
     }
 

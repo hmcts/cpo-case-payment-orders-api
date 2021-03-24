@@ -22,7 +22,7 @@ public class CasePaymentOrdersQueryBuilder {
         this.entityManager = entityManager;
     }
 
-    public List<CasePaymentOrderEntity> find(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+    public List<CasePaymentOrderEntity> findCasePaymentOrderByCriteria(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
 
         final PredicateBuilder predicateBuilder = new PredicateBuilder(casePaymentOrderQueryFilter);
         final CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();

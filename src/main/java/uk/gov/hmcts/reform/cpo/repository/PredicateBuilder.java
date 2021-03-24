@@ -30,7 +30,7 @@ public class PredicateBuilder {
             predicates.add(currentPredicate);
 
         }
-        if (isAIdsQuery()) {
+        if (isAnIdsQuery()) {
             final List<UUID> uuids = casePaymentOrderQueryFilter.getListOfIds().stream().map(
                 id -> UUID.fromString(id)
             ).collect(Collectors.toList());
@@ -40,14 +40,14 @@ public class PredicateBuilder {
     }
 
     public boolean isAnAndPredicate(){
-        return (isACasesIdQuery()) && (isAIdsQuery());
+        return (isACasesIdQuery()) && (isAnIdsQuery());
     }
 
     private boolean isACasesIdQuery(){
         return !casePaymentOrderQueryFilter.getListOfCasesIds().isEmpty();
     }
 
-    private boolean isAIdsQuery(){
+    private boolean isAnIdsQuery(){
         return !casePaymentOrderQueryFilter.getListOfIds().isEmpty();
     }
 }
