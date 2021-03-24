@@ -5,6 +5,7 @@ import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.RevisionType;
 import org.hibernate.envers.query.AuditEntity;
+import org.hibernate.envers.query.AuditQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -44,6 +46,9 @@ public class CasePaymentOrdersAuditTest extends BaseTest {
 
     private static final String ACTION_VALUE = "Action";
     private static final String NEW_ACTION_VALUE = "New Action";
+    private static final boolean SELECT_DELETED_ENTITIES = true;
+    private static final boolean SELECT_ENTITIES_ONLY = true;
+    private static final boolean SELECT_REVISION_INFO_ONLY = false;
 
     @BeforeEach
     void setUp() {
@@ -65,11 +70,8 @@ public class CasePaymentOrdersAuditTest extends BaseTest {
 
     @Test
     void testAuditOfCreatingCasePaymentOrder() {
-        CasePaymentOrderEntity auditedCasePaymentOrderEntity = (CasePaymentOrderEntity) auditReader
-                .createQuery()
-                .forRevisionsOfEntity(CasePaymentOrderEntity.class, true, true)
-                .add(AuditEntity.id().eq(casePaymentOrderEntity.getId()))
-                .getSingleResult();
+        CasePaymentOrderEntity auditedCasePaymentOrderEntity =
+                (CasePaymentOrderEntity) getAuditQuery(SELECT_ENTITIES_ONLY).getSingleResult();
 
         assertNotNull(auditedCasePaymentOrderEntity);
 
@@ -86,11 +88,7 @@ public class CasePaymentOrdersAuditTest extends BaseTest {
 
         assertNotNull(updateActionEntity);
 
-        List auditedEntries = auditReader
-                .createQuery()
-                .forRevisionsOfEntity(CasePaymentOrderEntity.class, true, true)
-                .add(AuditEntity.id().eq(casePaymentOrderEntity.getId()))
-                .getResultList();
+        List auditedEntries = getAuditQuery(SELECT_ENTITIES_ONLY).getResultList();
 
         // expect two audit entries - one for the create and one for the update
         assertEquals(2, auditedEntries.size());
@@ -106,11 +104,7 @@ public class CasePaymentOrdersAuditTest extends BaseTest {
     void testAuditOfCreatingAndDeletingCasePaymentOrder() {
         casePaymentOrdersRepository.delete(casePaymentOrderEntity);
 
-        List auditedEntries = auditReader
-                .createQuery()
-                .forRevisionsOfEntity(CasePaymentOrderEntity.class, true)
-                .add(AuditEntity.id().eq(casePaymentOrderEntity.getId()))
-                .getResultList();
+        List auditedEntries = getAuditQuery(SELECT_ENTITIES_ONLY).getResultList();
 
         assertEquals(2, auditedEntries.size());
 
@@ -129,13 +123,32 @@ public class CasePaymentOrdersAuditTest extends BaseTest {
         assertAuditDataRevisionTypes(List.of(RevisionType.ADD, RevisionType.DEL));
     }
 
+    @Test
+    void testUpdatingCasePaymentOrderCreationDetailsIsNotAudited() {
+        casePaymentOrderEntity.setCreatedBy("changeCreatedByField");
+        casePaymentOrderEntity.setCreatedTimestamp(LocalDateTime.now().plus(1, ChronoUnit.DAYS));
+
+        CasePaymentOrderEntity updatedActionEntity = casePaymentOrdersRepository.save(casePaymentOrderEntity);
+
+        assertNotNull(updatedActionEntity);
+
+        List auditedEntries = getAuditQuery(SELECT_ENTITIES_ONLY).getResultList();
+
+        assertEquals(1, auditedEntries.size());
+
+        assertAuditDataRevisionTypes(List.of(RevisionType.ADD));
+    }
+
+    private AuditQuery getAuditQuery(boolean shouldSelectEntitiesOnly) {
+        return auditReader
+                .createQuery()
+                .forRevisionsOfEntity(CasePaymentOrderEntity.class, shouldSelectEntitiesOnly, SELECT_DELETED_ENTITIES)
+                .add(AuditEntity.id().eq(casePaymentOrderEntity.getId()));
+    }
+
     private void assertAuditDataRevisionTypes(List<RevisionType> revisionTypes) {
         @SuppressWarnings("unchecked")
-        List<Object[]> resultList = auditReader
-                .createQuery()
-                .forRevisionsOfEntity(CasePaymentOrderEntity.class, false, true)
-                .add(AuditEntity.id().eq(casePaymentOrderEntity.getId()))
-                .getResultList();
+        List<Object[]> resultList = getAuditQuery(SELECT_REVISION_INFO_ONLY).getResultList();
 
         // Because the second boolean argument to (forRevisionsOfEntity(CasePaymentOrderEntity.class, false, true)) is
         // false a list with three-element arrays is returned
