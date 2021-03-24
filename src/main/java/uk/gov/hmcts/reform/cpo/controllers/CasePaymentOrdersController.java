@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
@@ -18,11 +19,12 @@ import java.util.Optional;
 public class CasePaymentOrdersController {
 
     private final CasePaymentOrdersServiceImpl casePaymentOrdersServiceImpl;
+    private final ApplicationParams applicationParams;
 
-    public CasePaymentOrdersController(CasePaymentOrdersServiceImpl casePaymentOrdersServiceImpl) {
+    public CasePaymentOrdersController(CasePaymentOrdersServiceImpl casePaymentOrdersServiceImpl, ApplicationParams applicationParams) {
         this.casePaymentOrdersServiceImpl = casePaymentOrdersServiceImpl;
+        this.applicationParams = applicationParams;
     }
-
 
     @GetMapping(value = "case-payment-orders", produces = {"application/json"})
     public List<CasePaymentOrder> getCasePaymentOrders(@ApiParam(value = "list of ids")
@@ -38,10 +40,9 @@ public class CasePaymentOrdersController {
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
             .listOfIds(listOfIds)
             .listOfCasesIds(listOfCasesIds)
-            .pageNumber(pageNumber.orElse(CasePaymentOrdersServiceImpl.DEFAULT_PAGE_NUMBER))
-            .pageSize(pageSize.orElse(CasePaymentOrdersServiceImpl.DEFAULT_PAGE_SIZE))
+            .pageNumber(pageNumber.orElse(Integer.parseInt(applicationParams.getDefaultPageNumber())))
+            .pageSize(pageSize.orElse(Integer.parseInt(applicationParams.getDefaultPageSize())))
             .build();
-
         return casePaymentOrdersServiceImpl.getCasePaymentOrders(casePaymentOrderQueryFilter);
     }
 

@@ -24,9 +24,6 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     @Autowired
     private CasePaymentOrdersRepository casePaymentOrdersRepository;
 
-    public static final Integer DEFAULT_PAGE_SIZE = 20;
-    public static final Integer DEFAULT_PAGE_NUMBER = 0;
-
     public CasePaymentOrdersServiceImpl(CasePaymentOrdersQueryBuilder casePaymentOrdersQueryBuilder, CasePaymentOrderMapper casePaymentOrderMapper, CasePaymentOrdersRepository casePaymentOrdersRepository) {
         this.casePaymentOrdersQueryBuilder = casePaymentOrdersQueryBuilder;
         this.casePaymentOrderMapper = casePaymentOrderMapper;
@@ -79,6 +76,8 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         casePaymentOrderEntity2.setCaseTypeId("setCaseTypeId");
         casePaymentOrderEntity2.setResponsibleParty("setResponsibleParty");
         casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity2);
+
+
 
     }
 }
