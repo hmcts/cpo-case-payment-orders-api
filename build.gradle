@@ -294,8 +294,7 @@ dependencies {
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
-  integrationTestImplementation group: 'org.testcontainers', name: 'testcontainers', version: versions.testcontainers
-  integrationTestImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
+
   integrationTestImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
 
   testImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.13.0'
