@@ -1,16 +1,16 @@
 {
-  "_guid_" : "S-101.3.2",
+  "_guid_" : "S-701.3.1",
   "_extends_" : "createCasePaymentOrderBase",
 
   "specs": [
     "an invalid mandatory parameter",
-    "an invalid datetime format"
+    "an incorrect caseid format"
   ],
 
   "request" : {
     "body" : {
       "_extends_" : "Base_CPO_Data",
-      "effective_from" : "18-03-2021 15:56:55"
+      "case_id" : "1234567890123456"
     }
   },
 
