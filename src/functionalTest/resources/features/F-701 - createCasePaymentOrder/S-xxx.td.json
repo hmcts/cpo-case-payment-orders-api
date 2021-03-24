@@ -1,9 +1,8 @@
 {
-  "_guid_" : "S-102_Base",
+  "_guid_" : "S-701",
   "_extends_" : "createCasePaymentOrderBase",
 
   "specs": [
-    "does not contain one or more of the mandatory parameters"
   ],
 
   "request" : {
@@ -11,6 +10,6 @@
   },
 
   "expectedResponse" : {
-    "_extends_" : "400_Response"
+
   }
 }

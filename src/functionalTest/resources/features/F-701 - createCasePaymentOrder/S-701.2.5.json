@@ -1,9 +1,9 @@
 {
-  "_guid_" : "S-101.2.4",
-  "_extends_" : "S-102_Base",
+  "_guid_" : "S-701.2.5",
+  "_extends_" : "S-702_Base",
 
   "specs": [
-    "does not contain the action parameter"
+    "does not contain the responsible_party parameter"
   ],
 
   "request" : {
@@ -12,7 +12,7 @@
       "effective_from" : "2021-01-01T00:00:00Z",
       "case_id" : "1615819590019905",
       "case_type_id" : "FT_MasterCaseType",
-      "responsible_party" : "party1",
+      "action" : "payday",
       "order_reference" : "order1"
     }
   },

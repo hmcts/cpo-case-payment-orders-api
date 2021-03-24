@@ -3,9 +3,11 @@ Feature:
 
   Background:
     Given an appropriate test context as detailed in the test data source,
+    Given a user with [an active profile in CCD],
 
   @S-101.1
   Scenario: Successfully allow the creation of a case payment order in the Case Payment Order database
+
     When a request is prepared with appropriate values
     And the request [intends to Create a case payment order]
     And the request [contains all the mandatory parameters]
@@ -14,7 +16,7 @@ Feature:
     And the response [contains a 200 success OK code]
     And the response [contains a valid UUID of the case order record]
     And the response has all other details as expected
-    And a call [to verify that a Case payment Order has been created] will get the expected response as in [CPO-5_getCasePaymentOrder_cpo_created].
+#    And a call [to verify that a Case payment Order has been created] will get the expected response as in [CPO-5_getCasePaymentOrder_cpo_created].
 
   Scenario Outline: AC2- Must return error if one or more of the mandatory parameters have not been provided (Please refer to the mandatory parameter list in the description)
     When a request is prepared with appropriate values

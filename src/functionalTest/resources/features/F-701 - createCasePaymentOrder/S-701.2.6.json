@@ -1,6 +1,6 @@
 {
-  "_guid_" : "S-101.2.6",
-  "_extends_" : "S-102_Base",
+  "_guid_" : "S-701.2.6",
+  "_extends_" : "S-702_Base",
 
   "specs": [
     "does not contain the order_reference parameter"
