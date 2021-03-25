@@ -51,7 +51,7 @@ class CasePaymentOrdersServiceImplTest {
     @Mock
     CasePaymentOrderEntity savedEntity;
 
-    private LocalDateTime effectiveFrom = LocalDateTime.of(2021, Month.MARCH, 24, 11, 48,
+    private static final LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24, 11, 48,
                                                            32);
     private static final Long CASE_ID = 1122334455667788L;
     private static final String CASE_TYPE_ID = "caseType";
@@ -82,7 +82,7 @@ class CasePaymentOrdersServiceImplTest {
             casePaymentOrdersService = new CasePaymentOrdersServiceImpl(casePaymentOrdersRepository, mapper,
                                                                         securityUtils);
             createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(
-                effectiveFrom,
+                EFFECTIVE_FROM,
                 CASE_ID,
                 CASE_TYPE_ID,
                 ACTION,
@@ -91,7 +91,7 @@ class CasePaymentOrdersServiceImplTest {
             );
 
             casePaymentOrderIncoming = CasePaymentOrder.builder()
-                .effectiveFrom(effectiveFrom)
+                .effectiveFrom(EFFECTIVE_FROM)
                 .caseId(CASE_ID)
                 .caseTypeId(CASE_TYPE_ID)
                 .action(ACTION)
@@ -102,7 +102,7 @@ class CasePaymentOrdersServiceImplTest {
                 .createdTimestamp(CREATED_TIMESTAMP)
                 .build();
 
-            requestEntity.setEffectiveFrom(effectiveFrom);
+            requestEntity.setEffectiveFrom(EFFECTIVE_FROM);
             requestEntity.setCaseId(CASE_ID);
             requestEntity.setCaseTypeId(CASE_TYPE_ID);
             requestEntity.setAction(ACTION);
@@ -110,7 +110,7 @@ class CasePaymentOrdersServiceImplTest {
             requestEntity.setOrderReference(ORDER_REFERENCE);
             requestEntity.setCreatedBy(CREATED_BY);
 
-            savedEntity.setEffectiveFrom(effectiveFrom);
+            savedEntity.setEffectiveFrom(EFFECTIVE_FROM);
             savedEntity.setCaseId(CASE_ID);
             savedEntity.setCaseTypeId(CASE_TYPE_ID);
             savedEntity.setAction(ACTION);

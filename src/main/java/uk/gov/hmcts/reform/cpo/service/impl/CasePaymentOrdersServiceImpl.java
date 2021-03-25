@@ -33,7 +33,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     public CasePaymentOrder createCasePaymentOrder(CreateCasePaymentOrderRequest createCasePaymentOrderRequest) {
         String createdBy = securityUtils.getUserInfo().getUid();
         CasePaymentOrderEntity requestEntity = mapper.toEntity(createCasePaymentOrderRequest, createdBy);
-        CasePaymentOrderEntity savedEntity = casePaymentOrdersRepository.save(requestEntity);
+        CasePaymentOrderEntity savedEntity = casePaymentOrdersRepository.saveAndFlush(requestEntity);
         return mapper.toDomainModel(savedEntity);
     }
 }

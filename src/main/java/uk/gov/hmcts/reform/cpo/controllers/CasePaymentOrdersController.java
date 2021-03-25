@@ -40,7 +40,7 @@ public class CasePaymentOrdersController {
     @ApiResponses({
         @ApiResponse(
             code = 201,
-            message = ""
+            message = "Case Payment Order Created"
         ),
         @ApiResponse(
             code = 400,
