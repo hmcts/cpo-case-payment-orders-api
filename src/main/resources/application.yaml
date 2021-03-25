@@ -21,6 +21,11 @@ spring:
     name: Case Payment Orders
   banner:
     location: classpath:case-payment-orders-banner.txt
+  cloud:
+    discovery:
+      client:
+        composite-indicator:
+          enabled: false
   config:
     import: "optional:configtree:/mnt/secrets/cpo/"
   jackson:
