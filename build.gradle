@@ -274,6 +274,8 @@ dependencies {
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   implementation group: 'org.mapstruct', name: 'mapstruct', version: versions.mapstruct
 
+  implementation group: 'org.hibernate', name: 'hibernate-envers', version: '5.4.30.Final'
+
   compile group: 'org.flywaydb', name: 'flyway-core', version: '7.7.0'
 
   annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: versions.mapstruct
@@ -293,8 +295,7 @@ dependencies {
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
-  integrationTestImplementation group: 'org.testcontainers', name: 'testcontainers', version: versions.testcontainers
-  integrationTestImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
+
   integrationTestImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
 
   testImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.13.0'
