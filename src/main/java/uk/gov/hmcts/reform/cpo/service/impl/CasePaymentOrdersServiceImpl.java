@@ -37,7 +37,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
             return Collections.emptyList();
         }
         validateCasePaymentOrderQueryFilter(casePaymentOrderQueryFilter);
-        final List<CasePaymentOrderEntity> result = casePaymentOrdersQueryBuilder.findCasePaymentOrderByCriteria(casePaymentOrderQueryFilter);
+        final List<CasePaymentOrderEntity> result = casePaymentOrdersQueryBuilder.find(casePaymentOrderQueryFilter);
         return convertListToDomainModel(result);
     }
 
@@ -66,6 +66,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         casePaymentOrderEntity.setCaseTypeId("setCaseTypeId");
         casePaymentOrderEntity.setResponsibleParty("setResponsibleParty");
         casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity);
+        casePaymentOrdersRepository.flush();
 
         final CasePaymentOrderEntity casePaymentOrderEntity1 = new CasePaymentOrderEntity();
         casePaymentOrderEntity1.setAction("action");
@@ -77,6 +78,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         casePaymentOrderEntity1.setCaseTypeId("setCaseTypeId");
         casePaymentOrderEntity1.setResponsibleParty("setResponsibleParty");
         casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity1);
+        casePaymentOrdersRepository.flush();
 
         final CasePaymentOrderEntity casePaymentOrderEntity2 = new CasePaymentOrderEntity();
         casePaymentOrderEntity2.setAction("action");
@@ -88,6 +90,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         casePaymentOrderEntity2.setCaseTypeId("setCaseTypeId");
         casePaymentOrderEntity2.setResponsibleParty("setResponsibleParty");
         casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity2);
+        casePaymentOrdersRepository.flush();
 
 
 
