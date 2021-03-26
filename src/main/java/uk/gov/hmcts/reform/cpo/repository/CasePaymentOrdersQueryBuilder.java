@@ -8,7 +8,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.List;
 
@@ -30,12 +29,7 @@ public class CasePaymentOrdersQueryBuilder {
         final Root<CasePaymentOrderEntity> root = criteriaQuery.from(CasePaymentOrderEntity.class);
 
         predicateBuilder.buildPredicates(root);
-
-        if (predicateBuilder.isAnAndPredicate()) {
-            criteriaQuery.where(criteriaBuilder.and(predicateBuilder.getPredicates().toArray(new Predicate[predicateBuilder.getPredicates().size()])));
-        } else {
-            criteriaQuery.where(predicateBuilder.getCurrentPredicate());
-        }
+        criteriaQuery.where(predicateBuilder.getCurrentPredicate());
 
         final TypedQuery<CasePaymentOrderEntity> query = entityManager.createQuery(criteriaQuery);
         query.setFirstResult(casePaymentOrderQueryFilter.getPageNumber());

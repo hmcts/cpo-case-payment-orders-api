@@ -4,7 +4,7 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.ArrayList;
 import java.util.List;
 
-interface Validator {
+interface Validator <T> {
 
     List<String> errors = new ArrayList<>();
 
@@ -14,4 +14,6 @@ interface Validator {
             .addConstraintViolation();
 
     }
+
+    void validate(T value);
 }

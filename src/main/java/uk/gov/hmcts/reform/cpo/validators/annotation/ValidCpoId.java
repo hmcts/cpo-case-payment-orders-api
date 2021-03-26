@@ -14,7 +14,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = IdsValidator.class)
 @Target({PARAMETER, FIELD})
 @Retention(RUNTIME)
-public @interface IdsAnnotation {
+public @interface ValidCpoId {
 
     String message() default "Error messages in id validator, the constraint is violated";
 

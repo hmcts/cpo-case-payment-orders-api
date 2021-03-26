@@ -25,29 +25,17 @@ public class PredicateBuilder {
 
     public void buildPredicates(final Root<CasePaymentOrderEntity> root) {
 
-        if (isACasesIdQuery()) {
+        if (casePaymentOrderQueryFilter.isACasesIdQuery()) {
             currentPredicate = root.get(CASE_ID).in(casePaymentOrderQueryFilter.getListOfCasesIds());
             predicates.add(currentPredicate);
 
         }
-        if (isAnIdsQuery()) {
+        if (casePaymentOrderQueryFilter.isAnIdsQuery()) {
             final List<UUID> uuids = casePaymentOrderQueryFilter.getListOfIds().stream().map(
                 id -> UUID.fromString(id)
             ).collect(Collectors.toList());
             currentPredicate = root.get(IDS).in(uuids);
             predicates.add(currentPredicate);
         }
-    }
-
-    public boolean isAnAndPredicate(){
-        return (isACasesIdQuery()) && (isAnIdsQuery());
-    }
-
-    private boolean isACasesIdQuery(){
-        return !casePaymentOrderQueryFilter.getListOfCasesIds().isEmpty();
-    }
-
-    private boolean isAnIdsQuery(){
-        return !casePaymentOrderQueryFilter.getListOfIds().isEmpty();
     }
 }

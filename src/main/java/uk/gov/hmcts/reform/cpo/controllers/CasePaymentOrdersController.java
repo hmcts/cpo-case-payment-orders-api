@@ -9,14 +9,15 @@ import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
-import uk.gov.hmcts.reform.cpo.validators.annotation.CaseIdsAnnotation;
+import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
 
 import org.springframework.validation.annotation.Validated;
-import uk.gov.hmcts.reform.cpo.validators.annotation.IdsAnnotation;
+import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
 
 @RestController
 @Validated
@@ -31,11 +32,12 @@ public class CasePaymentOrdersController {
         this.applicationParams = applicationParams;
     }
 
+
     @GetMapping(value = "case-payment-orders", produces = {"application/json"})
     public List<CasePaymentOrder> getCasePaymentOrders(@ApiParam(value = "list of ids")
-                                                       @IdsAnnotation @RequestParam("ids") Optional<List<String>> ids,
+                                                       @ValidCpoId @RequestParam("ids") Optional<List<String>> ids,
                                                        @ApiParam(value = "casesId of ids")
-                                                       @CaseIdsAnnotation @RequestParam("casesId")  Optional<List<String>> casesId,
+                                                       @ValidCaseId @RequestParam("casesId")  Optional<List<String>> casesId,
                                                        @RequestParam("pageSize") Optional<Integer> pageSize,
                                                        @RequestParam("pageNumber") Optional<Integer> pageNumber
 

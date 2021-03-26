@@ -14,7 +14,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = CaseIdsValidator.class)
 @Target({PARAMETER, FIELD})
 @Retention(RUNTIME)
-public @interface CaseIdsAnnotation {
+public @interface ValidCaseId {
 
     String message() default "Error messages in case validator, the constraint is violated";
 

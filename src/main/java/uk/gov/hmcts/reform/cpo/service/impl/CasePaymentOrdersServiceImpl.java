@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersQueryBuilder;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +33,10 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     }
 
     public List<CasePaymentOrder> getCasePaymentOrders(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+        if (casePaymentOrderQueryFilter.isItAnEmptyCriteria()){
+            return Collections.emptyList();
+        }
+        validateCasePaymentOrderQueryFilter(casePaymentOrderQueryFilter);
         final List<CasePaymentOrderEntity> result = casePaymentOrdersQueryBuilder.findCasePaymentOrderByCriteria(casePaymentOrderQueryFilter);
         return convertListToDomainModel(result);
     }
@@ -41,12 +47,18 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         ).collect(Collectors.toList());
     }
 
+    private void validateCasePaymentOrderQueryFilter(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter){
+        if ( casePaymentOrderQueryFilter.isAnIdsAndCasesIdQuery()) {
+            throw new CasePaymentOrdersQueryException("case-payment-orders cannot filter case payments orders by both id and cases-id.");
+        }
+    }
+
     //TODO THIS IS NOT GOING TO BE ADDED IN THE FINAL PR
     public void create() {
 
         final CasePaymentOrderEntity casePaymentOrderEntity = new CasePaymentOrderEntity();
         casePaymentOrderEntity.setAction("action");
-        casePaymentOrderEntity.setCaseId(Long.parseLong("1609243447569251"));
+        casePaymentOrderEntity.setCaseId(Long.parseLong("16"));
         casePaymentOrderEntity.setCreatedBy("action1");
         casePaymentOrderEntity.setOrderReference("action1");
         casePaymentOrderEntity.setEffectiveFrom(LocalDateTime.now());
@@ -57,7 +69,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
         final CasePaymentOrderEntity casePaymentOrderEntity1 = new CasePaymentOrderEntity();
         casePaymentOrderEntity1.setAction("action");
-        casePaymentOrderEntity1.setCaseId(Long.parseLong("1609243447569252"));
+        casePaymentOrderEntity1.setCaseId(Long.parseLong("17"));
         casePaymentOrderEntity1.setCreatedBy("action1");
         casePaymentOrderEntity1.setOrderReference("action1");
         casePaymentOrderEntity1.setEffectiveFrom(LocalDateTime.now());
@@ -68,7 +80,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
         final CasePaymentOrderEntity casePaymentOrderEntity2 = new CasePaymentOrderEntity();
         casePaymentOrderEntity2.setAction("action");
-        casePaymentOrderEntity2.setCaseId(Long.parseLong("1609243447569253"));
+        casePaymentOrderEntity2.setCaseId(Long.parseLong("18"));
         casePaymentOrderEntity2.setCreatedBy("action1");
         casePaymentOrderEntity2.setOrderReference("action1");
         casePaymentOrderEntity2.setEffectiveFrom(LocalDateTime.now());

@@ -14,4 +14,21 @@ public class CasePaymentOrderQueryFilter {
     private List<String> listOfIds;
     private List<String> listOfCasesIds;
 
+
+    public boolean isACasesIdQuery(){
+        return !listOfCasesIds.isEmpty();
+    }
+
+    public boolean isAnIdsQuery(){
+        return !listOfIds.isEmpty();
+    }
+
+    public boolean isAnIdsAndCasesIdQuery(){
+        return (isACasesIdQuery()) && (isAnIdsQuery());
+    }
+
+    public boolean isItAnEmptyCriteria(){
+        return listOfIds.isEmpty() && listOfCasesIds.isEmpty();
+    }
+
 }
