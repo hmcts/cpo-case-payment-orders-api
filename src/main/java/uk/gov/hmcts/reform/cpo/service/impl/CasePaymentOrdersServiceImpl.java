@@ -37,7 +37,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
             return Collections.emptyList();
         }
         validateCasePaymentOrderQueryFilter(casePaymentOrderQueryFilter);
-        final List<CasePaymentOrderEntity> result = casePaymentOrdersQueryBuilder.find(casePaymentOrderQueryFilter);
+        final List<CasePaymentOrderEntity> result = casePaymentOrdersQueryBuilder.findCasePaymentOrderByCriteria(casePaymentOrderQueryFilter);
         return convertListToDomainModel(result);
     }
 
