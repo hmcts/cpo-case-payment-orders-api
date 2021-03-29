@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cpo;
 
-import lombok.Builder;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 

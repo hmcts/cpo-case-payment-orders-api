@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class CaseIdsValidator implements ConstraintValidator<ValidCaseId, Optional<List<String>>>,Validator<String> {
 
-    private final String NUMERIC_EXPRESSION = "\\d{2}";
+    private final String NUMERIC_EXPRESSION = "\\d{16}";
     private final List<String> errors = new ArrayList<>();
 
     @Override
