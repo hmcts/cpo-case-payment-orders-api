@@ -5,8 +5,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +22,6 @@ public class CasePaymentOrdersController {
 
     @SuppressWarnings({"squid:S1075"})
 
-    private static final Logger LOG = LoggerFactory.getLogger(CasePaymentOrdersController.class);
     public static final String CASE_PAYMENT_ORDERS_PATH = "/case-payment-orders";
 
     private final CasePaymentOrdersService casePaymentOrdersService;

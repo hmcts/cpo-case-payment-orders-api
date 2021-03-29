@@ -45,7 +45,7 @@ class CasePaymentOrderMapperTest {
             .createdBy("Bob")
             .build();
 
-        request = new CreateCasePaymentOrderRequest(date, 1612345678123456L, "divorce",
+        request = new CreateCasePaymentOrderRequest(date, 1_122_334_455_667_788L, "divorce",
                                                     "Case Submit", "Jane Doe",
                                                     "2021-918425346");
     }
@@ -97,7 +97,7 @@ class CasePaymentOrderMapperTest {
 
     @Test
     void successfulRequestToEntityMapping() {
-        CasePaymentOrderEntity mappedRequestEntity = mapper.toEntity(request, "Bob");
+        CasePaymentOrderEntity mappedRequestEntity = mapper.toEntity(request, "Jane");
         assertEquals("Mapped entity effective from should equals mocked entity effective from",
                      request.getEffectiveFrom(), mappedRequestEntity.getEffectiveFrom());
         assertEquals("Mapped entity case id should equals mocked entity case id",
@@ -111,6 +111,6 @@ class CasePaymentOrderMapperTest {
         assertEquals("Mapped entity order reference should equals mocked entity order reference",
                      request.getOrderReference(), mappedRequestEntity.getOrderReference());
         assertEquals("Mapped entity created by should equals mocked entity created by",
-                     "Bob", mappedRequestEntity.getCreatedBy());
+                     "Jane", mappedRequestEntity.getCreatedBy());
     }
 }

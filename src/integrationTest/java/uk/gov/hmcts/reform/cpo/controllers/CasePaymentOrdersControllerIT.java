@@ -28,7 +28,7 @@ public class CasePaymentOrdersControllerIT {
     private static final LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24, 11, 48,
                                                                          32
     );
-    private static final Long CASE_ID = 1122334455667788L;
+    private static final Long CASE_ID = 1_122_334_455_667_788L;
     private static final String CASE_TYPE_ID = "caseType";
     private static final String ACTION = "action";
     private static final String RESPONSIBLE_PARTY = "responsibleParty";

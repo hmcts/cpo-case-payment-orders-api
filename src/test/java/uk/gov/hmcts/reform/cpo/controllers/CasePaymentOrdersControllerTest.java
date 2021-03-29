@@ -28,19 +28,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.hamcrest.CoreMatchers.is;
-
-
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
+@SuppressWarnings({"PMD.ExcessiveImports"})
 public class CasePaymentOrdersControllerTest {
 
 
@@ -54,7 +52,7 @@ public class CasePaymentOrdersControllerTest {
     private static final LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24,
                                                                          11, 48, 32
     );
-    private static final Long CASE_ID = 1122334455667788L;
+    private static final Long CASE_ID = 1_122_334_455_667_788L;
     private static final String CASE_TYPE_ID = "caseType";
     private static final String ACTION = "action";
     private static final String RESPONSIBLE_PARTY = "responsibleParty";
