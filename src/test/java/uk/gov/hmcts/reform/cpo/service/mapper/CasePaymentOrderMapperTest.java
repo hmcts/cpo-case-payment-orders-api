@@ -45,7 +45,9 @@ class CasePaymentOrderMapperTest {
             .createdBy("Bob")
             .build();
 
-        request = new CreateCasePaymentOrderRequest(date, 1612345678123456L, "divorce", "Case Submit", "Jane Doe","2021-918425346");
+        request = new CreateCasePaymentOrderRequest(date, 1612345678123456L, "divorce",
+                                                    "Case Submit", "Jane Doe",
+                                                    "2021-918425346");
     }
 
     @Test
@@ -73,7 +75,8 @@ class CasePaymentOrderMapperTest {
     @Test
     void successfulDomainMapping() {
         CasePaymentOrder mappedDomainObject = mapper.toDomainModel(entity);
-        assertEquals("Mapped domain model created timestamp should equals mocked domain model created timestamp",
+        assertEquals("Mapped domain model created timestamp should equals mocked domain model"
+                         + " created timestamp",
                      casePaymentOrder.getCreatedTimestamp(), mappedDomainObject.getCreatedTimestamp());
         assertEquals("Mapped domain model effective from should equals mocked domain model effective from",
                      casePaymentOrder.getEffectiveFrom(), mappedDomainObject.getEffectiveFrom());
@@ -83,7 +86,8 @@ class CasePaymentOrderMapperTest {
                      casePaymentOrder.getCaseTypeId(), mappedDomainObject.getCaseTypeId());
         assertEquals("Mapped domain model action should equals mocked domain model action",
                      casePaymentOrder.getAction(), mappedDomainObject.getAction());
-        assertEquals("Mapped domain model responsible party should equals mocked domain model responsible party",
+        assertEquals("Mapped domain model responsible party should equals mocked domain model "
+                         + "responsible party",
                      casePaymentOrder.getResponsibleParty(), mappedDomainObject.getResponsibleParty());
         assertEquals("Mapped domain model order reference should equals mocked domain model order reference",
                      casePaymentOrder.getOrderReference(), mappedDomainObject.getOrderReference());
@@ -92,7 +96,7 @@ class CasePaymentOrderMapperTest {
     }
 
     @Test
-    void successfulRequestToEntityMapping(){
+    void successfulRequestToEntityMapping() {
         CasePaymentOrderEntity mappedRequestEntity = mapper.toEntity(request, "Bob");
         assertEquals("Mapped entity effective from should equals mocked entity effective from",
                      request.getEffectiveFrom(), mappedRequestEntity.getEffectiveFrom());

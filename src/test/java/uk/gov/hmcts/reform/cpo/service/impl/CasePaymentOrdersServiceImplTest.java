@@ -125,7 +125,7 @@ class CasePaymentOrdersServiceImplTest {
         void shouldCreateCasePaymentOrder() {
             given(securityUtils.getUserInfo()).willReturn(userInfo);
             given(mapper.toEntity(createCasePaymentOrderRequest, CREATED_BY)).willReturn(requestEntity);
-            given(casePaymentOrdersRepository.save(requestEntity)).willReturn(savedEntity);
+            given(casePaymentOrdersRepository.saveAndFlush(requestEntity)).willReturn(savedEntity);
             given(mapper.toDomainModel(savedEntity)).willReturn(casePaymentOrderIncoming);
             CasePaymentOrder caseOrderReturn = casePaymentOrdersService
                 .createCasePaymentOrder(createCasePaymentOrderRequest);
