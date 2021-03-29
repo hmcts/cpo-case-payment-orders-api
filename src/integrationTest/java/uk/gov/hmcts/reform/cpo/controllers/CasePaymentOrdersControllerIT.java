@@ -46,7 +46,6 @@ public class CasePaymentOrdersControllerIT {
         @Autowired
         private ObjectMapper objectMapper;
 
-
         @BeforeEach
         void setUp() {
 
@@ -68,6 +67,12 @@ public class CasePaymentOrdersControllerIT {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.id", notNullValue()))
+                .andExpect(jsonPath("$.case_type_id", is(CASE_TYPE_ID)))
+                .andExpect(jsonPath("$.case_id", is(CASE_ID)))
+                .andExpect(jsonPath("$.action", is(ACTION)))
+                .andExpect(jsonPath("$.responsible_party", is(RESPONSIBLE_PARTY)))
+                .andExpect(jsonPath("$.order_reference", is(ORDER_REFERENCE)))
+                .andExpect(jsonPath("$.effective_from", is(EFFECTIVE_FROM.format(formatter))))
                 .andExpect(jsonPath("$.created_by", is("445")));
         }
     }

@@ -20,8 +20,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 public class CasePaymentOrdersController {
 
-    @SuppressWarnings({"squid:S1075"})
-
     public static final String CASE_PAYMENT_ORDERS_PATH = "/case-payment-orders";
 
     private final CasePaymentOrdersService casePaymentOrdersService;
