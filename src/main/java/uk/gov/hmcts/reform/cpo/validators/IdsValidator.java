@@ -11,8 +11,6 @@ import java.util.UUID;
 
 public class IdsValidator implements ConstraintValidator<ValidCpoId, Optional<List<String>>>, Validator <String>{
 
-    private final List<String> errors = new ArrayList<>();
-
     @Override
     public void initialize(final ValidCpoId constraintAnnotation) {
     }
@@ -22,16 +20,17 @@ public class IdsValidator implements ConstraintValidator<ValidCpoId, Optional<Li
         if (!casesId.isPresent()) {
             return true;
         }
-        casesId.get().stream().forEach(caseId -> validate(caseId));
+        final List<String> errors = new ArrayList<>();
+        casesId.get().stream().forEach(caseId -> validate(caseId,errors));
         if (errors.isEmpty()) {
             return true;
         }
-        buildErrors(context, "These ids: ");
+        buildErrors(context, "These ids: ",errors);
         return false;
     }
 
     @Override
-    public void validate(final String caseId) {
+    public void validate(final String caseId,List<String> errors) {
         try {
             UUID.fromString(caseId);
         } catch (Exception exception) {
