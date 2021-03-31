@@ -11,9 +11,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import uk.gov.hmcts.reform.TestIdamConfiguration;
 import uk.gov.hmcts.reform.cpo.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController;
+import uk.gov.hmcts.reform.cpo.errorhandling.CasePaymentIdentifierException;
 import uk.gov.hmcts.reform.cpo.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
@@ -31,6 +33,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CasePaymentOrdersControllerTest {
 
     private static final String CASE_PAYMENTS_ORDER_PATH = "/case-payment-orders";
+    private static final String CASE_IDS = "case-ids";
+    private static final String IDS = "ids";
+
+    private static final String VALID_LUHN_1 = "9511425043588823";
+    private static final String VALID_LUHN_2 = "9716401307140455";
+    private static final String INVALID_LUHN = "9653285214520123";
 
     @WebMvcTest(controllers = CasePaymentOrdersController.class,
             includeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes = CasePaymentOrderMapper.class),
@@ -52,20 +60,13 @@ public class CasePaymentOrdersControllerTest {
 
     @Nested
     @DisplayName("DELETE /case-payment-orders?id=")
-    // @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
     class DeleteCasePaymentOrdersById extends BaseMvcTest {
-
-        private static final String IDS = "ids";
 
         @DisplayName("happy path test without mockMvc")
         @Test
-        void directCallHappyPath() { // created to avoid IDE warnings in controller class that function is never used
-            // ARRANGE
-            //given(service.assignCaseAccess(any(CaseAssignment.class))).willReturn(roles);
+        void directCallHappyPath() throws Exception {
+            CasePaymentOrdersController controller = new CasePaymentOrdersController(service);
 
-            CasePaymentOrdersController controller = new CasePaymentOrdersController();
-
-            // ACT
             controller.deleteCasePaymentOrdersById(List.of(UUID.randomUUID()));
         }
 
@@ -101,25 +102,13 @@ public class CasePaymentOrdersControllerTest {
     }
 
     @Nested
-    @DisplayName("DELETE /case-payment-orders?case-id=")
-    // @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
+    @DisplayName("DELETE /case-payment-orders?case-ids=")
     class DeleteCasePaymentOrdersByCaseId extends BaseMvcTest {
-
-        private static final String CASE_IDS = "case-ids";
-
-        private static final String VALID_LUHN_1 = "9511425043588823";
-        private static final String VALID_LUHN_2 = "9716401307140455";
-        private static final String INVALID_LUHN = "9653285214520123";
 
         @DisplayName("happy path test without mockMvc")
         @Test
-        void directCallHappyPath() { // created to avoid IDE warnings in controller class that function is never used
-            // ARRANGE
-            //given(service.assignCaseAccess(any(CaseAssignment.class))).willReturn(roles);
-
-            CasePaymentOrdersController controller = new CasePaymentOrdersController();
-
-            // ACT
+        void directCallHappyPath() throws CasePaymentIdentifierException {
+            CasePaymentOrdersController controller = new CasePaymentOrdersController(service);
             controller.deleteCasePaymentOrdersByCaseId(List.of(VALID_LUHN_1));
         }
 
@@ -162,12 +151,29 @@ public class CasePaymentOrdersControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(content().string(containsString(ValidationError.CASE_IDS_INVALID)));
         }
+    }
+
+    @Nested
+    @DisplayName("DELETE /case-payment-orders")
+    class DeleteCasePaymentOrdersInvalidParameters extends BaseMvcTest {
 
         @DisplayName("should Fail With 4xx no request parameter is specified")
         @Test
         void shouldFailWhenNoRequestParameterIsSpecified() throws Exception {
             this.mockMvc.perform(delete(CASE_PAYMENTS_ORDER_PATH))
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().is4xxClientError());
+        }
+
+        @DisplayName("should Fail With 4xx when both ids and case-ids request parameter are specified")
+        @Test
+        void shouldFailWhenIdAndCaseIdRequestParameterIsSpecified() throws Exception {
+            this.mockMvc.perform(delete(CASE_PAYMENTS_ORDER_PATH)
+                    .param(IDS, UUID.randomUUID().toString(), UUID.randomUUID().toString())
+                    .param(CASE_IDS, VALID_LUHN_1, VALID_LUHN_2))
+                    .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().is4xxClientError());
         }
     }
+
 }

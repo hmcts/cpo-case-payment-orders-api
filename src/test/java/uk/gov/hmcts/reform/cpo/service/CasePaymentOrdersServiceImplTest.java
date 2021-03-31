@@ -1,22 +1,56 @@
 package uk.gov.hmcts.reform.cpo.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
 
-import static org.springframework.test.util.AssertionErrors.assertNotNull;
+import java.util.List;
+import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@SuppressWarnings("PMD.JUnitAssertionsShouldIncludeMessage")
+@ExtendWith(MockitoExtension.class)
 class CasePaymentOrdersServiceImplTest {
 
-    private CasePaymentOrdersService casePaymentOrdersService;
+    @Mock
+    private CasePaymentOrdersRepository casePaymentOrdersRepository;
 
-    @BeforeEach
-    public void setUp() {
-        casePaymentOrdersService = new CasePaymentOrdersServiceImpl();
+    @InjectMocks
+    private CasePaymentOrdersServiceImpl casePaymentOrdersService;
+
+    @Captor
+    ArgumentCaptor<List<UUID>> uuidArgumentCaptor;
+
+    @Captor
+    ArgumentCaptor<List<Long>> caseIdsArgumentCaptor;
+
+    private final List<UUID> uuidsToDelete = List.of(UUID.randomUUID(), UUID.randomUUID());
+
+    private final List<Long> caseIdsToDelete = List.of(123L, 456L);
+
+    @Test
+    public void deleteCasePaymentOrdersById() throws Exception {
+        casePaymentOrdersService.deleteCasePaymentOrdersByIds(uuidsToDelete);
+
+        Mockito.verify(casePaymentOrdersRepository).deleteByUuids(uuidArgumentCaptor.capture());
+
+        assertEquals(uuidArgumentCaptor.getValue(), uuidsToDelete);
     }
 
     @Test
-    void verify() {
-        assertNotNull("Class is not null", casePaymentOrdersService != null);
+    public void deleteCasePaymentOrdersByCaseIds() throws Exception {
+        casePaymentOrdersService.deleteCasePaymentOrdersByCaseIds(caseIdsToDelete);
+
+        Mockito.verify(casePaymentOrdersRepository).deleteByCaseIds(caseIdsArgumentCaptor.capture());
+
+        assertEquals(caseIdsArgumentCaptor.getValue(), caseIdsToDelete);
     }
 }

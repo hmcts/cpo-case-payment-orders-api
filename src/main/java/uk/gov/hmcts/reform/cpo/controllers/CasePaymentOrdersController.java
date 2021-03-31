@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
 import org.hibernate.validator.constraints.LuhnCheck;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,13 +14,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cpo.errorhandling.AuthError;
+import uk.gov.hmcts.reform.cpo.errorhandling.CasePaymentIdentifierException;
 import uk.gov.hmcts.reform.cpo.errorhandling.ValidationError;
+import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -27,7 +31,16 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Validated
 public class CasePaymentOrdersController {
 
-    @DeleteMapping(path = "/case-payment-orders", params = "ids")
+    protected static final String CASE_PAYMENT_ORDERS = "/case-payment-orders";
+
+    private final CasePaymentOrdersService casePaymentOrdersService;
+
+    @Autowired
+    public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersService) {
+        this.casePaymentOrdersService = casePaymentOrdersService;
+    }
+
+    @DeleteMapping(path = CASE_PAYMENT_ORDERS, params = "ids")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Delete case payment orders by id", notes = "Delete case payment orders by id")
     @ApiResponses({
@@ -61,10 +74,11 @@ public class CasePaymentOrdersController {
     })
     public void deleteCasePaymentOrdersById(@RequestParam("ids") @Valid
                                                   @NotEmpty(message = ValidationError.IDS_EMPTY)
-                                                          List<UUID> ids) {
+                                                          List<UUID> ids) throws CasePaymentIdentifierException {
+        casePaymentOrdersService.deleteCasePaymentOrdersByIds(ids);
     }
 
-    @DeleteMapping(path = "/case-payment-orders", params = "case-ids")
+    @DeleteMapping(path = CASE_PAYMENT_ORDERS, params = "case-ids")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Delete case payment orders by case-ids", notes = "Delete case payment orders by case-ids")
     @ApiResponses({
@@ -108,6 +122,8 @@ public class CasePaymentOrdersController {
                                                         ignoreNonDigitCharacters = false)
                                                     @Size(min = 16, max = 16,
                                                             message = ValidationError.CASE_ID_INVALID_LENGTH)
-                                                  String> caseIds) {
+                                                  String> caseIds) throws CasePaymentIdentifierException {
+        List<Long> caseIdLongs = caseIds.stream().map(x -> Long.parseLong(x)).collect(Collectors.toList());
+        casePaymentOrdersService.deleteCasePaymentOrdersByCaseIds(caseIdLongs);
     }
 }
