@@ -1,0 +1,13 @@
+{
+  "_guid_" : "Base_CPO_Response_Data",
+  "id" : "[[ANYTHING_PRESENT]]",
+  "created_timestamp" : "[[ANYTHING_PRESENT]]",
+  "effective_from" : "[[ANYTHING_PRESENT]]",
+  "case_id" : "${[scenarioContext][customValues][GetGeneratedCaseId]}",
+  "case_type_id" : "attribute-to-be-removed",
+  "action" : "payday",
+  "responsible_party" : "party1",
+  "order_reference" : "order1",
+  "created_by" : "[[ANYTHING_PRESENT]]"
+}
+

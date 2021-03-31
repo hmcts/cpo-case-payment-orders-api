@@ -1,0 +1,18 @@
+{
+  "_guid_" : "getCasePaymentOrder_cpo_created",
+  "_extends_" : "getCasePaymentOrderBase",
+
+  "specs" : [
+    "to verify that a Case payment Order has been created"
+  ],
+
+  "request" : {
+    "queryParams": {
+      "ids": "${[scenarioContext][siblingContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse" : {
+
+  }
+}

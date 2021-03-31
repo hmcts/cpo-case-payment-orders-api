@@ -1,0 +1,15 @@
+{
+  "_guid_" : "S-702.5",
+  "_extends_" : "updateCasePaymentOrderBase",
+
+  "specs": [
+  ],
+
+  "request" : {
+    "_extends_": "updateCasePaymentOrderPayloadData"
+  },
+
+  "expectedResponse" : {
+
+  }
+}

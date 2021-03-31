@@ -1,0 +1,30 @@
+{
+  "_guid_" : "updateCasePaymentOrderBase",
+  "_extends_" : "Common_Request",
+
+  "productName": "Case Payment Orders Microservice",
+  "operationName": "updateCasePaymentOrder",
+
+  "method": "PUT",
+  "uri": "/case-payment-orders",
+
+  "specs": [
+    "intends to update a previously created payment order",
+    "an active profile in CCD"
+  ],
+
+  "users": {
+    "invokingUser" : {
+      "_extends_" : "BeftaCaseworker1"
+    }
+  },
+
+  "s2sClientId": "xui_webapp",
+
+  "request" : {
+    "_extends_": "Common_Request"
+  }
+
+
+
+}

@@ -1,0 +1,20 @@
+{
+  "_guid_" : "S-702.2.1",
+  "_extends_" : "updateCasePaymentOrderBase",
+
+  "specs": [
+  ],
+
+  "request" : {
+    "id" : "${[scenarioContext][siblingContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
+    "case_id" : "${[scenarioContext][customValues][GenerateCaseId]}",
+    "action" : "payday",
+    "case_type_id" : "attribute-to-be-removed",
+    "responsible_party" : "party1",
+    "order_reference" : "order1"
+  },
+
+  "expectedResponse" : {
+
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "_guid_" : "S-703.7",
+  "_extends_" : "getCasePaymentOrderBase",
+
+  "specs": [
+  ],
+
+  "request" : {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "ids": "${[scenarioContext][siblingContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]},${[scenarioContext][siblingContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
+      "page_size" : 10,
+      "page_number" : 2
+
+    }
+  },
+
+  "expectedResponse" : {
+
+  }
+}

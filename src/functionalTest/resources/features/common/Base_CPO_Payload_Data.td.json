@@ -1,9 +1,12 @@
 {
   "_guid_" : "Base_CPO_Data",
     "effective_from" : "2021-01-01T00:00:00Z",
-    "case_id" : "1615819590019905",
-    "case_type_id" : "FT_MasterCaseType",
+    "case_id" : "${[scenarioContext][customValues][GenerateCaseId]}",
     "action" : "payday",
+    "case_type_id" : "attribute-to-be-removed",
     "responsible_party" : "party1",
-    "order_reference" : "order3"
+    "order_reference" : "order1"
 }
+
+
+

@@ -10,11 +10,11 @@
   "request" : {
     "body" : {
       "_extends_" : "Base_CPO_Data",
-      "case_id" : "1234567890123456"
+      "case_id" : "12345"
     }
   },
 
   "expectedResponse" : {
-    "_extends_" : "400_Response"
+
   }
 }

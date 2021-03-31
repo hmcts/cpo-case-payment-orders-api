@@ -1,0 +1,17 @@
+{
+  "_guid_" : "S-702.3.2",
+
+  "_extends_" : "updateCasePaymentOrderBase",
+
+  "specs": [
+  ],
+
+  "request" : {
+    "_extends_": "updateCasePaymentOrderPayloadData",
+    "effective_from" : "18-03-2021 15:56:55"
+  },
+
+  "expectedResponse" : {
+
+  }
+}

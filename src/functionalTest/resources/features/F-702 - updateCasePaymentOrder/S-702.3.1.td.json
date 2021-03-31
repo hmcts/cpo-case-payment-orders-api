@@ -1,0 +1,16 @@
+{
+  "_guid_" : "S-702.3.1",
+  "_extends_" : "updateCasePaymentOrderBase",
+
+  "specs": [
+  ],
+
+  "request" : {
+    "_extends_": "updateCasePaymentOrderPayloadData",
+    "case_id" : "12345"
+  },
+
+  "expectedResponse" : {
+
+  }
+}

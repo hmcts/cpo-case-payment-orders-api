@@ -1,6 +1,6 @@
 {
-  "_guid_" : "S-701",
-  "_extends_" : "createCasePaymentOrderBase",
+  "_guid_" : "S-703.3",
+  "_extends_" : "getCasePaymentOrderBase",
 
   "specs": [
   ],
@@ -10,6 +10,7 @@
   },
 
   "expectedResponse" : {
+    "_extends_" : "400_Response"
 
   }
 }

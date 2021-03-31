@@ -8,7 +8,9 @@
   ],
 
   "request" : {
-    "_extends_" : "Base_CPO_Data"
+    "_extends_" : "updateCasePaymentOrderPayloadData",
+    "order_reference" : "order2"
+
   },
 
   "expectedResponse" : {

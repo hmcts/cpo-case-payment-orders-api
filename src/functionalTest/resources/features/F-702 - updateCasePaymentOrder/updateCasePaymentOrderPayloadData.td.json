@@ -1,0 +1,11 @@
+{
+  "_guid_" : "updateCasePaymentOrderPayloadData",
+  "_extends_": "Base_CPO_Data",
+
+  "request" : {
+    "_extends_": "Common_Request",
+    "body": {
+      "id" : "${[scenarioContext][siblingContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}"
+    }
+  }
+}

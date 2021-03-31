@@ -5,7 +5,8 @@
   "specs": [
     "contains all the mandatory parameters",
     "contains a 200 success OK code",
-    "contains a valid UUID of the case order record"
+    "contains a valid UUID of the case order record",
+    "an active profile in CCD"
   ],
 
   "request" : {
@@ -16,6 +17,10 @@
   },
 
   "expectedResponse" : {
+    "_extends_" : "Common_201_Response",
+    "body" : {
+      "_extends_" : "Base_CPO_Response_Data"
+    }
 
   }
 }

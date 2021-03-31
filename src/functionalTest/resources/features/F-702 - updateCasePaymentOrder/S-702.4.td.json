@@ -1,0 +1,18 @@
+{
+  "_guid_" : "S-704",
+  "_extends_" : "updateCasePaymentOrderBase",
+
+  "specs": [
+    "contains all the mandatory parameters",
+    "contains the same order_reference as used in a previously created CPO for the same case id"
+  ],
+
+  "request" : {
+    "_extends_": "updateCasePaymentOrderPayloadData",
+    "order_reference" : "order2"
+  },
+
+  "expectedResponse" : {
+
+  }
+}

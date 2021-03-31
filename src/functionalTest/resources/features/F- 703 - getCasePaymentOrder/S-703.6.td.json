@@ -1,0 +1,18 @@
+{
+  "_guid_" : "S-703.6",
+  "_extends_" : "getCasePaymentOrderBase",
+
+  "specs": [
+  ],
+
+  "request" : {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "case_ids": "1617017531060561,1617017629907038"
+    }
+  },
+
+  "expectedResponse" : {
+
+  }
+}
