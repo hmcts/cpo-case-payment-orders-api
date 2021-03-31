@@ -21,8 +21,6 @@ public class CasePaymentOrder {
 
     private Long caseId;
 
-    private String caseTypeId;
-
     private String action;
 
     private String responsibleParty;
