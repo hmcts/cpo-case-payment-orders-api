@@ -54,7 +54,6 @@ class CasePaymentOrdersServiceImplTest {
     private static final LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24, 11, 48,
                                                            32);
     private static final Long CASE_ID = 1_122_334_455_667_788L;
-    private static final String CASE_TYPE_ID = "caseType";
     private static final String ACTION = "action";
     private static final String RESPONSIBLE_PARTY = "responsibleParty";
     private static final String ORDER_REFERENCE = "orderReference";
@@ -84,7 +83,6 @@ class CasePaymentOrdersServiceImplTest {
             createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(
                 EFFECTIVE_FROM,
                 CASE_ID,
-                CASE_TYPE_ID,
                 ACTION,
                 RESPONSIBLE_PARTY,
                 ORDER_REFERENCE
@@ -93,7 +91,6 @@ class CasePaymentOrdersServiceImplTest {
             casePaymentOrderIncoming = CasePaymentOrder.builder()
                 .effectiveFrom(EFFECTIVE_FROM)
                 .caseId(CASE_ID)
-                .caseTypeId(CASE_TYPE_ID)
                 .action(ACTION)
                 .responsibleParty(RESPONSIBLE_PARTY)
                 .orderReference(ORDER_REFERENCE)
@@ -104,7 +101,6 @@ class CasePaymentOrdersServiceImplTest {
 
             requestEntity.setEffectiveFrom(EFFECTIVE_FROM);
             requestEntity.setCaseId(CASE_ID);
-            requestEntity.setCaseTypeId(CASE_TYPE_ID);
             requestEntity.setAction(ACTION);
             requestEntity.setResponsibleParty(RESPONSIBLE_PARTY);
             requestEntity.setOrderReference(ORDER_REFERENCE);
@@ -112,7 +108,6 @@ class CasePaymentOrdersServiceImplTest {
 
             savedEntity.setEffectiveFrom(EFFECTIVE_FROM);
             savedEntity.setCaseId(CASE_ID);
-            savedEntity.setCaseTypeId(CASE_TYPE_ID);
             savedEntity.setAction(ACTION);
             savedEntity.setResponsibleParty(RESPONSIBLE_PARTY);
             savedEntity.setOrderReference(ORDER_REFERENCE);

@@ -54,7 +54,6 @@ public class CasePaymentOrdersControllerTest {
                                                                          11, 48, 32
     );
     private static final Long CASE_ID = 1_122_334_455_667_788L;
-    private static final String CASE_TYPE_ID = "caseType";
     private static final String ACTION = "action";
     private static final String RESPONSIBLE_PARTY = "responsibleParty";
     private static final String ORDER_REFERENCE = "orderReference";
@@ -96,7 +95,7 @@ public class CasePaymentOrdersControllerTest {
         @BeforeEach
         void setUp() {
 
-            createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(EFFECTIVE_FROM, CASE_ID, CASE_TYPE_ID,
+            createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(EFFECTIVE_FROM, CASE_ID,
                                                                               ACTION, RESPONSIBLE_PARTY,
                                                                               ORDER_REFERENCE
             );
@@ -104,7 +103,6 @@ public class CasePaymentOrdersControllerTest {
             casePaymentOrder = CasePaymentOrder.builder()
                 .caseId(CASE_ID)
                 .effectiveFrom(EFFECTIVE_FROM)
-                .caseTypeId(CASE_TYPE_ID)
                 .action(ACTION)
                 .responsibleParty(RESPONSIBLE_PARTY)
                 .orderReference(ORDER_REFERENCE)

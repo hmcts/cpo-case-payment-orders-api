@@ -18,9 +18,6 @@ public class CreateCasePaymentOrderRequest {
     @ApiModelProperty(value = "Case Id for which the record applies", required = true, example = "1612345678123456")
     private Long caseId;
 
-    @ApiModelProperty(value = "Case type ID for which the record applies", required = true, example = "divorce")
-    private String caseTypeId;
-
     @ApiModelProperty(value = "Action that initiated the creation of the case payment order", required = true,
         example = "Case Submit")
     private String action;

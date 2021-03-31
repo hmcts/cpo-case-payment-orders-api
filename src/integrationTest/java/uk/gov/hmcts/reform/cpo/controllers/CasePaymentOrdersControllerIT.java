@@ -29,7 +29,6 @@ public class CasePaymentOrdersControllerIT {
                                                                          32
     );
     private static final Long CASE_ID = 1_122_334_455_667_788L;
-    private static final String CASE_TYPE_ID = "caseType";
     private static final String ACTION = "action";
     private static final String RESPONSIBLE_PARTY = "responsibleParty";
     private static final String ORDER_REFERENCE = "orderReference";
@@ -49,7 +48,7 @@ public class CasePaymentOrdersControllerIT {
         @BeforeEach
         void setUp() {
 
-            createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(EFFECTIVE_FROM, CASE_ID, CASE_TYPE_ID,
+            createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(EFFECTIVE_FROM, CASE_ID,
                                                                               ACTION, RESPONSIBLE_PARTY,
                                                                               ORDER_REFERENCE
             );
@@ -67,7 +66,6 @@ public class CasePaymentOrdersControllerIT {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.id", notNullValue()))
-                .andExpect(jsonPath("$.case_type_id", is(CASE_TYPE_ID)))
                 .andExpect(jsonPath("$.case_id", is(CASE_ID)))
                 .andExpect(jsonPath("$.action", is(ACTION)))
                 .andExpect(jsonPath("$.responsible_party", is(RESPONSIBLE_PARTY)))
