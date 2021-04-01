@@ -10,9 +10,10 @@ class CasePaymentOrdersServiceImplTest {
 
     private CasePaymentOrdersService casePaymentOrdersService;
 
+
     @BeforeEach
     public void setUp() {
-        casePaymentOrdersService = new CasePaymentOrdersServiceImpl();
+        casePaymentOrdersService = new CasePaymentOrdersServiceImpl(null,null,null);
     }
 
     @Test

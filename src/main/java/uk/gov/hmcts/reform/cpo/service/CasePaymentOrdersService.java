@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.cpo.service;
 
-public interface CasePaymentOrdersService {
+import org.springframework.data.domain.Page;
+import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
+import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 
+public interface CasePaymentOrdersService {
+    Page<CasePaymentOrderEntity> getCasePaymentOrders(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter);
 }

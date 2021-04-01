@@ -46,4 +46,19 @@ public class CasePaymentOrderEntity {
 
     @Column(length = 70)
     private String createdBy;
+
+    public CasePaymentOrderEntity(UUID id, LocalDateTime createdTimestamp, LocalDateTime effectiveFrom, Long caseId, String caseTypeId, String action, String responsibleParty, String orderReference, String createdBy) {
+        this.id = id;
+        this.createdTimestamp = createdTimestamp;
+        this.effectiveFrom = effectiveFrom;
+        this.caseId = caseId;
+        this.caseTypeId = caseTypeId;
+        this.action = action;
+        this.responsibleParty = responsibleParty;
+        this.orderReference = orderReference;
+        this.createdBy = createdBy;
+    }
+
+    public CasePaymentOrderEntity() {
+    }
 }
