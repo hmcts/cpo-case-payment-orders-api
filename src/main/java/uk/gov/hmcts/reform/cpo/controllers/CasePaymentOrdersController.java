@@ -21,7 +21,7 @@ import java.util.Optional;
 
 @RestController
 @Validated
-@RequestMapping(value = "/api")
+@RequestMapping(value = "/")
 public class CasePaymentOrdersController {
 
     private final CasePaymentOrdersServiceImpl casePaymentOrdersServiceImpl;

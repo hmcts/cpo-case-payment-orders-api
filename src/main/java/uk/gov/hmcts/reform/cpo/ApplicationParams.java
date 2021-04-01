@@ -11,9 +11,9 @@ import javax.inject.Singleton;
 @Getter
 public class ApplicationParams {
 
-    @Value("${ccd.defaultPageSize}")
+    @Value("${cpo.defaultPageSize}")
     private String defaultPageSize;
 
-    @Value("${ccd.defaultPageNumber}")
+    @Value("${cpo.defaultPageNumber}")
     private String defaultPageNumber;
 }
