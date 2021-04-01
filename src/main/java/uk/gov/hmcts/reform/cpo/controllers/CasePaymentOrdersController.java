@@ -27,7 +27,8 @@ public class CasePaymentOrdersController {
     private final CasePaymentOrdersServiceImpl casePaymentOrdersServiceImpl;
     private final ApplicationParams applicationParams;
 
-    public CasePaymentOrdersController(CasePaymentOrdersServiceImpl casePaymentOrdersServiceImpl, ApplicationParams applicationParams) {
+    public CasePaymentOrdersController(CasePaymentOrdersServiceImpl casePaymentOrdersServiceImpl,
+                                       ApplicationParams applicationParams) {
         this.casePaymentOrdersServiceImpl = casePaymentOrdersServiceImpl;
         this.applicationParams = applicationParams;
     }
@@ -35,9 +36,11 @@ public class CasePaymentOrdersController {
 
     @GetMapping(value = "case-payment-orders", produces = {"application/json"})
     public Page<CasePaymentOrderEntity> getCasePaymentOrders(@ApiParam(value = "list of ids")
-                                                             @ValidCpoId @RequestParam("ids") Optional<List<String>> ids,
+                                                             @ValidCpoId
+                                                             @RequestParam("ids") Optional<List<String>> ids,
                                                              @ApiParam(value = "casesId of ids")
-                                                             @ValidCaseId @RequestParam("cases-ids") Optional<List<String>> casesId,
+                                                             @ValidCaseId
+                                                             @RequestParam("cases-ids") Optional<List<String>> casesId,
                                                              @RequestParam("pageSize") Optional<Integer> pageSize,
                                                              @RequestParam("pageNumber") Optional<Integer> pageNumber
 
@@ -55,7 +58,7 @@ public class CasePaymentOrdersController {
 
     //TODO this is not going to be included in final pr
     @GetMapping(value = "case-payment-orders-test-data", produces = {"application/json"})
-    public void createData(){
+    public void createData() {
         casePaymentOrdersServiceImpl.create();
     }
 }

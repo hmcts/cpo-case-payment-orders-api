@@ -24,12 +24,15 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     @Autowired
     private CasePaymentOrdersRepository casePaymentOrdersRepository;
 
-    public CasePaymentOrdersServiceImpl(CasePaymentOrderMapper casePaymentOrderMapper, CasePaymentOrdersRepository casePaymentOrdersRepository) {
+    public CasePaymentOrdersServiceImpl(CasePaymentOrderMapper casePaymentOrderMapper,
+                                        CasePaymentOrdersRepository casePaymentOrdersRepository) {
         this.casePaymentOrderMapper = casePaymentOrderMapper;
         this.casePaymentOrdersRepository = casePaymentOrdersRepository;
     }
 
-    public Page<CasePaymentOrderEntity> getCasePaymentOrders(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+    public Page<CasePaymentOrderEntity> getCasePaymentOrders(
+        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+
         if (casePaymentOrderQueryFilter.isItAnEmptyCriteria()) {
             return Page.empty();
         }
