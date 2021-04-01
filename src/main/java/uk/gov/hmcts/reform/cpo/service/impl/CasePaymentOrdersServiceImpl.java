@@ -77,7 +77,6 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         casePaymentOrderEntity.setOrderReference("action1");
         casePaymentOrderEntity.setEffectiveFrom(LocalDateTime.now());
         casePaymentOrderEntity.setCreatedTimestamp(LocalDateTime.now());
-        casePaymentOrderEntity.setCaseTypeId("setCaseTypeId");
         casePaymentOrderEntity.setResponsibleParty("setResponsibleParty");
         casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity);
         casePaymentOrdersRepository.flush();
@@ -89,7 +88,6 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         casePaymentOrderEntity1.setOrderReference("Baction2");
         casePaymentOrderEntity1.setEffectiveFrom(LocalDateTime.now());
         casePaymentOrderEntity1.setCreatedTimestamp(LocalDateTime.now());
-        casePaymentOrderEntity1.setCaseTypeId("setCaseTypeId");
         casePaymentOrderEntity1.setResponsibleParty("setResponsibleParty");
         casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity1);
         casePaymentOrdersRepository.flush();
@@ -101,7 +99,6 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         casePaymentOrderEntity2.setOrderReference("Caction3");
         casePaymentOrderEntity2.setEffectiveFrom(LocalDateTime.now());
         casePaymentOrderEntity2.setCreatedTimestamp(LocalDateTime.now());
-        casePaymentOrderEntity2.setCaseTypeId("setCaseTypeId");
         casePaymentOrderEntity2.setResponsibleParty("setResponsibleParty");
         casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity2);
         casePaymentOrdersRepository.flush();
