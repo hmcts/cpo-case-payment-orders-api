@@ -34,9 +34,6 @@ public class CasePaymentOrderEntity {
     private Long caseId;
 
     @Column(length = 70, nullable = false)
-    private String caseTypeId;
-
-    @Column(length = 70, nullable = false)
     private String action;
 
     @Column(length = 1024, nullable = false)
