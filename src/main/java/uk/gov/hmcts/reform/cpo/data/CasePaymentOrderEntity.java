@@ -58,5 +58,6 @@ public class CasePaymentOrderEntity {
     }
 
     public CasePaymentOrderEntity() {
+        //defalt constructor provided
     }
 }

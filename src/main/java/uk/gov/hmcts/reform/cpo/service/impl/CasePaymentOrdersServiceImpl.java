@@ -69,42 +69,4 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
                 "case-payment-orders cannot filter case payments orders by both id and cases-id.");
         }
     }
-
-    //TODO THIS IS NOT GOING TO BE ADDED IN THE FINAL PR
-    public void create() {
-
-        final CasePaymentOrderEntity casePaymentOrderEntity = new CasePaymentOrderEntity();
-        casePaymentOrderEntity.setAction("action");
-        casePaymentOrderEntity.setCaseId(Long.parseLong("1609243447569251"));
-        casePaymentOrderEntity.setCreatedBy("action1");
-        casePaymentOrderEntity.setOrderReference("action1");
-        casePaymentOrderEntity.setEffectiveFrom(LocalDateTime.now());
-        casePaymentOrderEntity.setCreatedTimestamp(LocalDateTime.now());
-        casePaymentOrderEntity.setResponsibleParty("setResponsibleParty");
-        casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity);
-        casePaymentOrdersRepository.flush();
-
-        final CasePaymentOrderEntity casePaymentOrderEntity1 = new CasePaymentOrderEntity();
-        casePaymentOrderEntity1.setAction("action");
-        casePaymentOrderEntity1.setCaseId(Long.parseLong("1609243447569252"));
-        casePaymentOrderEntity1.setCreatedBy("action1");
-        casePaymentOrderEntity1.setOrderReference("Baction2");
-        casePaymentOrderEntity1.setEffectiveFrom(LocalDateTime.now());
-        casePaymentOrderEntity1.setCreatedTimestamp(LocalDateTime.now());
-        casePaymentOrderEntity1.setResponsibleParty("setResponsibleParty");
-        casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity1);
-        casePaymentOrdersRepository.flush();
-
-        final CasePaymentOrderEntity casePaymentOrderEntity2 = new CasePaymentOrderEntity();
-        casePaymentOrderEntity2.setAction("action");
-        casePaymentOrderEntity2.setCaseId(Long.parseLong("1609243447569253"));
-        casePaymentOrderEntity2.setCreatedBy("action1");
-        casePaymentOrderEntity2.setOrderReference("Caction3");
-        casePaymentOrderEntity2.setEffectiveFrom(LocalDateTime.now());
-        casePaymentOrderEntity2.setCreatedTimestamp(LocalDateTime.now());
-        casePaymentOrderEntity2.setResponsibleParty("setResponsibleParty");
-        casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity2);
-        casePaymentOrdersRepository.flush();
-
-    }
 }

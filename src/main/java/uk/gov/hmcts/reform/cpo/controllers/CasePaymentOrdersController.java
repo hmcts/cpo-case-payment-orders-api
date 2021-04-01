@@ -55,10 +55,4 @@ public class CasePaymentOrdersController {
             .build();
         return casePaymentOrdersServiceImpl.getCasePaymentOrders(casePaymentOrderQueryFilter);
     }
-
-    //TODO this is not going to be included in final pr
-    @GetMapping(value = "case-payment-orders-test-data", produces = {"application/json"})
-    public void createData() {
-        casePaymentOrdersServiceImpl.create();
-    }
 }

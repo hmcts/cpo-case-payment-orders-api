@@ -29,7 +29,7 @@ public class CasePaymentOrderQueryFilter {
     }
 
     public boolean isAnIdsAndCasesIdQuery() {
-        return (isACasesIdQuery()) && (isAnIdsQuery());
+        return isACasesIdQuery() && isAnIdsQuery();
     }
 
     public boolean isItAnEmptyCriteria() {
