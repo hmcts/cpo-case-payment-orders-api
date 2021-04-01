@@ -10,7 +10,10 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.ConfusingTernary"})
 public class HttpError<T extends Serializable> implements Serializable {
+    private static final long serialVersionUID = 1501816452204696395L;
+
     public static final Integer DEFAULT_STATUS = HttpStatus.INTERNAL_SERVER_ERROR.value();
     public static final String DEFAULT_ERROR = "Unexpected Error";
 
@@ -32,13 +35,13 @@ public class HttpError<T extends Serializable> implements Serializable {
         this.message = exception.getMessage();
         this.path = UriUtils.encodePath(request.getRequestURI(), StandardCharsets.UTF_8);
     }
+
     public HttpError(Exception exception, HttpServletRequest request) {
         this(exception, request, null);
     }
 
-
-    private Integer getStatusFromResponseStatus(ResponseStatus responseStatus,HttpStatus status) {
-        if(status!=null){
+    private Integer getStatusFromResponseStatus(ResponseStatus responseStatus, HttpStatus status) {
+        if (status != null) {
             return status.value();
         }
         if (null != responseStatus) {

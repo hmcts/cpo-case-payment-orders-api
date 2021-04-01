@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class IdsValidator implements ConstraintValidator<ValidCpoId, Optional<List<String>>>, Validator <String>{
+public class IdsValidator implements ConstraintValidator<ValidCpoId, Optional<List<String>>>, Validator<String> {
 
     @Override
     public void initialize(final ValidCpoId constraintAnnotation) {

@@ -13,7 +13,7 @@ class CasePaymentOrdersServiceImplTest {
 
     @BeforeEach
     public void setUp() {
-        casePaymentOrdersService = new CasePaymentOrdersServiceImpl(null,null,null);
+        casePaymentOrdersService = new CasePaymentOrdersServiceImpl(null);
     }
 
     @Test
