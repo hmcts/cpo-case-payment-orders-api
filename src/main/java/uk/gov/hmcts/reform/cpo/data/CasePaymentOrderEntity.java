@@ -5,12 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.envers.Audited;
-import org.hibernate.envers.NotAudited;
 
 import javax.persistence.Column;
-import javax.persistence.Id;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -28,7 +27,6 @@ public class CasePaymentOrderEntity {
     private UUID id;
 
     @CreationTimestamp
-    @NotAudited
     private LocalDateTime createdTimestamp;
 
     @Column(nullable = false)
@@ -47,6 +45,5 @@ public class CasePaymentOrderEntity {
     private String orderReference;
 
     @Column(length = 70)
-    @NotAudited
     private String createdBy;
 }
