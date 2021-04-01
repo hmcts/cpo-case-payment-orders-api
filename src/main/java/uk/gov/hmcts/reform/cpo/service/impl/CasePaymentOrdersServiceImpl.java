@@ -54,7 +54,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
     private PageRequest getPageRequest(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
         final List<Sort.Order> orders = new ArrayList<>();
-        orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderQueryFilter.CASES_TYPE_ID));
+        orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderQueryFilter.CASES_ID));
         orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderQueryFilter.ORDER_REFERENCE));
         return PageRequest.of(
             casePaymentOrderQueryFilter.getPageNumber(),
