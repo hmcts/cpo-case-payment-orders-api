@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.cpo.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.util.UriUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +23,7 @@ public class HttpError<T extends Serializable> implements Serializable {
     private final String path;
     private T details;
 
-    public HttpError(Exception exception, HttpServletRequest request, HttpStatus status) {
+    public HttpError(Exception exception, String path,HttpStatus status) {
         final ResponseStatus responseStatus = exception.getClass().getAnnotation(ResponseStatus.class);
 
         this.exception = exception.getClass().getName();
@@ -30,7 +31,15 @@ public class HttpError<T extends Serializable> implements Serializable {
         this.status = getStatusFromResponseStatus(responseStatus, status);
         this.error = getErrorReason(responseStatus);
         this.message = exception.getMessage();
-        this.path = UriUtils.encodePath(request.getRequestURI(), StandardCharsets.UTF_8);
+        this.path = UriUtils.encodePath(path, StandardCharsets.UTF_8);
+    }
+
+    public HttpError(Exception exception, HttpServletRequest request, HttpStatus status) {
+        this(exception, request.getRequestURI(), status);
+    }
+
+    public HttpError(Exception exception, WebRequest request, HttpStatus status) {
+        this(exception, request.getContextPath(), status);
     }
 
     public HttpError(Exception exception, HttpServletRequest request) {
