@@ -29,6 +29,18 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return getHttpErrorBadRequest(request, exception);
     }
 
+    @ExceptionHandler(CasePaymentOrderCouldNotBeFoundException.class)
+    public ResponseEntity<Object> handleCasePaymentOrderCouldNotBeFoundException(final HttpServletRequest request,
+                                                                                 final Exception exception) {
+
+        LOG.debug("CasePaymentOrderCouldNotBeFoundException: {}", exception.getLocalizedMessage(), exception);
+        final HttpError<Serializable> error = new HttpError<Serializable>(exception, request, HttpStatus.NOT_FOUND)
+            .withDetails(exception.getCause());
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(error);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception,
                                                                   HttpHeaders headers,

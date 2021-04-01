@@ -1,14 +1,19 @@
 package uk.gov.hmcts.reform.cpo.service.mapper;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
+import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
+import static org.springframework.test.util.AssertionErrors.assertNotEquals;
+import static org.springframework.test.util.AssertionErrors.assertNotNull;
 
 class CasePaymentOrderMapperTest {
 
@@ -81,4 +86,70 @@ class CasePaymentOrderMapperTest {
         assertEquals("Mapped domain model created by should equals mocked domain model created by",
                      casePaymentOrder.getCreatedBy(), mappedDomainObject.getCreatedBy());
     }
+
+    @DisplayName("should successfully merge an update request into an entity")
+    @Test
+    void successfulMergeIntoEntityMapping() {
+
+        // GIVEN
+        UpdateCasePaymentOrderRequest updateRequest =
+            new UpdateCasePaymentOrderRequest(UUID.randomUUID().toString(),
+                                              LocalDateTime.of(2020, 10, 1, 12, 30, 0, 0),
+                                              "4444333322221111",
+                                              "Merge Action",
+                                              "Merge Responsible Party",
+                                              "Merge Order Reference");
+        final LocalDateTime originalCreatedTimestamp = entity.getCreatedTimestamp();
+        final String sourceCreatedBy = "Merge Created By";
+
+        // WHEN
+        mapper.mergeIntoEntity(entity, updateRequest, sourceCreatedBy);
+
+        // THEN
+        // check created/modifided data
+        assertEquals("Merged created by should equals supplied created by",
+                     sourceCreatedBy, entity.getCreatedBy());
+        assertNotNull("Merged created timestamp should be set", entity.getCreatedTimestamp());
+        assertNotEquals("Merged created timestamp should have changed",
+                        originalCreatedTimestamp, entity.getCreatedTimestamp());
+        // standard property checks
+        assertEquals("Merged effective from should equal source effective from",
+                     updateRequest.getEffectiveFrom(), entity.getEffectiveFrom());
+        assertEquals("Merged case id should equal source case id",
+                     updateRequest.getCaseId(), entity.getCaseId().toString());
+        assertEquals("Merged action should equal source action",
+                     updateRequest.getAction(), entity.getAction());
+        assertEquals("Merged responsible party should equal source responsible party",
+                     updateRequest.getResponsibleParty(), entity.getResponsibleParty());
+        assertEquals("Merged order reference should equal source order reference",
+                     updateRequest.getOrderReference(), entity.getOrderReference());
+
+    }
+
+    @DisplayName("should successfully run mergeIntoEntity when all inputs are null and leave entity unchanged")
+    @Test
+    void successfulMergeIntoEntityMappingUsingAllNullLeavesEntityUnchanged() {
+
+        // GIVEN
+        final LocalDateTime originalCreatedTimestamp = entity.getCreatedTimestamp();
+        final String originalCreatedBy = entity.getCreatedBy();
+
+        // WHEN
+        mapper.mergeIntoEntity(entity, null, null);
+
+        // THEN
+        // check created/modifided data (UNCHANGED)
+        assertEquals("Created by should be unchanged",
+                     originalCreatedBy, entity.getCreatedBy());
+        assertEquals("Created timestamp should be unchanged",
+                     originalCreatedTimestamp, entity.getCreatedTimestamp());
+        // standard property checks (not null: assume unchanged)
+        assertNotNull("Effective from should remain populated", entity.getEffectiveFrom());
+        assertNotNull("Case ID should remain populated", entity.getCaseId());
+        assertNotNull("Action should remain populated", entity.getAction());
+        assertNotNull("Responsible party should remain populated", entity.getResponsibleParty());
+        assertNotNull("Order reference should remain populated", entity.getOrderReference());
+
+    }
+
 }
