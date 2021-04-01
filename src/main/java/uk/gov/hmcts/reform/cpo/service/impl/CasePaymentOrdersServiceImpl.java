@@ -29,6 +29,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         this.casePaymentOrdersRepository = casePaymentOrdersRepository;
     }
 
+    @Override
     public Page<CasePaymentOrderEntity> getCasePaymentOrders(
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
 
@@ -52,7 +53,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     }
 
     private PageRequest getPageRequest(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
-        final List<Sort.Order> orders = new ArrayList<Sort.Order>();
+        final List<Sort.Order> orders = new ArrayList<>();
         orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderQueryFilter.CASES_TYPE_ID));
         orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderQueryFilter.ORDER_REFERENCE));
         return PageRequest.of(
