@@ -10,19 +10,13 @@ import java.util.Optional;
 
 public class CaseIdsValidator implements ConstraintValidator<ValidCaseId, Optional<List<String>>>, Validator<String> {
 
-    private static final String CASE_ID_RG = "\\d{16}";
-
     @Override
-    public void initialize(final ValidCaseId constraintAnnotation) {
-    }
-
-    @Override
-    public boolean isValid(final Optional<List<String>> ids, final ConstraintValidatorContext context) {
-        if (!ids.isPresent()) {
+    public boolean isValid(final Optional<List<String>> caseIds, final ConstraintValidatorContext context) {
+        if (caseIds.isEmpty()) {
             return true;
         }
         final List<String> errors = new ArrayList<>();
-        ids.get().stream().forEach(caseId -> validate(caseId,errors));
+        caseIds.get().forEach(caseId -> validate(caseId, errors));
         if (errors.isEmpty()) {
             return true;
         }
@@ -31,8 +25,8 @@ public class CaseIdsValidator implements ConstraintValidator<ValidCaseId, Option
     }
 
     @Override
-    public void validate(final String caseId,List<String> errors) {
-        if (!caseId.matches(CASE_ID_RG)) {
+    public void validate(final String caseId, List<String> errors) {
+        if (!Validator.isValidCaseId(caseId)) {
             errors.add(caseId);
         }
     }
