@@ -27,17 +27,16 @@ class IdsTest implements BaseTest<String> {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
     void passForValidIds() {
-        final String[] testedData = {"df54651b-3227-4067-9f23-6ffb32e2c6bd", "d702ef36-0ca7-46e9-8a00-ef044d78453e",
-            "d702ef36-0ca7-46e9-8a00-ef044d78453e"};
+        final String[] testedData = {CPO_ID_VALID_1, CPO_ID_VALID_2, CPO_ID_VALID_3};
 
         final Optional<List<String>> valuesToBeTested = createInitialValuesList(testedData);
         final boolean result = idsValidator.isValid(valuesToBeTested, constraintValidatorContext);
-        assertTrue("The values: " + testedData + "should be valid", result);
+        assertTrue("The values: " + testedData + " should be valid", result);
     }
 
     @Test
@@ -50,25 +49,25 @@ class IdsTest implements BaseTest<String> {
     @Test
     void passForOneId() {
         final List<String> errors = new ArrayList<String>();
-        final String valueToBeTested = "df54651b-3227-4067-9f23-6ffb32e2c6bd";
+        final String valueToBeTested = CPO_ID_VALID_1;
         idsValidator.validate(valueToBeTested, errors);
         assertTrue("There should not be any error for " + valueToBeTested + " value.", errors.isEmpty());
     }
 
     @Test
     void failForInvalidIds() {
-        final String[] testedData = {"dddd", "160924", "160924 "};
+        final String[] testedData = {CPO_ID_INVALID_NON_NUMERIC, CPO_ID_INVALID_1, CPO_ID_INVALID_2};
         final Optional<List<String>> valuesToBeTested = createInitialValuesList(testedData);
         when(constraintValidatorContext.buildConstraintViolationWithTemplate(anyString())).thenReturn(
             constraintViolationBuilder);
         final boolean result = idsValidator.isValid(valuesToBeTested, constraintValidatorContext);
-        assertFalse("The values: " + testedData + "should not be valid", result);
+        assertFalse("The values: " + testedData + " should not be valid", result);
     }
 
     @Test
     void failForOneId() {
         final List<String> errors = new ArrayList<String>();
-        final String valueToBeTested = "1609";
+        final String valueToBeTested = CPO_ID_INVALID_1;
         idsValidator.validate(valueToBeTested, errors);
         assertTrue("There should be any error for " + valueToBeTested + " value.", !errors.isEmpty());
     }

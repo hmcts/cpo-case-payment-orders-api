@@ -20,6 +20,7 @@ import static org.springframework.test.util.AssertionErrors.assertTrue;
 class CaseIdsTest implements BaseTest<String> {
 
     private CaseIdsValidator caseIdsValidator = new CaseIdsValidator();
+
     @Mock
     private ConstraintValidatorContext constraintValidatorContext;
     @Mock
@@ -27,16 +28,15 @@ class CaseIdsTest implements BaseTest<String> {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
-
 
     @Test
     void passForValidCasesIds() {
-        final String[] testedData = {"1609243447569251", "1609243447569252", "1609243447569253"};
+        final String[] testedData = {CASE_ID_VALID_1, CASE_ID_VALID_2, CASE_ID_VALID_3};
         final Optional<List<String>> valuesToBeTested = createInitialValuesList(testedData);
         final boolean result = caseIdsValidator.isValid(valuesToBeTested, constraintValidatorContext);
-        assertTrue("The values: " + testedData + "should be valid", result);
+        assertTrue("The values: " + testedData + " should be valid", result);
     }
 
     @Test
@@ -49,25 +49,25 @@ class CaseIdsTest implements BaseTest<String> {
     @Test
     void passForOneCasesId() {
         final List<String> errors = new ArrayList<String>();
-        final String valueToBeTested = "1609243447569251";
+        final String valueToBeTested = CASE_ID_VALID_1;
         caseIdsValidator.validate(valueToBeTested, errors);
         assertTrue("There should not be any error for " + valueToBeTested + " value.", errors.isEmpty());
     }
 
     @Test
     void failForInvalidCasesIds() {
-        final String[] testedData = {"dddd", "160924", "160924 "};
+        final String[] testedData = {CASE_ID_INVALID_NON_NUMERIC, CASE_ID_INVALID_LUHN, CASE_ID_INVALID_LENGTH};
         final Optional<List<String>> valuesToBeTested = createInitialValuesList(testedData);
         when(constraintValidatorContext.buildConstraintViolationWithTemplate(anyString())).thenReturn(
             constraintViolationBuilder);
         final boolean result = caseIdsValidator.isValid(valuesToBeTested, constraintValidatorContext);
-        assertFalse("The values: " + testedData + "should not be valid", result);
+        assertFalse("The values: " + testedData + " should not be valid", result);
     }
 
     @Test
     void failForOneCasesId() {
         final List<String> errors = new ArrayList<String>();
-        final String valueToBeTested = "1609";
+        final String valueToBeTested = CASE_ID_INVALID_LENGTH;
         caseIdsValidator.validate(valueToBeTested, errors);
         assertTrue("There should be any error for " + valueToBeTested + " value.", !errors.isEmpty());
     }
