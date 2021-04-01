@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,9 +19,9 @@ import java.util.List;
 public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
     @Autowired
-    private CasePaymentOrderMapper casePaymentOrderMapper;
+    private final CasePaymentOrderMapper casePaymentOrderMapper;
     @Autowired
-    private CasePaymentOrdersRepository casePaymentOrdersRepository;
+    private final CasePaymentOrdersRepository casePaymentOrdersRepository;
 
     public CasePaymentOrdersServiceImpl(CasePaymentOrderMapper casePaymentOrderMapper,
                                         CasePaymentOrdersRepository casePaymentOrdersRepository) {
@@ -54,7 +53,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
     private PageRequest getPageRequest(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
         final List<Sort.Order> orders = new ArrayList<Sort.Order>();
-        orders.add(new Sort.Order(Sort.Direction.ASC,  CasePaymentOrderQueryFilter.CASES_TYPE_ID));
+        orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderQueryFilter.CASES_TYPE_ID));
         orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderQueryFilter.ORDER_REFERENCE));
         return PageRequest.of(
             casePaymentOrderQueryFilter.getPageNumber(),
