@@ -105,6 +105,23 @@ class CasePaymentOrdersServiceImplTest implements BaseTest<String> {
         assertTrue("The getNumberOfElements should be 0.", pages.getNumberOfElements() == 3);
     }
 
+    @Test
+    void passForListCasesIds() {
+        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
+            .listOfIds(Collections.emptyList())
+            .listOfCasesIds(casesIds)
+            .pageNumber(PAGE_NUMBER)
+            .pageSize(PAGE_SIZE)
+            .build();
+
+        when(casePaymentOrdersRepository.findByCaseIdIn(anyList(), ArgumentMatchers.<Pageable>any())).thenReturn(
+            getPages(casePaymentOrderQueryFilter));
+        final Page<CasePaymentOrderEntity> pages = casePaymentOrdersService.getCasePaymentOrders(
+            casePaymentOrderQueryFilter);
+
+        assertTrue("The getNumberOfElements should be 0.", pages.getNumberOfElements() == 3);
+    }
+
     private Page<CasePaymentOrderEntity> getPages(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
         final PageRequest pageRequest = getPageRequest(casePaymentOrderQueryFilter);
         return new PageImpl<CasePaymentOrderEntity>(createListOfCasePaymentOrderEntity(), pageRequest, 3);
