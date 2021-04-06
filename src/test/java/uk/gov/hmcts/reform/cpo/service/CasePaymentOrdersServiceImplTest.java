@@ -9,7 +9,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
+import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,9 +36,23 @@ class CasePaymentOrdersServiceImplTest {
     @Captor
     ArgumentCaptor<List<Long>> caseIdsArgumentCaptor;
 
+    @Mock
+    private CasePaymentOrderMapper casePaymentOrderMapper;
+    @Mock
+    private CasePaymentOrdersRepository casePaymentOrdersRepository;
+
     private final List<UUID> uuidsToDelete = List.of(UUID.randomUUID(), UUID.randomUUID());
 
     private final List<Long> caseIdsToDelete = List.of(123L, 456L);
+
+    @BeforeEach
+    public void setUp() {
+
+        casePaymentOrdersService = new CasePaymentOrdersServiceImpl(
+            casePaymentOrderMapper,
+            casePaymentOrdersRepository
+        );
+    }
 
     @Test
     public void deleteCasePaymentOrdersById() throws Exception {
