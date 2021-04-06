@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
-import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
+import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 
@@ -27,10 +27,10 @@ import java.util.Optional;
 @RequestMapping(value = "/")
 public class CasePaymentOrdersController {
 
-    private final CasePaymentOrdersServiceImpl casePaymentOrdersServiceImpl;
+    private final CasePaymentOrdersService casePaymentOrdersServiceImpl;
     private final ApplicationParams applicationParams;
 
-    public CasePaymentOrdersController(CasePaymentOrdersServiceImpl casePaymentOrdersServiceImpl,
+    public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersServiceImpl,
                                        ApplicationParams applicationParams) {
         this.casePaymentOrdersServiceImpl = casePaymentOrdersServiceImpl;
         this.applicationParams = applicationParams;
@@ -56,8 +56,8 @@ public class CasePaymentOrdersController {
         final List<String> listOfIds = ids.orElse(Collections.emptyList());
         final List<String> listOfCasesIds = casesId.orElse(Collections.emptyList());
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
-            .listOfIds(listOfIds)
-            .listOfCasesIds(listOfCasesIds)
+            .cpoIds(listOfIds)
+            .caseIds(listOfCasesIds)
             .pageNumber(pageNumber.orElse(CasePaymentOrderQueryFilter.PAGE_NUMBER))
             .pageSize(pageSize.orElse(Integer.parseInt(applicationParams.getDefaultPageSize())))
             .build();

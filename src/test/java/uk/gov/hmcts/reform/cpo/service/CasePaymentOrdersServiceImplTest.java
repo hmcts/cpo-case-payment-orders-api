@@ -59,8 +59,8 @@ class CasePaymentOrdersServiceImplTest implements BaseTest<String> {
     @Test
     void passForEmptyPages() {
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
-            .listOfIds(Collections.emptyList())
-            .listOfCasesIds(Collections.emptyList())
+            .cpoIds(Collections.emptyList())
+            .caseIds(Collections.emptyList())
             .pageNumber(PAGE_NUMBER)
             .pageSize(PAGE_SIZE)
             .build();
@@ -75,8 +75,8 @@ class CasePaymentOrdersServiceImplTest implements BaseTest<String> {
     void failForCasesIdsAndIdsTogether() {
         final String expectedError = "case payment orders cannot be filtered by both id and case id.";
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
-            .listOfIds(ids)
-            .listOfCasesIds(casesIds)
+            .cpoIds(ids)
+            .caseIds(casesIds)
             .pageNumber(PAGE_NUMBER)
             .pageSize(PAGE_SIZE)
             .build();
@@ -91,8 +91,8 @@ class CasePaymentOrdersServiceImplTest implements BaseTest<String> {
     @Test
     void passForListIds() {
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
-            .listOfIds(ids)
-            .listOfCasesIds(Collections.emptyList())
+            .cpoIds(ids)
+            .caseIds(Collections.emptyList())
             .pageNumber(PAGE_NUMBER)
             .pageSize(PAGE_SIZE)
             .build();
@@ -108,8 +108,8 @@ class CasePaymentOrdersServiceImplTest implements BaseTest<String> {
     @Test
     void passForListCasesIds() {
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
-            .listOfIds(Collections.emptyList())
-            .listOfCasesIds(casesIds)
+            .cpoIds(Collections.emptyList())
+            .caseIds(casesIds)
             .pageNumber(PAGE_NUMBER)
             .pageSize(PAGE_SIZE)
             .build();

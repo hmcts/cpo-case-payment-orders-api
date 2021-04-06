@@ -15,16 +15,16 @@ public class CasePaymentOrderQueryFilter {
 
     private Integer pageSize;
     private Integer pageNumber;
-    private List<String> listOfIds;
-    private List<String> listOfCasesIds;
+    private List<String> cpoIds;
+    private List<String> caseIds;
 
 
     public boolean isACasesIdQuery() {
-        return !listOfCasesIds.isEmpty();
+        return !caseIds.isEmpty();
     }
 
     public boolean isAnIdsQuery() {
-        return !listOfIds.isEmpty();
+        return !cpoIds.isEmpty();
     }
 
     public boolean isAnIdsAndCasesIdQuery() {
@@ -32,14 +32,14 @@ public class CasePaymentOrderQueryFilter {
     }
 
     public boolean isItAnEmptyCriteria() {
-        return listOfIds.isEmpty() && listOfCasesIds.isEmpty();
+        return cpoIds.isEmpty() && caseIds.isEmpty();
     }
 
     public List<UUID> getListUUID() {
-        return listOfIds.stream().map(UUID::fromString).collect(Collectors.toList());
+        return cpoIds.stream().map(UUID::fromString).collect(Collectors.toList());
     }
 
     public List<Long> getListOfLongCasesIds() {
-        return listOfCasesIds.stream().map(Long::parseLong).collect(Collectors.toList());
+        return caseIds.stream().map(Long::parseLong).collect(Collectors.toList());
     }
 }
