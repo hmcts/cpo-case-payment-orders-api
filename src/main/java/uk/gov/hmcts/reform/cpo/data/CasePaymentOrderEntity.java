@@ -34,9 +34,6 @@ public class CasePaymentOrderEntity {
     private Long caseId;
 
     @Column(length = 70, nullable = false)
-    private String caseTypeId;
-
-    @Column(length = 70, nullable = false)
     private String action;
 
     @Column(length = 1024, nullable = false)
@@ -48,12 +45,12 @@ public class CasePaymentOrderEntity {
     @Column(length = 70)
     private String createdBy;
 
-    public CasePaymentOrderEntity(UUID id, LocalDateTime createdTimestamp, LocalDateTime effectiveFrom, Long caseId, String caseTypeId, String action, String responsibleParty, String orderReference, String createdBy) {
+    public CasePaymentOrderEntity(UUID id, LocalDateTime createdTimestamp, LocalDateTime effectiveFrom, Long caseId,
+                                  String action, String responsibleParty, String orderReference, String createdBy) {
         this.id = id;
         this.createdTimestamp = createdTimestamp;
         this.effectiveFrom = effectiveFrom;
         this.caseId = caseId;
-        this.caseTypeId = caseTypeId;
         this.action = action;
         this.responsibleParty = responsibleParty;
         this.orderReference = orderReference;
@@ -61,5 +58,6 @@ public class CasePaymentOrderEntity {
     }
 
     public CasePaymentOrderEntity() {
+        //defalt constructor provided
     }
 }

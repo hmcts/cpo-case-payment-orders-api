@@ -27,7 +27,6 @@ class CasePaymentOrderMapperTest {
         entity.setCreatedTimestamp(date);
         entity.setEffectiveFrom(date);
         entity.setCaseId(1_234_123_412_341_234L);
-        entity.setCaseTypeId("Probate");
         entity.setAction("Case Creation");
         entity.setResponsibleParty("The executor on the will");
         entity.setOrderReference("Bob123");
@@ -37,7 +36,6 @@ class CasePaymentOrderMapperTest {
             .createdTimestamp(entity.getCreatedTimestamp())
             .effectiveFrom(date)
             .caseId(1_234_123_412_341_234L)
-            .caseTypeId("Probate")
             .action("Case Creation")
             .responsibleParty("The executor on the will")
             .orderReference("Bob123")
@@ -55,8 +53,6 @@ class CasePaymentOrderMapperTest {
                      entity.getEffectiveFrom(), mappedEntity.getEffectiveFrom());
         assertEquals("Mapped entity case id should equals mocked entity case id",
                      entity.getCaseId(), mappedEntity.getCaseId());
-        assertEquals("Mapped entity case type id should equals mocked entity case type id",
-                     entity.getCaseTypeId(), mappedEntity.getCaseTypeId());
         assertEquals("Mapped entity action should equals mocked entity action",
                      entity.getAction(), mappedEntity.getAction());
         assertEquals("Mapped entity responsible party should equals mocked entity responsible party",
@@ -76,8 +72,6 @@ class CasePaymentOrderMapperTest {
                      casePaymentOrder.getEffectiveFrom(), mappedDomainObject.getEffectiveFrom());
         assertEquals("Mapped domain model case id should equals mocked domain model case id",
                      casePaymentOrder.getCaseId(), mappedDomainObject.getCaseId());
-        assertEquals("Mapped domain model case type id should equals mocked domain model case type id",
-                     casePaymentOrder.getCaseTypeId(), mappedDomainObject.getCaseTypeId());
         assertEquals("Mapped domain model action should equals mocked domain model action",
                      casePaymentOrder.getAction(), mappedDomainObject.getAction());
         assertEquals("Mapped domain model responsible party should equals mocked domain model responsible party",
