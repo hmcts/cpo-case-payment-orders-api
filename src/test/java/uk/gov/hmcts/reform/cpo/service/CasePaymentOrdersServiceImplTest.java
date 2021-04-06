@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -8,9 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
@@ -38,8 +36,6 @@ class CasePaymentOrdersServiceImplTest {
 
     @Mock
     private CasePaymentOrderMapper casePaymentOrderMapper;
-    @Mock
-    private CasePaymentOrdersRepository casePaymentOrdersRepository;
 
     private final List<UUID> uuidsToDelete = List.of(UUID.randomUUID(), UUID.randomUUID());
 

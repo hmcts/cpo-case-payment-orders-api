@@ -18,7 +18,7 @@ public class HttpError<T extends Serializable> implements Serializable {
     private final transient LocalDateTime timestamp;
     private final Integer status;
     private final String error;
-    private final String message;
+    private String message;
     private final String path;
     private T details;
 
@@ -107,6 +107,11 @@ public class HttpError<T extends Serializable> implements Serializable {
 
     public HttpError<T> withDetails(T details) {
         this.details = details;
+        return this;
+    }
+
+    public HttpError<T> withMessage(String message) {
+        this.message = message;
         return this;
     }
 }

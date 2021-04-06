@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.cpo.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.errorhandling.CasePaymentIdentifierException;
 
 import java.util.List;
@@ -48,5 +51,15 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
     @Override
     public void deleteAuditEntriesByCaseIds(List<Long> caseIds) {
         casePaymentOrdersAuditJpaRepository.deleteByCaseIdIn(caseIds);
+    }
+
+    @Override
+    public Page<CasePaymentOrderEntity> findByIdIn(List<UUID> ids, Pageable pageable) {
+        throw new UnsupportedOperationException("Implement me");
+    }
+
+    @Override
+    public Page<CasePaymentOrderEntity> findByCaseIdIn(List<Long> casesId, Pageable pageable) {
+        throw new UnsupportedOperationException("Implement me");
     }
 }

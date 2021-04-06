@@ -4,20 +4,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
+import uk.gov.hmcts.reform.cpo.errorhandling.CasePaymentIdentifierException;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
-import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
-import uk.gov.hmcts.reform.cpo.errorhandling.CasePaymentIdentifierException;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import java.util.List;
 import java.util.UUID;
 

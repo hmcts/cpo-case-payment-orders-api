@@ -13,6 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import uk.gov.hmcts.reform.TestIdamConfiguration;
+import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController;
 import uk.gov.hmcts.reform.cpo.errorhandling.CasePaymentIdentifierException;
@@ -54,6 +55,9 @@ public class CasePaymentOrdersControllerTest {
         @MockBean
         protected CasePaymentOrdersService service;
 
+        @MockBean
+        protected ApplicationParams applicationParams;
+
         @Autowired
         protected ObjectMapper objectMapper;
     }
@@ -65,7 +69,7 @@ public class CasePaymentOrdersControllerTest {
         @DisplayName("happy path test without mockMvc")
         @Test
         void directCallHappyPath() throws Exception {
-            CasePaymentOrdersController controller = new CasePaymentOrdersController(service);
+            CasePaymentOrdersController controller = new CasePaymentOrdersController(service, applicationParams);
 
             controller.deleteCasePaymentOrdersById(List.of(UUID.randomUUID()));
         }
@@ -108,7 +112,7 @@ public class CasePaymentOrdersControllerTest {
         @DisplayName("happy path test without mockMvc")
         @Test
         void directCallHappyPath() throws CasePaymentIdentifierException {
-            CasePaymentOrdersController controller = new CasePaymentOrdersController(service);
+            CasePaymentOrdersController controller = new CasePaymentOrdersController(service, applicationParams);
             controller.deleteCasePaymentOrdersByCaseId(List.of(VALID_LUHN_1));
         }
 

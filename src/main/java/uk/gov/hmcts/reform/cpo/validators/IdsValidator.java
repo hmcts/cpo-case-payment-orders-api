@@ -17,11 +17,11 @@ public class IdsValidator implements ConstraintValidator<ValidCpoId, Optional<Li
 
     @Override
     public boolean isValid(final Optional<List<String>> casesId, final ConstraintValidatorContext context) {
-        if (!casesId.isPresent()) {
+        if (casesId.isEmpty()) {
             return true;
         }
         final List<String> errors = new ArrayList<>();
-        casesId.get().stream().forEach(caseId -> validate(caseId, errors));
+        casesId.get().forEach(caseId -> validate(caseId, errors));
         if (errors.isEmpty()) {
             return true;
         }

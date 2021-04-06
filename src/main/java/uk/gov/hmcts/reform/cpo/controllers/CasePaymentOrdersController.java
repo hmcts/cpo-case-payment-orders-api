@@ -1,47 +1,41 @@
 package uk.gov.hmcts.reform.cpo.controllers;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import io.swagger.annotations.ApiParam;
-import org.springframework.data.domain.Page;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.cpo.ApplicationParams;
+import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.errorhandling.AuthError;
 import uk.gov.hmcts.reform.cpo.errorhandling.CasePaymentIdentifierException;
 import uk.gov.hmcts.reform.cpo.errorhandling.ValidationError;
+import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
+import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
+import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import uk.gov.hmcts.reform.cpo.ApplicationParams;
-import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
-import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
-import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
-import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
-import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
 
 @RestController
@@ -79,7 +73,7 @@ public class CasePaymentOrdersController {
                 .pageNumber(pageNumber.orElse(Integer.parseInt(applicationParams.getDefaultPageNumber())))
                 .pageSize(pageSize.orElse(Integer.parseInt(applicationParams.getDefaultPageSize())))
                 .build();
-        return casePaymentOrdersServiceImpl.getCasePaymentOrders(casePaymentOrderQueryFilter);
+        return casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter);
     }
 
     @DeleteMapping(path = CASE_PAYMENT_ORDERS, params = "ids")
