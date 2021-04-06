@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,16 +19,20 @@ import java.util.List;
 public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
     @Autowired
-    private CasePaymentOrderMapper casePaymentOrderMapper;
+    private final CasePaymentOrderMapper casePaymentOrderMapper;
     @Autowired
-    private CasePaymentOrdersRepository casePaymentOrdersRepository;
+    private final CasePaymentOrdersRepository casePaymentOrdersRepository;
 
-    public CasePaymentOrdersServiceImpl(CasePaymentOrderMapper casePaymentOrderMapper, CasePaymentOrdersRepository casePaymentOrdersRepository) {
+    public CasePaymentOrdersServiceImpl(CasePaymentOrderMapper casePaymentOrderMapper,
+                                        CasePaymentOrdersRepository casePaymentOrdersRepository) {
         this.casePaymentOrderMapper = casePaymentOrderMapper;
         this.casePaymentOrdersRepository = casePaymentOrdersRepository;
     }
 
-    public Page<CasePaymentOrderEntity> getCasePaymentOrders(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+    @Override
+    public Page<CasePaymentOrderEntity> getCasePaymentOrders(
+        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+
         if (casePaymentOrderQueryFilter.isItAnEmptyCriteria()) {
             return Page.empty();
         }
@@ -50,8 +53,8 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     }
 
     private PageRequest getPageRequest(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
-        final List<Sort.Order> orders = new ArrayList<Sort.Order>();
-        orders.add(new Sort.Order(Sort.Direction.ASC,  CasePaymentOrderQueryFilter.CASES_TYPE_ID));
+        final List<Sort.Order> orders = new ArrayList<>();
+        orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderQueryFilter.CASES_ID));
         orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderQueryFilter.ORDER_REFERENCE));
         return PageRequest.of(
             casePaymentOrderQueryFilter.getPageNumber(),
@@ -65,46 +68,5 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
             throw new CasePaymentOrdersQueryException(
                 "case-payment-orders cannot filter case payments orders by both id and cases-id.");
         }
-    }
-
-    //TODO THIS IS NOT GOING TO BE ADDED IN THE FINAL PR
-    public void create() {
-
-        final CasePaymentOrderEntity casePaymentOrderEntity = new CasePaymentOrderEntity();
-        casePaymentOrderEntity.setAction("action");
-        casePaymentOrderEntity.setCaseId(Long.parseLong("1609243447569251"));
-        casePaymentOrderEntity.setCreatedBy("action1");
-        casePaymentOrderEntity.setOrderReference("action1");
-        casePaymentOrderEntity.setEffectiveFrom(LocalDateTime.now());
-        casePaymentOrderEntity.setCreatedTimestamp(LocalDateTime.now());
-        casePaymentOrderEntity.setCaseTypeId("setCaseTypeId");
-        casePaymentOrderEntity.setResponsibleParty("setResponsibleParty");
-        casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity);
-        casePaymentOrdersRepository.flush();
-
-        final CasePaymentOrderEntity casePaymentOrderEntity1 = new CasePaymentOrderEntity();
-        casePaymentOrderEntity1.setAction("action");
-        casePaymentOrderEntity1.setCaseId(Long.parseLong("1609243447569252"));
-        casePaymentOrderEntity1.setCreatedBy("action1");
-        casePaymentOrderEntity1.setOrderReference("Baction2");
-        casePaymentOrderEntity1.setEffectiveFrom(LocalDateTime.now());
-        casePaymentOrderEntity1.setCreatedTimestamp(LocalDateTime.now());
-        casePaymentOrderEntity1.setCaseTypeId("setCaseTypeId");
-        casePaymentOrderEntity1.setResponsibleParty("setResponsibleParty");
-        casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity1);
-        casePaymentOrdersRepository.flush();
-
-        final CasePaymentOrderEntity casePaymentOrderEntity2 = new CasePaymentOrderEntity();
-        casePaymentOrderEntity2.setAction("action");
-        casePaymentOrderEntity2.setCaseId(Long.parseLong("1609243447569253"));
-        casePaymentOrderEntity2.setCreatedBy("action1");
-        casePaymentOrderEntity2.setOrderReference("Caction3");
-        casePaymentOrderEntity2.setEffectiveFrom(LocalDateTime.now());
-        casePaymentOrderEntity2.setCreatedTimestamp(LocalDateTime.now());
-        casePaymentOrderEntity2.setCaseTypeId("setCaseTypeId");
-        casePaymentOrderEntity2.setResponsibleParty("setResponsibleParty");
-        casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity2);
-        casePaymentOrdersRepository.flush();
-
     }
 }
