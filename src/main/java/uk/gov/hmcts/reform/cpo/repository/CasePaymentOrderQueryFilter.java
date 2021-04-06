@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 @Getter
 public class CasePaymentOrderQueryFilter {
 
-    public static final String CASES_ID = "caseId";
-    public static final String ORDER_REFERENCE = "orderReference";
     public static final Integer PAGE_NUMBER = 0;
 
     private Integer pageSize;

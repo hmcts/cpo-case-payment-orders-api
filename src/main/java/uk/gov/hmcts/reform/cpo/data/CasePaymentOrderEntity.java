@@ -19,6 +19,9 @@ import java.util.UUID;
 @Table(name = "case_payment_orders")
 public class CasePaymentOrderEntity {
 
+    public static final String CASES_ID = "caseId";
+    public static final String ORDER_REFERENCE = "orderReference";
+
     @Id
     @GeneratedValue
     @Setter(AccessLevel.NONE)

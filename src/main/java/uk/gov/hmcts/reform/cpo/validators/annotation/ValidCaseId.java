@@ -16,7 +16,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface ValidCaseId {
 
-    String message() default "Error messages in case validator, the constraint is violated";
+    String message() default "Invalid caseId";
 
     Class<?>[] groups() default {};
 
