@@ -21,7 +21,6 @@ CREATE TABLE public.case_payment_orders_audit
     created_by            varchar(70),
     created_by_mod        boolean,
     created_timestamp     timestamp,
-    created_timestamp_mod boolean,
     effective_from        timestamp,
     effective_from_mod    boolean,
     order_reference       varchar(70),
