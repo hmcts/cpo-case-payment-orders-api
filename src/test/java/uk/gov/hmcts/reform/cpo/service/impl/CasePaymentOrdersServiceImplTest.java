@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo.service.impl;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -7,8 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.dao.DataIntegrityViolationException;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
+import uk.gov.hmcts.reform.cpo.exception.CaseIdOrderReferenceUniqueConstraintException;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
@@ -128,7 +131,7 @@ class CasePaymentOrdersServiceImplTest {
             // :: the load
             given(casePaymentOrdersRepository.findById(ID)).willReturn(Optional.of(casePaymentOrderEntity));
             // :: the save
-            given(casePaymentOrdersRepository.save(casePaymentOrderEntity)).willReturn(savedEntity);
+            given(casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity)).willReturn(savedEntity);
             // :: the conversion
             given(mapper.toDomainModel(savedEntity)).willReturn(casePaymentOrderResponse);
 
@@ -136,7 +139,7 @@ class CasePaymentOrdersServiceImplTest {
             CasePaymentOrder response = casePaymentOrdersService.updateCasePaymentOrder(updateCasePaymentOrderRequest);
 
             // THEN
-            verify(casePaymentOrdersRepository, times(1)).save(casePaymentOrderEntity);
+            verify(casePaymentOrdersRepository, times(1)).saveAndFlush(casePaymentOrderEntity);
             assertThat("UUID does not match expected", response.getId().equals(ID));
             assertThat("Returned model does not match expected", response.equals(casePaymentOrderResponse));
         }
@@ -152,6 +155,63 @@ class CasePaymentOrdersServiceImplTest {
             assertThatThrownBy(() -> casePaymentOrdersService.updateCasePaymentOrder(updateCasePaymentOrderRequest))
                 .isInstanceOf(CasePaymentOrderCouldNotBeFoundException.class)
                 .hasMessageContaining(ValidationError.CPO_NOT_FOUND);
+        }
+
+        @Test
+        @DisplayName("Should throw CaseIdOrderReferenceUniqueConstraintException when correct constraint encountered")
+        void shouldThrowCaseIdOrderReferenceUniqueConstraintExceptionWhenCorrectConstraintTriggered() {
+
+            // GIVEN
+            // :: the load
+            given(casePaymentOrdersRepository.findById(ID)).willReturn(Optional.of(casePaymentOrderEntity));
+            // :: the save
+            ConstraintViolationException constraintViolationException =
+                new ConstraintViolationException("",
+                                                 null,
+                                                 CasePaymentOrdersServiceImpl.UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT);
+            given(casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity))
+                .willThrow(new DataIntegrityViolationException("", constraintViolationException));
+
+            // WHEN / THEN
+            assertThatThrownBy(() -> casePaymentOrdersService.updateCasePaymentOrder(updateCasePaymentOrderRequest))
+                .isInstanceOf(CaseIdOrderReferenceUniqueConstraintException.class)
+                .hasMessageContaining(ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE);
+        }
+
+        @Test
+        @DisplayName("Should re-throw DataIntegrityViolationException when incorrect constraint encountered")
+        void shouldRethrowDataIntegrityViolationExceptionWhenIncorrectConstraintTriggered() {
+
+            // GIVEN
+            // :: the load
+            given(casePaymentOrdersRepository.findById(ID)).willReturn(Optional.of(casePaymentOrderEntity));
+            // :: the save
+            ConstraintViolationException constraintViolationException =
+                new ConstraintViolationException("",
+                                                 null,
+                                                 "DIFFERENT-CONSTRAINT-NAME");
+            given(casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity))
+                .willThrow(new DataIntegrityViolationException("", constraintViolationException));
+
+            // WHEN / THEN
+            assertThatThrownBy(() -> casePaymentOrdersService.updateCasePaymentOrder(updateCasePaymentOrderRequest))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Should re-throw DataIntegrityViolationException when no constraint encountered")
+        void shouldRethrowDataIntegrityViolationExceptionWhenNoConstraintTriggered() {
+
+            // GIVEN
+            // :: the load
+            given(casePaymentOrdersRepository.findById(ID)).willReturn(Optional.of(casePaymentOrderEntity));
+            // :: the save
+            given(casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity))
+                .willThrow(new DataIntegrityViolationException(""));
+
+            // WHEN / THEN
+            assertThatThrownBy(() -> casePaymentOrdersService.updateCasePaymentOrder(updateCasePaymentOrderRequest))
+                .isInstanceOf(DataIntegrityViolationException.class);
         }
 
     }

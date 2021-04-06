@@ -5,11 +5,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @SuppressWarnings({"PMD.MissingSerialVersionUID"})
 @ResponseStatus(
-    code = HttpStatus.NOT_FOUND
+    code = HttpStatus.CONFLICT
 )
-public class CasePaymentOrderCouldNotBeFoundException extends ApiException {
+public class CaseIdOrderReferenceUniqueConstraintException extends ApiException {
 
-    public CasePaymentOrderCouldNotBeFoundException(String message) {
+    public CaseIdOrderReferenceUniqueConstraintException(String message) {
         super(message);
     }
 

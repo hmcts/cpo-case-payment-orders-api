@@ -22,23 +22,22 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestExceptionHandler.class);
 
+    @ExceptionHandler({ApiException.class})
+    @ResponseBody
+    public ResponseEntity<HttpError<Serializable>> handleApiException(final HttpServletRequest request,
+                                                                      final Exception exception) {
+        LOG.error(exception.getMessage(), exception);
+        final HttpError<Serializable> error = new HttpError<>(exception, request);
+        return ResponseEntity
+            .status(error.getStatus())
+            .body(error);
+    }
+
     @ExceptionHandler({CasePaymentOrdersQueryException.class,ConstraintViolationException.class})
     @ResponseBody
     public ResponseEntity<HttpError> handleCasePaymentOrdersQueryException(final HttpServletRequest request,
                                                         final Exception exception) {
         return getHttpErrorBadRequest(request, exception);
-    }
-
-    @ExceptionHandler(CasePaymentOrderCouldNotBeFoundException.class)
-    public ResponseEntity<Object> handleCasePaymentOrderCouldNotBeFoundException(final HttpServletRequest request,
-                                                                                 final Exception exception) {
-
-        LOG.debug("CasePaymentOrderCouldNotBeFoundException: {}", exception.getLocalizedMessage(), exception);
-        final HttpError<Serializable> error = new HttpError<Serializable>(exception, request, HttpStatus.NOT_FOUND)
-            .withDetails(exception.getCause());
-        return ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
-            .body(error);
     }
 
     @Override
@@ -50,7 +49,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
            .map(DefaultMessageSourceResolvable::getDefaultMessage)
            .toArray(String[]::new);
         LOG.debug("MethodArgumentNotValidException:{}", exception.getLocalizedMessage());
-        final HttpError<Serializable> error = new HttpError<Serializable>(exception, request, HttpStatus.BAD_REQUEST)
+        final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
             .withDetails(errors);
         return ResponseEntity
            .status(HttpStatus.BAD_REQUEST)

@@ -14,8 +14,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import uk.gov.hmcts.reform.TestIdamConfiguration;
 import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.config.SecurityConfiguration;
@@ -49,8 +51,6 @@ import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CA
 
 @SuppressWarnings({"PMD.ExcessiveImports"})
 public class CasePaymentOrdersControllerTest {
-
-    private static final String HTTP_ERROR_DETAILS_PATH = "$.details";
 
     @Autowired
     protected MockMvc mockMvc;
@@ -199,13 +199,12 @@ public class CasePaymentOrdersControllerTest {
             );
 
             // WHEN
-            this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                // THEN
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasSize(1)))
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasItem(ValidationError.ID_REQUIRED)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
+
+            // THEN
+            assertBadRequestResponse(result, ValidationError.ID_REQUIRED);
         }
 
         @DisplayName("should fail with 400 bad request when ID is empty")
@@ -223,13 +222,12 @@ public class CasePaymentOrdersControllerTest {
             );
 
             // WHEN
-            this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                // THEN
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasSize(1)))
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasItem(ValidationError.ID_REQUIRED)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
+
+            // THEN
+            assertBadRequestResponse(result, ValidationError.ID_REQUIRED);
         }
 
         @DisplayName("should fail with 400 bad request when ID is invalid")
@@ -247,13 +245,12 @@ public class CasePaymentOrdersControllerTest {
             );
 
             // WHEN
-            this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                // THEN
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasSize(1)))
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasItem(ValidationError.ID_INVALID)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
+
+            // THEN
+            assertBadRequestResponse(result, ValidationError.ID_INVALID);
         }
 
         @DisplayName("should fail with 400 bad request when Effective From is null")
@@ -271,13 +268,12 @@ public class CasePaymentOrdersControllerTest {
             );
 
             // WHEN
-            this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                // THEN
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasSize(1)))
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasItem(ValidationError.EFFECTIVE_FROM_REQUIRED)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
+
+            // THEN
+            assertBadRequestResponse(result, ValidationError.EFFECTIVE_FROM_REQUIRED);
         }
 
         @DisplayName("should fail with 400 bad request when Case ID is null")
@@ -295,13 +291,12 @@ public class CasePaymentOrdersControllerTest {
             );
 
             // WHEN
-            this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                // THEN
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasSize(1)))
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasItem(ValidationError.CASE_ID_REQUIRED)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
+
+            // THEN
+            assertBadRequestResponse(result, ValidationError.CASE_ID_REQUIRED);
         }
 
         @DisplayName("should fail with 400 bad request when Case ID is empty")
@@ -319,13 +314,12 @@ public class CasePaymentOrdersControllerTest {
             );
 
             // WHEN
-            this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                // THEN
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasSize(1)))
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasItem(ValidationError.CASE_ID_REQUIRED)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
+
+            // THEN
+            assertBadRequestResponse(result, ValidationError.CASE_ID_REQUIRED);
         }
 
         @DisplayName("should fail with 400 bad request when Case ID is invalid")
@@ -343,13 +337,12 @@ public class CasePaymentOrdersControllerTest {
             );
 
             // WHEN
-            this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                // THEN
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasSize(1)))
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasItem(ValidationError.CASE_ID_INVALID)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
+
+            // THEN
+            assertBadRequestResponse(result, ValidationError.CASE_ID_INVALID);
         }
 
         @DisplayName("should fail with 400 bad request when Order Reference is null")
@@ -367,13 +360,12 @@ public class CasePaymentOrdersControllerTest {
             );
 
             // WHEN
-            this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                // THEN
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasSize(1)))
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasItem(ValidationError.ORDER_REFERENCE_REQUIRED)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
+
+            // THEN
+            assertBadRequestResponse(result, ValidationError.ORDER_REFERENCE_REQUIRED);
         }
 
         @DisplayName("should fail with 400 bad request when Order Reference is empty")
@@ -391,13 +383,12 @@ public class CasePaymentOrdersControllerTest {
             );
 
             // WHEN
-            this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                // THEN
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasSize(1)))
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasItem(ValidationError.ORDER_REFERENCE_REQUIRED)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
+
+            // THEN
+            assertBadRequestResponse(result, ValidationError.ORDER_REFERENCE_REQUIRED);
         }
 
         @DisplayName("should fail with 400 bad request when Action is null")
@@ -415,13 +406,12 @@ public class CasePaymentOrdersControllerTest {
             );
 
             // WHEN
-            this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                // THEN
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasSize(1)))
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasItem(ValidationError.ACTION_REQUIRED)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
+
+            // THEN
+            assertBadRequestResponse(result, ValidationError.ACTION_REQUIRED);
         }
 
         @DisplayName("should fail with 400 bad request when Action is empty")
@@ -439,13 +429,12 @@ public class CasePaymentOrdersControllerTest {
             );
 
             // WHEN
-            this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                // THEN
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasSize(1)))
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasItem(ValidationError.ACTION_REQUIRED)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
+
+            // THEN
+            assertBadRequestResponse(result, ValidationError.ACTION_REQUIRED);
         }
 
         @DisplayName("should fail with 400 bad request when Responsible Party is null")
@@ -463,13 +452,12 @@ public class CasePaymentOrdersControllerTest {
             );
 
             // WHEN
-            this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                // THEN
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasSize(1)))
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasItem(ValidationError.RESPONSIBLE_PARTY_REQUIRED)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
+
+            // THEN
+            assertBadRequestResponse(result, ValidationError.RESPONSIBLE_PARTY_REQUIRED);
         }
 
         @DisplayName("should fail with 400 bad request when Responsible Party is empty")
@@ -487,15 +475,24 @@ public class CasePaymentOrdersControllerTest {
             );
 
             // WHEN
-            this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                // THEN
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasSize(1)))
-                .andExpect(jsonPath(HTTP_ERROR_DETAILS_PATH, hasItem(ValidationError.RESPONSIBLE_PARTY_REQUIRED)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
+
+            // THEN
+            assertBadRequestResponse(result, ValidationError.RESPONSIBLE_PARTY_REQUIRED);
         }
 
     }
 
+    private void assertBadRequestResponse(ResultActions result,
+                                          String validationDetails) throws Exception {
+
+        result
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+            .andExpect(jsonPath("$.error").value(HttpStatus.BAD_REQUEST.getReasonPhrase()))
+            .andExpect(jsonPath("$.details", hasSize(1)))
+            .andExpect(jsonPath("$.details", hasItem(validationDetails)));
+    }
 }

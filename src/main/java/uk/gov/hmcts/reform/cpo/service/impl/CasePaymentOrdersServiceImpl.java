@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.cpo.service.impl;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
+import uk.gov.hmcts.reform.cpo.exception.CaseIdOrderReferenceUniqueConstraintException;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
@@ -24,6 +27,8 @@ import java.util.UUID;
 
 @Service
 public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
+
+    protected static final String UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT = "unique_case_id_order_reference";
 
     @Autowired
     private final CasePaymentOrderMapper casePaymentOrderMapper;
@@ -93,8 +98,27 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
         casePaymentOrderMapper.mergeIntoEntity(casePaymentOrderEntity, updateCasePaymentOrderRequest, createdBy);
 
-        CasePaymentOrderEntity returnEntity = casePaymentOrdersRepository.save(casePaymentOrderEntity);
+        CasePaymentOrderEntity returnEntity;
+
+        try {
+            // save and flush to force unique constraint to apply now
+            returnEntity = casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity);
+
+        } catch (DataIntegrityViolationException exception) {
+            if (exception.getCause() instanceof ConstraintViolationException
+                && isDuplicateCaseIdOrderRefPairing(exception)) {
+
+                throw new CaseIdOrderReferenceUniqueConstraintException(ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE);
+            } else {
+                throw exception;
+            }
+        }
+
         return casePaymentOrderMapper.toDomainModel(returnEntity);
     }
 
+    private boolean isDuplicateCaseIdOrderRefPairing(DataIntegrityViolationException exception) {
+        return ((ConstraintViolationException) exception.getCause()).getConstraintName()
+            .equals(UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT);
+    }
 }

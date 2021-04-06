@@ -94,9 +94,10 @@ public class CasePaymentOrdersController {
             examples = @Example({
                 @ExampleProperty(
                     value = "{\n"
-                        + "   \"status\": \"BAD_REQUEST\",\n"
-                        + "   \"message\": \"" + ValidationError.ID_REQUIRED + "\",\n"
-                        + "   \"errors\": [ ]\n"
+                        + "   \"status\": \"400\",\n"
+                        + "   \"error\": \"Bad Request\",\n"
+                        + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
+                        + "   \"details\": [ \""  + ValidationError.ID_REQUIRED + "\" ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
             })
@@ -112,6 +113,10 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 404,
             message = ValidationError.CPO_NOT_FOUND
+        ),
+        @ApiResponse(
+            code = 409,
+            message = ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE
         )
     })
     public CasePaymentOrder updateCasePaymentOrderRequest(@Valid @RequestBody UpdateCasePaymentOrderRequest

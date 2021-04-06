@@ -14,7 +14,9 @@ public final class ValidationError {
     public static final String ORDER_REFERENCE_REQUIRED = "Order Reference Party is required.";
     public static final String RESPONSIBLE_PARTY_REQUIRED = "Responsible Party is required.";
 
+    // additional constraints etc..
     public static final String CPO_NOT_FOUND = "Case Payment Order does not exist";
+    public static final String CASE_ID_ORDER_REFERENCE_UNIQUE = "Case ID and Order Reference pairing must be unique";
 
     // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
     private ValidationError() {

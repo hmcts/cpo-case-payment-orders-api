@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.cpo.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.util.UriUtils;
 
@@ -29,7 +30,7 @@ public class HttpError<T extends Serializable> implements Serializable {
         this.exception = exception.getClass().getName();
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
         this.status = getStatusFromResponseStatus(responseStatus, status);
-        this.error = getErrorReason(responseStatus);
+        this.error = getErrorReason(responseStatus, status);
         this.message = exception.getMessage();
         this.path = UriUtils.encodePath(path, StandardCharsets.UTF_8);
     }
@@ -39,7 +40,7 @@ public class HttpError<T extends Serializable> implements Serializable {
     }
 
     public HttpError(Exception exception, WebRequest request, HttpStatus status) {
-        this(exception, request.getContextPath(), status);
+        this(exception, ((ServletWebRequest)request).getRequest().getRequestURI(), status);
     }
 
     public HttpError(Exception exception, HttpServletRequest request) {
@@ -71,7 +72,7 @@ public class HttpError<T extends Serializable> implements Serializable {
         return null;
     }
 
-    private String getErrorReason(ResponseStatus responseStatus) {
+    private String getErrorReason(ResponseStatus responseStatus, HttpStatus status) {
         if (null != responseStatus) {
             if (!responseStatus.reason().isEmpty()) {
                 return responseStatus.reason();
@@ -81,6 +82,8 @@ public class HttpError<T extends Serializable> implements Serializable {
             if (null != httpStatus) {
                 return httpStatus.getReasonPhrase();
             }
+        } else if (null != status) {
+            return status.getReasonPhrase();
         }
 
         return DEFAULT_ERROR;
