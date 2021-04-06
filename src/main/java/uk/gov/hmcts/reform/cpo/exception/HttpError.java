@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo.exception;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriUtils;
@@ -10,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+@Getter
 public class HttpError<T extends Serializable> implements Serializable {
     public static final Integer DEFAULT_STATUS = HttpStatus.INTERNAL_SERVER_ERROR.value();
     public static final String DEFAULT_ERROR = "Unexpected Error";
@@ -75,34 +77,6 @@ public class HttpError<T extends Serializable> implements Serializable {
         }
 
         return DEFAULT_ERROR;
-    }
-
-    public String getException() {
-        return exception;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public T getDetails() {
-        return details;
     }
 
     public HttpError<T> withDetails(T details) {

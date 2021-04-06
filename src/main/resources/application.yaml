@@ -79,4 +79,4 @@ azure:
     instrumentation-key: ${cpo.AppInsightsInstrumentationKey:00000000-0000-0000-0000-000000000000}
 
 cpo:
-  defaultPageSize: 2
+  defaultPageSize: 20
