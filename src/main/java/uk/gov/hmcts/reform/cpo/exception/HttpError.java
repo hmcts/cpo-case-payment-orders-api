@@ -25,12 +25,12 @@ public class HttpError<T extends Serializable> implements Serializable {
     private final String path;
     private T details;
 
-    public HttpError(Exception exception, HttpServletRequest request,HttpStatus status) {
+    public HttpError(Exception exception, HttpServletRequest request, HttpStatus status) {
         final ResponseStatus responseStatus = exception.getClass().getAnnotation(ResponseStatus.class);
 
         this.exception = exception.getClass().getName();
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
-        this.status = getStatusFromResponseStatus(responseStatus,status);
+        this.status = getStatusFromResponseStatus(responseStatus, status);
         this.error = getErrorReason(responseStatus);
         this.message = exception.getMessage();
         this.path = UriUtils.encodePath(request.getRequestURI(), StandardCharsets.UTF_8);

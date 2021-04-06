@@ -21,16 +21,16 @@ public class IdsValidator implements ConstraintValidator<ValidCpoId, Optional<Li
             return true;
         }
         final List<String> errors = new ArrayList<>();
-        casesId.get().stream().forEach(caseId -> validate(caseId,errors));
+        casesId.get().stream().forEach(caseId -> validate(caseId, errors));
         if (errors.isEmpty()) {
             return true;
         }
-        buildErrors(context, "These ids: ",errors);
+        buildErrors(context, "These ids: ", errors);
         return false;
     }
 
     @Override
-    public void validate(final String caseId,List<String> errors) {
+    public void validate(final String caseId, List<String> errors) {
         try {
             UUID.fromString(caseId);
         } catch (Exception exception) {

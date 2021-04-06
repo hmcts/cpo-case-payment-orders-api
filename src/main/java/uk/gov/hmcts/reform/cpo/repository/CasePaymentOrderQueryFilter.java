@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 @Getter
 public class CasePaymentOrderQueryFilter {
 
-    public static final String CASES_TYPE_ID = "caseTypeId";
-    public static final String  ORDER_REFERENCE = "orderReference";
+    public static final String CASES_ID = "caseId";
+    public static final String ORDER_REFERENCE = "orderReference";
 
     private Integer pageSize;
     private Integer pageNumber;
@@ -37,10 +37,10 @@ public class CasePaymentOrderQueryFilter {
     }
 
     public List<UUID> getListUUID() {
-        return listOfIds.stream().map(id -> UUID.fromString(id)).collect(Collectors.toList());
+        return listOfIds.stream().map(UUID::fromString).collect(Collectors.toList());
     }
 
     public List<Long> getListOfLongCasesIds() {
-        return listOfCasesIds.stream().map(caseId -> Long.parseLong(caseId)).collect(Collectors.toList());
+        return listOfCasesIds.stream().map(Long::parseLong).collect(Collectors.toList());
     }
 }

@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class CaseIdsValidator implements ConstraintValidator<ValidCaseId, Optional<List<String>>>, Validator<String> {
 
-    private static final String NUMERIC_EXPRESSION = "\\d{16}";
+    private static final String CASE_ID_RG = "\\d{16}";
 
     @Override
     public void initialize(final ValidCaseId constraintAnnotation) {
@@ -32,7 +32,7 @@ public class CaseIdsValidator implements ConstraintValidator<ValidCaseId, Option
 
     @Override
     public void validate(final String caseId,List<String> errors) {
-        if (!caseId.matches(NUMERIC_EXPRESSION)) {
+        if (!caseId.matches(CASE_ID_RG)) {
             errors.add(caseId);
         }
     }
