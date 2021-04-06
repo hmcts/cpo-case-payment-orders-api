@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.cpo.controllers;
 
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +38,11 @@ public class CasePaymentOrdersController {
 
 
     @GetMapping(value = "case-payment-orders", produces = {"application/json"})
+    @ApiOperation(value = "Get payment orders for a case", notes = "Get payment orders for a case")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Payment orders retrieved"),
+        @ApiResponse(code = 400, message = "Bad request")
+    })
     public Page<CasePaymentOrderEntity> getCasePaymentOrders(@ApiParam(value = "list of ids")
                                                              @ValidCpoId
                                                              @RequestParam("ids") Optional<List<String>> ids,
@@ -50,7 +58,7 @@ public class CasePaymentOrdersController {
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
             .listOfIds(listOfIds)
             .listOfCasesIds(listOfCasesIds)
-            .pageNumber(pageNumber.orElse(Integer.parseInt(applicationParams.getDefaultPageNumber())))
+            .pageNumber(pageNumber.orElse(CasePaymentOrderQueryFilter.PAGE_NUMBER))
             .pageSize(pageSize.orElse(Integer.parseInt(applicationParams.getDefaultPageSize())))
             .build();
         return casePaymentOrdersServiceImpl.getCasePaymentOrders(casePaymentOrderQueryFilter);
