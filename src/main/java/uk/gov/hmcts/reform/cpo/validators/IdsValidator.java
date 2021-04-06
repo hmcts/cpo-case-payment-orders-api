@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class IdsValidator implements ConstraintValidator<ValidCpoId, Optional<List<String>>>, Validator <String>{
+public class IdsValidator implements ConstraintValidator<ValidCpoId, Optional<List<String>>>, Validator<String> {
 
     @Override
     public void initialize(final ValidCpoId constraintAnnotation) {
@@ -21,16 +21,16 @@ public class IdsValidator implements ConstraintValidator<ValidCpoId, Optional<Li
             return true;
         }
         final List<String> errors = new ArrayList<>();
-        casesId.get().stream().forEach(caseId -> validate(caseId,errors));
+        casesId.get().stream().forEach(caseId -> validate(caseId, errors));
         if (errors.isEmpty()) {
             return true;
         }
-        buildErrors(context, "These ids: ",errors);
+        buildErrors(context, "These ids: ", errors);
         return false;
     }
 
     @Override
-    public void validate(final String caseId,List<String> errors) {
+    public void validate(final String caseId, List<String> errors) {
         try {
             UUID.fromString(caseId);
         } catch (Exception exception) {
