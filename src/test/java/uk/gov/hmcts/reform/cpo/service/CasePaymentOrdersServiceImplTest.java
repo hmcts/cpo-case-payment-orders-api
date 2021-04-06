@@ -11,7 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
-import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
@@ -73,17 +73,17 @@ class CasePaymentOrdersServiceImplTest implements BaseTest<String> {
 
     @Test
     void failForCasesIdsAndIdsTogether() {
-        final String expectedError = "case-payment-orders cannot filter case payments orders by both id and cases-id.";
+        final String expectedError = "case payment orders cannot be filtered by both id and case id.";
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
             .listOfIds(ids)
             .listOfCasesIds(casesIds)
             .pageNumber(PAGE_NUMBER)
             .pageSize(PAGE_SIZE)
             .build();
-        try{
+        try {
             casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter);
             fail();
-        }catch (CasePaymentOrdersQueryException casePaymentOrdersQueryException){
+        } catch (CasePaymentOrdersFilterException casePaymentOrdersQueryException) {
             assertThat(casePaymentOrdersQueryException.getMessage(), is(expectedError));
         }
     }
@@ -144,7 +144,6 @@ class CasePaymentOrdersServiceImplTest implements BaseTest<String> {
         casePaymentOrderEntity.setOrderReference("action1");
         casePaymentOrderEntity.setEffectiveFrom(LocalDateTime.now());
         casePaymentOrderEntity.setCreatedTimestamp(LocalDateTime.now());
-        casePaymentOrderEntity.setCaseTypeId("setCaseTypeId");
         casePaymentOrderEntity.setResponsibleParty("setResponsibleParty");
         casePaymentOrders.add(casePaymentOrderEntity);
 
@@ -155,7 +154,6 @@ class CasePaymentOrdersServiceImplTest implements BaseTest<String> {
         casePaymentOrderEntity1.setOrderReference("Baction2");
         casePaymentOrderEntity1.setEffectiveFrom(LocalDateTime.now());
         casePaymentOrderEntity1.setCreatedTimestamp(LocalDateTime.now());
-        casePaymentOrderEntity1.setCaseTypeId("setCaseTypeId");
         casePaymentOrderEntity1.setResponsibleParty("setResponsibleParty");
         casePaymentOrders.add(casePaymentOrderEntity1);
 
@@ -166,7 +164,6 @@ class CasePaymentOrdersServiceImplTest implements BaseTest<String> {
         casePaymentOrderEntity2.setOrderReference("Caction3");
         casePaymentOrderEntity2.setEffectiveFrom(LocalDateTime.now());
         casePaymentOrderEntity2.setCreatedTimestamp(LocalDateTime.now());
-        casePaymentOrderEntity2.setCaseTypeId("setCaseTypeId");
         casePaymentOrderEntity2.setResponsibleParty("setResponsibleParty");
         casePaymentOrders.add(casePaymentOrderEntity2);
         return casePaymentOrders;

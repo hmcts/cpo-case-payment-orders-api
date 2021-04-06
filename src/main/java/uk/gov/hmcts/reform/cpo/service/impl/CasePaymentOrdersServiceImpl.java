@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
-import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
@@ -65,8 +65,8 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
     private void validateCasePaymentOrderQueryFilter(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
         if (casePaymentOrderQueryFilter.isAnIdsAndCasesIdQuery()) {
-            throw new CasePaymentOrdersQueryException(
-                "case-payment-orders cannot filter case payments orders by both id and cases-id.");
+            throw new CasePaymentOrdersFilterException(
+                "case payment orders cannot be filtered by both id and case id.");
         }
     }
 }

@@ -32,7 +32,9 @@ class IdsTest implements BaseTest<String> {
 
     @Test
     void passForValidIds() {
-        final String[] testedData = {"df54651b-3227-4067-9f23-6ffb32e2c6bd", "d702ef36-0ca7-46e9-8a00-ef044d78453e", "d702ef36-0ca7-46e9-8a00-ef044d78453e"};
+        final String[] testedData = {"df54651b-3227-4067-9f23-6ffb32e2c6bd", "d702ef36-0ca7-46e9-8a00-ef044d78453e",
+            "d702ef36-0ca7-46e9-8a00-ef044d78453e"};
+
         final Optional<List<String>> valuesToBeTested = createInitialValuesList(testedData);
         final boolean result = idsValidator.isValid(valuesToBeTested, constraintValidatorContext);
         assertTrue("The values: " + testedData + "should be valid", result);

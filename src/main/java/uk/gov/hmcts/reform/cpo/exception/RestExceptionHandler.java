@@ -18,7 +18,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestExceptionHandler.class);
 
-    @ExceptionHandler({CasePaymentOrdersQueryException.class,ConstraintViolationException.class})
+    @ExceptionHandler({CasePaymentOrdersFilterException.class,ConstraintViolationException.class})
     @ResponseBody
     public ResponseEntity<HttpError> handleCasePaymentOrdersQueryException(final HttpServletRequest request,
                                                         final Exception exception) {

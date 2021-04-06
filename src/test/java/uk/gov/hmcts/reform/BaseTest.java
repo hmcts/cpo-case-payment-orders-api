@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface BaseTest<T> {
 
-    default Optional<List<T>> createInitialValuesList(final T[] initialValues){
+    default Optional<List<T>> createInitialValuesList(final T[] initialValues) {
         return Optional.of(Arrays.asList(initialValues));
     }
 }
