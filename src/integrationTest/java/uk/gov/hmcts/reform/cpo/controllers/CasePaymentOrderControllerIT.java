@@ -144,7 +144,7 @@ public class CasePaymentOrderControllerIT extends BaseTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.message",
                             containsString("Failed to convert value of type 'java.lang.String'"
-                                    + "to required type 'java.util.List'")))
+                                    + " to required type 'java.util.List'")))
                     .andExpect(jsonPath("$.details.message", is("Invalid UUID string: 123")));
         }
 
