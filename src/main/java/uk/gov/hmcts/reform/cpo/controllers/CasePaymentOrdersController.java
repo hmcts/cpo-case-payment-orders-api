@@ -43,10 +43,10 @@ public class CasePaymentOrdersController {
         @ApiResponse(code = 200, message = "Payment orders retrieved"),
         @ApiResponse(code = 400, message = "Bad request")
     })
-    public Page<CasePaymentOrderEntity> getCasePaymentOrders(@ApiParam(value = "list of ids")
+    public Page<CasePaymentOrderEntity> getCasePaymentOrders(@ApiParam("list of case payment orders ids")
                                                              @ValidCpoId
                                                              @RequestParam("ids") Optional<List<String>> ids,
-                                                             @ApiParam(value = "casesId of ids")
+                                                             @ApiParam("list of ccd case reference numbers")
                                                              @ValidCaseId
                                                              @RequestParam("cases-ids") Optional<List<String>> casesId,
                                                              @RequestParam("pageSize") Optional<Integer> pageSize,
@@ -59,7 +59,7 @@ public class CasePaymentOrdersController {
             .cpoIds(listOfIds)
             .caseIds(listOfCasesIds)
             .pageNumber(pageNumber.orElse(CasePaymentOrderQueryFilter.PAGE_NUMBER))
-            .pageSize(pageSize.orElse(Integer.parseInt(applicationParams.getDefaultPageSize())))
+            .pageSize(pageSize.orElse(applicationParams.getDefaultPageSize()))
             .build();
         return casePaymentOrdersServiceImpl.getCasePaymentOrders(casePaymentOrderQueryFilter);
     }

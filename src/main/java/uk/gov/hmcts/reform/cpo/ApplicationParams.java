@@ -9,5 +9,5 @@ import org.springframework.stereotype.Component;
 public class ApplicationParams {
 
     @Value("${cpo.defaultPageSize}")
-    private String defaultPageSize;
+    private Integer defaultPageSize;
 }
