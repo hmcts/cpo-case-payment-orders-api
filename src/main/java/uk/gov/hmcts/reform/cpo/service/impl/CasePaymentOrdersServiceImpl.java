@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 import javax.transaction.Transactional;
-import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 
