@@ -4,28 +4,45 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.hibernate.validator.constraints.LuhnCheck;
+import uk.gov.hmcts.reform.cpo.exception.ValidationError;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+
+import static uk.gov.hmcts.reform.cpo.exception.ValidationError.CASE_ID_INVALID;
 
 @Getter
 @AllArgsConstructor
 @ApiModel("Create Case Payment Order Request")
 public class CreateCasePaymentOrderRequest {
 
+    @NotNull(message = ValidationError.EFFECTIVE_FROM_EMPTY)
     @ApiModelProperty(value = "The date/time from which the record is valid", required = true,
         example = "2021-02-10T03:02:30Z")
     private LocalDateTime effectiveFrom;
 
-    @ApiModelProperty(value = "Case Id for which the record applies", required = true, example = "1612345678123456")
-    private Long caseId;
+    @NotNull(message = ValidationError.CASE_ID_EMPTY)
+    @Size(min = 16, max = 16, message = ValidationError.CASE_ID_INVALID_LENGTH)
+    @LuhnCheck(message = CASE_ID_INVALID)
+    @ApiModelProperty(value = "Case Id for which the record applies", required = true, example = "6551341964128977")
+    private String caseId;
 
+    @NotEmpty(message = ValidationError.ACTION_EMPTY)
     @ApiModelProperty(value = "Action that initiated the creation of the case payment order", required = true,
         example = "Case Submit")
     private String action;
 
+    @NotEmpty(message = ValidationError.RESPONSIBLE_PARTY_EMPTY)
     @ApiModelProperty(value = "Description of the party responsible for the case payment order", required = true,
         example = "Jane Doe")
     private String responsibleParty;
 
+    @Pattern(regexp = "^2[0-9]{3}-[0-9]{11}$", message = ValidationError.ORDER_REFERENCE_INVALID)
+    @NotEmpty(message = ValidationError.ORDER_REFERENCE_EMPTY)
     @ApiModelProperty(value = "Description of the Payments system order reference", required = true,
         example = "2021-918425346")
     private String orderReference;

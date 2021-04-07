@@ -82,7 +82,7 @@ class CasePaymentOrdersServiceImplTest {
                                                                         securityUtils);
             createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(
                 EFFECTIVE_FROM,
-                CASE_ID,
+                "1122334455667788",
                 ACTION,
                 RESPONSIBLE_PARTY,
                 ORDER_REFERENCE

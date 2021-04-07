@@ -6,26 +6,26 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestParam;
 import io.swagger.annotations.ApiParam;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
+import uk.gov.hmcts.reform.cpo.exception.ValidationError;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import javax.validation.Valid;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
-import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 
@@ -33,20 +33,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-
 @RestController
 @Validated
-@RequestMapping(value = "/api")
 public class CasePaymentOrdersController {
 
     public static final String CASE_PAYMENT_ORDERS_PATH = "/case-payment-orders";
 
     private final CasePaymentOrdersService casePaymentOrdersService;
+    private final ApplicationParams applicationParams;
 
-    public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersService) {
+    public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersService,
+                                       ApplicationParams applicationParams) {
+        this.applicationParams = applicationParams;
         this.casePaymentOrdersService = casePaymentOrdersService;
     }
-
 
     @PostMapping(path = CASE_PAYMENT_ORDERS_PATH, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Create Case Payment Order", notes = "Create Case Payment Order")
@@ -59,20 +59,20 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
-                + "\n1) " //+ ValidationError.CASE_ID_INVALID
-                + "\n2) " //+ ValidationError.CASE_ID_INVALID_LENGTH
-                + "\n3) "//+ ValidationError.CASE_ID_EMPTY
-                + "\n4) " //+ ValidationError.CASE_TYPE_ID_EMPTY
-                + "\n5) " //+ ValidationError.ASSIGNEE_ID_EMPTY
-                + "\n6) " //+ ValidationError.ASSIGNEE_ORGANISATION_ERROR
-                + "\n7) " //+ ValidationError.ORGANISATION_POLICY_ERROR
-                + "\n8) ", //+ ValidationError.ASSIGNEE_ROLE_ERROR,
+                + "\n1) " + ValidationError.CASE_ID_INVALID
+                + "\n2) " + ValidationError.CASE_ID_INVALID_LENGTH
+                + "\n3) " + ValidationError.CASE_ID_EMPTY
+                + "\n4) " + ValidationError.EFFECTIVE_FROM_EMPTY
+                + "\n5) " + ValidationError.ACTION_EMPTY
+                + "\n6) " + ValidationError.RESPONSIBLE_PARTY_EMPTY
+                + "\n7) " + ValidationError.ORDER_REFERENCE_EMPTY
+                + "\n8) " + ValidationError.ORDER_REFERENCE_INVALID,
             response = String.class,
             examples = @Example({
                 @ExampleProperty(
                     value = "{\n"
                         + "   \"status\": \"BAD_REQUEST\",\n"
-                        + "   \"message\": \"" //+ ValidationError.ASSIGNEE_ORGANISATION_ERROR + "\",\n"
+                        + "   \"message\": \"" + ValidationError.ORDER_REFERENCE_INVALID + "\",\n"
                         + "   \"errors\": [ ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
@@ -93,27 +93,17 @@ public class CasePaymentOrdersController {
     })
 
     public CasePaymentOrder createCasePaymentOrderRequest(@Valid @RequestBody CreateCasePaymentOrderRequest
-                                                                  requestPayload) {
+                                                              requestPayload) {
         return casePaymentOrdersService.createCasePaymentOrder(requestPayload);
     }
 
-    private final CasePaymentOrdersServiceImpl casePaymentOrdersServiceImpl;
-    private final ApplicationParams applicationParams;
-
-    public CasePaymentOrdersController(CasePaymentOrdersServiceImpl casePaymentOrdersServiceImpl,
-                                       ApplicationParams applicationParams) {
-        this.casePaymentOrdersServiceImpl = casePaymentOrdersServiceImpl;
-        this.applicationParams = applicationParams;
-    }
-
-
     @GetMapping(value = "case-payment-orders", produces = {"application/json"})
     public Page<CasePaymentOrderEntity> getCasePaymentOrders(@ApiParam(value = "list of ids")
-                                                             @ValidCpoId
-                                                             @RequestParam("ids") Optional<List<String>> ids,
+                                                             @ValidCpoId @RequestParam("ids")
+                                                                 Optional<List<String>> ids,
                                                              @ApiParam(value = "casesId of ids")
-                                                             @ValidCaseId
-                                                             @RequestParam("cases-ids") Optional<List<String>> casesId,
+                                                             @ValidCaseId @RequestParam("cases-ids")
+                                                                 Optional<List<String>> casesId,
                                                              @RequestParam("pageSize") Optional<Integer> pageSize,
                                                              @RequestParam("pageNumber") Optional<Integer> pageNumber
 
@@ -126,6 +116,12 @@ public class CasePaymentOrdersController {
             .pageNumber(pageNumber.orElse(Integer.parseInt(applicationParams.getDefaultPageNumber())))
             .pageSize(pageSize.orElse(Integer.parseInt(applicationParams.getDefaultPageSize())))
             .build();
-        return casePaymentOrdersServiceImpl.getCasePaymentOrders(casePaymentOrderQueryFilter);
+        return casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter);
+    }
+
+    //TODO this is not going to be included in final pr
+    @GetMapping(value = "case-payment-orders-test-data", produces = {"application/json"})
+    public void createData() {
+        casePaymentOrdersService.create();
     }
 }

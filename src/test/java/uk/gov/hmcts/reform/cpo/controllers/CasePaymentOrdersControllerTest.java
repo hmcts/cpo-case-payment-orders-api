@@ -16,11 +16,13 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.TestIdamConfiguration;
+import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -42,21 +44,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @SuppressWarnings({"PMD.ExcessiveImports"})
 public class CasePaymentOrdersControllerTest {
 
-
-    @Autowired
-    protected MockMvc mockMvc;
-
-    @Autowired
-    protected ObjectMapper objectMapper;
-
-
     private static final LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24,
                                                                          11, 48, 32
     );
-    private static final Long CASE_ID = 1_122_334_455_667_788L;
+    private static final Long CASE_ID = 6_551_341_964_128_977L;
     private static final String ACTION = "action";
     private static final String RESPONSIBLE_PARTY = "responsibleParty";
-    private static final String ORDER_REFERENCE = "orderReference";
+    private static final String ORDER_REFERENCE = "2021-11223344556";
     private static final UUID ID = UUID.randomUUID();
     private static final String CREATED_BY = "createdBy";
     private static final LocalDateTime CREATED_TIMESTAMP = LocalDateTime.now();
@@ -83,6 +77,9 @@ public class CasePaymentOrdersControllerTest {
         @Autowired
         protected ObjectMapper objectMapper;
 
+        @MockBean
+        ApplicationParams applicationParams;
+
     }
 
     @Nested
@@ -92,10 +89,11 @@ public class CasePaymentOrdersControllerTest {
         private CreateCasePaymentOrderRequest createCasePaymentOrderRequest;
         private CasePaymentOrder casePaymentOrder;
 
+
         @BeforeEach
         void setUp() {
 
-            createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(EFFECTIVE_FROM, CASE_ID,
+            createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(EFFECTIVE_FROM, "6551341964128977",
                                                                               ACTION, RESPONSIBLE_PARTY,
                                                                               ORDER_REFERENCE
             );
@@ -118,7 +116,8 @@ public class CasePaymentOrdersControllerTest {
         void directCallHappyPath() {
             given(casePaymentOrdersService.createCasePaymentOrder(createCasePaymentOrderRequest))
                 .willReturn(casePaymentOrder);
-            CasePaymentOrdersController controller = new CasePaymentOrdersController(casePaymentOrdersService);
+            CasePaymentOrdersController controller = new CasePaymentOrdersController(casePaymentOrdersService,
+                                                                                     applicationParams);
             CasePaymentOrder response = controller.createCasePaymentOrderRequest(createCasePaymentOrderRequest);
             assertThat(response).isNotNull();
             assertEquals(response, casePaymentOrder);

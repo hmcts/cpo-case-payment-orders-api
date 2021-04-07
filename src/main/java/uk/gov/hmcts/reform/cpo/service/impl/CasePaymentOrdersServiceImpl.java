@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cpo.service.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -10,20 +9,17 @@ import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
-import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
-import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
-
 import javax.transaction.Transactional;
-
-import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
-
-import java.time.LocalDateTime;
+import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static uk.gov.hmcts.reform.cpo.exception.ValidationError.IDAM_ID_CANNOT_BE_FOUND;
+import static uk.gov.hmcts.reform.cpo.exception.ValidationError.NON_UNIQUE_PAIRING;
 
 @Service
 public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
@@ -44,26 +40,26 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     @Transactional
     @Override
     public CasePaymentOrder createCasePaymentOrder(CreateCasePaymentOrderRequest createCasePaymentOrderRequest) {
-        String createdBy = securityUtils.getUserInfo().getUid();
+        String createdBy;
+        try {
+            createdBy = securityUtils.getUserInfo().getUid();
+        } catch (Exception e) {
+            throw new CasePaymentOrdersQueryException(IDAM_ID_CANNOT_BE_FOUND);
+        }
         CasePaymentOrderEntity requestEntity = mapper.toEntity(createCasePaymentOrderRequest, createdBy);
-        CasePaymentOrderEntity savedEntity = casePaymentOrdersRepository.saveAndFlush(requestEntity);
-        return mapper.toDomainModel(savedEntity);
-    }
-    @Autowired
-    private final CasePaymentOrderMapper casePaymentOrderMapper;
-    @Autowired
-    private final CasePaymentOrdersRepository casePaymentOrdersRepository;
 
-    public CasePaymentOrdersServiceImpl(CasePaymentOrderMapper casePaymentOrderMapper,
-                                        CasePaymentOrdersRepository casePaymentOrdersRepository) {
-        this.casePaymentOrderMapper = casePaymentOrderMapper;
-        this.casePaymentOrdersRepository = casePaymentOrdersRepository;
+        try {
+            CasePaymentOrderEntity savedEntity = casePaymentOrdersRepository.saveAndFlush(requestEntity);
+            return mapper.toDomainModel(savedEntity);
+        } catch (Exception e) {
+            throw new CasePaymentOrdersQueryException(NON_UNIQUE_PAIRING);
+        }
+
     }
 
     @Override
-    public Page<CasePaymentOrderEntity> getCasePaymentOrders(
-        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
-
+    public Page<CasePaymentOrderEntity> getCasePaymentOrders(final CasePaymentOrderQueryFilter
+                                                                 casePaymentOrderQueryFilter) {
         if (casePaymentOrderQueryFilter.isItAnEmptyCriteria()) {
             return Page.empty();
         }
@@ -81,6 +77,11 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
                 pageRequest
             );
         }
+    }
+
+    @Override
+    public void create() {
+
     }
 
     private PageRequest getPageRequest(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
