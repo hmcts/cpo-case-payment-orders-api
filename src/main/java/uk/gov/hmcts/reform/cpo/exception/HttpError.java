@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo.exception;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriUtils;
@@ -10,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+@Getter
 @SuppressWarnings({"PMD.LawOfDemeter", "PMD.ConfusingTernary"})
 public class HttpError<T extends Serializable> implements Serializable {
     private static final long serialVersionUID = 1501816452204696395L;
@@ -39,6 +41,7 @@ public class HttpError<T extends Serializable> implements Serializable {
     public HttpError(Exception exception, HttpServletRequest request) {
         this(exception, request, null);
     }
+
 
     private Integer getStatusFromResponseStatus(ResponseStatus responseStatus, HttpStatus status) {
         if (status != null) {
@@ -79,33 +82,6 @@ public class HttpError<T extends Serializable> implements Serializable {
         return DEFAULT_ERROR;
     }
 
-    public String getException() {
-        return exception;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public T getDetails() {
-        return details;
-    }
 
     public HttpError<T> withDetails(T details) {
         this.details = details;

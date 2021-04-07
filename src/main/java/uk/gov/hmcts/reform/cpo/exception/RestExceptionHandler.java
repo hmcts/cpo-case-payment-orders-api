@@ -27,7 +27,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private ResponseEntity<HttpError> getHttpErrorBadRequest(HttpServletRequest request, Exception exception) {
         LOG.error(exception.getMessage(), exception);
-        final HttpError<Serializable> error = new HttpError<Serializable>(exception, request,HttpStatus.BAD_REQUEST)
+        final HttpError<Serializable> error = new HttpError<>(exception, request,HttpStatus.BAD_REQUEST)
             .withDetails(exception.getCause());
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)

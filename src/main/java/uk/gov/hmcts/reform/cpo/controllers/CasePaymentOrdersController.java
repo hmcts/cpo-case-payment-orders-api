@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
-import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
+import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 
@@ -21,13 +21,13 @@ import java.util.Optional;
 
 @RestController
 @Validated
-@RequestMapping("/api")
+@RequestMapping("/")
 public class CasePaymentOrdersController {
 
-    private final CasePaymentOrdersServiceImpl casePaymentOrdersServiceImpl;
+    private final CasePaymentOrdersService casePaymentOrdersServiceImpl;
     private final ApplicationParams applicationParams;
 
-    public CasePaymentOrdersController(CasePaymentOrdersServiceImpl casePaymentOrdersServiceImpl,
+    public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersServiceImpl,
                                        ApplicationParams applicationParams) {
         this.casePaymentOrdersServiceImpl = casePaymentOrdersServiceImpl;
         this.applicationParams = applicationParams;
@@ -55,4 +55,5 @@ public class CasePaymentOrdersController {
             .build();
         return casePaymentOrdersServiceImpl.getCasePaymentOrders(casePaymentOrderQueryFilter);
     }
+
 }
