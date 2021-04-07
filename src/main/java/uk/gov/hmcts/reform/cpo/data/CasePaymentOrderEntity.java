@@ -4,6 +4,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -17,6 +19,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "case_payment_orders")
+@Audited(withModifiedFlag = true)
 public class CasePaymentOrderEntity {
 
     public static final String CASES_ID = "caseId";
@@ -28,6 +31,7 @@ public class CasePaymentOrderEntity {
     private UUID id;
 
     @CreationTimestamp
+    @NotAudited
     private LocalDateTime createdTimestamp;
 
     @Column(nullable = false)
