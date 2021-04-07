@@ -55,10 +55,10 @@ public class CasePaymentOrdersController {
     }
 
     @GetMapping(value = "case-payment-orders", produces = {"application/json"})
-    public Page<CasePaymentOrderEntity> getCasePaymentOrders(@ApiParam(value = "list of ids")
+    public Page<CasePaymentOrderEntity> getCasePaymentOrders(@ApiParam("list of ids")
                                                              @ValidCpoId
                                                              @RequestParam("ids") Optional<List<String>> ids,
-                                                             @ApiParam(value = "casesId of ids")
+                                                             @ApiParam("casesId of ids")
                                                              @ValidCaseId
                                                              @RequestParam("cases-ids") Optional<List<String>> casesId,
                                                              @RequestParam("pageSize") Optional<Integer> pageSize,

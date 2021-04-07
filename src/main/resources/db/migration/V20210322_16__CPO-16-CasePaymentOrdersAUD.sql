@@ -19,6 +19,7 @@ CREATE TABLE public.case_payment_orders_audit
     case_id               bigint,
     case_id_mod           boolean,
     created_by            varchar(70),
+    created_by_mod        boolean,
     created_timestamp     timestamp,
     effective_from        timestamp,
     effective_from_mod    boolean,

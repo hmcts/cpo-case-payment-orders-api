@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
-import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,14 +19,10 @@ import java.util.UUID;
 @Service
 public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
-    private final CasePaymentOrderMapper casePaymentOrderMapper;
-
     private final CasePaymentOrdersRepository casePaymentOrdersRepository;
 
     @Autowired
-    public CasePaymentOrdersServiceImpl(CasePaymentOrderMapper casePaymentOrderMapper,
-                                        CasePaymentOrdersRepository casePaymentOrdersRepository) {
-        this.casePaymentOrderMapper = casePaymentOrderMapper;
+    public CasePaymentOrdersServiceImpl(CasePaymentOrdersRepository casePaymentOrdersRepository) {
         this.casePaymentOrdersRepository = casePaymentOrdersRepository;
     }
 

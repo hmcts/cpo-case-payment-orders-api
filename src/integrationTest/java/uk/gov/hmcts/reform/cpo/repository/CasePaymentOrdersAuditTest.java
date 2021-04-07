@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -101,14 +100,21 @@ public class CasePaymentOrdersAuditTest extends BaseTest {
     }
 
     @Test
-    void testAuditOfCreatingAndDeletingCasePaymentOrder() {
+    void testAuditOfDeletingCasePaymentOrder() {
         casePaymentOrdersRepository.delete(casePaymentOrderEntity);
 
         List auditedEntries = getAuditQuery(SELECT_ENTITIES_ONLY).getResultList();
 
         assertEquals(2, auditedEntries.size());
 
+        assertAuditRecordForDeletionOfEntityIsPresent();
+
+        assertAuditDataRevisionTypes(List.of(RevisionType.ADD, RevisionType.DEL));
+    }
+
+    private void assertAuditRecordForDeletionOfEntityIsPresent() {
         CasePaymentOrderEntity updatedCasePaymentOrderEntity = null;
+
         try {
             updatedCasePaymentOrderEntity = (CasePaymentOrderEntity) auditReader
                     .createQuery()
@@ -119,24 +125,6 @@ public class CasePaymentOrdersAuditTest extends BaseTest {
         } catch (NoResultException nre) {
             assertNull(updatedCasePaymentOrderEntity);
         }
-
-        assertAuditDataRevisionTypes(List.of(RevisionType.ADD, RevisionType.DEL));
-    }
-
-    @Test
-    void testUpdatingCasePaymentOrderCreationDetailsIsNotAudited() {
-        casePaymentOrderEntity.setCreatedBy("changeCreatedByField");
-        casePaymentOrderEntity.setCreatedTimestamp(LocalDateTime.now().plus(1, ChronoUnit.DAYS));
-
-        CasePaymentOrderEntity updatedActionEntity = casePaymentOrdersRepository.save(casePaymentOrderEntity);
-
-        assertNotNull(updatedActionEntity);
-
-        List auditedEntries = getAuditQuery(SELECT_ENTITIES_ONLY).getResultList();
-
-        assertEquals(1, auditedEntries.size());
-
-        assertAuditDataRevisionTypes(List.of(RevisionType.ADD));
     }
 
     private AuditQuery getAuditQuery(boolean shouldSelectEntitiesOnly) {
