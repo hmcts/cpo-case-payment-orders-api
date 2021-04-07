@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
@@ -19,8 +20,11 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.reform.cpo.exception.ValidationError.IDAM_ID_CANNOT_BE_FOUND;
+import static uk.gov.hmcts.reform.cpo.exception.ValidationError.NON_UNIQUE_PAIRING;
 
 class CasePaymentOrdersServiceImplTest {
 
@@ -126,6 +130,26 @@ class CasePaymentOrdersServiceImplTest {
                 .createCasePaymentOrder(createCasePaymentOrderRequest);
             assertThat("UUID does not match expected", caseOrderReturn.getId().equals(ID));
             assertThat("Returned entity does not match expected", caseOrderReturn.equals(casePaymentOrderIncoming));
+        }
+
+        @Test
+        @DisplayName("Should throw error when request has non-unique order reference and case id pairing")
+        void shouldErrorWhenNonUniquePairing() {
+            given(securityUtils.getUserInfo()).willReturn(userInfo);
+            given(mapper.toEntity(createCasePaymentOrderRequest, CREATED_BY)).willReturn(requestEntity);
+            given(casePaymentOrdersRepository.saveAndFlush(requestEntity)).willThrow(new RuntimeException());
+            assertThatThrownBy(() -> casePaymentOrdersService.createCasePaymentOrder(createCasePaymentOrderRequest))
+                .isInstanceOf(CasePaymentOrdersQueryException.class)
+                .hasMessageContaining(NON_UNIQUE_PAIRING);
+        }
+
+        @Test
+        @DisplayName("Should throw error when idam Id cannot be retrieved")
+        void shouldErrorWhenCannotRetrieveIdamId() {
+            given(securityUtils.getUserInfo()).willThrow(new RuntimeException());
+            assertThatThrownBy(() -> casePaymentOrdersService.createCasePaymentOrder(createCasePaymentOrderRequest))
+                .isInstanceOf(CasePaymentOrdersQueryException.class)
+                .hasMessageContaining(IDAM_ID_CANNOT_BE_FOUND);
         }
     }
 }
