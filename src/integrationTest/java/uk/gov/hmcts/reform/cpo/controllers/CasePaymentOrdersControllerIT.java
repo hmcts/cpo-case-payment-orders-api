@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH;
 
 
 public class CasePaymentOrdersControllerIT {
@@ -75,7 +74,7 @@ public class CasePaymentOrdersControllerIT {
         @Test
         void shouldSuccessfullyCreateCasePaymentOrder() throws Exception {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+            this.mockMvc.perform(post("/api/case-payment-orders")
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
                 .andExpect(jsonPath("$.created_timestamp", is(LocalDateTime.now().format(formatter))))
@@ -93,7 +92,7 @@ public class CasePaymentOrdersControllerIT {
         @DisplayName("Null request fields throws errors")
         @Test
         void shouldThrowNotNullErrors() throws Exception {
-            this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+            this.mockMvc.perform(post("/api/case-payment-orders")
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(createCasePaymentOrderRequestNull)))
                 .andExpect(status().isBadRequest())
@@ -109,7 +108,7 @@ public class CasePaymentOrdersControllerIT {
         @DisplayName("Invalid request fields throws errors")
         @Test
         void shouldThrowInvalidFormErrors() throws Exception {
-            this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+            this.mockMvc.perform(post("/api/case-payment-orders")
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(createCasePaymentOrderRequestInvalid)))
                 .andExpect(status().isBadRequest())

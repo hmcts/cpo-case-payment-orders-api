@@ -12,6 +12,4 @@ public interface CasePaymentOrdersService {
     CasePaymentOrder createCasePaymentOrder(CreateCasePaymentOrderRequest request);
 
     Page<CasePaymentOrderEntity> getCasePaymentOrders(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter);
-
-    void create();
 }

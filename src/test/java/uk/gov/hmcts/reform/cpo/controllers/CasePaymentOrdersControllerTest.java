@@ -37,7 +37,6 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
-import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
@@ -132,7 +131,7 @@ public class CasePaymentOrdersControllerTest {
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-            this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+            this.mockMvc.perform(post("/api/case-payment-orders")
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
                 .andExpect(status().isCreated())
