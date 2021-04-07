@@ -4,6 +4,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -17,6 +19,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "case_payment_orders")
+@Audited(withModifiedFlag = true)
 public class CasePaymentOrderEntity {
 
     @Id
@@ -25,6 +28,7 @@ public class CasePaymentOrderEntity {
     private UUID id;
 
     @CreationTimestamp
+    @NotAudited
     private LocalDateTime createdTimestamp;
 
     @Column(nullable = false)
@@ -44,20 +48,4 @@ public class CasePaymentOrderEntity {
 
     @Column(length = 70)
     private String createdBy;
-
-    public CasePaymentOrderEntity(UUID id, LocalDateTime createdTimestamp, LocalDateTime effectiveFrom, Long caseId,
-                                  String action, String responsibleParty, String orderReference, String createdBy) {
-        this.id = id;
-        this.createdTimestamp = createdTimestamp;
-        this.effectiveFrom = effectiveFrom;
-        this.caseId = caseId;
-        this.action = action;
-        this.responsibleParty = responsibleParty;
-        this.orderReference = orderReference;
-        this.createdBy = createdBy;
-    }
-
-    public CasePaymentOrderEntity() {
-        //defalt constructor provided
-    }
 }
