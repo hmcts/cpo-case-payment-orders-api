@@ -159,7 +159,7 @@ public class CasePaymentOrdersController {
                                                     @Size(min = 16, max = 16,
                                                             message = ValidationError.CASE_ID_INVALID_LENGTH)
                                                   String> caseIds) throws CasePaymentIdentifierException {
-        List<Long> caseIdLongs = caseIds.stream().map(x -> Long.parseLong(x)).collect(Collectors.toList());
+        List<Long> caseIdLongs = caseIds.stream().map(Long::parseLong).collect(Collectors.toList());
         casePaymentOrdersService.deleteCasePaymentOrdersByCaseIds(caseIdLongs);
     }
 }

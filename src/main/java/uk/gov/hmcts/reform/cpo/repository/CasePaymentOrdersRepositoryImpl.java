@@ -41,9 +41,9 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
 
     @Override
     public void deleteByCaseIds(List<Long> caseIds) throws CasePaymentIdentifierException {
-        int deleteByCasesIds = casePaymentOrdersJpaRepository.deleteByCaseIdIsIn(caseIds);
+        int deleteByCaseIds = casePaymentOrdersJpaRepository.deleteByCaseIdIsIn(caseIds);
 
-        if (deleteByCasesIds != caseIds.size()) {
+        if (deleteByCaseIds != caseIds.size()) {
             throw new CasePaymentIdentifierException(String.format(ERROR_MESSAGE, "Case ID"));
         }
     }
