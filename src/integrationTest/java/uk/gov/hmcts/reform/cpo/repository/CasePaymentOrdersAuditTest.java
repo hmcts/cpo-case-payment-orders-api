@@ -100,14 +100,21 @@ public class CasePaymentOrdersAuditTest extends BaseTest {
     }
 
     @Test
-    void testAuditOfCreatingAndDeletingCasePaymentOrder() {
+    void testAuditOfDeletingCasePaymentOrder() {
         casePaymentOrdersRepository.delete(casePaymentOrderEntity);
 
         List auditedEntries = getAuditQuery(SELECT_ENTITIES_ONLY).getResultList();
 
         assertEquals(2, auditedEntries.size());
 
+        assertAuditRecordForDeletionOfEntityIsPresent();
+
+        assertAuditDataRevisionTypes(List.of(RevisionType.ADD, RevisionType.DEL));
+    }
+
+    private void assertAuditRecordForDeletionOfEntityIsPresent() {
         CasePaymentOrderEntity updatedCasePaymentOrderEntity = null;
+
         try {
             updatedCasePaymentOrderEntity = (CasePaymentOrderEntity) auditReader
                     .createQuery()
@@ -118,8 +125,6 @@ public class CasePaymentOrdersAuditTest extends BaseTest {
         } catch (NoResultException nre) {
             assertNull(updatedCasePaymentOrderEntity);
         }
-
-        assertAuditDataRevisionTypes(List.of(RevisionType.ADD, RevisionType.DEL));
     }
 
     private AuditQuery getAuditQuery(boolean shouldSelectEntitiesOnly) {
