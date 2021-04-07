@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
+import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
@@ -65,7 +66,7 @@ class CasePaymentOrdersServiceImplTest implements BaseTest<String> {
             .pageSize(PAGE_SIZE)
             .build();
 
-        final Page<CasePaymentOrderEntity> pages = casePaymentOrdersService.getCasePaymentOrders(
+        final Page<CasePaymentOrder> pages = casePaymentOrdersService.getCasePaymentOrders(
             casePaymentOrderQueryFilter);
         assertTrue("The getNumberOfElements should be 0.", pages.getNumberOfElements() == 0);
     }
@@ -98,8 +99,10 @@ class CasePaymentOrdersServiceImplTest implements BaseTest<String> {
             .build();
 
         when(casePaymentOrdersRepository.findByIdIn(anyList(), ArgumentMatchers.<Pageable>any())).thenReturn(
-            getPages(casePaymentOrderQueryFilter));
-        final Page<CasePaymentOrderEntity> pages = casePaymentOrdersService.getCasePaymentOrders(
+            getEntityPages(casePaymentOrderQueryFilter));
+
+        when(casePaymentOrderMapper.map(anyList())).thenReturn(createListOfCasePaymentOrder());
+        final Page<CasePaymentOrder> pages = casePaymentOrdersService.getCasePaymentOrders(
             casePaymentOrderQueryFilter);
 
         assertTrue("The getNumberOfElements should be 0.", pages.getNumberOfElements() == 3);
@@ -115,16 +118,24 @@ class CasePaymentOrdersServiceImplTest implements BaseTest<String> {
             .build();
 
         when(casePaymentOrdersRepository.findByCaseIdIn(anyList(), ArgumentMatchers.<Pageable>any())).thenReturn(
-            getPages(casePaymentOrderQueryFilter));
-        final Page<CasePaymentOrderEntity> pages = casePaymentOrdersService.getCasePaymentOrders(
+            getEntityPages(casePaymentOrderQueryFilter));
+
+        when(casePaymentOrderMapper.map(anyList())).thenReturn(createListOfCasePaymentOrder());
+
+        final Page<CasePaymentOrder> pages = casePaymentOrdersService.getCasePaymentOrders(
             casePaymentOrderQueryFilter);
 
         assertTrue("The getNumberOfElements should be 0.", pages.getNumberOfElements() == 3);
     }
 
-    private Page<CasePaymentOrderEntity> getPages(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+    private Page<CasePaymentOrderEntity> getEntityPages(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
         final PageRequest pageRequest = getPageRequest(casePaymentOrderQueryFilter);
         return new PageImpl<CasePaymentOrderEntity>(createListOfCasePaymentOrderEntity(), pageRequest, 3);
+    }
+
+    private Page<CasePaymentOrder> getDomainPages(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+        final PageRequest pageRequest = getPageRequest(casePaymentOrderQueryFilter);
+        return new PageImpl<CasePaymentOrder>(createListOfCasePaymentOrder(), pageRequest, 3);
     }
 
     private PageRequest getPageRequest(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
@@ -166,6 +177,48 @@ class CasePaymentOrdersServiceImplTest implements BaseTest<String> {
         casePaymentOrderEntity2.setCreatedTimestamp(LocalDateTime.now());
         casePaymentOrderEntity2.setResponsibleParty("setResponsibleParty");
         casePaymentOrders.add(casePaymentOrderEntity2);
+        return casePaymentOrders;
+    }
+
+    private List<CasePaymentOrder> createListOfCasePaymentOrder() {
+        final ArrayList<CasePaymentOrder> casePaymentOrders = new ArrayList<>();
+
+        final CasePaymentOrder casePaymentOrder = CasePaymentOrder.builder()
+            .createdTimestamp(LocalDateTime.now())
+            .effectiveFrom(LocalDateTime.now())
+            .caseId(1_234_123_412_341_234L)
+            .action("Case Creation")
+            .responsibleParty("The executor on the will")
+            .orderReference("Bob123")
+            .createdBy("Bob")
+            .build();
+
+        casePaymentOrders.add(casePaymentOrder);
+
+        final CasePaymentOrder casePaymentOrder1 = CasePaymentOrder.builder()
+            .createdTimestamp(LocalDateTime.now())
+            .effectiveFrom(LocalDateTime.now())
+            .caseId(1_234_123_412_341_234L)
+            .action("Case Creation")
+            .responsibleParty("The executor on the will")
+            .orderReference("Bob123")
+            .createdBy("Bob")
+            .build();
+
+        casePaymentOrders.add(casePaymentOrder1);
+
+        final CasePaymentOrder casePaymentOrder2 = CasePaymentOrder.builder()
+            .createdTimestamp(LocalDateTime.now())
+            .effectiveFrom(LocalDateTime.now())
+            .caseId(1_234_123_412_341_234L)
+            .action("Case Creation")
+            .responsibleParty("The executor on the will")
+            .orderReference("Bob123")
+            .createdBy("Bob")
+            .build();
+
+        casePaymentOrders.add(casePaymentOrder2);
+
         return casePaymentOrders;
     }
 }

@@ -2,7 +2,11 @@ package uk.gov.hmcts.reform.cpo.repository;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -41,5 +45,16 @@ public class CasePaymentOrderQueryFilter {
 
     public List<Long> getListOfLongCasesIds() {
         return caseIds.stream().map(Long::parseLong).collect(Collectors.toList());
+    }
+
+    public PageRequest getPageRequest() {
+        final List<Sort.Order> orders = new ArrayList<>();
+        orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderEntity.CASES_ID));
+        orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderEntity.ORDER_REFERENCE));
+        return PageRequest.of(
+            this.getPageNumber(),
+            this.getPageSize(),
+            Sort.by(orders)
+        );
     }
 }

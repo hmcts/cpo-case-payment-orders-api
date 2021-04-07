@@ -15,3 +15,4 @@ public interface CasePaymentOrderMapper {
 
     List<CasePaymentOrder> map(List<CasePaymentOrderEntity> casePaymentOrderEntities);
 }
+

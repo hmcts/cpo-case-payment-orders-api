@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cpo.ApplicationParams;
-import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
+import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
@@ -43,14 +43,14 @@ public class CasePaymentOrdersController {
         @ApiResponse(code = 200, message = "Payment orders retrieved"),
         @ApiResponse(code = 400, message = "Bad request")
     })
-    public Page<CasePaymentOrderEntity> getCasePaymentOrders(@ApiParam("list of case payment orders ids")
-                                                             @ValidCpoId
-                                                             @RequestParam("ids") Optional<List<String>> ids,
-                                                             @ApiParam("list of ccd case reference numbers")
-                                                             @ValidCaseId
-                                                             @RequestParam("cases-ids") Optional<List<String>> casesId,
-                                                             @RequestParam("pageSize") Optional<Integer> pageSize,
-                                                             @RequestParam("pageNumber") Optional<Integer> pageNumber
+    public Page<CasePaymentOrder> getCasePaymentOrders(@ApiParam("list of case payment orders ids")
+                                                       @ValidCpoId
+                                                       @RequestParam("ids") Optional<List<String>> ids,
+                                                       @ApiParam("list of ccd case reference numbers")
+                                                       @ValidCaseId
+                                                       @RequestParam("cases-ids") Optional<List<String>> casesId,
+                                                       @RequestParam("pageSize") Optional<Integer> pageSize,
+                                                       @RequestParam("pageNumber") Optional<Integer> pageNumber
 
     ) {
         final List<String> listOfIds = ids.orElse(Collections.emptyList());
