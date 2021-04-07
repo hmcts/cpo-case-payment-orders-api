@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
+
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -57,8 +58,9 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     }
 
     @Override
-    public Page<CasePaymentOrderEntity> getCasePaymentOrders(final CasePaymentOrderQueryFilter
-                                                                 casePaymentOrderQueryFilter) {
+    public Page<CasePaymentOrderEntity> getCasePaymentOrders(
+        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+
         if (casePaymentOrderQueryFilter.isItAnEmptyCriteria()) {
             return Page.empty();
         }
@@ -76,11 +78,6 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
                 pageRequest
             );
         }
-    }
-
-    @Override
-    public void create() {
-
     }
 
     private PageRequest getPageRequest(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {

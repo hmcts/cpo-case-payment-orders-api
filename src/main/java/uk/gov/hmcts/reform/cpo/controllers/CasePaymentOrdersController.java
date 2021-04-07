@@ -35,6 +35,7 @@ import java.util.Optional;
 
 @RestController
 @Validated
+@RequestMapping("/api")
 public class CasePaymentOrdersController {
 
     public static final String CASE_PAYMENT_ORDERS_PATH = "/case-payment-orders";
@@ -98,12 +99,12 @@ public class CasePaymentOrdersController {
     }
 
     @GetMapping(value = "case-payment-orders", produces = {"application/json"})
-    public Page<CasePaymentOrderEntity> getCasePaymentOrders(@ApiParam(value = "list of ids")
-                                                             @ValidCpoId @RequestParam("ids")
-                                                                 Optional<List<String>> ids,
-                                                             @ApiParam(value = "casesId of ids")
-                                                             @ValidCaseId @RequestParam("cases-ids")
-                                                                 Optional<List<String>> casesId,
+    public Page<CasePaymentOrderEntity> getCasePaymentOrders(@ApiParam("list of ids")
+                                                             @ValidCpoId
+                                                             @RequestParam("ids") Optional<List<String>> ids,
+                                                             @ApiParam("casesId of ids")
+                                                             @ValidCaseId
+                                                             @RequestParam("cases-ids") Optional<List<String>> casesId,
                                                              @RequestParam("pageSize") Optional<Integer> pageSize,
                                                              @RequestParam("pageNumber") Optional<Integer> pageNumber
 
