@@ -58,21 +58,6 @@ class CasePaymentOrdersServiceImplTest implements BaseTest<String> {
     }
 
     @Test
-    void passForEmptyPages() {
-        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
-            .cpoIds(Collections.emptyList())
-            .caseIds(Collections.emptyList())
-            .pageNumber(PAGE_NUMBER)
-            .pageSize(PAGE_SIZE)
-            .build();
-
-        final Page<CasePaymentOrder> pages = casePaymentOrdersService.getCasePaymentOrders(
-            casePaymentOrderQueryFilter);
-        assertTrue("The getNumberOfElements should be 0.", pages.getNumberOfElements() == 0);
-    }
-
-
-    @Test
     void failForCasesIdsAndIdsTogether() {
         final String expectedError = "case payment orders cannot be filtered by both id and case id.";
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()

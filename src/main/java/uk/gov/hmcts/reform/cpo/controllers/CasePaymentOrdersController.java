@@ -53,6 +53,7 @@ public class CasePaymentOrdersController {
                                                        @RequestParam("pageNumber") Optional<Integer> pageNumber
 
     ) {
+
         final List<String> listOfIds = ids.orElse(Collections.emptyList());
         final List<String> listOfCasesIds = casesId.orElse(Collections.emptyList());
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
@@ -61,6 +62,10 @@ public class CasePaymentOrdersController {
             .pageNumber(pageNumber.orElse(CasePaymentOrderQueryFilter.PAGE_NUMBER))
             .pageSize(pageSize.orElse(applicationParams.getDefaultPageSize()))
             .build();
+
+        if (casePaymentOrderQueryFilter.isItAnEmptyCriteria()) {
+            return Page.empty();
+        }
         return casePaymentOrdersServiceImpl.getCasePaymentOrders(casePaymentOrderQueryFilter);
     }
 }

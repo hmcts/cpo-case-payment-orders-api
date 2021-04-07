@@ -86,8 +86,3 @@ azure:
 cpo:
   defaultPageSize: 20
 
-logging:
-  level:
-    root: INFO
-    org.springframework.web: INFO
-    org.hibernate: INFO

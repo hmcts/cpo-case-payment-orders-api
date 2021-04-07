@@ -32,9 +32,6 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     @Override
     public Page<CasePaymentOrder> getCasePaymentOrders(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
         final Page<CasePaymentOrderEntity> casePaymentOrderEntities;
-        if (casePaymentOrderQueryFilter.isItAnEmptyCriteria()) {
-            return Page.empty();
-        }
         validateCasePaymentOrderQueryFilter(casePaymentOrderQueryFilter);
         final PageRequest pageRequest = casePaymentOrderQueryFilter.getPageRequest();
         if (casePaymentOrderQueryFilter.isACasesIdQuery()) {
