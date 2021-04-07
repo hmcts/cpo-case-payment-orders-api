@@ -90,9 +90,9 @@ class CasePaymentOrderMapperTest {
 
         final List<CasePaymentOrderEntity> casePaymentOrderEntities = new ArrayList<>();
         casePaymentOrderEntities.add(entity);
-        final List<CasePaymentOrder> casePaymentOrders =  mapper.map(casePaymentOrderEntities);
+        final List<CasePaymentOrder> casePaymentOrders = mapper.map(casePaymentOrderEntities);
 
-        assertTrue("The expected size is 1",casePaymentOrders.size()==1);
+        assertTrue("The expected size is 1", casePaymentOrders.size() == 1);
         CasePaymentOrder mappedDomainObject = casePaymentOrders.get(0);
         assertEquals("Mapped domain model created timestamp should equals mocked domain model created timestamp",
                      casePaymentOrder.getCreatedTimestamp(), mappedDomainObject.getCreatedTimestamp());
