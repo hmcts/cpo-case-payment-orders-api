@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.cpo.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +20,11 @@ import java.util.UUID;
 
 @Service
 public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CasePaymentOrdersServiceImpl.class);
+    public static final String AUDIT_ENTRY_DELETION_ERROR = "Exception thrown when deleting audit entry for case "
+                                                            + "payment orders '{}'. Unwanted previous  versions of the"
+                                                            + " case payment order might be leftover";
 
     private final CasePaymentOrdersRepository casePaymentOrdersRepository;
 
@@ -70,12 +77,20 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     @Override
     public void deleteCasePaymentOrdersByIds(List<UUID> ids) throws CasePaymentIdentifierException {
         casePaymentOrdersRepository.deleteByUuids(ids);
-        casePaymentOrdersRepository.deleteAuditEntriesByUuids(ids);
+        try {
+            casePaymentOrdersRepository.deleteAuditEntriesByUuids(ids);
+        } catch (Exception e) {
+            LOG.error(AUDIT_ENTRY_DELETION_ERROR, ids);
+        }
     }
 
     @Override
     public void deleteCasePaymentOrdersByCaseIds(List<Long> caseIds) throws CasePaymentIdentifierException {
         casePaymentOrdersRepository.deleteByCaseIds(caseIds);
-        casePaymentOrdersRepository.deleteAuditEntriesByCaseIds(caseIds);
+        try {
+            casePaymentOrdersRepository.deleteAuditEntriesByCaseIds(caseIds);
+        } catch (Exception e) {
+            LOG.error(AUDIT_ENTRY_DELETION_ERROR, caseIds);
+        }
     }
 }
