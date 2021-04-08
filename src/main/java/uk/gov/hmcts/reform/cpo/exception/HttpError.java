@@ -28,7 +28,7 @@ public class HttpError<T extends Serializable> implements Serializable {
     private final String path;
     private T details;
 
-    public HttpError(Exception exception, String path,HttpStatus status) {
+    public HttpError(Exception exception, String path, HttpStatus status) {
         final ResponseStatus responseStatus = exception.getClass().getAnnotation(ResponseStatus.class);
 
         this.exception = exception.getClass().getName();

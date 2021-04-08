@@ -38,6 +38,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Validated
 public class CasePaymentOrdersController {
 
+    @SuppressWarnings({"squid:S1075"})
     public static final String CASE_PAYMENT_ORDERS_PATH = "/case-payment-orders";
 
     private final CasePaymentOrdersService casePaymentOrdersService;
@@ -98,6 +99,7 @@ public class CasePaymentOrdersController {
                     value = "{\n"
                         + "   \"status\": \"400\",\n"
                         + "   \"error\": \"Bad Request\",\n"
+                        + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
                         + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
                         + "   \"details\": [ \""  + ValidationError.ID_REQUIRED + "\" ]\n"
                         + "}",
@@ -122,7 +124,7 @@ public class CasePaymentOrdersController {
         )
     })
     public CasePaymentOrder updateCasePaymentOrderRequest(@Valid @RequestBody UpdateCasePaymentOrderRequest
-                                                              requestPayload) {
+                                                                  requestPayload) {
         return casePaymentOrdersService.updateCasePaymentOrder(requestPayload);
     }
 

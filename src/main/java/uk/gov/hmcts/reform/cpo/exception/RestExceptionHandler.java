@@ -34,9 +34,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             .body(error);
     }
 
-    @ExceptionHandler({CasePaymentOrdersQueryException.class,ConstraintViolationException.class})
+    @ExceptionHandler({CasePaymentOrdersQueryException.class, ConstraintViolationException.class})
     @ResponseBody
-    public ResponseEntity<HttpError> handleCasePaymentOrdersQueryException(final HttpServletRequest request,
+    public ResponseEntity<HttpError<Serializable>> handleCasePaymentOrdersQueryException(
+                                                        final HttpServletRequest request,
                                                         final Exception exception) {
         return getHttpErrorBadRequest(request, exception);
     }
@@ -58,9 +59,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             .body(error);
     }
 
-    private ResponseEntity<HttpError> getHttpErrorBadRequest(HttpServletRequest request, Exception exception) {
+    private ResponseEntity<HttpError<Serializable>> getHttpErrorBadRequest(HttpServletRequest request,
+                                                                           Exception exception) {
         LOG.error(exception.getMessage(), exception);
-        final HttpError<Serializable> error = new HttpError<Serializable>(exception, request, HttpStatus.BAD_REQUEST)
+        final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
             .withDetails(exception.getCause());
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
