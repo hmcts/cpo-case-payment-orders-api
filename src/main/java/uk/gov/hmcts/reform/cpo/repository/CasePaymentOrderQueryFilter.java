@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,4 +58,12 @@ public class CasePaymentOrderQueryFilter {
             Sort.by(orders)
         );
     }
+
+    public void validateCasePaymentOrderQueryFilter() {
+        if (this.isAnIdsAndCasesIdQuery()) {
+            throw new CasePaymentOrdersFilterException(
+                "case payment orders cannot be filtered by both id and case id.");
+        }
+    }
+
 }

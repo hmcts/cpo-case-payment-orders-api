@@ -66,6 +66,7 @@ public class CasePaymentOrdersController {
         if (casePaymentOrderQueryFilter.isItAnEmptyCriteria()) {
             return Page.empty();
         }
+        casePaymentOrderQueryFilter.validateCasePaymentOrderQueryFilter();
         return casePaymentOrdersServiceImpl.getCasePaymentOrders(casePaymentOrderQueryFilter);
     }
 }

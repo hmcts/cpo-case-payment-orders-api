@@ -12,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
-import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
@@ -23,9 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static junit.framework.TestCase.fail;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
@@ -53,26 +49,12 @@ class CasePaymentOrdersServiceImplTest implements BaseTest<String> {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        casePaymentOrdersService = new CasePaymentOrdersServiceImpl(casePaymentOrderMapper,
-                                                                    casePaymentOrdersRepository);
+        casePaymentOrdersService = new CasePaymentOrdersServiceImpl(
+            casePaymentOrderMapper,
+            casePaymentOrdersRepository
+        );
     }
 
-    @Test
-    void failForCasesIdsAndIdsTogether() {
-        final String expectedError = "case payment orders cannot be filtered by both id and case id.";
-        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
-            .cpoIds(ids)
-            .caseIds(casesIds)
-            .pageNumber(PAGE_NUMBER)
-            .pageSize(PAGE_SIZE)
-            .build();
-        try {
-            casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter);
-            fail();
-        } catch (CasePaymentOrdersFilterException casePaymentOrdersQueryException) {
-            assertThat(casePaymentOrdersQueryException.getMessage(), is(expectedError));
-        }
-    }
 
     @Test
     void passForListIds() {

@@ -7,7 +7,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
-import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
@@ -31,26 +30,19 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
     @Override
     public Page<CasePaymentOrder> getCasePaymentOrders(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+
         final Page<CasePaymentOrderEntity> casePaymentOrderEntities;
-        validateCasePaymentOrderQueryFilter(casePaymentOrderQueryFilter);
         final PageRequest pageRequest = casePaymentOrderQueryFilter.getPageRequest();
         if (casePaymentOrderQueryFilter.isACasesIdQuery()) {
             casePaymentOrderEntities = casePaymentOrdersRepository.findByCaseIdIn(
-                casePaymentOrderQueryFilter.getListOfLongCasesIds(),pageRequest);
+                casePaymentOrderQueryFilter.getListOfLongCasesIds(), pageRequest);
         } else {
             casePaymentOrderEntities = casePaymentOrdersRepository.findByIdIn(
                 casePaymentOrderQueryFilter.getListUUID(),
                 pageRequest
             );
         }
-        return getPageOfCasePaymentOrder(casePaymentOrderEntities,pageRequest);
-    }
-
-    private void validateCasePaymentOrderQueryFilter(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
-        if (casePaymentOrderQueryFilter.isAnIdsAndCasesIdQuery()) {
-            throw new CasePaymentOrdersFilterException(
-                "case payment orders cannot be filtered by both id and case id.");
-        }
+        return getPageOfCasePaymentOrder(casePaymentOrderEntities, pageRequest);
     }
 
     private Page<CasePaymentOrder> getPageOfCasePaymentOrder(Page<CasePaymentOrderEntity> casePaymentOrderEntities,
@@ -60,6 +52,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
             casePaymentOrderMapper.map(casePaymentOrderEntities.getContent());
 
         return new PageImpl<>(casePaymentOrders, pageRequest,
-                                              casePaymentOrderEntities.getTotalElements());
+                              casePaymentOrderEntities.getTotalElements()
+        );
     }
 }
