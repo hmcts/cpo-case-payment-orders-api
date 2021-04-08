@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface BaseTest<T> {
+public interface BaseTest {
 
     String CASE_ID_VALID_1 = "9511425043588823";
     String CASE_ID_VALID_2 = "9716401307140455";
@@ -34,7 +34,7 @@ public interface BaseTest<T> {
     String CREATED_BY = "createdBy";
     LocalDateTime CREATED_TIMESTAMP = LocalDateTime.now();
 
-    default Optional<List<T>> createInitialValuesList(final T[] initialValues) {
+    default <T> Optional<List<T>> createInitialValuesList(final T[] initialValues) {
         return Optional.of(Arrays.asList(initialValues));
     }
 

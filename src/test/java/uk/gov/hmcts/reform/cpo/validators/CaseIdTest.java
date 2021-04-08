@@ -15,7 +15,7 @@ import static org.springframework.test.util.AssertionErrors.assertFalse;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 
-class CaseIdTest implements BaseTest<String> {
+class CaseIdTest implements BaseTest {
 
     private CaseIdValidator caseIdValidator = new CaseIdValidator();
 

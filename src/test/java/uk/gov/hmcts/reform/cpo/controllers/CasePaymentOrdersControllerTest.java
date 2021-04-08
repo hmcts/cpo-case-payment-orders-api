@@ -47,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH;
 
 
-public class CasePaymentOrdersControllerTest implements BaseTest<String> {
+public class CasePaymentOrdersControllerTest implements BaseTest {
 
     @Autowired
     protected MockMvc mockMvc;

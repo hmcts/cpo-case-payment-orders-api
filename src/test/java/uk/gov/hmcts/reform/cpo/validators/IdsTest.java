@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.util.AssertionErrors.assertFalse;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
-class IdsTest implements BaseTest<String> {
+class IdsTest implements BaseTest {
 
     private IdsValidator idsValidator = new IdsValidator();
 

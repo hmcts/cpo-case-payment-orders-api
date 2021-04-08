@@ -5,10 +5,17 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.BaseTest;
 
+import java.util.List;
+
 import static org.springframework.test.util.AssertionErrors.assertFalse;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
-class ValidatorTest implements BaseTest<String> {
+class ValidatorTest implements BaseTest, Validator<String> {
+
+    @Override
+    public void validate(String value, List<String> errors) {
+
+    }
 
     @Nested
     @DisplayName("Validator.isValidCaseId(..)")
@@ -19,7 +26,7 @@ class ValidatorTest implements BaseTest<String> {
         void successfullyValidatesValidCaseId() {
             assertTrue(
                 "16 digit Luhn number should validate as true",
-                Validator.isValidCaseId(CASE_ID_VALID_1)
+                isValidCaseId(CASE_ID_VALID_1)
             );
         }
 
@@ -28,7 +35,7 @@ class ValidatorTest implements BaseTest<String> {
         void successfullyFlagsNullCaseIdAsInvalid() {
             assertFalse(
                 "Null value Case ID should be flagged as invalid",
-                Validator.isValidCaseId(null)
+                isValidCaseId(null)
             );
         }
 
@@ -37,7 +44,7 @@ class ValidatorTest implements BaseTest<String> {
         void successfullyFlagsEmptyCaseIdAsInvalid() {
             assertFalse(
                 "Empty value Case ID should be flagged as invalid",
-                Validator.isValidCaseId("")
+                isValidCaseId("")
             );
         }
 
@@ -46,7 +53,7 @@ class ValidatorTest implements BaseTest<String> {
         void successfullyFlagsNonNumericCaseIdAsInvalid() {
             assertFalse(
                 "non-numeric Case ID should be flagged as invalid",
-                Validator.isValidCaseId("NON-NUMERIC")
+                isValidCaseId(CASE_ID_INVALID_NON_NUMERIC)
             );
         }
 
@@ -55,7 +62,7 @@ class ValidatorTest implements BaseTest<String> {
         void successfullyFlagsShortCaseIdAsInvalid() {
             assertFalse(
                 "Short Case ID should be flagged as invalid",
-                Validator.isValidCaseId(CASE_ID_INVALID_LENGTH)
+                isValidCaseId(CASE_ID_INVALID_LENGTH)
             );
         }
 
@@ -64,7 +71,7 @@ class ValidatorTest implements BaseTest<String> {
         void successfullyFlagsBadLuhnCaseIdAsInvalid() {
             assertFalse(
                 "non-numeric Case ID should be flagged as invalid",
-                Validator.isValidCaseId(CASE_ID_INVALID_LUHN)
+                isValidCaseId(CASE_ID_INVALID_LUHN)
             );
         }
 
@@ -79,7 +86,7 @@ class ValidatorTest implements BaseTest<String> {
         void successfullyValidatesValidCpoId() {
             assertTrue(
                 "Random UUID should validate as true",
-                Validator.isValidCpoId(CPO_ID_VALID_1)
+                isValidCpoId(CPO_ID_VALID_1)
             );
         }
 
@@ -88,7 +95,7 @@ class ValidatorTest implements BaseTest<String> {
         void successfullyFlagsNullCpoIdAsInvalid() {
             assertFalse(
                 "Null CPO ID should be flagged as invalid",
-                Validator.isValidCpoId(null)
+                isValidCpoId(null)
             );
         }
 
@@ -97,7 +104,7 @@ class ValidatorTest implements BaseTest<String> {
         void successfullyFlagsEmptyCpoIdAsInvalid() {
             assertFalse(
                 "Empty CPO ID should be flagged as invalid",
-                Validator.isValidCpoId("")
+                isValidCpoId("")
             );
         }
 
@@ -106,7 +113,7 @@ class ValidatorTest implements BaseTest<String> {
         void successfullyFlagsNonNumericCpoIdAsInvalid() {
             assertFalse(
                 "non-numeric CPO ID should be flagged as invalid",
-                Validator.isValidCpoId(CPO_ID_INVALID_NON_NUMERIC)
+                isValidCpoId(CPO_ID_INVALID_NON_NUMERIC)
             );
         }
 
@@ -115,7 +122,7 @@ class ValidatorTest implements BaseTest<String> {
         void successfullyFlagsBadUuidCpoIdAsInvalid() {
             assertFalse(
                 "Bad UUID CPO ID should be flagged as invalid",
-                Validator.isValidCpoId(CPO_ID_INVALID_1)
+                isValidCpoId(CPO_ID_INVALID_1)
             );
         }
 

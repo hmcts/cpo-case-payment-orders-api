@@ -40,7 +40,7 @@ import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CA
         {SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class}))
 @AutoConfigureMockMvc(addFilters = false)
 @ImportAutoConfiguration(TestIdamConfiguration.class)
-class RestExceptionHandlerTest implements BaseTest<String> {
+class RestExceptionHandlerTest implements BaseTest {
 
     @Autowired
     protected MockMvc mockMvc;

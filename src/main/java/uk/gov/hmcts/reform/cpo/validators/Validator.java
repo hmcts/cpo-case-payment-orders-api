@@ -17,14 +17,13 @@ interface Validator<T> {
             .addConstraintViolation();
     }
 
-    static boolean isValidCaseId(String caseId) {
-
+    default boolean isValidCaseId(String caseId) {
         return caseId != null
             && caseId.matches(CASE_ID_RG)
             && LUHN_CHECK_DIGIT.isValid(caseId);
     }
 
-    static boolean isValidCpoId(String cpoId) {
+    default boolean isValidCpoId(String cpoId) {
         try {
             UUID.fromString(cpoId);
             return true;
@@ -34,4 +33,5 @@ interface Validator<T> {
     }
 
     void validate(T value, List<String> errors);
+
 }

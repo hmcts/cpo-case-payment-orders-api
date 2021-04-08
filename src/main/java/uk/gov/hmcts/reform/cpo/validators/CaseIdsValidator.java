@@ -26,8 +26,9 @@ public class CaseIdsValidator implements ConstraintValidator<ValidCaseId, Option
 
     @Override
     public void validate(final String caseId, List<String> errors) {
-        if (!Validator.isValidCaseId(caseId)) {
+        if (!isValidCaseId(caseId)) {
             errors.add(caseId);
         }
     }
+
 }
