@@ -1,8 +1,14 @@
 package uk.gov.hmcts.reform;
 
+import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
+import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
+
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface BaseTest<T> {
 
@@ -20,7 +26,41 @@ public interface BaseTest<T> {
     String CPO_ID_INVALID_1 = "160924";
     String CPO_ID_INVALID_2 = "160924 ";
 
+    String ORDER_REFERENCE = "orderReference";
+    String ACTION = "action";
+    String RESPONSIBLE_PARTY = "responsibleParty";
+    LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24, 11, 48, 32);
+
+    String CREATED_BY = "createdBy";
+    LocalDateTime CREATED_TIMESTAMP = LocalDateTime.now();
+
     default Optional<List<T>> createInitialValuesList(final T[] initialValues) {
         return Optional.of(Arrays.asList(initialValues));
     }
+
+    default CasePaymentOrder createCasePaymentOrder() {
+        return CasePaymentOrder.builder()
+            .caseId(Long.parseLong(CASE_ID_VALID_1))
+            .effectiveFrom(EFFECTIVE_FROM)
+            .action(ACTION)
+            .responsibleParty(RESPONSIBLE_PARTY)
+            .orderReference(ORDER_REFERENCE)
+            .id(UUID.fromString(CPO_ID_VALID_1))
+            .createdBy(CREATED_BY)
+            .createdTimestamp(CREATED_TIMESTAMP)
+            .build();
+    }
+
+    default UpdateCasePaymentOrderRequest createUpdateCasePaymentOrderRequest() {
+        return new UpdateCasePaymentOrderRequest(
+            CPO_ID_VALID_1,
+            LocalDateTime.now(),
+            CASE_ID_VALID_1,
+            ORDER_REFERENCE,
+            ACTION,
+            RESPONSIBLE_PARTY
+        );
+    }
+
 }
+

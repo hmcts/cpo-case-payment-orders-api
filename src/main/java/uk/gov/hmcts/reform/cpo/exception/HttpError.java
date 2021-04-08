@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+
 @Getter
 @SuppressWarnings({"PMD.LawOfDemeter", "PMD.ConfusingTernary"})
 public class HttpError<T extends Serializable> implements Serializable {
@@ -25,7 +26,7 @@ public class HttpError<T extends Serializable> implements Serializable {
     private final transient LocalDateTime timestamp;
     private final Integer status;
     private final String error;
-    private final String message;
+    private String message;
     private final String path;
     private T details;
 
@@ -35,7 +36,7 @@ public class HttpError<T extends Serializable> implements Serializable {
         this.exception = exception.getClass().getName();
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
         this.status = getStatusFromResponseStatus(responseStatus, status);
-        this.error = getErrorReason(responseStatus);
+        this.error = getErrorReason(responseStatus, status);
         this.message = exception.getMessage();
         this.path = UriUtils.encodePath(path, StandardCharsets.UTF_8);
     }
@@ -77,7 +78,7 @@ public class HttpError<T extends Serializable> implements Serializable {
         return null;
     }
 
-    private String getErrorReason(ResponseStatus responseStatus) {
+    private String getErrorReason(ResponseStatus responseStatus, HttpStatus status) {
         if (null != responseStatus) {
             if (!responseStatus.reason().isEmpty()) {
                 return responseStatus.reason();
@@ -87,14 +88,21 @@ public class HttpError<T extends Serializable> implements Serializable {
             if (null != httpStatus) {
                 return httpStatus.getReasonPhrase();
             }
+        } else if (null != status) {
+            return status.getReasonPhrase();
         }
 
         return DEFAULT_ERROR;
     }
 
-
     public HttpError<T> withDetails(T details) {
         this.details = details;
         return this;
     }
+
+    public HttpError<T> withMessage(String message) {
+        this.message = message;
+        return this;
+    }
+
 }

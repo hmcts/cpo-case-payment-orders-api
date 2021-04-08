@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
@@ -21,6 +22,17 @@ import java.io.Serializable;
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestExceptionHandler.class);
+
+    @ExceptionHandler({ApiException.class})
+    @ResponseBody
+    public ResponseEntity<HttpError<Serializable>> handleApiException(final HttpServletRequest request,
+                                                                      final Exception exception) {
+        LOG.error(exception.getMessage(), exception);
+        final HttpError<Serializable> error = new HttpError<>(exception, request);
+        return ResponseEntity
+            .status(error.getStatus())
+            .body(error);
+    }
 
     @ExceptionHandler({CasePaymentOrdersQueryException.class,ConstraintViolationException.class})
     @ResponseBody
@@ -35,19 +47,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   HttpStatus status,
                                                                   WebRequest request) {
         String[] errors = exception.getBindingResult().getFieldErrors().stream()
-           .map(DefaultMessageSourceResolvable::getDefaultMessage)
-           .toArray(String[]::new);
+            .map(DefaultMessageSourceResolvable::getDefaultMessage)
+            .toArray(String[]::new);
         LOG.debug("MethodArgumentNotValidException:{}", exception.getLocalizedMessage());
         final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
+            .withMessage(ValidationError.ARGUMENT_NOT_VALID)
             .withDetails(errors);
         return ResponseEntity
-           .status(HttpStatus.BAD_REQUEST)
-           .body(error);
+            .status(HttpStatus.BAD_REQUEST)
+            .body(error);
     }
 
     private ResponseEntity<HttpError> getHttpErrorBadRequest(HttpServletRequest request, Exception exception) {
         LOG.error(exception.getMessage(), exception);
-        final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
+        final HttpError<Serializable> error = new HttpError<Serializable>(exception, request, HttpStatus.BAD_REQUEST)
             .withDetails(exception.getCause());
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
