@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public interface BaseTest<T> {
+public interface BaseTest {
 
-    default Optional<List<T>> createInitialValuesList(final T[] initialValues) {
+    default <T> Optional<List<T>> createInitialValuesList(final T[] initialValues) {
         return Optional.of(Arrays.asList(initialValues));
     }
 }

@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
-class CasePaymentOrdersServiceImplTest implements BaseTest<String> {
+class CasePaymentOrdersServiceImplTest implements BaseTest {
 
     private CasePaymentOrdersService casePaymentOrdersService;
 
