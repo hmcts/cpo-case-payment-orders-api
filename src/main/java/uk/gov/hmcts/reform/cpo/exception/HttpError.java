@@ -15,9 +15,7 @@ import java.time.ZoneOffset;
 
 
 @Getter
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.ConfusingTernary"})
 public class HttpError<T extends Serializable> implements Serializable {
-    private static final long serialVersionUID = 1501816452204696395L;
 
     public static final Integer DEFAULT_STATUS = HttpStatus.INTERNAL_SERVER_ERROR.value();
     public static final String DEFAULT_ERROR = "Unexpected Error";

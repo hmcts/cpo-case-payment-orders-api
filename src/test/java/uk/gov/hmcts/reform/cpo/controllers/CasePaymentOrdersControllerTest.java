@@ -47,7 +47,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH;
 
 
-@SuppressWarnings({"PMD.ExcessiveImports"})
 public class CasePaymentOrdersControllerTest implements BaseTest<String> {
 
     @Autowired
@@ -89,7 +88,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest<String> {
     }
 
 
-    @SuppressWarnings({"PMD.TooManyMethods"})
     @Nested
     @DisplayName("PUT /case-payment-orders")
     class UpdateCasePaymentOrder extends BaseMvcTest {
