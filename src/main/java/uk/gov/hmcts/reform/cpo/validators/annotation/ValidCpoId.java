@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo.validators.annotation;
 
+import uk.gov.hmcts.reform.cpo.validators.IdValidator;
 import uk.gov.hmcts.reform.cpo.validators.IdsValidator;
 
 import javax.validation.Constraint;
@@ -11,7 +12,7 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@Constraint(validatedBy = IdsValidator.class)
+@Constraint(validatedBy = {IdValidator.class, IdsValidator.class})
 @Target({PARAMETER, FIELD})
 @Retention(RUNTIME)
 public @interface ValidCpoId {
