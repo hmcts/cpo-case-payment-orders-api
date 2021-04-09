@@ -91,18 +91,15 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     public CasePaymentOrder updateCasePaymentOrder(UpdateCasePaymentOrderRequest updateCasePaymentOrderRequest) {
         String createdBy = securityUtils.getUserInfo().getUid();
 
-        // verify CPO exists upfront
-        CasePaymentOrderEntity casePaymentOrderEntity =
-            casePaymentOrdersRepository.findById(UUID.fromString(updateCasePaymentOrderRequest.getId()))
-                .orElseThrow(() -> new CasePaymentOrderCouldNotBeFoundException(ValidationError.CPO_NOT_FOUND));
+        CasePaymentOrderEntity casePaymentOrderEntity = verifyCpoExists(updateCasePaymentOrderRequest.getUUID());
 
         casePaymentOrderMapper.mergeIntoEntity(casePaymentOrderEntity, updateCasePaymentOrderRequest, createdBy);
 
-        CasePaymentOrderEntity returnEntity;
+        CasePaymentOrderEntity updatedEntity;
 
         try {
             // save and flush to force unique constraint to apply now
-            returnEntity = casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity);
+            updatedEntity = casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity);
 
         } catch (DataIntegrityViolationException exception) {
             if (exception.getCause() instanceof ConstraintViolationException
@@ -114,11 +111,17 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
             }
         }
 
-        return casePaymentOrderMapper.toDomainModel(returnEntity);
+        return casePaymentOrderMapper.toDomainModel(updatedEntity);
     }
 
     private boolean isDuplicateCaseIdOrderRefPairing(DataIntegrityViolationException exception) {
         return ((ConstraintViolationException) exception.getCause()).getConstraintName()
             .equals(UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT);
     }
+
+    private CasePaymentOrderEntity verifyCpoExists(UUID id) {
+        return casePaymentOrdersRepository.findById(id)
+            .orElseThrow(() -> new CasePaymentOrderCouldNotBeFoundException(ValidationError.CPO_NOT_FOUND));
+    }
+
 }

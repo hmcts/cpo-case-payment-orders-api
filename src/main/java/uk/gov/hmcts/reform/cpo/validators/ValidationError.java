@@ -16,9 +16,11 @@ public final class ValidationError {
 
     // additional constraints etc..
     public static final String CPO_NOT_FOUND = "Case Payment Order does not exist";
-    public static final String CASE_ID_ORDER_REFERENCE_UNIQUE = "Case ID and Order Reference pairing must be unique";
+    public static final String CASE_ID_ORDER_REFERENCE_UNIQUE
+        = "A case payment order with the specified Order Reference already exists on the case";
 
     // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
     private ValidationError() {
     }
+
 }
