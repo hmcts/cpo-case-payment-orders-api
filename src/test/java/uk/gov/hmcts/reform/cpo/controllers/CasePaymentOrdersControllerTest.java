@@ -25,11 +25,9 @@ import uk.gov.hmcts.reform.cpo.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter;
-import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
+import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
-
 import java.time.format.DateTimeFormatter;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasItem;
@@ -46,54 +44,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
-import uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter;
-import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.hamcrest.CoreMatchers.is;
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.time.format.DateTimeFormatter;
 import java.util.UUID;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
 
 public class CasePaymentOrdersControllerTest implements BaseTest {
 
-    @Autowired
-    protected MockMvc mockMvc;
-
-    @Autowired
-    protected ObjectMapper objectMapper;
-
-    @Autowired
-    protected ApplicationParams applicationParams;
-
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-
-@SuppressWarnings({"PMD.ExcessiveImports"})
-public class CasePaymentOrdersControllerTest {
-
     private static final LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24,
                                                                          11, 48, 32
     );
     private static final Long CASE_ID = 6_551_341_964_128_977L;
-    private static final String ACTION = "action";
-    private static final String RESPONSIBLE_PARTY = "responsibleParty";
     private static final String ORDER_REFERENCE = "2021-11223344556";
     private static final UUID ID = UUID.randomUUID();
-    private static final String CREATED_BY = "createdBy";
-    private static final LocalDateTime CREATED_TIMESTAMP = LocalDateTime.now();
+
+
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     @BeforeEach
     void setUp() {
@@ -112,7 +80,7 @@ public class CasePaymentOrdersControllerTest {
         protected MockMvc mockMvc;
 
         @MockBean
-        protected CasePaymentOrdersServiceImpl casePaymentOrdersServiceImpl;
+        protected CasePaymentOrdersService casePaymentOrdersService;
 
         @MockBean
         protected ApplicationParams applicationParams;
@@ -149,6 +117,43 @@ public class CasePaymentOrdersControllerTest {
                 .createdTimestamp(CREATED_TIMESTAMP)
                 .build();
 
+        }
+
+        @DisplayName("happy path test without mockMvc")
+        @Test
+        void directCallHappyPath() {
+            given(casePaymentOrdersService.createCasePaymentOrder(createCasePaymentOrderRequest))
+                .willReturn(casePaymentOrder);
+            CasePaymentOrdersController controller = new CasePaymentOrdersController(
+                casePaymentOrdersService,
+                applicationParams
+            );
+            CasePaymentOrder response = controller.createCasePaymentOrderRequest(createCasePaymentOrderRequest);
+            assertThat(response).isNotNull();
+            assertEquals("Case Payment Order returned", response, casePaymentOrder);
+
+        }
+
+
+        @DisplayName("happy path test with mockMvc")
+        @Test
+        void shouldSuccessfullyCreateCasePaymentOrder() throws Exception {
+            given(casePaymentOrdersService.createCasePaymentOrder(any(CreateCasePaymentOrderRequest.class)))
+                .willReturn(casePaymentOrder);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+            this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.id", is(ID.toString())))
+                .andExpect(jsonPath("$.created_timestamp", is(CREATED_TIMESTAMP.format(formatter))));
+        }
+
+    }
+
 
     @Nested
     @DisplayName("PUT /case-payment-orders")
@@ -163,7 +168,7 @@ public class CasePaymentOrdersControllerTest {
 
             casePaymentOrder = createCasePaymentOrder();
 
-            given(casePaymentOrdersServiceImpl.updateCasePaymentOrder(any(UpdateCasePaymentOrderRequest.class)))
+            given(casePaymentOrdersService.updateCasePaymentOrder(any(UpdateCasePaymentOrderRequest.class)))
                 .willReturn(casePaymentOrder);
         }
 
@@ -172,7 +177,7 @@ public class CasePaymentOrdersControllerTest {
         void directCallHappyPath() {
 
             // GIVEN
-            CasePaymentOrdersController controller = new CasePaymentOrdersController(casePaymentOrdersServiceImpl,
+            CasePaymentOrdersController controller = new CasePaymentOrdersController(casePaymentOrdersService,
                                                                                      applicationParams);
 
             // WHEN
@@ -199,7 +204,7 @@ public class CasePaymentOrdersControllerTest {
             // verify service call
             ArgumentCaptor<UpdateCasePaymentOrderRequest> captor =
                 ArgumentCaptor.forClass(UpdateCasePaymentOrderRequest.class);
-            verify(casePaymentOrdersServiceImpl).updateCasePaymentOrder(captor.capture());
+            verify(casePaymentOrdersService).updateCasePaymentOrder(captor.capture());
             assertEquals("Service called with request data: ID",
                          request.getId(), captor.getValue().getId());
             assertEquals("Service called with request data: Effective from",
@@ -506,9 +511,9 @@ public class CasePaymentOrdersControllerTest {
             );
 
             // WHEN
-            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                                             .contentType(MediaType.APPLICATION_JSON)
-                                                             .content(objectMapper.writeValueAsString(request)));
+            ResultActions result = this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                            .contentType(MediaType.APPLICATION_JSON)
+                                                            .content(objectMapper.writeValueAsString(request)));
 
             // THEN
             assertBadRequestResponse(result, ValidationError.RESPONSIBLE_PARTY_REQUIRED);
@@ -525,32 +530,6 @@ public class CasePaymentOrdersControllerTest {
             .andExpect(jsonPath("$.error").value(HttpStatus.BAD_REQUEST.getReasonPhrase()))
             .andExpect(jsonPath("$.details", hasSize(1)))
             .andExpect(jsonPath("$.details", hasItem(validationDetails)));
-            given(casePaymentOrdersService.createCasePaymentOrder(createCasePaymentOrderRequest))
-                .willReturn(casePaymentOrder);
-            CasePaymentOrdersController controller = new CasePaymentOrdersController(casePaymentOrdersService,
-                                                                                     applicationParams);
-            CasePaymentOrder response = controller.createCasePaymentOrderRequest(createCasePaymentOrderRequest);
-            assertThat(response).isNotNull();
-            assertEquals(response, casePaymentOrder);
-
-        }
-
-        @DisplayName("happy path test with mockMvc")
-        @Test
-        void shouldSuccessfullyCreateCasePaymentOrder() throws Exception {
-            given(casePaymentOrdersService.createCasePaymentOrder(any(CreateCasePaymentOrderRequest.class)))
-                .willReturn(casePaymentOrder);
-
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-            this.mockMvc.perform(post("/api/case-payment-orders")
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.id", is(ID.toString())))
-                .andExpect(jsonPath("$.created_timestamp", is(CREATED_TIMESTAMP.format(formatter))));
-        }
-
     }
+
 }

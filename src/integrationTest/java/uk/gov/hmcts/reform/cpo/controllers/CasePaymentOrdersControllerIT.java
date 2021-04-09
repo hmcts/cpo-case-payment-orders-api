@@ -9,8 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.cpo.BaseTest;
-import uk.gov.hmcts.reform.cpo.exception.ValidationError;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
+import uk.gov.hmcts.reform.cpo.validators.ValidationError;
+
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
@@ -22,6 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH;
 
 
 public class CasePaymentOrdersControllerIT {
@@ -74,7 +76,7 @@ public class CasePaymentOrdersControllerIT {
         @Test
         void shouldSuccessfullyCreateCasePaymentOrder() throws Exception {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            this.mockMvc.perform(post("/api/case-payment-orders")
+            this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
                 .andExpect(jsonPath("$.created_timestamp", is(LocalDateTime.now().format(formatter))))
@@ -92,31 +94,49 @@ public class CasePaymentOrdersControllerIT {
         @DisplayName("Null request fields throws errors")
         @Test
         void shouldThrowNotNullErrors() throws Exception {
-            this.mockMvc.perform(post("/api/case-payment-orders")
+            this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(createCasePaymentOrderRequestNull)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errors.length()", is(5)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.ACTION_EMPTY)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.ORDER_REFERENCE_EMPTY)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_EMPTY)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.EFFECTIVE_FROM_EMPTY)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.RESPONSIBLE_PARTY_EMPTY)));
+                .andExpect(jsonPath("$.message", is("Input not valid")))
+                .andExpect(jsonPath("$.details.length()", is(5)))
+                .andExpect(jsonPath("$.details", hasItem(ValidationError.ACTION_REQUIRED)))
+                .andExpect(jsonPath("$.details", hasItem(ValidationError.ORDER_REFERENCE_REQUIRED)))
+                .andExpect(jsonPath("$.details", hasItem(ValidationError.CASE_ID_REQUIRED)))
+                .andExpect(jsonPath("$.details", hasItem(ValidationError.EFFECTIVE_FROM_REQUIRED)))
+                .andExpect(jsonPath("$.details", hasItem(ValidationError.RESPONSIBLE_PARTY_REQUIRED)));
         }
 
         @DisplayName("Invalid request fields throws errors")
         @Test
         void shouldThrowInvalidFormErrors() throws Exception {
-            this.mockMvc.perform(post("/api/case-payment-orders")
+            this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(createCasePaymentOrderRequestInvalid)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errors.length()", is(3)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_INVALID_LENGTH)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_INVALID)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.ORDER_REFERENCE_INVALID)));
+                .andExpect(jsonPath("$.message", is("Input not valid")))
+                .andExpect(jsonPath("$.details.length()", is(3)))
+                .andExpect(jsonPath("$.details", hasItem(ValidationError.CASE_ID_INVALID_LENGTH)))
+                .andExpect(jsonPath("$.details", hasItem(ValidationError.CASE_ID_INVALID)))
+                .andExpect(jsonPath("$.details", hasItem(ValidationError.ORDER_REFERENCE_INVALID)));
         }
+
+        @DisplayName("Non-unique order reference and case id pairing throws errors")
+        @Test
+        void shouldThrowNonUniquePairingErrors() throws Exception {
+            this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
+                .andExpect(status().isCreated());
+
+            this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message", is(ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE)));
+        }
+
     }
 }

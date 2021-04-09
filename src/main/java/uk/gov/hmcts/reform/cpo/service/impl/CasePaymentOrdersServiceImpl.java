@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.cpo.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
-import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
+import uk.gov.hmcts.reform.cpo.exception.CaseIdOrderReferenceUniqueConstraintException;
+import uk.gov.hmcts.reform.cpo.exception.IdAMIdCannotBeRetrievedException;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
@@ -16,16 +19,18 @@ import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
-import javax.transaction.Transactional;
+import uk.gov.hmcts.reform.cpo.validators.ValidationError;
+
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.cpo.exception.ValidationError.IDAM_ID_CANNOT_BE_FOUND;
-import static uk.gov.hmcts.reform.cpo.exception.ValidationError.NON_UNIQUE_PAIRING;
+import static uk.gov.hmcts.reform.cpo.validators.ValidationError.IDAM_ID_NOT_FOUND;
 
 @Service
 public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
+
+    protected static final String UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT = "unique_case_id_order_reference";
 
     private final SecurityUtils securityUtils;
 
@@ -34,9 +39,11 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     private final CasePaymentOrdersRepository casePaymentOrdersRepository;
 
     @Autowired
-    public CasePaymentOrdersServiceImpl(CasePaymentOrdersRepository casePaymentOrdersRepository) {
+    public CasePaymentOrdersServiceImpl(CasePaymentOrdersRepository casePaymentOrdersRepository,
+                                        SecurityUtils securityUtils, CasePaymentOrderMapper mapper) {
         this.casePaymentOrdersRepository = casePaymentOrdersRepository;
         this.securityUtils = securityUtils;
+        this.mapper = mapper;
     }
 
     @Transactional
@@ -46,18 +53,25 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         try {
             createdBy = securityUtils.getUserInfo().getUid();
         } catch (Exception e) {
-            throw new CasePaymentOrdersQueryException(IDAM_ID_CANNOT_BE_FOUND);
+            throw new IdAMIdCannotBeRetrievedException(IDAM_ID_NOT_FOUND);
         }
         CasePaymentOrderEntity requestEntity = mapper.toEntity(createCasePaymentOrderRequest, createdBy);
 
         try {
             CasePaymentOrderEntity savedEntity = casePaymentOrdersRepository.saveAndFlush(requestEntity);
             return mapper.toDomainModel(savedEntity);
-        } catch (Exception e) {
-            throw new CasePaymentOrdersQueryException(NON_UNIQUE_PAIRING);
+        } catch (DataIntegrityViolationException exception) {
+            if (exception.getRootCause() != null && exception.getRootCause().getMessage()
+                .contains(UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT)) {
+                throw new CaseIdOrderReferenceUniqueConstraintException(ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE);
+            } else {
+                throw exception;
+            }
         }
-
     }
+
+
+
 
     @Override
     public Page<CasePaymentOrderEntity> getCasePaymentOrders(

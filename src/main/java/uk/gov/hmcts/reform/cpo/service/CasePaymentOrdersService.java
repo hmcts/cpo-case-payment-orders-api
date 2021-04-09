@@ -5,7 +5,6 @@ import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 
 import org.springframework.data.domain.Page;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
-import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 

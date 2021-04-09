@@ -7,9 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.dao.DataIntegrityViolationException;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
-import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
+import uk.gov.hmcts.reform.cpo.exception.CaseIdOrderReferenceUniqueConstraintException;
+import uk.gov.hmcts.reform.cpo.exception.IdAMIdCannotBeRetrievedException;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
@@ -23,8 +25,8 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static uk.gov.hmcts.reform.cpo.exception.ValidationError.IDAM_ID_CANNOT_BE_FOUND;
-import static uk.gov.hmcts.reform.cpo.exception.ValidationError.NON_UNIQUE_PAIRING;
+import static uk.gov.hmcts.reform.cpo.validators.ValidationError.IDAM_ID_NOT_FOUND;
+import static uk.gov.hmcts.reform.cpo.validators.ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE;
 
 class CasePaymentOrdersServiceImplTest {
 
@@ -82,8 +84,8 @@ class CasePaymentOrdersServiceImplTest {
                 .uid(CREATED_BY)
                 .build();
 
-            casePaymentOrdersService = new CasePaymentOrdersServiceImpl(casePaymentOrdersRepository, mapper,
-                                                                        securityUtils);
+            casePaymentOrdersService = new CasePaymentOrdersServiceImpl(casePaymentOrdersRepository,
+                                                                        securityUtils, mapper);
             createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(
                 EFFECTIVE_FROM,
                 "1122334455667788",
@@ -137,19 +139,23 @@ class CasePaymentOrdersServiceImplTest {
         void shouldErrorWhenNonUniquePairing() {
             given(securityUtils.getUserInfo()).willReturn(userInfo);
             given(mapper.toEntity(createCasePaymentOrderRequest, CREATED_BY)).willReturn(requestEntity);
-            given(casePaymentOrdersRepository.saveAndFlush(requestEntity)).willThrow(new RuntimeException());
+            Throwable throwable = new Throwable("duplicate key value violates unique constraint "
+                                                    + "\"unique_case_id_order_reference\"");
+            DataIntegrityViolationException exception = new DataIntegrityViolationException("", throwable);
+
+            given(casePaymentOrdersRepository.saveAndFlush(requestEntity)).willThrow(exception);
             assertThatThrownBy(() -> casePaymentOrdersService.createCasePaymentOrder(createCasePaymentOrderRequest))
-                .isInstanceOf(CasePaymentOrdersQueryException.class)
-                .hasMessageContaining(NON_UNIQUE_PAIRING);
+                .isInstanceOf(CaseIdOrderReferenceUniqueConstraintException.class)
+                .hasMessageContaining(CASE_ID_ORDER_REFERENCE_UNIQUE);
         }
 
         @Test
-        @DisplayName("Should throw error when idam Id cannot be retrieved")
+        @DisplayName("Should throw error when IdAM Id cannot be retrieved")
         void shouldErrorWhenCannotRetrieveIdamId() {
             given(securityUtils.getUserInfo()).willThrow(new RuntimeException());
             assertThatThrownBy(() -> casePaymentOrdersService.createCasePaymentOrder(createCasePaymentOrderRequest))
-                .isInstanceOf(CasePaymentOrdersQueryException.class)
-                .hasMessageContaining(IDAM_ID_CANNOT_BE_FOUND);
+                .isInstanceOf(IdAMIdCannotBeRetrievedException.class)
+                .hasMessageContaining(IDAM_ID_NOT_FOUND);
         }
     }
 }
