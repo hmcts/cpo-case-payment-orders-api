@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.cpo.service.impl;
+package uk.gov.hmcts.reform.cpo.service;
 
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundExceptio
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
+import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapperImpl;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -30,6 +31,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
+import static uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity.UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT;
 
 class CasePaymentOrdersServiceImplTest {
 
@@ -168,7 +171,7 @@ class CasePaymentOrdersServiceImplTest {
             ConstraintViolationException constraintViolationException =
                 new ConstraintViolationException("",
                                                  null,
-                                                 CasePaymentOrdersServiceImpl.UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT);
+                                                 UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT);
             given(casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity))
                 .willThrow(new DataIntegrityViolationException("", constraintViolationException));
 

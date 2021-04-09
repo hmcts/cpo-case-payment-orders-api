@@ -19,6 +19,8 @@ import java.util.UUID;
 @Table(name = "case_payment_orders")
 public class CasePaymentOrderEntity {
 
+    public static final String UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT = "unique_case_id_order_reference";
+
     @Id
     @GeneratedValue
     @Setter(AccessLevel.NONE)

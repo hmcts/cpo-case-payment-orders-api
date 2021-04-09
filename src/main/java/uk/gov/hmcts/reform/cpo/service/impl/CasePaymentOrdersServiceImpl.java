@@ -25,10 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity.UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT;
+
 @Service
 public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
-
-    protected static final String UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT = "unique_case_id_order_reference";
 
     @Autowired
     private final CasePaymentOrderMapper casePaymentOrderMapper;
