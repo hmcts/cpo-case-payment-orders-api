@@ -6,6 +6,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.PageRequest;
 import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
+import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import java.util.Collections;
 import java.util.List;
@@ -53,7 +54,6 @@ class CasePaymentOrderQueryFilterTest implements BaseTest {
 
     @Test
     void failValidation() {
-        final String expectedError = "case payment orders cannot be filtered by both id and case id.";
         try {
             final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = getCasePaymentOrderQueryFilter(
                 casesIds,
@@ -62,7 +62,7 @@ class CasePaymentOrderQueryFilterTest implements BaseTest {
             casePaymentOrderQueryFilter.validateCasePaymentOrderQueryFilter();
             fail();
         } catch (CasePaymentOrdersFilterException casePaymentOrdersQueryException) {
-            assertThat(casePaymentOrdersQueryException.getMessage(), is(expectedError));
+            assertThat(casePaymentOrdersQueryException.getMessage(), is(ValidationError.CPO_FILER_ERROR));
         }
 
     }

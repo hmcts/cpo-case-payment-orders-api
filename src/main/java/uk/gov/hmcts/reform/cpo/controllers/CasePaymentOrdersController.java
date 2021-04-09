@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cpo.ApplicationParams;
-import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
@@ -54,17 +53,59 @@ public class CasePaymentOrdersController {
 
     @GetMapping(value = "case-payment-orders", produces = {"application/json"})
     @ApiOperation(value = "Get payment orders for a case", notes = "Get payment orders for a case")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Payment orders retrieved"),
-        @ApiResponse(code = 400, message = "Bad request")
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = ""
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "One or more of the following reasons:"
+                + "\n1) " + ValidationError.CPO_FILER_ERROR
+                + "\n2) " + ValidationError.CASE_ID_INVALID
+                + "\n3) " + ValidationError.ID_INVALID,
+            response = String.class,
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\n"
+                        + "   \"status\": \"400\",\n"
+                        + "   \"error\": \"Bad Request\",\n"
+                        + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
+                        + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
+                        + "   \"details\": [ \""  + ValidationError.CASE_ID_INVALID + "\" ]\n"
+                        + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 401,
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID
+        ),
+        @ApiResponse(
+            code = 403,
+            message = AuthError.UNAUTHORISED_S2S_SERVICE
+        ),
+        @ApiResponse(
+            code = 404,
+            message = ValidationError.CPO_NOT_FOUND
+        ),
+        @ApiResponse(
+            code = 409,
+            message = ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE
+        )
     })
     public Page<CasePaymentOrder> getCasePaymentOrders(@ApiParam("list of case payment orders ids")
                                                        @ValidCpoId
-                                                       @RequestParam("ids") Optional<List<String>> ids,
+                                                       @RequestParam(name = "ids", required = false)
+                                                       Optional<List<String>> ids,
                                                        @ApiParam("list of ccd case reference numbers")
                                                        @ValidCaseId
-                                                       @RequestParam("cases-ids") Optional<List<String>> casesId,@RequestParam("pageSize") Optional<Integer> pageSize,
-                                                       @RequestParam("pageNumber") Optional<Integer> pageNumber
+                                                       @RequestParam(name = "cases-ids", required = false)
+                                                       Optional<List<String>> casesId,
+                                                       @RequestParam(name = "pageSize", required = false)
+                                                       Optional<Integer> pageSize,
+                                                       @RequestParam(name = "pageNumber", required = false)
+                                                       Optional<Integer> pageNumber
 
     ) {
 

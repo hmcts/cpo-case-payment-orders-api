@@ -34,7 +34,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             .body(error);
     }
 
-    @ExceptionHandler({CasePaymentOrdersQueryException.class, ConstraintViolationException.class})
+    @ExceptionHandler({CasePaymentOrdersFilterException.class, ConstraintViolationException.class})
     @ResponseBody
     public ResponseEntity<HttpError<Serializable>> handleCasePaymentOrdersQueryException(
         final HttpServletRequest request,
