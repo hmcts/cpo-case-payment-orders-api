@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.exception.UnauthorisedServiceException;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+@Service("securityUtils")
 public class SecurityUtils {
 
     public static final String BEARER = "Bearer ";
