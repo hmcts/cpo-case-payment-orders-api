@@ -3,22 +3,25 @@ version: '2.4'
 
 services:
   case-payment-orders-api:
-    image: "hmctspublic.azurecr.io/cpo/case-payment-orders-api:latest"
+    image: "hmctspublic.azurecr.io/cpo/case-payment-orders-api:${CASE_PAYMENT_ORDERS_API_TAG:-latest}"
     container_name: case-payment-orders-api
     environment:
+      SERVER_PORT: 4457
       CPO_CASE_PAYMENT_ORDERS_DB_HOST: cpo-db
       CPO_CASE_PAYMENT_ORDERS_DB_PORT: 5432
       CPO_CASE_PAYMENT_ORDERS_DB_NAME: ${DB_NAME}
       CPO_CASE_PAYMENT_ORDERS_DB_USERNAME: ${DB_USERNAME}
       CPO_CASE_PAYMENT_ORDERS_DB_PASSWORD: ${DB_PASSWORD}
+      IDAM_API_URL: "${IDAM_STUB_SERVICE_NAME:-http://idam-api:5000}"
+      IDAM_OIDC_URL: "${IDAM_STUB_SERVICE_NAME:-http://idam-api:5000}"
+      S2S_URL: http://service-auth-provider-api:8080
       CPO_S2S_AUTHORISED_SERVICES: xui_webapp
-      IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
-      IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
-      S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     ports:
       - 4457:4457
     depends_on:
       - cpo-db
+    networks:
+      - ccd-network
 
   cpo-db:
     image: postgres:11.11
@@ -29,8 +32,14 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     ports:
       - 6968:5432
+    networks:
+      - ccd-network
     volumes:
       - cpo-database-data:/var/lib/postgresql/data
+
+networks:
+  ccd-network:
+    external: true
 
 volumes:
   cpo-database-data:

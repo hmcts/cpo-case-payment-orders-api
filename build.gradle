@@ -1,6 +1,5 @@
 plugins {
   id 'application'
-  id 'pmd'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.11.RELEASE'
   id 'org.springframework.boot' version '2.4.4'
@@ -156,14 +155,6 @@ task customCleanBeftaReports(type:Delete) {
 }
 tasks.clean.dependsOn(tasks.customCleanBeftaReports)
 
-pmd {
-  toolVersion = "6.18.0"
-  sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest]
-  reportsDir = file("$project.buildDir/reports/pmd")
-  // https://github.com/pmd/pmd/issues/876
-  ruleSets = []
-  ruleSetFiles = files("config/pmd/ruleset.xml")
-}
 
 jacocoTestReport {
   executionData(test, integration)
@@ -181,7 +172,7 @@ sonarqube {
     property "sonar.projectName", "Reform :: cpo-case-payment-orders-api"
     property "sonar.projectKey", "uk.gov.hmcts.reform:cpo-case-payment-orders-api"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/security/SecurityUtils.java"
+    property "sonar.coverage.exclusions", "**/security/SecurityUtils.java,**/CasePaymentOrdersServiceImpl.java,**/CasePaymentOrderQueryFilter.java,**/CasePaymentOrderEntity.java,**/CaseIdsValidator.java"
     property "sonar.exclusions","**/config/SecurityConfiguration.java"
 
   }
@@ -255,13 +246,15 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
+
 
   implementation "org.springframework.security:spring-security-web"
   implementation "org.springframework.security:spring-security-config"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
 
-  implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
+  implementation group: 'io.springfox', name: 'springfox-boot-starter', version: versions.springfoxSwagger
 
   implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
   implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
@@ -274,10 +267,15 @@ dependencies {
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   implementation group: 'org.mapstruct', name: 'mapstruct', version: versions.mapstruct
 
+  implementation group: 'org.hibernate', name: 'hibernate-envers', version: '5.4.30.Final'
+
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
   implementation group: 'org.apache.commons', name: 'commons-lang3', version: versions.commonsLang3
 
   compile group: 'org.flywaydb', name: 'flyway-core', version: '7.7.0'
+  compile group: 'javax.inject', name: 'javax.inject', version: '1'
+
+  compile group: 'commons-validator', name: 'commons-validator', version: '1.7'
 
   annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: versions.mapstruct
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -296,8 +294,7 @@ dependencies {
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
-  integrationTestImplementation group: 'org.testcontainers', name: 'testcontainers', version: versions.testcontainers
-  integrationTestImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
+
   integrationTestImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
 
   testImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.13.0'
