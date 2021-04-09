@@ -8,8 +8,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
-import uk.gov.hmcts.reform.cpo.errorhandling.CasePaymentIdentifierException;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
@@ -84,7 +84,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     }
 
     @Override
-    public void deleteCasePaymentOrdersByIds(List<UUID> ids) throws CasePaymentIdentifierException {
+    public void deleteCasePaymentOrdersByIds(List<UUID> ids) throws CasePaymentOrderCouldNotBeFoundException {
         casePaymentOrdersRepository.deleteByUuids(ids);
         try {
             casePaymentOrdersRepository.deleteAuditEntriesByUuids(ids);
@@ -94,7 +94,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     }
 
     @Override
-    public void deleteCasePaymentOrdersByCaseIds(List<Long> caseIds) throws CasePaymentIdentifierException {
+    public void deleteCasePaymentOrdersByCaseIds(List<Long> caseIds) throws CasePaymentOrderCouldNotBeFoundException {
         casePaymentOrdersRepository.deleteByCaseIds(caseIds);
         try {
             casePaymentOrdersRepository.deleteAuditEntriesByCaseIds(caseIds);

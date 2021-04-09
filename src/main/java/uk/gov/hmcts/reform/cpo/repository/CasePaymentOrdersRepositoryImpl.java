@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
-import uk.gov.hmcts.reform.cpo.errorhandling.CasePaymentIdentifierException;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,11 +26,11 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
     }
 
     @Override
-    public void deleteByUuids(List<UUID> uuids) throws CasePaymentIdentifierException {
+    public void deleteByUuids(List<UUID> uuids) throws CasePaymentOrderCouldNotBeFoundException {
         int deleteByIds = casePaymentOrdersJpaRepository.deleteByIdIsIn(uuids);
 
         if (deleteByIds != uuids.size()) {
-            throw new CasePaymentIdentifierException(String.format(ERROR_MESSAGE, "UUID"));
+            throw new CasePaymentOrderCouldNotBeFoundException(String.format(ERROR_MESSAGE, "UUID"));
         }
     }
 
@@ -40,11 +40,11 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
     }
 
     @Override
-    public void deleteByCaseIds(List<Long> caseIds) throws CasePaymentIdentifierException {
+    public void deleteByCaseIds(List<Long> caseIds) throws CasePaymentOrderCouldNotBeFoundException {
         int deleteByCaseIds = casePaymentOrdersJpaRepository.deleteByCaseIdIsIn(caseIds);
 
         if (deleteByCaseIds != caseIds.size()) {
-            throw new CasePaymentIdentifierException(String.format(ERROR_MESSAGE, "Case ID"));
+            throw new CasePaymentOrderCouldNotBeFoundException(String.format(ERROR_MESSAGE, "Case ID"));
         }
     }
 

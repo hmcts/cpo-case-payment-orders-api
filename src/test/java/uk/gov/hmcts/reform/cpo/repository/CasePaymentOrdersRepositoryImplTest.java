@@ -8,7 +8,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.cpo.errorhandling.CasePaymentIdentifierException;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
 
 import java.util.List;
 import java.util.UUID;
@@ -64,7 +64,7 @@ public class CasePaymentOrdersRepositoryImplTest {
     @Test
     void testExceptionThrownIfUnknownUuidCannotBeDeleted() {
         when(casePaymentOrdersJpaRepository.deleteByIdIsIn(anyList())).thenReturn(0);
-        assertThrows(CasePaymentIdentifierException.class, () -> {
+        assertThrows(CasePaymentOrderCouldNotBeFoundException.class, () -> {
             casePaymentOrdersRepository.deleteByUuids(List.of(UUID.randomUUID()));
         });
     }
@@ -92,7 +92,7 @@ public class CasePaymentOrdersRepositoryImplTest {
     @Test
     void testExceptionThrownIfUnknownCaseIdCannotBeDeleted() {
         when(casePaymentOrdersJpaRepository.deleteByCaseIdIsIn(anyList())).thenReturn(0);
-        assertThrows(CasePaymentIdentifierException.class, () -> {
+        assertThrows(CasePaymentOrderCouldNotBeFoundException.class, () -> {
             casePaymentOrdersRepository.deleteByCaseIds(List.of(123L));
         });
     }

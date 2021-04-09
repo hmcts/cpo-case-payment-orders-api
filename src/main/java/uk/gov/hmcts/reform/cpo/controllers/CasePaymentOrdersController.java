@@ -21,19 +21,15 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
-import uk.gov.hmcts.reform.cpo.errorhandling.AuthError;
-import uk.gov.hmcts.reform.cpo.errorhandling.CasePaymentIdentifierException;
-import uk.gov.hmcts.reform.cpo.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.security.AuthError;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
-import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 
-import javax.validation.Valid;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
@@ -45,8 +41,6 @@ import java.util.stream.Collectors;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 
 @RestController
 @Validated
@@ -54,9 +48,13 @@ public class CasePaymentOrdersController {
 
     @SuppressWarnings({"squid:S1075"})
     public static final String CASE_PAYMENT_ORDERS_PATH = "/case-payment-orders";
+    public static final String CASE_IDS = "case-ids";
+    public static final String IDS = "ids";
 
     private final CasePaymentOrdersService casePaymentOrdersService;
     private final ApplicationParams applicationParams;
+
+
 
     @Autowired
     public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersService,
@@ -68,7 +66,7 @@ public class CasePaymentOrdersController {
     @GetMapping(value = CASE_PAYMENT_ORDERS_PATH, produces = {APPLICATION_JSON_VALUE})
     public Page<CasePaymentOrderEntity> getCasePaymentOrders(@ApiParam("list of ids")
                                                              @ValidCpoId
-                                                             @RequestParam("ids") Optional<List<String>> ids,
+                                                             @RequestParam(IDS) Optional<List<String>> ids,
                                                              @ApiParam("casesId of ids")
                                                              @ValidCaseId
                                                              @RequestParam("cases-ids") Optional<List<String>> casesId,
@@ -87,7 +85,7 @@ public class CasePaymentOrdersController {
         return casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter);
     }
 
-    @DeleteMapping(path = CASE_PAYMENT_ORDERS_PATH, params = "ids")
+    @DeleteMapping(path = CASE_PAYMENT_ORDERS_PATH, params = IDS)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Delete case payment orders by id", notes = "Delete case payment orders by id")
     @ApiResponses({
@@ -119,13 +117,14 @@ public class CasePaymentOrdersController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE
         )
     })
-    public void deleteCasePaymentOrdersById(@RequestParam("ids") @Valid
+    public void deleteCasePaymentOrdersById(@RequestParam(IDS) @Valid
                                                   @NotEmpty(message = ValidationError.IDS_EMPTY)
-                                                          List<UUID> ids) throws CasePaymentIdentifierException {
+                                                          List<UUID> ids)
+            throws CasePaymentOrderCouldNotBeFoundException {
         casePaymentOrdersService.deleteCasePaymentOrdersByIds(ids);
     }
 
-    @DeleteMapping(path = CASE_PAYMENT_ORDERS_PATH, params = "case-ids")
+    @DeleteMapping(path = CASE_PAYMENT_ORDERS_PATH, params = CASE_IDS)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Delete case payment orders by case-ids", notes = "Delete case payment orders by case-ids")
     @ApiResponses({
@@ -136,7 +135,7 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
-                + "\n1) " + ValidationError.CASE_IDS_INVALID
+                + "\n1) " + ValidationError.CASE_ID_INVALID
                 + "\n2) " + ValidationError.CASE_ID_INVALID_LENGTH
                 + "\n3) " + ValidationError.CASE_IDS_EMPTY,
             examples = @Example(value = {
@@ -162,14 +161,14 @@ public class CasePaymentOrdersController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE
         )
     })
-    public void deleteCasePaymentOrdersByCaseId(@RequestParam("case-ids") @Valid
+    public void deleteCasePaymentOrdersByCaseId(@RequestParam(CASE_IDS) @Valid
                                                   @NotEmpty(message = ValidationError.CASE_IDS_EMPTY)
                                                   List<
-                                                    @LuhnCheck(message = ValidationError.CASE_IDS_INVALID,
+                                                    @LuhnCheck(message = ValidationError.CASE_ID_INVALID,
                                                         ignoreNonDigitCharacters = false)
                                                     @Size(min = 16, max = 16,
                                                             message = ValidationError.CASE_ID_INVALID_LENGTH)
-                                                  String> caseIds) throws CasePaymentIdentifierException {
+                                                  String> caseIds) throws CasePaymentOrderCouldNotBeFoundException {
         List<Long> caseIdLongs = caseIds.stream().map(Long::parseLong).collect(Collectors.toList());
         casePaymentOrdersService.deleteCasePaymentOrdersByCaseIds(caseIdLongs);
     }

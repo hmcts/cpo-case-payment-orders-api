@@ -6,7 +6,7 @@ services:
     image: "hmctspublic.azurecr.io/cpo/case-payment-orders-api:latest"
     container_name: case-payment-orders-api
     environment:
-      CPO_CASE_PAYMENT_ORDERS_DB_HOST: cpo-db
+      CPO_CASE_PAYMENT_ORDERS_PATH_DB_HOST: cpo-db
       CPO_CASE_PAYMENT_ORDERS_DB_PORT: 5432
       CPO_CASE_PAYMENT_ORDERS_DB_NAME: ${DB_NAME}
       CPO_CASE_PAYMENT_ORDERS_DB_USERNAME: ${DB_USERNAME}

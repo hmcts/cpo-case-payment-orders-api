@@ -14,7 +14,6 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
-import uk.gov.hmcts.reform.cpo.errorhandling.CasePaymentIdentifierException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
@@ -72,34 +71,22 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<HttpError> handleIllegalStateException(final HttpServletRequest request,
+    public ResponseEntity<HttpError<Serializable>> handleIllegalStateException(final HttpServletRequest request,
                                                               Exception exception) {
         LOG.error("Validation exception:", exception);
         if (exception.getMessage().contains("Ambiguous handler methods mapped for '/case-payment-orders'")) {
             final HttpError<Serializable> error =
                     new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
-                        .withDetails("Can't delete case payment order with both id AND case-id specified");
+                        .withMessage("Can't delete case payment order with both id AND case-id specified");
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
         return getHttpErrorBadRequest(request, exception);
     }
 
-    @ExceptionHandler(CasePaymentIdentifierException.class)
-    public ResponseEntity<HttpError> handleCasePaymentIdentifierException(final HttpServletRequest request,
-                                                                 final Exception exception) {
-        LOG.error(exception.getMessage(), exception);
-        final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.NOT_FOUND)
-                .withDetails(exception.getCause());
-
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(error);
-    }
-
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<HttpError> handleMethodArgumentTypeMismatchException(final HttpServletRequest request,
-                                                                 final Exception exception) {
+    public ResponseEntity<HttpError<Serializable>> handleMethodArgumentTypeMismatchException(
+            final HttpServletRequest request, final Exception exception) {
         return getHttpErrorBadRequest(request, exception);
     }
 }

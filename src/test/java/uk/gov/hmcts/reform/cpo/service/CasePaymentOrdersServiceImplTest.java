@@ -12,7 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
-import uk.gov.hmcts.reform.cpo.errorhandling.CasePaymentIdentifierException;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
 
@@ -77,7 +77,8 @@ class CasePaymentOrdersServiceImplTest {
     }
 
     @Test
-    void deleteCasePaymentOrdersById_UserNotifiedIfAuditIsNotDeleted() throws CasePaymentIdentifierException {
+    void deleteCasePaymentOrdersById_UserNotifiedIfAuditIsNotDeleted()
+            throws CasePaymentOrderCouldNotBeFoundException {
         doThrow(IllegalStateException.class).when(casePaymentOrdersRepository).deleteAuditEntriesByUuids(anyList());
 
 
@@ -91,7 +92,8 @@ class CasePaymentOrdersServiceImplTest {
     }
 
     @Test
-    void deleteCasePaymentOrdersByCaseId_UserNotifiedIfAuditIsNotDeleted() throws CasePaymentIdentifierException {
+    void deleteCasePaymentOrdersByCaseId_UserNotifiedIfAuditIsNotDeleted()
+            throws CasePaymentOrderCouldNotBeFoundException {
         doThrow(IllegalStateException.class).when(casePaymentOrdersRepository).deleteAuditEntriesByCaseIds(anyList());
 
         casePaymentOrdersService.deleteCasePaymentOrdersByCaseIds(caseIdsToDelete);

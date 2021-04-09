@@ -14,6 +14,11 @@ public final class ValidationError {
     public static final String ORDER_REFERENCE_REQUIRED = "Order Reference Party is required.";
     public static final String RESPONSIBLE_PARTY_REQUIRED = "Responsible Party is required.";
 
+    public static final String IDS_EMPTY = "IDs are required";
+    public static final String CASE_ID_INVALID_LENGTH = "Case ID has to be 16-digits long";
+    public static final String CASE_IDS_EMPTY = "Case ID can not be empty";
+
+
     // additional constraints etc..
     public static final String CPO_NOT_FOUND = "Case Payment Order does not exist.";
     public static final String CASE_ID_ORDER_REFERENCE_UNIQUE = "Case ID and Order Reference pairing must be unique.";
