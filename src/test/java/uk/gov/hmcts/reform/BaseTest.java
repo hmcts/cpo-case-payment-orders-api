@@ -1,10 +1,15 @@
 package uk.gov.hmcts.reform;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
+import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +17,9 @@ import java.util.UUID;
 
 public interface BaseTest {
 
+    String IDS = "ids";
+    String CASES_IDS = "cases-ids";
+    int PAGE_SIZE = 3;
     String CASE_ID_VALID_1 = "9511425043588823";
     String CASE_ID_VALID_2 = "9716401307140455";
     String CASE_ID_VALID_3 = "4444333322221111";
@@ -63,4 +71,68 @@ public interface BaseTest {
         );
     }
 
+    default CasePaymentOrderQueryFilter getACasePaymentOrderQueryFilter(int  pageSize, List<String> casesIds,
+                                                                        List<String> ids) {
+
+        return CasePaymentOrderQueryFilter.builder()
+            .cpoIds(ids)
+            .caseIds(casesIds)
+            .pageNumber(CasePaymentOrderQueryFilter.PAGE_NUMBER)
+            .pageSize(pageSize)
+            .build();
+    }
+
+    default PageRequest getPageRequest(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+        return PageRequest.of(
+            casePaymentOrderQueryFilter.getPageNumber(),
+            casePaymentOrderQueryFilter.getPageSize()
+        );
+    }
+
+    default Page<CasePaymentOrder> getDomainPages(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+        final PageRequest pageRequest = getPageRequest(casePaymentOrderQueryFilter);
+        return new PageImpl<CasePaymentOrder>(createListOfCasePaymentOrder(), pageRequest, 3);
+    }
+
+    default List<CasePaymentOrder> createListOfCasePaymentOrder() {
+        final ArrayList<CasePaymentOrder> casePaymentOrders = new ArrayList<>();
+
+        final CasePaymentOrder casePaymentOrder = CasePaymentOrder.builder()
+            .createdTimestamp(LocalDateTime.now())
+            .effectiveFrom(LocalDateTime.now())
+            .caseId(1_234_123_412_341_234L)
+            .action("Case Creation")
+            .responsibleParty("The executor on the will")
+            .orderReference("Bob123")
+            .createdBy("Bob")
+            .build();
+
+        casePaymentOrders.add(casePaymentOrder);
+
+        final CasePaymentOrder casePaymentOrder1 = CasePaymentOrder.builder()
+            .createdTimestamp(LocalDateTime.now())
+            .effectiveFrom(LocalDateTime.now())
+            .caseId(1_234_123_412_341_234L)
+            .action("Case Creation")
+            .responsibleParty("The executor on the will")
+            .orderReference("Bob123")
+            .createdBy("Bob")
+            .build();
+
+        casePaymentOrders.add(casePaymentOrder1);
+
+        final CasePaymentOrder casePaymentOrder2 = CasePaymentOrder.builder()
+            .createdTimestamp(LocalDateTime.now())
+            .effectiveFrom(LocalDateTime.now())
+            .caseId(1_234_123_412_341_234L)
+            .action("Case Creation")
+            .responsibleParty("The executor on the will")
+            .orderReference("Bob123")
+            .createdBy("Bob")
+            .build();
+
+        casePaymentOrders.add(casePaymentOrder2);
+
+        return casePaymentOrders;
+    }
 }

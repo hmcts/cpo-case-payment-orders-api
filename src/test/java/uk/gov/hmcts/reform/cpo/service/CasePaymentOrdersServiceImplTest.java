@@ -100,17 +100,8 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
         return new PageImpl<CasePaymentOrderEntity>(createListOfCasePaymentOrderEntity(), pageRequest, 3);
     }
 
-    private Page<CasePaymentOrder> getDomainPages(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
-        final PageRequest pageRequest = getPageRequest(casePaymentOrderQueryFilter);
-        return new PageImpl<CasePaymentOrder>(createListOfCasePaymentOrder(), pageRequest, 3);
-    }
 
-    private PageRequest getPageRequest(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
-        return PageRequest.of(
-            casePaymentOrderQueryFilter.getPageNumber(),
-            casePaymentOrderQueryFilter.getPageSize()
-        );
-    }
+
 
     private List<CasePaymentOrderEntity> createListOfCasePaymentOrderEntity() {
         final ArrayList<CasePaymentOrderEntity> casePaymentOrders = new ArrayList<>();
@@ -144,48 +135,6 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
         casePaymentOrderEntity2.setCreatedTimestamp(LocalDateTime.now());
         casePaymentOrderEntity2.setResponsibleParty("setResponsibleParty");
         casePaymentOrders.add(casePaymentOrderEntity2);
-        return casePaymentOrders;
-    }
-
-    private List<CasePaymentOrder> createListOfCasePaymentOrder() {
-        final ArrayList<CasePaymentOrder> casePaymentOrders = new ArrayList<>();
-
-        final CasePaymentOrder casePaymentOrder = CasePaymentOrder.builder()
-            .createdTimestamp(LocalDateTime.now())
-            .effectiveFrom(LocalDateTime.now())
-            .caseId(1_234_123_412_341_234L)
-            .action("Case Creation")
-            .responsibleParty("The executor on the will")
-            .orderReference("Bob123")
-            .createdBy("Bob")
-            .build();
-
-        casePaymentOrders.add(casePaymentOrder);
-
-        final CasePaymentOrder casePaymentOrder1 = CasePaymentOrder.builder()
-            .createdTimestamp(LocalDateTime.now())
-            .effectiveFrom(LocalDateTime.now())
-            .caseId(1_234_123_412_341_234L)
-            .action("Case Creation")
-            .responsibleParty("The executor on the will")
-            .orderReference("Bob123")
-            .createdBy("Bob")
-            .build();
-
-        casePaymentOrders.add(casePaymentOrder1);
-
-        final CasePaymentOrder casePaymentOrder2 = CasePaymentOrder.builder()
-            .createdTimestamp(LocalDateTime.now())
-            .effectiveFrom(LocalDateTime.now())
-            .caseId(1_234_123_412_341_234L)
-            .action("Case Creation")
-            .responsibleParty("The executor on the will")
-            .orderReference("Bob123")
-            .createdBy("Bob")
-            .build();
-
-        casePaymentOrders.add(casePaymentOrder2);
-
         return casePaymentOrders;
     }
 }
