@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo.validators.annotation;
 
+import uk.gov.hmcts.reform.cpo.validators.CaseIdValidator;
 import uk.gov.hmcts.reform.cpo.validators.CaseIdsValidator;
 
 import javax.validation.Constraint;
@@ -11,12 +12,12 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@Constraint(validatedBy = CaseIdsValidator.class)
+@Constraint(validatedBy = {CaseIdValidator.class, CaseIdsValidator.class})
 @Target({PARAMETER, FIELD})
 @Retention(RUNTIME)
 public @interface ValidCaseId {
 
-    String message() default "Error messages in case validator, the constraint is violated";
+    String message() default "Invalid caseId";
 
     Class<?>[] groups() default {};
 

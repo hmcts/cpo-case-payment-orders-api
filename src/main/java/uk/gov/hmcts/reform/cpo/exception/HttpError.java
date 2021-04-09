@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.cpo.exception;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.util.UriUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,7 +13,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.ConfusingTernary"})
+
+@Getter
 public class HttpError<T extends Serializable> implements Serializable {
     private static final long serialVersionUID = 1501816452204696395L;
 
@@ -25,15 +29,23 @@ public class HttpError<T extends Serializable> implements Serializable {
     private final String path;
     private T details;
 
-    public HttpError(Exception exception, HttpServletRequest request, HttpStatus status) {
+    public HttpError(Exception exception, String path, HttpStatus status) {
         final ResponseStatus responseStatus = exception.getClass().getAnnotation(ResponseStatus.class);
 
         this.exception = exception.getClass().getName();
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
         this.status = getStatusFromResponseStatus(responseStatus, status);
-        this.error = getErrorReason(responseStatus);
+        this.error = getErrorReason(responseStatus, status);
         this.message = exception.getMessage();
-        this.path = UriUtils.encodePath(request.getRequestURI(), StandardCharsets.UTF_8);
+        this.path = UriUtils.encodePath(path, StandardCharsets.UTF_8);
+    }
+
+    public HttpError(Exception exception, HttpServletRequest request, HttpStatus status) {
+        this(exception, request.getRequestURI(), status);
+    }
+
+    public HttpError(Exception exception, WebRequest request, HttpStatus status) {
+        this(exception, ((ServletWebRequest)request).getRequest().getRequestURI(), status);
     }
 
     public HttpError(Exception exception, HttpServletRequest request) {
@@ -64,7 +76,7 @@ public class HttpError<T extends Serializable> implements Serializable {
         return null;
     }
 
-    private String getErrorReason(ResponseStatus responseStatus) {
+    private String getErrorReason(ResponseStatus responseStatus, HttpStatus status) {
         if (null != responseStatus) {
             if (!responseStatus.reason().isEmpty()) {
                 return responseStatus.reason();
@@ -74,37 +86,11 @@ public class HttpError<T extends Serializable> implements Serializable {
             if (null != httpStatus) {
                 return httpStatus.getReasonPhrase();
             }
+        } else if (null != status) {
+            return status.getReasonPhrase();
         }
 
         return DEFAULT_ERROR;
-    }
-
-    public String getException() {
-        return exception;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public T getDetails() {
-        return details;
     }
 
     public HttpError<T> withDetails(T details) {

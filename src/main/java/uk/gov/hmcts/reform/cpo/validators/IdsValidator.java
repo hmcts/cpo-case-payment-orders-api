@@ -7,21 +7,16 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public class IdsValidator implements ConstraintValidator<ValidCpoId, Optional<List<String>>>, Validator<String> {
 
     @Override
-    public void initialize(final ValidCpoId constraintAnnotation) {
-    }
-
-    @Override
-    public boolean isValid(final Optional<List<String>> casesId, final ConstraintValidatorContext context) {
-        if (casesId.isEmpty()) {
+    public boolean isValid(final Optional<List<String>> cpoIds, final ConstraintValidatorContext context) {
+        if (cpoIds.isEmpty()) {
             return true;
         }
         final List<String> errors = new ArrayList<>();
-        casesId.get().forEach(caseId -> validate(caseId, errors));
+        cpoIds.get().forEach(cpoId -> validate(cpoId, errors));
         if (errors.isEmpty()) {
             return true;
         }
@@ -30,11 +25,10 @@ public class IdsValidator implements ConstraintValidator<ValidCpoId, Optional<Li
     }
 
     @Override
-    public void validate(final String caseId, List<String> errors) {
-        try {
-            UUID.fromString(caseId);
-        } catch (Exception exception) {
-            errors.add(caseId);
+    public void validate(final String cpoId, List<String> errors) {
+        if (!isValidCpoId(cpoId)) {
+            errors.add(cpoId);
         }
     }
+
 }
