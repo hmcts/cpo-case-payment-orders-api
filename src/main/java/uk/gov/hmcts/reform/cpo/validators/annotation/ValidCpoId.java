@@ -17,7 +17,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface ValidCpoId {
 
-    String message() default "Error messages in id validator, the constraint is violated";
+    String message() default "Invalid CpoId";
 
     Class<?>[] groups() default {};
 

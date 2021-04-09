@@ -8,7 +8,9 @@ import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 
 public interface CasePaymentOrdersService {
+
     Page<CasePaymentOrderEntity> getCasePaymentOrders(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter);
 
     CasePaymentOrder updateCasePaymentOrder(UpdateCasePaymentOrderRequest request);
+
 }

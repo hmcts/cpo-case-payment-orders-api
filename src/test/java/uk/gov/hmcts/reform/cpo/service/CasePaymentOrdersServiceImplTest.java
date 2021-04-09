@@ -5,9 +5,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
@@ -17,7 +18,7 @@ import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
 import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
-import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapperImpl;
+import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -31,9 +32,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
 import static uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity.UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT;
 
+@ExtendWith(MockitoExtension.class)
 class CasePaymentOrdersServiceImplTest {
 
     @InjectMocks
@@ -43,7 +44,7 @@ class CasePaymentOrdersServiceImplTest {
     private CasePaymentOrdersRepository casePaymentOrdersRepository;
 
     @Mock
-    private CasePaymentOrderMapperImpl mapper;
+    private CasePaymentOrderMapper mapper;
 
     @Mock
     private SecurityUtils securityUtils;
@@ -60,8 +61,6 @@ class CasePaymentOrdersServiceImplTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
-
         UserInfo userInfo = UserInfo.builder()
             .uid(CREATED_BY)
             .build();

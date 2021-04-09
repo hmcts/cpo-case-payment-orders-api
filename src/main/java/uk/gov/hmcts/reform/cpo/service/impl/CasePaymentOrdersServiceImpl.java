@@ -68,24 +68,6 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         }
     }
 
-    private PageRequest getPageRequest(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
-        final List<Sort.Order> orders = new ArrayList<>();
-        orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderQueryFilter.CASES_ID));
-        orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderQueryFilter.ORDER_REFERENCE));
-        return PageRequest.of(
-            casePaymentOrderQueryFilter.getPageNumber(),
-            casePaymentOrderQueryFilter.getPageSize(),
-            Sort.by(orders)
-        );
-    }
-
-    private void validateCasePaymentOrderQueryFilter(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
-        if (casePaymentOrderQueryFilter.isAnIdsAndCasesIdQuery()) {
-            throw new CasePaymentOrdersQueryException(
-                "case-payment-orders cannot filter case payments orders by both id and cases-id.");
-        }
-    }
-
     @Transactional
     @Override
     public CasePaymentOrder updateCasePaymentOrder(UpdateCasePaymentOrderRequest updateCasePaymentOrderRequest) {
@@ -112,6 +94,24 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         }
 
         return casePaymentOrderMapper.toDomainModel(updatedEntity);
+    }
+
+    private PageRequest getPageRequest(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+        final List<Sort.Order> orders = new ArrayList<>();
+        orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderQueryFilter.CASES_ID));
+        orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderQueryFilter.ORDER_REFERENCE));
+        return PageRequest.of(
+            casePaymentOrderQueryFilter.getPageNumber(),
+            casePaymentOrderQueryFilter.getPageSize(),
+            Sort.by(orders)
+        );
+    }
+
+    private void validateCasePaymentOrderQueryFilter(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+        if (casePaymentOrderQueryFilter.isAnIdsAndCasesIdQuery()) {
+            throw new CasePaymentOrdersQueryException(
+                "case-payment-orders cannot filter case payments orders by both id and cases-id.");
+        }
     }
 
     private boolean isDuplicateCaseIdOrderRefPairing(DataIntegrityViolationException exception) {

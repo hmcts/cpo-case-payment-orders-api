@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo.exception;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -12,7 +13,10 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+
+@Getter
 public class HttpError<T extends Serializable> implements Serializable {
+
     public static final Integer DEFAULT_STATUS = HttpStatus.INTERNAL_SERVER_ERROR.value();
     public static final String DEFAULT_ERROR = "Unexpected Error";
 
@@ -20,11 +24,11 @@ public class HttpError<T extends Serializable> implements Serializable {
     private final transient LocalDateTime timestamp;
     private final Integer status;
     private final String error;
-    private final String message;
+    private String message;
     private final String path;
     private T details;
 
-    public HttpError(Exception exception, String path,HttpStatus status) {
+    public HttpError(Exception exception, String path, HttpStatus status) {
         final ResponseStatus responseStatus = exception.getClass().getAnnotation(ResponseStatus.class);
 
         this.exception = exception.getClass().getName();
@@ -89,36 +93,14 @@ public class HttpError<T extends Serializable> implements Serializable {
         return DEFAULT_ERROR;
     }
 
-    public String getException() {
-        return exception;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public T getDetails() {
-        return details;
-    }
-
     public HttpError<T> withDetails(T details) {
         this.details = details;
         return this;
     }
+
+    public HttpError<T> withMessage(String message) {
+        this.message = message;
+        return this;
+    }
+
 }

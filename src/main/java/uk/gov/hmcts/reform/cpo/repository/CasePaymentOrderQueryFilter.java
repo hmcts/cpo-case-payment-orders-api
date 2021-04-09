@@ -37,10 +37,10 @@ public class CasePaymentOrderQueryFilter {
     }
 
     public List<UUID> getListUUID() {
-        return listOfIds.stream().map(id -> UUID.fromString(id)).collect(Collectors.toList());
+        return listOfIds.stream().map(UUID::fromString).collect(Collectors.toList());
     }
 
     public List<Long> getListOfLongCasesIds() {
-        return listOfCasesIds.stream().map(caseId -> Long.parseLong(caseId)).collect(Collectors.toList());
+        return listOfCasesIds.stream().map(Long::parseLong).collect(Collectors.toList());
     }
 }

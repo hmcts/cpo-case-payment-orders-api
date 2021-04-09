@@ -3,13 +3,19 @@ package uk.gov.hmcts.reform.cpo.validators;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.BaseTest;
 
-import java.util.UUID;
+import java.util.List;
 
 import static org.springframework.test.util.AssertionErrors.assertFalse;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
-class ValidatorTest {
+class ValidatorTest implements BaseTest, Validator<String> {
+
+    @Override
+    public void validate(String value, List<String> errors) {
+
+    }
 
     @Nested
     @DisplayName("Validator.isValidCaseId(..)")
@@ -20,7 +26,7 @@ class ValidatorTest {
         void successfullyValidatesValidCaseId() {
             assertTrue(
                 "16 digit Luhn number should validate as true",
-                Validator.isValidCaseId("4444333322221111")
+                isValidCaseId(CASE_ID_VALID_1)
             );
         }
 
@@ -29,7 +35,7 @@ class ValidatorTest {
         void successfullyFlagsNullCaseIdAsInvalid() {
             assertFalse(
                 "Null value Case ID should be flagged as invalid",
-                Validator.isValidCaseId(null)
+                isValidCaseId(null)
             );
         }
 
@@ -38,7 +44,7 @@ class ValidatorTest {
         void successfullyFlagsEmptyCaseIdAsInvalid() {
             assertFalse(
                 "Empty value Case ID should be flagged as invalid",
-                Validator.isValidCaseId("")
+                isValidCaseId("")
             );
         }
 
@@ -47,7 +53,7 @@ class ValidatorTest {
         void successfullyFlagsNonNumericCaseIdAsInvalid() {
             assertFalse(
                 "non-numeric Case ID should be flagged as invalid",
-                Validator.isValidCaseId("NON-NUMERIC")
+                isValidCaseId(CASE_ID_INVALID_NON_NUMERIC)
             );
         }
 
@@ -56,7 +62,7 @@ class ValidatorTest {
         void successfullyFlagsShortCaseIdAsInvalid() {
             assertFalse(
                 "Short Case ID should be flagged as invalid",
-                Validator.isValidCaseId("3038") // NB: valid luhn number
+                isValidCaseId(CASE_ID_INVALID_LENGTH)
             );
         }
 
@@ -65,7 +71,7 @@ class ValidatorTest {
         void successfullyFlagsBadLuhnCaseIdAsInvalid() {
             assertFalse(
                 "non-numeric Case ID should be flagged as invalid",
-                Validator.isValidCaseId("4444333322221110") // NB: correct length: 16 digits
+                isValidCaseId(CASE_ID_INVALID_LUHN)
             );
         }
 
@@ -80,7 +86,7 @@ class ValidatorTest {
         void successfullyValidatesValidCpoId() {
             assertTrue(
                 "Random UUID should validate as true",
-                Validator.isValidCpoId(UUID.randomUUID().toString())
+                isValidCpoId(CPO_ID_VALID_1)
             );
         }
 
@@ -89,7 +95,7 @@ class ValidatorTest {
         void successfullyFlagsNullCpoIdAsInvalid() {
             assertFalse(
                 "Null CPO ID should be flagged as invalid",
-                Validator.isValidCpoId(null)
+                isValidCpoId(null)
             );
         }
 
@@ -98,7 +104,7 @@ class ValidatorTest {
         void successfullyFlagsEmptyCpoIdAsInvalid() {
             assertFalse(
                 "Empty CPO ID should be flagged as invalid",
-                Validator.isValidCpoId("")
+                isValidCpoId("")
             );
         }
 
@@ -107,7 +113,7 @@ class ValidatorTest {
         void successfullyFlagsNonNumericCpoIdAsInvalid() {
             assertFalse(
                 "non-numeric CPO ID should be flagged as invalid",
-                Validator.isValidCpoId("NON-NUMERIC")
+                isValidCpoId(CPO_ID_INVALID_NON_NUMERIC)
             );
         }
 
@@ -116,7 +122,7 @@ class ValidatorTest {
         void successfullyFlagsBadUuidCpoIdAsInvalid() {
             assertFalse(
                 "Bad UUID CPO ID should be flagged as invalid",
-                Validator.isValidCpoId("123456")
+                isValidCpoId(CPO_ID_INVALID_1)
             );
         }
 

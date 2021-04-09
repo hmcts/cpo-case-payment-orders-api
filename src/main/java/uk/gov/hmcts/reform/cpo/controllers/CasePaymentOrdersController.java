@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.security.AuthError;
-import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
+import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
@@ -37,23 +37,24 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Validated
 public class CasePaymentOrdersController {
 
+    @SuppressWarnings({"squid:S1075"})
     public static final String CASE_PAYMENT_ORDERS_PATH = "/case-payment-orders";
 
-    private final CasePaymentOrdersServiceImpl casePaymentOrdersServiceImpl;
+    private final CasePaymentOrdersService casePaymentOrdersService;
     private final ApplicationParams applicationParams;
 
-    public CasePaymentOrdersController(CasePaymentOrdersServiceImpl casePaymentOrdersServiceImpl,
+    public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersService,
                                        ApplicationParams applicationParams) {
-        this.casePaymentOrdersServiceImpl = casePaymentOrdersServiceImpl;
+        this.casePaymentOrdersService = casePaymentOrdersService;
         this.applicationParams = applicationParams;
     }
 
 
-    @GetMapping(value = "case-payment-orders", produces = {"application/json"})
-    public Page<CasePaymentOrderEntity> getCasePaymentOrders(@ApiParam(value = "list of ids")
+    @GetMapping(value = CASE_PAYMENT_ORDERS_PATH, produces = {APPLICATION_JSON_VALUE})
+    public Page<CasePaymentOrderEntity> getCasePaymentOrders(@ApiParam("list of ids")
                                                              @ValidCpoId
                                                              @RequestParam("ids") Optional<List<String>> ids,
-                                                             @ApiParam(value = "casesId of ids")
+                                                             @ApiParam("casesId of ids")
                                                              @ValidCaseId
                                                              @RequestParam("cases-ids") Optional<List<String>> casesId,
                                                              @RequestParam("pageSize") Optional<Integer> pageSize,
@@ -68,8 +69,9 @@ public class CasePaymentOrdersController {
             .pageNumber(pageNumber.orElse(Integer.parseInt(applicationParams.getDefaultPageNumber())))
             .pageSize(pageSize.orElse(Integer.parseInt(applicationParams.getDefaultPageSize())))
             .build();
-        return casePaymentOrdersServiceImpl.getCasePaymentOrders(casePaymentOrderQueryFilter);
+        return casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter);
     }
+
 
     @PutMapping(path = CASE_PAYMENT_ORDERS_PATH, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Update Case Payment Order", notes = "Updates a case payment order")
@@ -96,6 +98,7 @@ public class CasePaymentOrdersController {
                     value = "{\n"
                         + "   \"status\": \"400\",\n"
                         + "   \"error\": \"Bad Request\",\n"
+                        + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
                         + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
                         + "   \"details\": [ \""  + ValidationError.ID_REQUIRED + "\" ]\n"
                         + "}",
@@ -121,7 +124,7 @@ public class CasePaymentOrdersController {
     })
     public CasePaymentOrder updateCasePaymentOrderRequest(@Valid @RequestBody UpdateCasePaymentOrderRequest
                                                                   requestPayload) {
-        return casePaymentOrdersServiceImpl.updateCasePaymentOrder(requestPayload);
+        return casePaymentOrdersService.updateCasePaymentOrder(requestPayload);
     }
 
 }

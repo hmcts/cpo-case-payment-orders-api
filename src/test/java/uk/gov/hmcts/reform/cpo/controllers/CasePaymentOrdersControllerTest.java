@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.TestIdamConfiguration;
 import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.config.SecurityConfiguration;
@@ -27,10 +28,7 @@ import uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
-import java.time.LocalDateTime;
-import java.time.Month;
 import java.time.format.DateTimeFormatter;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
@@ -49,8 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH;
 
 
-@SuppressWarnings({"PMD.ExcessiveImports"})
-public class CasePaymentOrdersControllerTest {
+public class CasePaymentOrdersControllerTest implements BaseTest {
 
     @Autowired
     protected MockMvc mockMvc;
@@ -60,17 +57,6 @@ public class CasePaymentOrdersControllerTest {
 
     @Autowired
     protected ApplicationParams applicationParams;
-
-
-    private static final LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24, 11, 48, 32
-    );
-    private static final Long CASE_ID = 4_444_333_322_221_111L;
-    private static final String ACTION = "action";
-    private static final String RESPONSIBLE_PARTY = "responsibleParty";
-    private static final String ORDER_REFERENCE = "orderReference";
-    private static final UUID ID = UUID.randomUUID();
-    private static final String CREATED_BY = "createdBy";
-    private static final LocalDateTime CREATED_TIMESTAMP = LocalDateTime.now();
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
@@ -102,7 +88,6 @@ public class CasePaymentOrdersControllerTest {
     }
 
 
-    @SuppressWarnings({"PMD.TooManyMethods"})
     @Nested
     @DisplayName("PUT /case-payment-orders")
     class UpdateCasePaymentOrder extends BaseMvcTest {
@@ -112,25 +97,9 @@ public class CasePaymentOrdersControllerTest {
 
         @BeforeEach
         void setUp() {
-            request = new UpdateCasePaymentOrderRequest(
-                ID.toString(),
-                EFFECTIVE_FROM,
-                CASE_ID.toString(),
-                ORDER_REFERENCE,
-                ACTION,
-                RESPONSIBLE_PARTY
-            );
+            request = createUpdateCasePaymentOrderRequest();
 
-            casePaymentOrder = CasePaymentOrder.builder()
-                .caseId(CASE_ID)
-                .effectiveFrom(EFFECTIVE_FROM)
-                .action(ACTION)
-                .responsibleParty(RESPONSIBLE_PARTY)
-                .orderReference(ORDER_REFERENCE)
-                .id(ID)
-                .createdBy(CREATED_BY)
-                .createdTimestamp(CREATED_TIMESTAMP)
-                .build();
+            casePaymentOrder = createCasePaymentOrder();
 
             given(casePaymentOrdersServiceImpl.updateCasePaymentOrder(any(UpdateCasePaymentOrderRequest.class)))
                 .willReturn(casePaymentOrder);
@@ -162,7 +131,7 @@ public class CasePaymentOrdersControllerTest {
                 // THEN
                 .andExpect(status().isAccepted())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.id", is(ID.toString())))
+                .andExpect(jsonPath("$.id", is(CPO_ID_VALID_1)))
                 .andExpect(jsonPath("$.created_timestamp", is(CREATED_TIMESTAMP.format(formatter))));
 
             // verify service call
@@ -192,7 +161,7 @@ public class CasePaymentOrdersControllerTest {
             request = new UpdateCasePaymentOrderRequest(
                 null,
                 EFFECTIVE_FROM,
-                CASE_ID.toString(),
+                CASE_ID_VALID_1,
                 ORDER_REFERENCE,
                 ACTION,
                 RESPONSIBLE_PARTY
@@ -215,7 +184,7 @@ public class CasePaymentOrdersControllerTest {
             request = new UpdateCasePaymentOrderRequest(
                 "",
                 EFFECTIVE_FROM,
-                CASE_ID.toString(),
+                CASE_ID_VALID_1,
                 ORDER_REFERENCE,
                 ACTION,
                 RESPONSIBLE_PARTY
@@ -236,9 +205,9 @@ public class CasePaymentOrdersControllerTest {
 
             // GIVEN
             request = new UpdateCasePaymentOrderRequest(
-                "INVALID",
+                CPO_ID_INVALID_1,
                 EFFECTIVE_FROM,
-                CASE_ID.toString(),
+                CASE_ID_VALID_1,
                 ORDER_REFERENCE,
                 ACTION,
                 RESPONSIBLE_PARTY
@@ -259,9 +228,9 @@ public class CasePaymentOrdersControllerTest {
 
             // GIVEN
             request = new UpdateCasePaymentOrderRequest(
-                ID.toString(),
+                CPO_ID_VALID_1,
                 null,
-                CASE_ID.toString(),
+                CASE_ID_VALID_1,
                 ACTION,
                 RESPONSIBLE_PARTY,
                 ORDER_REFERENCE
@@ -282,7 +251,7 @@ public class CasePaymentOrdersControllerTest {
 
             // GIVEN
             request = new UpdateCasePaymentOrderRequest(
-                ID.toString(),
+                CPO_ID_VALID_1,
                 EFFECTIVE_FROM,
                 null,
                 ORDER_REFERENCE,
@@ -305,7 +274,7 @@ public class CasePaymentOrdersControllerTest {
 
             // GIVEN
             request = new UpdateCasePaymentOrderRequest(
-                ID.toString(),
+                CPO_ID_VALID_1,
                 EFFECTIVE_FROM,
                 "",
                 ORDER_REFERENCE,
@@ -328,9 +297,9 @@ public class CasePaymentOrdersControllerTest {
 
             // GIVEN
             request = new UpdateCasePaymentOrderRequest(
-                ID.toString(),
+                CPO_ID_VALID_1,
                 EFFECTIVE_FROM,
-                "INVALID",
+                CASE_ID_INVALID_LUHN,
                 ORDER_REFERENCE,
                 ACTION,
                 RESPONSIBLE_PARTY
@@ -351,9 +320,9 @@ public class CasePaymentOrdersControllerTest {
 
             // GIVEN
             request = new UpdateCasePaymentOrderRequest(
-                ID.toString(),
+                CPO_ID_VALID_1,
                 EFFECTIVE_FROM,
-                CASE_ID.toString(),
+                CASE_ID_VALID_1,
                 null,
                 ACTION,
                 RESPONSIBLE_PARTY
@@ -374,9 +343,9 @@ public class CasePaymentOrdersControllerTest {
 
             // GIVEN
             request = new UpdateCasePaymentOrderRequest(
-                ID.toString(),
+                CPO_ID_VALID_1,
                 EFFECTIVE_FROM,
-                CASE_ID.toString(),
+                CASE_ID_VALID_1,
                 "",
                 ACTION,
                 RESPONSIBLE_PARTY
@@ -397,9 +366,9 @@ public class CasePaymentOrdersControllerTest {
 
             // GIVEN
             request = new UpdateCasePaymentOrderRequest(
-                ID.toString(),
+                CPO_ID_VALID_1,
                 EFFECTIVE_FROM,
-                CASE_ID.toString(),
+                CASE_ID_VALID_1,
                 ORDER_REFERENCE,
                 null,
                 RESPONSIBLE_PARTY
@@ -420,9 +389,9 @@ public class CasePaymentOrdersControllerTest {
 
             // GIVEN
             request = new UpdateCasePaymentOrderRequest(
-                ID.toString(),
+                CPO_ID_VALID_1,
                 EFFECTIVE_FROM,
-                CASE_ID.toString(),
+                CASE_ID_VALID_1,
                 ORDER_REFERENCE,
                 "",
                 RESPONSIBLE_PARTY
@@ -443,9 +412,9 @@ public class CasePaymentOrdersControllerTest {
 
             // GIVEN
             request = new UpdateCasePaymentOrderRequest(
-                ID.toString(),
+                CPO_ID_VALID_1,
                 EFFECTIVE_FROM,
-                CASE_ID.toString(),
+                CASE_ID_VALID_1,
                 ORDER_REFERENCE,
                 ACTION,
                 null
@@ -466,9 +435,9 @@ public class CasePaymentOrdersControllerTest {
 
             // GIVEN
             request = new UpdateCasePaymentOrderRequest(
-                ID.toString(),
+                CPO_ID_VALID_1,
                 EFFECTIVE_FROM,
-                CASE_ID.toString(),
+                CASE_ID_VALID_1,
                 ORDER_REFERENCE,
                 ACTION,
                 ""
@@ -495,4 +464,5 @@ public class CasePaymentOrdersControllerTest {
             .andExpect(jsonPath("$.details", hasSize(1)))
             .andExpect(jsonPath("$.details", hasItem(validationDetails)));
     }
+
 }

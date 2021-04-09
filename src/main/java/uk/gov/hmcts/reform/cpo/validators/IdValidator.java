@@ -28,8 +28,9 @@ public class IdValidator implements ConstraintValidator<ValidCpoId, String>, Val
 
     @Override
     public void validate(final String id, List<String> errors) {
-        if (!Validator.isValidCpoId(id)) {
+        if (!isValidCpoId(id)) {
             errors.add(ValidationError.ID_INVALID);
         }
     }
+
 }

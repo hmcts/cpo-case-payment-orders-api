@@ -26,8 +26,9 @@ public class IdsValidator implements ConstraintValidator<ValidCpoId, Optional<Li
 
     @Override
     public void validate(final String cpoId, List<String> errors) {
-        if (!Validator.isValidCpoId(cpoId)) {
+        if (!isValidCpoId(cpoId)) {
             errors.add(cpoId);
         }
     }
+
 }

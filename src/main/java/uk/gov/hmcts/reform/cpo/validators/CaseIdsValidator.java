@@ -20,14 +20,15 @@ public class CaseIdsValidator implements ConstraintValidator<ValidCaseId, Option
         if (errors.isEmpty()) {
             return true;
         }
-        buildErrors(context, "These casesIds: ",errors);
+        buildErrors(context, "These casesIds: ", errors);
         return false;
     }
 
     @Override
     public void validate(final String caseId, List<String> errors) {
-        if (!Validator.isValidCaseId(caseId)) {
+        if (!isValidCaseId(caseId)) {
             errors.add(caseId);
         }
     }
+
 }
