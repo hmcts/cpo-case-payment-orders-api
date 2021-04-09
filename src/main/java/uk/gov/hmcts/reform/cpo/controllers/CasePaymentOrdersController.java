@@ -84,14 +84,6 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 403,
             message = AuthError.UNAUTHORISED_S2S_SERVICE
-        ),
-        @ApiResponse(
-            code = 404,
-            message = ValidationError.CPO_NOT_FOUND
-        ),
-        @ApiResponse(
-            code = 409,
-            message = ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE
         )
     })
     public Page<CasePaymentOrder> getCasePaymentOrders(@ApiParam("list of case payment orders ids")
