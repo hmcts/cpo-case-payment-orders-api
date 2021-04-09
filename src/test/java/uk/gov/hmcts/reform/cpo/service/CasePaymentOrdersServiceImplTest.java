@@ -66,7 +66,7 @@ class CasePaymentOrdersServiceImplTest {
     }
 
     @Test
-    void deleteCasePaymentOrdersById() throws Exception {
+    void deleteCasePaymentOrdersById() {
         casePaymentOrdersService.deleteCasePaymentOrdersByIds(uuidsToDelete);
 
         verify(casePaymentOrdersRepository).deleteByUuids(uuidArgumentCaptor.capture());
@@ -106,7 +106,7 @@ class CasePaymentOrdersServiceImplTest {
     }
 
     @Test
-    void deleteCasePaymentOrdersByCaseIds() throws Exception {
+    void deleteCasePaymentOrdersByCaseIds() {
         casePaymentOrdersService.deleteCasePaymentOrdersByCaseIds(caseIdsToDelete);
 
         verify(casePaymentOrdersRepository).deleteByCaseIds(caseIdsArgumentCaptor.capture());

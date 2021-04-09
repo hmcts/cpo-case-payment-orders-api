@@ -26,8 +26,8 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
     private static final Logger LOG = LoggerFactory.getLogger(CasePaymentOrdersServiceImpl.class);
     public static final String AUDIT_ENTRY_DELETION_ERROR = "Exception thrown when deleting audit entry for case "
-                                                            + "payment orders '{}'. Unwanted previous  versions of the"
-                                                            + " case payment order might be leftover";
+                                                            + "payment orders '{}'. Unwanted previous versions of the"
+                                                            + " case payment orders may remain";
 
     private final CasePaymentOrdersRepository casePaymentOrdersRepository;
 
