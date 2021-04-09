@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.cpo.service.mapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
@@ -15,7 +16,7 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.util.AssertionErrors.assertNotEquals;
 import static org.springframework.test.util.AssertionErrors.assertNotNull;
 
-class CasePaymentOrderMapperTest {
+class CasePaymentOrderMapperTest implements BaseTest {
 
     private CasePaymentOrderMapperImpl mapper;
 
@@ -26,26 +27,9 @@ class CasePaymentOrderMapperTest {
     public void setUp() {
         mapper = new CasePaymentOrderMapperImpl();
 
-        LocalDateTime date = LocalDateTime.now();
-
-        entity = new CasePaymentOrderEntity();
-        entity.setCreatedTimestamp(date);
-        entity.setEffectiveFrom(date);
-        entity.setCaseId(1_234_123_412_341_234L);
-        entity.setAction("Case Creation");
-        entity.setResponsibleParty("The executor on the will");
-        entity.setOrderReference("Bob123");
-        entity.setCreatedBy("Bob");
-
-        casePaymentOrder = CasePaymentOrder.builder()
-            .createdTimestamp(entity.getCreatedTimestamp())
-            .effectiveFrom(date)
-            .caseId(1_234_123_412_341_234L)
-            .action("Case Creation")
-            .responsibleParty("The executor on the will")
-            .orderReference("Bob123")
-            .createdBy("Bob")
-            .build();
+        // create entity and domain model from same sample data in `BaseTest`
+        entity = createCasePaymentOrderEntity();
+        casePaymentOrder = createCasePaymentOrder();
     }
 
     @Test
@@ -95,7 +79,7 @@ class CasePaymentOrderMapperTest {
         UpdateCasePaymentOrderRequest updateRequest =
             new UpdateCasePaymentOrderRequest(UUID.randomUUID().toString(),
                                               LocalDateTime.of(2020, 10, 1, 12, 30, 0, 0),
-                                              "4444333322221111",
+                                              CASE_ID_VALID_2,
                                               "Merge Action",
                                               "Merge Responsible Party",
                                               "Merge Order Reference");

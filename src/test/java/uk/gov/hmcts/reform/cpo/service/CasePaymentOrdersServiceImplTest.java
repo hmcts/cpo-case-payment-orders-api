@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.exception.CaseIdOrderReferenceUniqueConstraintException;
@@ -22,8 +23,6 @@ import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,7 +34,7 @@ import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity.UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT;
 
 @ExtendWith(MockitoExtension.class)
-class CasePaymentOrdersServiceImplTest {
+class CasePaymentOrdersServiceImplTest implements BaseTest {
 
     @InjectMocks
     private CasePaymentOrdersServiceImpl casePaymentOrdersService;
@@ -44,30 +43,10 @@ class CasePaymentOrdersServiceImplTest {
     private CasePaymentOrdersRepository casePaymentOrdersRepository;
 
     @Mock
-    private CasePaymentOrderMapper mapper;
+    private CasePaymentOrderMapper casePaymentOrderMapper;
 
     @Mock
     private SecurityUtils securityUtils;
-
-    private static final LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24, 11, 48,
-                                                           32);
-    private static final Long CASE_ID = 1_122_334_455_667_788L;
-    private static final String ACTION = "action";
-    private static final String RESPONSIBLE_PARTY = "responsibleParty";
-    private static final String ORDER_REFERENCE = "orderReference";
-    private static final UUID ID = UUID.randomUUID();
-    private static final String CREATED_BY = "createdBy";
-    private static final LocalDateTime CREATED_TIMESTAMP = LocalDateTime.now();
-
-    @BeforeEach
-    public void setUp() {
-        UserInfo userInfo = UserInfo.builder()
-            .uid(CREATED_BY)
-            .build();
-
-        given(securityUtils.getUserInfo()).willReturn(userInfo);
-    }
-
 
     @Nested
     @DisplayName("Update Case Payment Order")
@@ -84,45 +63,19 @@ class CasePaymentOrdersServiceImplTest {
         @BeforeEach
         public void setUp() {
 
-            updateCasePaymentOrderRequest = new UpdateCasePaymentOrderRequest(
-                ID.toString(),
-                EFFECTIVE_FROM,
-                CASE_ID.toString(),
-                ORDER_REFERENCE,
-                ACTION,
-                RESPONSIBLE_PARTY
-            );
+            setupSecurityUtilsMock();
+
+            // update request
+            updateCasePaymentOrderRequest = createUpdateCasePaymentOrderRequest();
 
             // loaded entity
-            casePaymentOrderEntity = new CasePaymentOrderEntity();
-            casePaymentOrderEntity.setEffectiveFrom(EFFECTIVE_FROM);
-            casePaymentOrderEntity.setCaseId(CASE_ID);
-            casePaymentOrderEntity.setAction(ACTION);
-            casePaymentOrderEntity.setResponsibleParty(RESPONSIBLE_PARTY);
-            casePaymentOrderEntity.setOrderReference(ORDER_REFERENCE);
-            casePaymentOrderEntity.setCreatedBy(CREATED_BY);
+            casePaymentOrderEntity = createCasePaymentOrderEntity();
 
             // saved entity
-            savedEntity = new CasePaymentOrderEntity();
-            savedEntity.setEffectiveFrom(EFFECTIVE_FROM);
-            savedEntity.setCaseId(CASE_ID);
-            savedEntity.setAction(ACTION);
-            savedEntity.setResponsibleParty(RESPONSIBLE_PARTY);
-            savedEntity.setOrderReference(ORDER_REFERENCE);
-            savedEntity.setCreatedBy(CREATED_BY);
-            savedEntity.setCreatedTimestamp(CREATED_TIMESTAMP);
+            savedEntity = createCasePaymentOrderEntity();
 
             // response model
-            casePaymentOrderResponse = CasePaymentOrder.builder()
-                .effectiveFrom(EFFECTIVE_FROM)
-                .caseId(CASE_ID)
-                .action(ACTION)
-                .responsibleParty(RESPONSIBLE_PARTY)
-                .orderReference(ORDER_REFERENCE)
-                .createdBy(CREATED_BY)
-                .id(ID)
-                .createdTimestamp(CREATED_TIMESTAMP)
-                .build();
+            casePaymentOrderResponse = createCasePaymentOrder();
         }
 
         @Test
@@ -131,19 +84,20 @@ class CasePaymentOrdersServiceImplTest {
 
             // GIVEN
             // :: the load
-            given(casePaymentOrdersRepository.findById(ID)).willReturn(Optional.of(casePaymentOrderEntity));
+            UUID id = updateCasePaymentOrderRequest.getUUID();
+            given(casePaymentOrdersRepository.findById(id)).willReturn(Optional.of(casePaymentOrderEntity));
             // :: the save
             given(casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity)).willReturn(savedEntity);
             // :: the conversion
-            given(mapper.toDomainModel(savedEntity)).willReturn(casePaymentOrderResponse);
+            given(casePaymentOrderMapper.toDomainModel(savedEntity)).willReturn(casePaymentOrderResponse);
 
             // WHEN
             CasePaymentOrder response = casePaymentOrdersService.updateCasePaymentOrder(updateCasePaymentOrderRequest);
 
             // THEN
             verify(casePaymentOrdersRepository, times(1)).saveAndFlush(casePaymentOrderEntity);
-            assertThat("UUID does not match expected", response.getId().equals(ID));
-            assertThat("Returned model does not match expected", response.equals(casePaymentOrderResponse));
+            assertThat("UUID should match expected", response.getId().equals(id));
+            assertThat("Returned model should match expected", response.equals(casePaymentOrderResponse));
         }
 
         @Test
@@ -151,7 +105,8 @@ class CasePaymentOrdersServiceImplTest {
         void shouldThrowCpoCouldNotBeFoundExceptionWhenCpoNotFound() {
 
             // GIVEN
-            given(casePaymentOrdersRepository.findById(ID)).willReturn(Optional.empty());
+            UUID id = updateCasePaymentOrderRequest.getUUID();
+            given(casePaymentOrdersRepository.findById(id)).willReturn(Optional.empty());
 
             // WHEN / THEN
             assertThatThrownBy(() -> casePaymentOrdersService.updateCasePaymentOrder(updateCasePaymentOrderRequest))
@@ -165,7 +120,8 @@ class CasePaymentOrdersServiceImplTest {
 
             // GIVEN
             // :: the load
-            given(casePaymentOrdersRepository.findById(ID)).willReturn(Optional.of(casePaymentOrderEntity));
+            UUID id = updateCasePaymentOrderRequest.getUUID();
+            given(casePaymentOrdersRepository.findById(id)).willReturn(Optional.of(casePaymentOrderEntity));
             // :: the save
             ConstraintViolationException constraintViolationException =
                 new ConstraintViolationException("",
@@ -186,7 +142,8 @@ class CasePaymentOrdersServiceImplTest {
 
             // GIVEN
             // :: the load
-            given(casePaymentOrdersRepository.findById(ID)).willReturn(Optional.of(casePaymentOrderEntity));
+            UUID id = updateCasePaymentOrderRequest.getUUID();
+            given(casePaymentOrdersRepository.findById(id)).willReturn(Optional.of(casePaymentOrderEntity));
             // :: the save
             ConstraintViolationException constraintViolationException =
                 new ConstraintViolationException("",
@@ -206,7 +163,8 @@ class CasePaymentOrdersServiceImplTest {
 
             // GIVEN
             // :: the load
-            given(casePaymentOrdersRepository.findById(ID)).willReturn(Optional.of(casePaymentOrderEntity));
+            UUID id = updateCasePaymentOrderRequest.getUUID();
+            given(casePaymentOrdersRepository.findById(id)).willReturn(Optional.of(casePaymentOrderEntity));
             // :: the save
             given(casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity))
                 .willThrow(new DataIntegrityViolationException(""));
@@ -216,6 +174,14 @@ class CasePaymentOrdersServiceImplTest {
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
 
+    }
+
+    private void setupSecurityUtilsMock() {
+        UserInfo userInfo = UserInfo.builder()
+            .uid(CREATED_BY)
+            .build();
+
+        given(securityUtils.getUserInfo()).willReturn(userInfo);
     }
 
 }
