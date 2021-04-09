@@ -27,3 +27,8 @@ definition_files/
 
 /BEFTA Report for Smoke Tests/
 /BEFTA Report for Functional Tests/
+
+/bin/functionalTest
+/bin/integrationTest
+/bin/main
+/bin/test
