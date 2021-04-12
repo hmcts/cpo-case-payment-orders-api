@@ -93,7 +93,7 @@ public class CasePaymentOrdersController {
                                                        @ApiParam("list of ccd case reference numbers")
                                                        @ValidCaseId
                                                        @RequestParam(name = "case-ids", required = false)
-                                                       Optional<List<String>> caseId,
+                                                       Optional<List<String>> caseIds,
                                                        @RequestParam(name = "pageSize", required = false)
                                                        Optional<Integer> pageSize,
                                                        @RequestParam(name = "pageNumber", required = false)
@@ -101,11 +101,9 @@ public class CasePaymentOrdersController {
 
     ) {
 
-        final List<String> listOfIds = ids.orElse(Collections.emptyList());
-        final List<String> listOfCasesIds = caseId.orElse(Collections.emptyList());
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
-            .cpoIds(listOfIds)
-            .caseIds(listOfCasesIds)
+            .cpoIds(ids.orElse(Collections.emptyList()))
+            .caseIds(caseIds.orElse(Collections.emptyList()))
             .pageNumber(pageNumber.orElse(CasePaymentOrderQueryFilter.PAGE_NUMBER))
             .pageSize(pageSize.orElse(applicationParams.getDefaultPageSize()))
             .build();
