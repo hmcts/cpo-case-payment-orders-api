@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo.service.impl;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,6 +26,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity.UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT;
 import static uk.gov.hmcts.reform.cpo.validators.ValidationError.IDAM_ID_NOT_FOUND;
 import static uk.gov.hmcts.reform.cpo.validators.ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE;
 
@@ -58,7 +60,8 @@ class CasePaymentOrdersServiceImplTest {
     CasePaymentOrderEntity savedEntity;
 
     private static final LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24, 11, 48,
-                                                           32);
+                                                                         32
+    );
     private static final Long CASE_ID = 1_122_334_455_667_788L;
     private static final String ACTION = "action";
     private static final String RESPONSIBLE_PARTY = "responsibleParty";
@@ -85,7 +88,8 @@ class CasePaymentOrdersServiceImplTest {
                 .build();
 
             casePaymentOrdersService = new CasePaymentOrdersServiceImpl(casePaymentOrdersRepository,
-                                                                        securityUtils, mapper);
+                                                                        securityUtils, mapper
+            );
             createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(
                 EFFECTIVE_FROM,
                 "1122334455667788",
@@ -139,11 +143,14 @@ class CasePaymentOrdersServiceImplTest {
         void shouldErrorWhenNonUniquePairing() {
             given(securityUtils.getUserInfo()).willReturn(userInfo);
             given(mapper.toEntity(createCasePaymentOrderRequest, CREATED_BY)).willReturn(requestEntity);
-            Throwable throwable = new Throwable("duplicate key value violates unique constraint "
-                                                    + "\"unique_case_id_order_reference\"");
-            DataIntegrityViolationException exception = new DataIntegrityViolationException("", throwable);
-
-            given(casePaymentOrdersRepository.saveAndFlush(requestEntity)).willThrow(exception);
+            ConstraintViolationException exception =
+                new ConstraintViolationException(
+                    "",
+                    null,
+                    UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT
+                );
+            given(casePaymentOrdersRepository.saveAndFlush(requestEntity)).willThrow(
+                new DataIntegrityViolationException("", exception));
             assertThatThrownBy(() -> casePaymentOrdersService.createCasePaymentOrder(createCasePaymentOrderRequest))
                 .isInstanceOf(CaseIdOrderReferenceUniqueConstraintException.class)
                 .hasMessageContaining(CASE_ID_ORDER_REFERENCE_UNIQUE);
