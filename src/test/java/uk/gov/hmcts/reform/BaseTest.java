@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public interface BaseTest {
 
     String IDS = "ids";
-    String CASES_IDS = "cases-ids";
+    String CASE_IDS = "case-ids";
     int PAGE_SIZE = 3;
     String CASE_ID_VALID_1 = "9511425043588823";
     String CASE_ID_VALID_2 = "9716401307140455";

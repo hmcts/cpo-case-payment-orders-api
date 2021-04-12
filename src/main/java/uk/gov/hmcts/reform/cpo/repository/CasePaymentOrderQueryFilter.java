@@ -25,7 +25,7 @@ public class CasePaymentOrderQueryFilter {
     private List<String> caseIds;
 
 
-    public boolean isACasesIdQuery() {
+    public boolean isFindByCaseIdQuery() {
         return !caseIds.isEmpty();
     }
 
@@ -33,11 +33,11 @@ public class CasePaymentOrderQueryFilter {
         return !cpoIds.isEmpty();
     }
 
-    public boolean isAnIdsAndCasesIdQuery() {
-        return isACasesIdQuery() && isAnIdsQuery();
+    public boolean isFilterByBothIdAndCaseId() {
+        return isFindByCaseIdQuery() && isAnIdsQuery();
     }
 
-    public boolean isItAnEmptyCriteria() {
+    public boolean noFilters() {
         return cpoIds.isEmpty() && caseIds.isEmpty();
     }
 
@@ -51,7 +51,7 @@ public class CasePaymentOrderQueryFilter {
 
     public PageRequest getPageRequest() {
         final List<Sort.Order> orders = new ArrayList<>();
-        orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderEntity.CASES_ID));
+        orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderEntity.CASE_ID));
         orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderEntity.ORDER_REFERENCE));
         return PageRequest.of(
             this.getPageNumber(),
@@ -60,8 +60,8 @@ public class CasePaymentOrderQueryFilter {
         );
     }
 
-    public void validateCasePaymentOrderQueryFilter() {
-        if (this.isAnIdsAndCasesIdQuery()) {
+    public void validateCasePaymentOrdersFiltering() {
+        if (this.isFilterByBothIdAndCaseId()) {
             throw new CasePaymentOrdersFilterException(ValidationError.CPO_FILER_ERROR);
         }
     }

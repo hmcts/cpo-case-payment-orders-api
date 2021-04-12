@@ -48,7 +48,7 @@ class CasePaymentOrderQueryFilterTest implements BaseTest {
             casesIds,
             Collections.emptyList()
         );
-        casePaymentOrderQueryFilter.validateCasePaymentOrderQueryFilter();
+        casePaymentOrderQueryFilter.validateCasePaymentOrdersFiltering();
 
     }
 
@@ -59,7 +59,7 @@ class CasePaymentOrderQueryFilterTest implements BaseTest {
                 casesIds,
                 ids
             );
-            casePaymentOrderQueryFilter.validateCasePaymentOrderQueryFilter();
+            casePaymentOrderQueryFilter.validateCasePaymentOrdersFiltering();
             fail();
         } catch (CasePaymentOrdersFilterException casePaymentOrdersQueryException) {
             assertThat(casePaymentOrdersQueryException.getMessage(), is(ValidationError.CPO_FILER_ERROR));

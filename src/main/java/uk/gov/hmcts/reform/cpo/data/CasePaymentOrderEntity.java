@@ -22,7 +22,7 @@ import java.util.UUID;
 @Audited(withModifiedFlag = true)
 public class CasePaymentOrderEntity {
 
-    public static final String CASES_ID = "caseId";
+    public static final String CASE_ID = "caseId";
     public static final String ORDER_REFERENCE = "orderReference";
 
     @Id

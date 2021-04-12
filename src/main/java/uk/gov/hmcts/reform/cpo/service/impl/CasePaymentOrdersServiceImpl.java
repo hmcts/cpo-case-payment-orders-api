@@ -43,7 +43,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
         final Page<CasePaymentOrderEntity> casePaymentOrderEntities;
         final PageRequest pageRequest = casePaymentOrderQueryFilter.getPageRequest();
-        if (casePaymentOrderQueryFilter.isACasesIdQuery()) {
+        if (casePaymentOrderQueryFilter.isFindByCaseIdQuery()) {
             casePaymentOrderEntities = casePaymentOrdersRepository.findByCaseIdIn(
                 casePaymentOrderQueryFilter.getListOfLongCasesIds(), pageRequest);
         } else {
@@ -59,7 +59,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
                                                              PageRequest pageRequest) {
 
         final List<CasePaymentOrder> casePaymentOrders =
-            casePaymentOrderMapper.map(casePaymentOrderEntities.getContent());
+            casePaymentOrderMapper.toDomainModelList(casePaymentOrderEntities.getContent());
 
         return new PageImpl<>(casePaymentOrders, pageRequest,
                               casePaymentOrderEntities.getTotalElements()

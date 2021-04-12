@@ -526,7 +526,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             assertArrayEquals(response.getContent().toArray(), getDomainPages.getContent().toArray());
         }
 
-        @DisplayName("happy path for cases-ids")
+        @DisplayName("happy path for case-ids")
         @Test
         void passForCasesIds() {
 
@@ -560,7 +560,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         }
 
 
-        @DisplayName("fail for for cases-ids and ids")
+        @DisplayName("fail for for case-ids and ids")
         @Test
         void failForCasesAndIds() {
 
@@ -575,7 +575,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
                 ResultActions response = this.mockMvc.perform(
                     request(HttpMethod.GET, CASE_PAYMENT_ORDERS_PATH)
                         .param(IDS, "b00445ee-5bed-42c5-812f-12687175beca")
-                        .param(CASES_IDS, "1574419234651640,1574932009200070")
+                        .param(CASE_IDS, "1574419234651640,1574932009200070")
                 );
                 // THEN
                 assertGetCopPResponse(ValidationError.CPO_FILER_ERROR, response);
@@ -627,7 +627,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             try {
                 ResultActions response = this.mockMvc.perform(
                     request(HttpMethod.GET, CASE_PAYMENT_ORDERS_PATH)
-                        .param(CASES_IDS, "XXXX")
+                        .param(CASE_IDS, "XXXX")
                 );
                 // THEN
                 assertGetCopPResponse(expectedError, response);

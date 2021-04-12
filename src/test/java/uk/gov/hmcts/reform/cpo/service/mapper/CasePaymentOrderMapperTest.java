@@ -90,7 +90,7 @@ class CasePaymentOrderMapperTest {
 
         final List<CasePaymentOrderEntity> casePaymentOrderEntities = new ArrayList<>();
         casePaymentOrderEntities.add(entity);
-        final List<CasePaymentOrder> casePaymentOrders = mapper.map(casePaymentOrderEntities);
+        final List<CasePaymentOrder> casePaymentOrders = mapper.toDomainModelList(casePaymentOrderEntities);
 
         assertTrue("The expected size is 1", casePaymentOrders.size() == 1);
         CasePaymentOrder mappedDomainObject = casePaymentOrders.get(0);

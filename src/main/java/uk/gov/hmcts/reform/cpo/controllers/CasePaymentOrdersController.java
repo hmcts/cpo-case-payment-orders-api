@@ -92,8 +92,8 @@ public class CasePaymentOrdersController {
                                                        Optional<List<String>> ids,
                                                        @ApiParam("list of ccd case reference numbers")
                                                        @ValidCaseId
-                                                       @RequestParam(name = "cases-ids", required = false)
-                                                       Optional<List<String>> casesId,
+                                                       @RequestParam(name = "case-ids", required = false)
+                                                       Optional<List<String>> caseId,
                                                        @RequestParam(name = "pageSize", required = false)
                                                        Optional<Integer> pageSize,
                                                        @RequestParam(name = "pageNumber", required = false)
@@ -102,7 +102,7 @@ public class CasePaymentOrdersController {
     ) {
 
         final List<String> listOfIds = ids.orElse(Collections.emptyList());
-        final List<String> listOfCasesIds = casesId.orElse(Collections.emptyList());
+        final List<String> listOfCasesIds = caseId.orElse(Collections.emptyList());
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
             .cpoIds(listOfIds)
             .caseIds(listOfCasesIds)
@@ -110,10 +110,10 @@ public class CasePaymentOrdersController {
             .pageSize(pageSize.orElse(applicationParams.getDefaultPageSize()))
             .build();
 
-        if (casePaymentOrderQueryFilter.isItAnEmptyCriteria()) {
+        if (casePaymentOrderQueryFilter.noFilters()) {
             return Page.empty();
         }
-        casePaymentOrderQueryFilter.validateCasePaymentOrderQueryFilter();
+        casePaymentOrderQueryFilter.validateCasePaymentOrdersFiltering();
         return casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter);
     }
 

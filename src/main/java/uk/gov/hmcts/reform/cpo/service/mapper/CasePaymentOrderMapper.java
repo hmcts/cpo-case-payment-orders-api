@@ -13,6 +13,6 @@ public interface CasePaymentOrderMapper {
 
     CasePaymentOrder toDomainModel(CasePaymentOrderEntity casePaymentOrderEntity);
 
-    List<CasePaymentOrder> map(List<CasePaymentOrderEntity> casePaymentOrderEntities);
+    List<CasePaymentOrder> toDomainModelList(List<CasePaymentOrderEntity> casePaymentOrderEntities);
 }
 

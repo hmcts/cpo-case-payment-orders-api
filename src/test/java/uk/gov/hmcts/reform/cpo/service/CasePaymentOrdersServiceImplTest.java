@@ -68,7 +68,7 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
         when(casePaymentOrdersRepository.findByIdIn(anyList(), ArgumentMatchers.<Pageable>any())).thenReturn(
             getEntityPages(casePaymentOrderQueryFilter));
 
-        when(casePaymentOrderMapper.map(anyList())).thenReturn(createListOfCasePaymentOrder());
+        when(casePaymentOrderMapper.toDomainModelList(anyList())).thenReturn(createListOfCasePaymentOrder());
         final Page<CasePaymentOrder> pages = casePaymentOrdersService.getCasePaymentOrders(
             casePaymentOrderQueryFilter);
 
@@ -87,7 +87,7 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
         when(casePaymentOrdersRepository.findByCaseIdIn(anyList(), ArgumentMatchers.<Pageable>any())).thenReturn(
             getEntityPages(casePaymentOrderQueryFilter));
 
-        when(casePaymentOrderMapper.map(anyList())).thenReturn(createListOfCasePaymentOrder());
+        when(casePaymentOrderMapper.toDomainModelList(anyList())).thenReturn(createListOfCasePaymentOrder());
 
         final Page<CasePaymentOrder> pages = casePaymentOrdersService.getCasePaymentOrders(
             casePaymentOrderQueryFilter);
