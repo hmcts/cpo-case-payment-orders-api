@@ -41,11 +41,14 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
 
     @Override
     public void deleteByCaseIds(List<Long> caseIds) throws CasePaymentOrderCouldNotBeFoundException {
-        int deleteByCaseIds = casePaymentOrdersJpaRepository.deleteByCaseIdIsIn(caseIds);
 
-        if (deleteByCaseIds != caseIds.size()) {
-            throw new CasePaymentOrderCouldNotBeFoundException(String.format(ERROR_MESSAGE, "Case ID"));
+        for (Long cid : caseIds) {
+            if (casePaymentOrdersJpaRepository.findAllByCaseId(cid).isEmpty()) {
+                throw new CasePaymentOrderCouldNotBeFoundException(String.format(ERROR_MESSAGE, "Case ID"));
+            }
         }
+
+        casePaymentOrdersJpaRepository.deleteByCaseIdIsIn(caseIds);
     }
 
     @Override

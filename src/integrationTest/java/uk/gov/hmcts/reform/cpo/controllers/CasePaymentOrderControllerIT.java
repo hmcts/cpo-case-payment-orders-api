@@ -211,6 +211,33 @@ public class CasePaymentOrderControllerIT extends BaseTest {
             assertTrue(casePaymentOrdersAuditJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
         }
 
+        @DisplayName("Successfully delete multiple case payment orders with the same case id")
+        @Test
+        void shouldDeleteMultipleCasePaymentsSpecifiedByTheSameCaseId() throws Exception {
+            List<CasePaymentOrderEntity> savedEntities =
+                    casePaymentOrderEntityGenerator.generateAndSaveEntitiesWithSameCaseId(3);
+
+            List<UUID> savedEntitiesUuids = savedEntities.stream()
+                    .map(CasePaymentOrderEntity::getId)
+                    .collect(Collectors.toList());
+
+            String savedEntityCaseId = savedEntities.stream()
+                    .map(CasePaymentOrderEntity::getCaseId)
+                    .map(caseId -> Long.toString(caseId))
+                    .distinct()
+                    .collect(Collectors.joining());
+
+            assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
+
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
+                    .queryParam(CASE_IDS, savedEntityCaseId))
+                    .andExpect(status().isOk());
+
+            assertTrue(casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
+            assertTrue(casePaymentOrdersAuditJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
+        }
+
+
         @DisplayName("Fail if one case payment from list cannot be removed as specified Case Id does not exist")
         @Test
         void shouldFailWithNotFoundWhenDeleteNonExistentCaseId() throws Exception {

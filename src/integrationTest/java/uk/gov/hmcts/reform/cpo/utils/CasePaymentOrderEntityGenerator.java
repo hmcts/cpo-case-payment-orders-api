@@ -24,14 +24,16 @@ public class CasePaymentOrderEntityGenerator {
     @Autowired
     private UIDService uidService;
 
-    public List<CasePaymentOrderEntity> generateAndSaveEntities(int numberToGenerate) {
+    private List<CasePaymentOrderEntity> generateAndSaveEntities(int numberToGenerate, boolean useSameCaseId) {
+
+        Long caseId = Long.parseLong(uidService.generateUID());
 
         List<CasePaymentOrderEntity> returnValue = new ArrayList<>();
 
         for (int i = 0; i < numberToGenerate; i++) {
             CasePaymentOrder casePaymentOrder = CasePaymentOrder.builder()
                     .action("Action " + RandomUtils.nextInt())
-                    .caseId(Long.parseLong(uidService.generateUID()))
+                    .caseId(useSameCaseId ? caseId : Long.parseLong(uidService.generateUID()))
                     .createdBy("Created by " + RandomUtils.nextBytes(2))
                     .orderReference("order ref " + RandomUtils.nextBytes(3))
                     .effectiveFrom(LocalDateTime.now())
@@ -47,4 +49,13 @@ public class CasePaymentOrderEntityGenerator {
 
         return returnValue;
     }
+
+    public List<CasePaymentOrderEntity> generateAndSaveEntities(int numberToGenerate) {
+        return generateAndSaveEntities(numberToGenerate, false);
+    }
+
+    public List<CasePaymentOrderEntity> generateAndSaveEntitiesWithSameCaseId(int numberToGenerate) {
+        return generateAndSaveEntities(numberToGenerate, true);
+    }
+
 }
