@@ -54,8 +54,6 @@ public class CasePaymentOrdersController {
     private final CasePaymentOrdersService casePaymentOrdersService;
     private final ApplicationParams applicationParams;
 
-
-
     @Autowired
     public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersService,
                                        ApplicationParams applicationParams) {
@@ -95,7 +93,10 @@ public class CasePaymentOrdersController {
         ),
         @ApiResponse(
             code = 400,
-            message = ValidationError.IDS_EMPTY,
+            message = "One or more of the following reasons:"
+                        + "\n1) " + ValidationError.IDS_EMPTY
+                        + "\n2) " + ValidationError.CPO_NO_FOUND_BY_ID
+                        + "\n2) " + ValidationError.CANNOT_DELETE_WITH_BOTH_ID_AND_CASE_ID_SPECIFIED,
             examples = @Example(value = {
                 @ExampleProperty(
                     value = "{\n"
@@ -135,19 +136,20 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
-                + "\n1) " + ValidationError.CASE_ID_INVALID
-                + "\n2) " + ValidationError.CASE_ID_INVALID_LENGTH
-                + "\n3) " + ValidationError.CASE_IDS_EMPTY,
+                + "\n1) " + ValidationError.CASE_IDS_EMPTY
+                + "\n2) " + ValidationError.CASE_ID_INVALID
+                + "\n3) " + ValidationError.CASE_ID_INVALID_LENGTH
+                + "\n4) " + ValidationError.CPO_NO_FOUND_BY_ID
+                + "\n5) " + ValidationError.CANNOT_DELETE_WITH_BOTH_ID_AND_CASE_ID_SPECIFIED,
             examples = @Example(value = {
                 @ExampleProperty(
-                    value = "{\n"
-                            + "   \"status\": \"BAD_REQUEST\",\n"
-                            + "   \"errors\": [\n"
-                            + "      \"case-ids can not be empty,\"\n"
-                            + "      \"caseId invalid,\"\n"
-                            + "      \"invalid length\"\n"
-                            + "   ]\n"
-                            + "}",
+                        value = "{\n"
+                                + "   \"status\": \"400\",\n"
+                                + "   \"error\": \"Bad Request\",\n"
+                                + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
+                                + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
+                                + "   \"details\": [ \""  + ValidationError.CASE_IDS_EMPTY + "\" ]\n"
+                                + "}",
                     mediaType = APPLICATION_JSON_VALUE
                 )
             })

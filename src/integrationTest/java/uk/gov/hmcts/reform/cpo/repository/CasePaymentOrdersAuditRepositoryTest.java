@@ -81,7 +81,7 @@ public class CasePaymentOrdersAuditRepositoryTest extends BaseTest {
         }
 
         /**
-         * Dleting a single ID - Audit entry has multiple rows for that ID.
+         * Deleting a single ID - Audit entry has multiple rows for that ID.
          */
         @DisplayName("test deletion of single audit entity that has multiple rows, from audit table")
         @Test

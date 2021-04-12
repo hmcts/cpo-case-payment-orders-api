@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import java.io.Serializable;
 
+import static uk.gov.hmcts.reform.cpo.validators.ValidationError.CANNOT_DELETE_WITH_BOTH_ID_AND_CASE_ID_SPECIFIED;
+
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -77,7 +79,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         if (exception.getMessage().contains("Ambiguous handler methods mapped for '/case-payment-orders'")) {
             final HttpError<Serializable> error =
                     new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
-                        .withMessage("Can't delete case payment order with both id AND case-id specified");
+                        .withMessage(CANNOT_DELETE_WITH_BOTH_ID_AND_CASE_ID_SPECIFIED);
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }

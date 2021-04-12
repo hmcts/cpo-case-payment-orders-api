@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
+import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,8 +16,6 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
     private final CasePaymentOrdersJpaRepository casePaymentOrdersJpaRepository;
 
     private final CasePaymentOrdersAuditJpaRepository casePaymentOrdersAuditJpaRepository;
-
-    private static final String ERROR_MESSAGE = "One of the supplied %s's was not present in the database";
 
     @Autowired
     public CasePaymentOrdersRepositoryImpl(CasePaymentOrdersJpaRepository casePaymentOrdersJpaRepository,
@@ -30,7 +29,7 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
         int deleteByIds = casePaymentOrdersJpaRepository.deleteByIdIsIn(uuids);
 
         if (deleteByIds != uuids.size()) {
-            throw new CasePaymentOrderCouldNotBeFoundException(String.format(ERROR_MESSAGE, "UUID"));
+            throw new CasePaymentOrderCouldNotBeFoundException(ValidationError.CPO_NO_FOUND_BY_ID);
         }
     }
 
@@ -44,7 +43,7 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
 
         for (Long cid : caseIds) {
             if (casePaymentOrdersJpaRepository.findAllByCaseId(cid).isEmpty()) {
-                throw new CasePaymentOrderCouldNotBeFoundException(String.format(ERROR_MESSAGE, "Case ID"));
+                throw new CasePaymentOrderCouldNotBeFoundException(ValidationError.CPO_NOT_FOUND_BY_CASE_ID);
             }
         }
 

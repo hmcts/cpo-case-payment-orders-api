@@ -115,7 +115,7 @@ public class CasePaymentOrderControllerIT extends BaseTest {
 
             mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, savedEntitiesUuidsString))
                     .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.message", is("One of the supplied UUID's was not present in the database")));
+                    .andExpect(jsonPath("$.message", is(ValidationError.CPO_NO_FOUND_BY_ID)));
             assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
         }
 
@@ -153,7 +153,7 @@ public class CasePaymentOrderControllerIT extends BaseTest {
         void shouldThrow400BadRequestWhenEmptyListOfUuidsIsSpecified() throws Exception {
             mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, ""))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message", containsString("IDs are required")));
+                    .andExpect(jsonPath("$.message", containsString(ValidationError.IDS_EMPTY)));
 
         }
 
@@ -164,8 +164,8 @@ public class CasePaymentOrderControllerIT extends BaseTest {
                     .queryParam(IDS, UUID.randomUUID().toString())
                     .queryParam(CASE_IDS, uidService.generateUID()))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message", is("Can't delete case payment order with "
-                            + "both id AND case-id specified")));
+                    .andExpect(jsonPath("$.message",
+                            is(ValidationError.CANNOT_DELETE_WITH_BOTH_ID_AND_CASE_ID_SPECIFIED)));
         }
     }
 
@@ -259,7 +259,7 @@ public class CasePaymentOrderControllerIT extends BaseTest {
                     .queryParam(CASE_IDS, savedEntitiesCaseIds.toArray(String[]::new)))
                     .andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.message",
-                            is("One of the supplied Case ID's was not present in the database")));
+                            is(ValidationError.CPO_NOT_FOUND_BY_CASE_ID)));
 
 
             assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
