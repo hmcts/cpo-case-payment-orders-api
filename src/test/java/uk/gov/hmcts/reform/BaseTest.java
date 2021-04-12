@@ -23,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public interface BaseTest {
 
+    int PAGE_NUMBER_MINUS_ONE = 0;
     String IDS = "ids";
     String CASE_IDS = "case-ids";
     int PAGE_SIZE = 3;
@@ -85,7 +86,7 @@ public interface BaseTest {
         return CasePaymentOrderQueryFilter.builder()
             .cpoIds(ids)
             .caseIds(casesIds)
-            .pageNumber(CasePaymentOrderQueryFilter.PAGE_NUMBER)
+            .pageNumber(PAGE_NUMBER_MINUS_ONE)
             .pageSize(pageSize)
             .build();
     }

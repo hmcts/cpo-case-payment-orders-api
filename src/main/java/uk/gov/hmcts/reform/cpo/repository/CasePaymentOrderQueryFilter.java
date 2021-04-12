@@ -17,8 +17,6 @@ import java.util.stream.Collectors;
 @Getter
 public class CasePaymentOrderQueryFilter {
 
-    public static final Integer PAGE_NUMBER = 0;
-
     private Integer pageSize;
     private Integer pageNumber;
     private List<String> cpoIds;

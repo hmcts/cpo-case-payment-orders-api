@@ -37,6 +37,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Validated
 public class CasePaymentOrdersController {
 
+    private static final Integer PAGE_NUMBER_MINUS_ONE = 0;
+
     @SuppressWarnings({"squid:S1075"})
     public static final String CASE_PAYMENT_ORDERS_PATH = "/case-payment-orders";
 
@@ -104,7 +106,7 @@ public class CasePaymentOrdersController {
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
             .cpoIds(ids.orElse(Collections.emptyList()))
             .caseIds(caseIds.orElse(Collections.emptyList()))
-            .pageNumber(pageNumber.orElse(CasePaymentOrderQueryFilter.PAGE_NUMBER))
+            .pageNumber(pageNumber.orElse(PAGE_NUMBER_MINUS_ONE))
             .pageSize(pageSize.orElse(applicationParams.getDefaultPageSize()))
             .build();
 

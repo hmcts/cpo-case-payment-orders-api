@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.cpo.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
@@ -14,7 +13,6 @@ import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 
 import javax.transaction.Transactional;
-import java.util.List;
 
 @Service
 public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
@@ -52,17 +50,13 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
                 pageRequest
             );
         }
-        return getPageOfCasePaymentOrder(casePaymentOrderEntities, pageRequest);
+        return getPageOfCasePaymentOrder(casePaymentOrderEntities);
     }
 
-    private Page<CasePaymentOrder> getPageOfCasePaymentOrder(Page<CasePaymentOrderEntity> casePaymentOrderEntities,
-                                                             PageRequest pageRequest) {
+    private Page<CasePaymentOrder> getPageOfCasePaymentOrder(Page<CasePaymentOrderEntity> casePaymentOrderEntities) {
 
-        final List<CasePaymentOrder> casePaymentOrders =
-            casePaymentOrderMapper.toDomainModelList(casePaymentOrderEntities.getContent());
-
-        return new PageImpl<>(casePaymentOrders, pageRequest,
-                              casePaymentOrderEntities.getTotalElements()
+        return casePaymentOrderEntities.map(casePaymentOrderEntity ->
+                                                casePaymentOrderMapper.toDomainModel(casePaymentOrderEntity)
         );
     }
 }
