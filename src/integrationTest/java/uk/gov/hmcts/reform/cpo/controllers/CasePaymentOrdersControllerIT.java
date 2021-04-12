@@ -10,8 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.cpo.BaseTest;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
+import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
-
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
@@ -52,8 +52,13 @@ public class CasePaymentOrdersControllerIT {
         @Autowired
         private ObjectMapper objectMapper;
 
+        @Autowired
+        private CasePaymentOrdersRepository repository;
+
         @BeforeEach
         void setUp() {
+
+            repository.deleteAllInBatch();
 
             createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(EFFECTIVE_FROM, "6551341964128977",
                                                                               ACTION, RESPONSIBLE_PARTY,
