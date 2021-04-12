@@ -38,11 +38,11 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -578,25 +578,19 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
                         .param(CASES_IDS, "1574419234651640,1574932009200070")
                 );
                 // THEN
-                response
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
-                    .andExpect(jsonPath("$.error").value(HttpStatus.BAD_REQUEST.getReasonPhrase()))
-                    .andExpect(jsonPath("$.message").value(ValidationError.CPO_FILER_ERROR));
-
-
-                //assertBadRequestResponse(response, ValidationError.ID_REQUIRED);
+                assertGetCopPResponse(ValidationError.CPO_FILER_ERROR, response);
             } catch (Exception exception) {
                 exception.printStackTrace();
+                fail(UN_EXPECTED_ERROR_IN_TEST);
             }
 
         }
 
-        @DisplayName("fail for for ids")
+        @DisplayName("fail for for ids only")
         @Test
         void failForIds() {
             final String expectedError =
-                "getCasePaymentOrders.ids: These ids: XXXX are incorrect., getCasePaymentOrders.ids: ID is invalid.";
+                "getCasePaymentOrders.ids: These ids: XXXX are incorrect.";
             // GIVEN
             CasePaymentOrdersController controller = new CasePaymentOrdersController(
                 casePaymentOrdersServiceImpl,
@@ -610,16 +604,36 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
                         .param(IDS, "XXXX")
                 );
                 // THEN
-                response
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
-                    .andExpect(jsonPath("$.error").value(HttpStatus.BAD_REQUEST.getReasonPhrase()))
-                    .andExpect(jsonPath("$.message",containsString(expectedError)));
-
-
-                //assertBadRequestResponse(response, ValidationError.ID_REQUIRED);
+                assertGetCopPResponse(expectedError, response);
             } catch (Exception exception) {
                 exception.printStackTrace();
+                fail(UN_EXPECTED_ERROR_IN_TEST);
+            }
+
+        }
+
+        @DisplayName("fail for for case-ids only")
+        @Test
+        void failForCaseIds() {
+            final String expectedError =
+                "Case ID has to be a valid 16-digit Luhn number.";
+            // GIVEN
+            CasePaymentOrdersController controller = new CasePaymentOrdersController(
+                casePaymentOrdersServiceImpl,
+                applicationParams
+            );
+
+            // WHEN
+            try {
+                ResultActions response = this.mockMvc.perform(
+                    request(HttpMethod.GET, CASE_PAYMENT_ORDERS_PATH)
+                        .param(CASES_IDS, "XXXX")
+                );
+                // THEN
+                assertGetCopPResponse(expectedError, response);
+            } catch (Exception exception) {
+                exception.printStackTrace();
+                fail(UN_EXPECTED_ERROR_IN_TEST);
             }
 
         }

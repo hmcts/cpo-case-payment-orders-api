@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.web.servlet.ResultActions;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
@@ -14,6 +16,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public interface BaseTest {
 
@@ -41,6 +47,8 @@ public interface BaseTest {
 
     String CREATED_BY = "createdBy";
     LocalDateTime CREATED_TIMESTAMP = LocalDateTime.now();
+
+    String UN_EXPECTED_ERROR_IN_TEST = "Fail due an expected error in the test.";
 
     default <T> Optional<List<T>> createInitialValuesList(final T[] initialValues) {
         return Optional.of(Arrays.asList(initialValues));
@@ -134,5 +142,13 @@ public interface BaseTest {
         casePaymentOrders.add(casePaymentOrder2);
 
         return casePaymentOrders;
+    }
+
+    default void assertGetCopPResponse(String expectedError, ResultActions response) throws Exception {
+        response
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+            .andExpect(jsonPath("$.error").value(HttpStatus.BAD_REQUEST.getReasonPhrase()))
+            .andExpect(jsonPath("$.message",containsString(expectedError)));
     }
 }
