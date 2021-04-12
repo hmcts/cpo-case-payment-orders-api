@@ -106,6 +106,8 @@ To run all integration tests execute the following command:
 The tests are written using befta-fw library. To find out more about BEFTA Framework, see the
  [BEFTA-FW repository and its README](https://github.com/hmcts/befta-fw).
 
+
+
 These tests can be run using:
 ```bash
 export TEST_URL=http://localhost:4457
