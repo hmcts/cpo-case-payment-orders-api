@@ -38,6 +38,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertArrayEquals;
@@ -561,7 +562,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
 
         @DisplayName("fail for for cases-ids and ids")
         @Test
-        void failForCasesIds() {
+        void failForCasesAndIds() {
 
             // GIVEN
             CasePaymentOrdersController controller = new CasePaymentOrdersController(
@@ -582,6 +583,38 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
                     .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
                     .andExpect(jsonPath("$.error").value(HttpStatus.BAD_REQUEST.getReasonPhrase()))
                     .andExpect(jsonPath("$.message").value(ValidationError.CPO_FILER_ERROR));
+
+
+                //assertBadRequestResponse(response, ValidationError.ID_REQUIRED);
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+
+        }
+
+        @DisplayName("fail for for ids")
+        @Test
+        void failForIds() {
+            final String expectedError =
+                "getCasePaymentOrders.ids: These ids: XXXX are incorrect., getCasePaymentOrders.ids: ID is invalid.";
+            // GIVEN
+            CasePaymentOrdersController controller = new CasePaymentOrdersController(
+                casePaymentOrdersServiceImpl,
+                applicationParams
+            );
+
+            // WHEN
+            try {
+                ResultActions response = this.mockMvc.perform(
+                    request(HttpMethod.GET, CASE_PAYMENT_ORDERS_PATH)
+                        .param(IDS, "XXXX")
+                );
+                // THEN
+                response
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+                    .andExpect(jsonPath("$.error").value(HttpStatus.BAD_REQUEST.getReasonPhrase()))
+                    .andExpect(jsonPath("$.message",containsString(expectedError)));
 
 
                 //assertBadRequestResponse(response, ValidationError.ID_REQUIRED);
