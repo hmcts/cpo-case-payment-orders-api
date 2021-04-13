@@ -10,45 +10,31 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
-import uk.gov.hmcts.reform.cpo.exception.CaseIdOrderReferenceUniqueConstraintException;
-import uk.gov.hmcts.reform.cpo.exception.IdAMIdCannotBeRetrievedException;
+import uk.gov.hmcts.reform.cpo.exception.*;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersJpaRepository;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
 import uk.gov.hmcts.reform.cpo.exception.CaseIdOrderReferenceUniqueConstraintException;
-import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
-import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
-import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
-import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
-import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
-import uk.gov.hmcts.reform.cpo.validators.ValidationError;
-import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
-
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import static uk.gov.hmcts.reform.cpo.validators.ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS;
-import java.util.UUID;
 
 import static uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity.UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT;
 
-import static uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity.UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT;
 import static uk.gov.hmcts.reform.cpo.validators.ValidationError.IDAM_ID_NOT_FOUND;
 
 @Service
 public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
-    @Autowired
-    private final CasePaymentOrderMapper casePaymentOrderMapper;
     @Autowired
     private static final Logger LOG = LoggerFactory.getLogger(CasePaymentOrdersServiceImpl.class);
 
@@ -99,30 +85,6 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         }
     }
 
-
-    @Override
-    public Page<CasePaymentOrderEntity> getCasePaymentOrders(
-        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
-
-        if (casePaymentOrderQueryFilter.isItAnEmptyCriteria()) {
-            return Page.empty();
-        }
-        validateCasePaymentOrderQueryFilter(casePaymentOrderQueryFilter);
-
-        final PageRequest pageRequest = getPageRequest(casePaymentOrderQueryFilter);
-        if (casePaymentOrderQueryFilter.isACasesIdQuery()) {
-            return casePaymentOrdersRepository.findByCaseIdIn(
-                casePaymentOrderQueryFilter.getListOfLongCasesIds(),
-                pageRequest
-            );
-        } else {
-            return casePaymentOrdersRepository.findByIdIn(
-                casePaymentOrderQueryFilter.getListUUID(),
-                pageRequest
-            );
-        }
-    }
-
     @Transactional
     @Override
     public CasePaymentOrder updateCasePaymentOrder(UpdateCasePaymentOrderRequest updateCasePaymentOrderRequest) {
@@ -155,7 +117,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     public void deleteCasePaymentOrders(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
         validateCasePaymentOrderQueryFilter(casePaymentOrderQueryFilter);
 
-        if (casePaymentOrderQueryFilter.isACasesIdQuery()) {
+        if (casePaymentOrderQueryFilter.isFindByCaseIdQuery()) {
             deleteCasePaymentOrdersByCaseIds(casePaymentOrderQueryFilter.getListOfLongCasesIds());
         } else {
             deleteCasePaymentOrdersByIds(casePaymentOrderQueryFilter.getListUUID());
@@ -201,7 +163,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     private Page<CasePaymentOrder> getPageOfCasePaymentOrder(Page<CasePaymentOrderEntity> casePaymentOrderEntities) {
 
         return casePaymentOrderEntities.map(casePaymentOrderEntity ->
-                                                casePaymentOrderMapper.toDomainModel(casePaymentOrderEntity)
+                                                mapper.toDomainModel(casePaymentOrderEntity)
         );
     }
 
@@ -213,6 +175,13 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     private CasePaymentOrderEntity verifyCpoExists(UUID id) {
         return casePaymentOrdersJpaRepository.findById(id)
             .orElseThrow(() -> new CasePaymentOrderCouldNotBeFoundException(ValidationError.CPO_NOT_FOUND));
+    }
+
+    private void validateCasePaymentOrderQueryFilter(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+        if (casePaymentOrderQueryFilter.isFilterByBothIdAndCaseId()) {
+            throw new CasePaymentOrdersQueryException(
+            CANNOT_DELETE_USING_IDS_AND_CASE_IDS);
+        }
     }
 
 }

@@ -234,8 +234,8 @@ public class CasePaymentOrdersController {
                                                     Optional<List<String>> caseIds) {
 
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
-                .listOfIds(ids.orElse(emptyList()))
-                .listOfCasesIds(caseIds.orElse(emptyList()))
+                .cpoIds(ids.orElse(emptyList()))
+                .caseIds(caseIds.orElse(emptyList()))
                 .build();
 
         casePaymentOrdersService.deleteCasePaymentOrders(casePaymentOrderQueryFilter);
