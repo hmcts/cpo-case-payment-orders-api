@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -48,13 +47,13 @@ public class CasePaymentOrderQueryFilter {
     }
 
     public PageRequest getPageRequest() {
-        final List<Sort.Order> orders = new ArrayList<>();
-        orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderEntity.CASE_ID));
-        orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderEntity.ORDER_REFERENCE));
         return PageRequest.of(
             this.getPageNumber(),
             this.getPageSize(),
-            Sort.by(orders)
+            Sort.by(
+                Sort.Order.asc(CasePaymentOrderEntity.CASE_ID),
+                Sort.Order.asc(CasePaymentOrderEntity.ORDER_REFERENCE)
+            )
         );
     }
 
