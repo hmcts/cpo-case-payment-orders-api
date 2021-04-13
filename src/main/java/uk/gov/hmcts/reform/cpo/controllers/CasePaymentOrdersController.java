@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
-import org.hibernate.validator.constraints.LuhnCheck;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
-import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.security.AuthError;
@@ -31,14 +29,10 @@ import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyList;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
@@ -62,18 +56,22 @@ public class CasePaymentOrdersController {
     }
 
     @GetMapping(value = CASE_PAYMENT_ORDERS_PATH, produces = {APPLICATION_JSON_VALUE})
-    public Page<CasePaymentOrderEntity> getCasePaymentOrders(@ApiParam("list of ids")
+    public Page<CasePaymentOrderEntity> getCasePaymentOrders(@ApiParam("list of IDs")
                                                              @ValidCpoId
-                                                             @RequestParam(IDS) Optional<List<String>> ids,
-                                                             @ApiParam("casesId of ids")
+                                                             @RequestParam(name = IDS, required = false)
+                                                                         Optional<List<String>> ids,
+                                                             @ApiParam("list of caseIDs")
                                                              @ValidCaseId
-                                                             @RequestParam("cases-ids") Optional<List<String>> casesId,
-                                                             @RequestParam("pageSize") Optional<Integer> pageSize,
-                                                             @RequestParam("pageNumber") Optional<Integer> pageNumber
+                                                             @RequestParam(name = CASE_IDS, required = false)
+                                                                     Optional<List<String>> casesId,
+                                                             @RequestParam(name = "pageSize", required = false)
+                                                                         Optional<Integer> pageSize,
+                                                             @RequestParam(name = "pageNumber", required = false)
+                                                                         Optional<Integer> pageNumber
 
     ) {
-        final List<String> listOfIds = ids.orElse(Collections.emptyList());
-        final List<String> listOfCasesIds = casesId.orElse(Collections.emptyList());
+        final List<String> listOfIds = ids.orElse(emptyList());
+        final List<String> listOfCasesIds = casesId.orElse(emptyList());
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
                 .listOfIds(listOfIds)
                 .listOfCasesIds(listOfCasesIds)
@@ -83,9 +81,9 @@ public class CasePaymentOrdersController {
         return casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter);
     }
 
-    @DeleteMapping(path = CASE_PAYMENT_ORDERS_PATH, params = IDS)
+    @DeleteMapping(path = CASE_PAYMENT_ORDERS_PATH)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Delete case payment orders by id", notes = "Delete case payment orders by id")
+    @ApiOperation(value = "Delete specified case payment orders")
     @ApiResponses({
         @ApiResponse(
             code = 200,
@@ -94,17 +92,20 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
-                        + "\n1) " + ValidationError.IDS_EMPTY
-                        + "\n2) " + ValidationError.CPO_NO_FOUND_BY_ID
-                        + "\n2) " + ValidationError.CANNOT_DELETE_WITH_BOTH_ID_AND_CASE_ID_SPECIFIED,
+                        + "\n1) " + ValidationError.ID_INVALID
+                        + "\n2) " + ValidationError.CASE_ID_INVALID
+                        + "\n3) " + ValidationError.CPO_NO_FOUND_BY_ID
+                        + "\n4) " + ValidationError.CPO_NOT_FOUND_BY_CASE_ID
+                        + "\n5) " + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS,
             examples = @Example(value = {
-                @ExampleProperty(
+                    @ExampleProperty(
                     value = "{\n"
-                        + "   \"status\": \"BAD_REQUEST\",\n"
-                        + "   \"errors\": [\n"
-                        + "   \"message\": \"" + ValidationError.IDS_EMPTY + "\",\n"
-                        + "   ]\n"
-                        + "}",
+                            + "   \"status\": \"400\",\n"
+                            + "   \"error\": \"Bad Request\",\n"
+                            + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
+                            + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
+                            + "   \"details\": [ \""  + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS + "\" ]\n"
+                            + "}",
                     mediaType = APPLICATION_JSON_VALUE
                 )
             })
@@ -118,63 +119,21 @@ public class CasePaymentOrdersController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE
         )
     })
-    public void deleteCasePaymentOrdersById(@RequestParam(IDS) @Valid
-                                                  @NotEmpty(message = ValidationError.IDS_EMPTY)
-                                                          List<UUID> ids)
-            throws CasePaymentOrderCouldNotBeFoundException {
-        casePaymentOrdersService.deleteCasePaymentOrdersByIds(ids);
-    }
+    public void deleteCasePaymentOrdersById(@ApiParam("list of IDs")
+                                            @ValidCpoId
+                                            @RequestParam(name = IDS, required = false) Optional<List<String>> ids,
+                                            @ApiParam("list of Case IDs")
+                                            @ValidCaseId
+                                            @RequestParam(name = CASE_IDS, required = false)
+                                                    Optional<List<String>> caseIds) {
 
-    @DeleteMapping(path = CASE_PAYMENT_ORDERS_PATH, params = CASE_IDS)
-    @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Delete case payment orders by case-ids", notes = "Delete case payment orders by case-ids")
-    @ApiResponses({
-        @ApiResponse(
-                code = 200,
-                message = ""
-        ),
-        @ApiResponse(
-            code = 400,
-            message = "One or more of the following reasons:"
-                + "\n1) " + ValidationError.CASE_IDS_EMPTY
-                + "\n2) " + ValidationError.CASE_ID_INVALID
-                + "\n3) " + ValidationError.CASE_ID_INVALID_LENGTH
-                + "\n4) " + ValidationError.CPO_NO_FOUND_BY_ID
-                + "\n5) " + ValidationError.CANNOT_DELETE_WITH_BOTH_ID_AND_CASE_ID_SPECIFIED,
-            examples = @Example(value = {
-                @ExampleProperty(
-                        value = "{\n"
-                                + "   \"status\": \"400\",\n"
-                                + "   \"error\": \"Bad Request\",\n"
-                                + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
-                                + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
-                                + "   \"details\": [ \""  + ValidationError.CASE_IDS_EMPTY + "\" ]\n"
-                                + "}",
-                    mediaType = APPLICATION_JSON_VALUE
-                )
-            })
-        ),
-        @ApiResponse(
-            code = 401,
-            message = AuthError.AUTHENTICATION_TOKEN_INVALID
-        ),
-        @ApiResponse(
-            code = 403,
-            message = AuthError.UNAUTHORISED_S2S_SERVICE
-        )
-    })
-    public void deleteCasePaymentOrdersByCaseId(@RequestParam(CASE_IDS) @Valid
-                                                  @NotEmpty(message = ValidationError.CASE_IDS_EMPTY)
-                                                  List<
-                                                    @LuhnCheck(message = ValidationError.CASE_ID_INVALID,
-                                                        ignoreNonDigitCharacters = false)
-                                                    @Size(min = 16, max = 16,
-                                                            message = ValidationError.CASE_ID_INVALID_LENGTH)
-                                                  String> caseIds) throws CasePaymentOrderCouldNotBeFoundException {
-        List<Long> caseIdLongs = caseIds.stream().map(Long::parseLong).collect(Collectors.toList());
-        casePaymentOrdersService.deleteCasePaymentOrdersByCaseIds(caseIdLongs);
-    }
+        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
+                .listOfIds(ids.orElse(emptyList()))
+                .listOfCasesIds(caseIds.orElse(emptyList()))
+                .build();
 
+        casePaymentOrdersService.deleteCasePaymentOrders(casePaymentOrderQueryFilter);
+    }
 
     @PutMapping(path = CASE_PAYMENT_ORDERS_PATH, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Update Case Payment Order", notes = "Updates a case payment order")

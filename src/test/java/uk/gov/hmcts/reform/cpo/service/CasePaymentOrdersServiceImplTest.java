@@ -12,12 +12,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
-import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
+import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -41,11 +43,15 @@ class CasePaymentOrdersServiceImplTest {
     @Captor
     ArgumentCaptor<List<Long>> caseIdsArgumentCaptor;
 
-    private final List<UUID> uuidsToDelete = List.of(UUID.randomUUID(), UUID.randomUUID());
+    private static final List<UUID> uuidsToDelete = List.of(UUID.randomUUID(), UUID.randomUUID());
 
     private final List<Long> caseIdsToDelete = List.of(123L, 456L);
 
     private static final ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+
+    private CasePaymentOrderQueryFilter uuidFilter;
+
+    private CasePaymentOrderQueryFilter caseIdFilter;
 
     @BeforeAll
     static void setUp() {
@@ -55,6 +61,18 @@ class CasePaymentOrdersServiceImplTest {
     @BeforeEach
     void beforeEachTest() {
         listAppender.list.clear();
+        uuidFilter = CasePaymentOrderQueryFilter.builder()
+                .listOfIds(uuidsToDelete.stream()
+                        .map(UUID::toString)
+                        .collect(Collectors.toList()))
+                .listOfCasesIds(Collections.emptyList())
+                .build();
+        caseIdFilter = CasePaymentOrderQueryFilter.builder()
+                .listOfIds(Collections.emptyList())
+                .listOfCasesIds(caseIdsToDelete.stream()
+                        .map(Object::toString)
+                        .collect(Collectors.toList()))
+                .build();
     }
 
     private static void createAndStartTestLogger() {
@@ -67,7 +85,7 @@ class CasePaymentOrdersServiceImplTest {
 
     @Test
     void deleteCasePaymentOrdersById() {
-        casePaymentOrdersService.deleteCasePaymentOrdersByIds(uuidsToDelete);
+        casePaymentOrdersService.deleteCasePaymentOrders(uuidFilter);
 
         verify(casePaymentOrdersRepository).deleteByUuids(uuidArgumentCaptor.capture());
         assertEquals(uuidArgumentCaptor.getValue(), uuidsToDelete);
@@ -77,12 +95,11 @@ class CasePaymentOrdersServiceImplTest {
     }
 
     @Test
-    void deleteCasePaymentOrdersById_UserNotifiedIfAuditIsNotDeleted()
-            throws CasePaymentOrderCouldNotBeFoundException {
+    void deleteCasePaymentOrdersById_UserNotifiedIfAuditIsNotDeleted() {
         doThrow(IllegalStateException.class).when(casePaymentOrdersRepository).deleteAuditEntriesByUuids(anyList());
 
 
-        casePaymentOrdersService.deleteCasePaymentOrdersByIds(uuidsToDelete);
+        casePaymentOrdersService.deleteCasePaymentOrders(uuidFilter);
 
         List<ILoggingEvent> logsList = listAppender.list;
 
@@ -92,11 +109,10 @@ class CasePaymentOrdersServiceImplTest {
     }
 
     @Test
-    void deleteCasePaymentOrdersByCaseId_UserNotifiedIfAuditIsNotDeleted()
-            throws CasePaymentOrderCouldNotBeFoundException {
+    void deleteCasePaymentOrdersByCaseId_UserNotifiedIfAuditIsNotDeleted() {
         doThrow(IllegalStateException.class).when(casePaymentOrdersRepository).deleteAuditEntriesByCaseIds(anyList());
 
-        casePaymentOrdersService.deleteCasePaymentOrdersByCaseIds(caseIdsToDelete);
+        casePaymentOrdersService.deleteCasePaymentOrders(caseIdFilter);
 
         List<ILoggingEvent> logsList = listAppender.list;
 
@@ -107,7 +123,7 @@ class CasePaymentOrdersServiceImplTest {
 
     @Test
     void deleteCasePaymentOrdersByCaseIds() {
-        casePaymentOrdersService.deleteCasePaymentOrdersByCaseIds(caseIdsToDelete);
+        casePaymentOrdersService.deleteCasePaymentOrders(caseIdFilter);
 
         verify(casePaymentOrdersRepository).deleteByCaseIds(caseIdsArgumentCaptor.capture());
         assertEquals(caseIdsArgumentCaptor.getValue(), caseIdsToDelete);

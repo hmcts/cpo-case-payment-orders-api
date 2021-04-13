@@ -140,21 +140,13 @@ public class CasePaymentOrderControllerIT extends BaseTest {
         @DisplayName("Should fail with 400 Bad Request when invalid id (not a UUID) specified")
         @Test
         void shouldThrow400BadRequestWhenInvalidUuidIsSpecified() throws Exception {
-            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, "123"))
+            final String invalidUuid = "123";
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, invalidUuid))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.message",
-                            containsString("Failed to convert value of type 'java.lang.String'"
-                                    + " to required type 'java.util.List'")))
-                    .andExpect(jsonPath("$.details.message", is("Invalid UUID string: 123")));
-        }
-
-        @DisplayName("Should fail with 400 Bad Request when empty list of UUID's are specified")
-        @Test
-        void shouldThrow400BadRequestWhenEmptyListOfUuidsIsSpecified() throws Exception {
-            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, ""))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message", containsString(ValidationError.IDS_EMPTY)));
-
+                            containsString("deleteCasePaymentOrdersById.ids: These ids: "
+                                    + invalidUuid
+                                    + " are incorrect.")));
         }
 
         @DisplayName("Should fail with 400 Bad Request when CaseIds and UUIDs are specified")
@@ -165,7 +157,7 @@ public class CasePaymentOrderControllerIT extends BaseTest {
                     .queryParam(CASE_IDS, uidService.generateUID()))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.message",
-                            is(ValidationError.CANNOT_DELETE_WITH_BOTH_ID_AND_CASE_ID_SPECIFIED)));
+                            is(ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS)));
         }
     }
 
@@ -286,25 +278,23 @@ public class CasePaymentOrderControllerIT extends BaseTest {
         @DisplayName("Should fail with 400 Bad Request when invalid length caseId is specified")
         @Test
         void shouldThrow400BadRequestWhenInvalidLengthCaseIdSpecified() throws Exception {
-            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(CASE_IDS, "12345"))
+            final String invalidCaseId = "12345";
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(CASE_IDS, invalidCaseId))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message", containsString(ValidationError.CASE_ID_INVALID_LENGTH)));
+                    .andExpect(jsonPath("$.message", containsString("These caseIDs: "
+                            + invalidCaseId
+                            + " are incorrect")));
         }
 
         @DisplayName("Should fail with 400 Bad Request when invalid caseId is specified")
         @Test
         void shouldThrow400BadRequestWhenInvalidCaseIdSpecified() throws Exception {
-            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(CASE_IDS, "1234567890123456"))
+            final String invalidLuhn = "1234567890123456";
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(CASE_IDS, invalidLuhn))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message", containsString(ValidationError.CASE_ID_INVALID)));
-        }
-
-        @DisplayName("Should fail with 400 Bad Request when empty list of Case-ID's are specified")
-        @Test
-        void shouldThrow400BadRequestWhenEmptyListOfCaseIdsIsSpecified() throws Exception {
-            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(CASE_IDS, ""))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message", containsString(ValidationError.CASE_IDS_EMPTY)));
+                    .andExpect(jsonPath("$.message", containsString("These caseIDs: "
+                            + invalidLuhn
+                            + " are incorrect")));
         }
     }
 }

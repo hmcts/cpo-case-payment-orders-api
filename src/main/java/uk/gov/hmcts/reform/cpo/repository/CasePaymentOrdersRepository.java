@@ -11,11 +11,11 @@ import java.util.UUID;
 
 @Transactional(rollbackFor = CasePaymentOrderCouldNotBeFoundException.class)
 public interface CasePaymentOrdersRepository {
-    void deleteByUuids(List<UUID> uuids) throws CasePaymentOrderCouldNotBeFoundException;
+    void deleteByUuids(List<UUID> uuids);
 
     void deleteAuditEntriesByUuids(List<UUID> uuids);
 
-    void deleteByCaseIds(List<Long> caseIds) throws CasePaymentOrderCouldNotBeFoundException;
+    void deleteByCaseIds(List<Long> caseIds);
 
     void deleteAuditEntriesByCaseIds(List<Long> caseIds);
 

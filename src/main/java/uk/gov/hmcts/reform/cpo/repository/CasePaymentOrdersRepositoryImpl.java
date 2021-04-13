@@ -25,7 +25,7 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
     }
 
     @Override
-    public void deleteByUuids(List<UUID> uuids) throws CasePaymentOrderCouldNotBeFoundException {
+    public void deleteByUuids(List<UUID> uuids) {
         int deleteByIds = casePaymentOrdersJpaRepository.deleteByIdIsIn(uuids);
 
         if (deleteByIds != uuids.size()) {
@@ -39,7 +39,7 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
     }
 
     @Override
-    public void deleteByCaseIds(List<Long> caseIds) throws CasePaymentOrderCouldNotBeFoundException {
+    public void deleteByCaseIds(List<Long> caseIds) {
 
         for (Long cid : caseIds) {
             if (casePaymentOrdersJpaRepository.findAllByCaseId(cid).isEmpty()) {
@@ -57,11 +57,11 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
 
     @Override
     public Page<CasePaymentOrderEntity> findByIdIn(List<UUID> ids, Pageable pageable) {
-        throw new UnsupportedOperationException("Implement me");
+        return casePaymentOrdersJpaRepository.findByIdIn(ids, pageable);
     }
 
     @Override
     public Page<CasePaymentOrderEntity> findByCaseIdIn(List<Long> casesId, Pageable pageable) {
-        throw new UnsupportedOperationException("Implement me");
+        return casePaymentOrdersJpaRepository.findByCaseIdIn(casesId, pageable);
     }
 }

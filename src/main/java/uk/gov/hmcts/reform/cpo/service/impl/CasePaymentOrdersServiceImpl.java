@@ -9,7 +9,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
-import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
@@ -21,10 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static uk.gov.hmcts.reform.cpo.validators.ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS;
+
 @Service
 public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
     private static final Logger LOG = LoggerFactory.getLogger(CasePaymentOrdersServiceImpl.class);
+
     public static final String AUDIT_ENTRY_DELETION_ERROR = "Exception thrown when deleting audit entry for case "
                                                             + "payment orders '{}'. Unwanted previous versions of the"
                                                             + " case payment orders may remain";
@@ -65,6 +67,35 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         throw new UnsupportedOperationException("Implement me: see CPO-6");
     }
 
+    @Override
+    public void deleteCasePaymentOrders(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+        validateCasePaymentOrderQueryFilter(casePaymentOrderQueryFilter);
+
+        if (casePaymentOrderQueryFilter.isACasesIdQuery()) {
+            deleteCasePaymentOrdersByCaseIds(casePaymentOrderQueryFilter.getListOfLongCasesIds());
+        } else {
+            deleteCasePaymentOrdersByIds(casePaymentOrderQueryFilter.getListUUID());
+        }
+    }
+
+    private void deleteCasePaymentOrdersByIds(List<UUID> ids) {
+        casePaymentOrdersRepository.deleteByUuids(ids);
+        try {
+            casePaymentOrdersRepository.deleteAuditEntriesByUuids(ids);
+        } catch (Exception e) {
+            LOG.error(AUDIT_ENTRY_DELETION_ERROR, ids);
+        }
+    }
+
+    private void deleteCasePaymentOrdersByCaseIds(List<Long> caseIds) {
+        casePaymentOrdersRepository.deleteByCaseIds(caseIds);
+        try {
+            casePaymentOrdersRepository.deleteAuditEntriesByCaseIds(caseIds);
+        } catch (Exception e) {
+            LOG.error(AUDIT_ENTRY_DELETION_ERROR, caseIds);
+        }
+    }
+
     private PageRequest getPageRequest(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
         final List<Sort.Order> orders = new ArrayList<>();
         orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderQueryFilter.CASES_ID));
@@ -79,27 +110,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     private void validateCasePaymentOrderQueryFilter(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
         if (casePaymentOrderQueryFilter.isAnIdsAndCasesIdQuery()) {
             throw new CasePaymentOrdersQueryException(
-                "case-payment-orders cannot filter case payments orders by both id and cases-id.");
-        }
-    }
-
-    @Override
-    public void deleteCasePaymentOrdersByIds(List<UUID> ids) throws CasePaymentOrderCouldNotBeFoundException {
-        casePaymentOrdersRepository.deleteByUuids(ids);
-        try {
-            casePaymentOrdersRepository.deleteAuditEntriesByUuids(ids);
-        } catch (Exception e) {
-            LOG.error(AUDIT_ENTRY_DELETION_ERROR, ids);
-        }
-    }
-
-    @Override
-    public void deleteCasePaymentOrdersByCaseIds(List<Long> caseIds) throws CasePaymentOrderCouldNotBeFoundException {
-        casePaymentOrdersRepository.deleteByCaseIds(caseIds);
-        try {
-            casePaymentOrdersRepository.deleteAuditEntriesByCaseIds(caseIds);
-        } catch (Exception e) {
-            LOG.error(AUDIT_ENTRY_DELETION_ERROR, caseIds);
+                    CANNOT_DELETE_USING_IDS_AND_CASE_IDS);
         }
     }
 }

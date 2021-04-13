@@ -19,8 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import java.io.Serializable;
 
-import static uk.gov.hmcts.reform.cpo.validators.ValidationError.CANNOT_DELETE_WITH_BOTH_ID_AND_CASE_ID_SPECIFIED;
-
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -70,20 +68,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(error);
-    }
-
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<HttpError<Serializable>> handleIllegalStateException(final HttpServletRequest request,
-                                                              Exception exception) {
-        LOG.error("Validation exception:", exception);
-        if (exception.getMessage().contains("Ambiguous handler methods mapped for '/case-payment-orders'")) {
-            final HttpError<Serializable> error =
-                    new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
-                        .withMessage(CANNOT_DELETE_WITH_BOTH_ID_AND_CASE_ID_SPECIFIED);
-
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-        }
-        return getHttpErrorBadRequest(request, exception);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
