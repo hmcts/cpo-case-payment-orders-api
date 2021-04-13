@@ -64,4 +64,11 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
     public Page<CasePaymentOrderEntity> findByCaseIdIn(List<Long> casesId, Pageable pageable) {
         return casePaymentOrdersJpaRepository.findByCaseIdIn(casesId, pageable);
     }
+
+    @Override
+    public CasePaymentOrderEntity saveAndFlush(CasePaymentOrderEntity casePaymentOrderEntity) {
+        return casePaymentOrdersJpaRepository.saveAndFlush(casePaymentOrderEntity);
+    }
+
+
 }

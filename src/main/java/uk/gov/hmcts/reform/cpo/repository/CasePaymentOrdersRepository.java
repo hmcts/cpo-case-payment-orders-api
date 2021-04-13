@@ -22,4 +22,6 @@ public interface CasePaymentOrdersRepository {
     Page<CasePaymentOrderEntity> findByIdIn(List<UUID> ids, Pageable pageable);
 
     Page<CasePaymentOrderEntity> findByCaseIdIn(List<Long> casesId, Pageable pageable);
+
+    CasePaymentOrderEntity saveAndFlush(CasePaymentOrderEntity casePaymentOrderEntity);
 }

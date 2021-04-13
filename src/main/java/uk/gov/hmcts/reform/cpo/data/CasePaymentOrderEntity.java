@@ -22,6 +22,8 @@ import java.util.UUID;
 @Audited(withModifiedFlag = true)
 public class CasePaymentOrderEntity {
 
+    public static final String UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT = "unique_case_id_order_reference";
+
     @Id
     @GeneratedValue
     @Setter(AccessLevel.NONE)
