@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
@@ -30,6 +29,7 @@ import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
+import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -47,6 +47,9 @@ import static uk.gov.hmcts.reform.cpo.validators.ValidationError.IDAM_ID_NOT_FOU
 @Service
 public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
+    @Autowired
+    private final CasePaymentOrderMapper casePaymentOrderMapper;
+    @Autowired
     private static final Logger LOG = LoggerFactory.getLogger(CasePaymentOrdersServiceImpl.class);
 
     public static final String AUDIT_ENTRY_DELETION_ERROR = "Exception thrown when deleting audit entry for case "
@@ -177,22 +180,29 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         }
     }
 
-    private PageRequest getPageRequest(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
-        final List<Sort.Order> orders = new ArrayList<>();
-        orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderQueryFilter.CASES_ID));
-        orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderQueryFilter.ORDER_REFERENCE));
-        return PageRequest.of(
-            casePaymentOrderQueryFilter.getPageNumber(),
-            casePaymentOrderQueryFilter.getPageSize(),
-            Sort.by(orders)
-        );
+
+    @Override
+    public Page<CasePaymentOrder> getCasePaymentOrders(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+
+        final Page<CasePaymentOrderEntity> casePaymentOrderEntities;
+        final PageRequest pageRequest = casePaymentOrderQueryFilter.getPageRequest();
+        if (casePaymentOrderQueryFilter.isFindByCaseIdQuery()) {
+            casePaymentOrderEntities = casePaymentOrdersRepository.findByCaseIdIn(
+                casePaymentOrderQueryFilter.getListOfLongCasesIds(), pageRequest);
+        } else {
+            casePaymentOrderEntities = casePaymentOrdersRepository.findByIdIn(
+                casePaymentOrderQueryFilter.getListUUID(),
+                pageRequest
+            );
+        }
+        return getPageOfCasePaymentOrder(casePaymentOrderEntities);
     }
 
-    private void validateCasePaymentOrderQueryFilter(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
-        if (casePaymentOrderQueryFilter.isAnIdsAndCasesIdQuery()) {
-            throw new CasePaymentOrdersQueryException(
-                    CANNOT_DELETE_USING_IDS_AND_CASE_IDS);
-        }
+    private Page<CasePaymentOrder> getPageOfCasePaymentOrder(Page<CasePaymentOrderEntity> casePaymentOrderEntities) {
+
+        return casePaymentOrderEntities.map(casePaymentOrderEntity ->
+                                                casePaymentOrderMapper.toDomainModel(casePaymentOrderEntity)
+        );
     }
 
     private boolean isDuplicateCaseIdOrderRefPairing(DataIntegrityViolationException exception) {

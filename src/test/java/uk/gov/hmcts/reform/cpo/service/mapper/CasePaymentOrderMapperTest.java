@@ -11,11 +11,14 @@ import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.util.AssertionErrors.assertNotEquals;
 import static org.springframework.test.util.AssertionErrors.assertNotNull;
+import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 class CasePaymentOrderMapperTest implements BaseTest {
 
@@ -78,10 +81,37 @@ class CasePaymentOrderMapperTest implements BaseTest {
     }
 
     @Test
+    void successfulMap() {
+        CasePaymentOrder mappedDomainObject = mapper.toDomainModel(entity);
+        assertEquals("Mapped domain model created timestamp should equals mocked domain model created timestamp",
+                     casePaymentOrder.getCreatedTimestamp(), mappedDomainObject.getCreatedTimestamp());
+        assertEquals("Mapped domain model effective from should equals mocked domain model effective from",
+                     casePaymentOrder.getEffectiveFrom(), mappedDomainObject.getEffectiveFrom());
+        assertEquals("Mapped domain model case id should equals mocked domain model case id",
+                     casePaymentOrder.getCaseId(), mappedDomainObject.getCaseId());
+        assertEquals("Mapped domain model action should equals mocked domain model action",
+                     casePaymentOrder.getAction(), mappedDomainObject.getAction());
+        assertEquals("Mapped domain model responsible party should equals mocked domain model responsible party",
+                     casePaymentOrder.getResponsibleParty(), mappedDomainObject.getResponsibleParty());
+        assertEquals("Mapped domain model order reference should equals mocked domain model order reference",
+                     casePaymentOrder.getOrderReference(), mappedDomainObject.getOrderReference());
+        assertEquals("Mapped domain model created by should equals mocked domain model created by",
+                     casePaymentOrder.getCreatedBy(), mappedDomainObject.getCreatedBy());
+    }
+
+    @Test
     void successfulDomainMapping() {
         CasePaymentOrder mappedDomainObject = mapper.toDomainModel(entity);
         assertEquals("Mapped domain model created timestamp should equals mocked domain model"
                          + " created timestamp",
+
+        final List<CasePaymentOrderEntity> casePaymentOrderEntities = new ArrayList<>();
+        casePaymentOrderEntities.add(entity);
+        final List<CasePaymentOrder> casePaymentOrders = mapper.toDomainModelList(casePaymentOrderEntities);
+
+        assertTrue("The expected size is 1", casePaymentOrders.size() == 1);
+        CasePaymentOrder mappedDomainObject = casePaymentOrders.get(0);
+        assertEquals("Mapped domain model created timestamp should equals mocked domain model created timestamp",
                      casePaymentOrder.getCreatedTimestamp(), mappedDomainObject.getCreatedTimestamp());
         assertEquals("Mapped domain model effective from should equals mocked domain model effective from",
                      casePaymentOrder.getEffectiveFrom(), mappedDomainObject.getEffectiveFrom());

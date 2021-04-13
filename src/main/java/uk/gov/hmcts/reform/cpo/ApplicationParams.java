@@ -2,18 +2,12 @@ package uk.gov.hmcts.reform.cpo;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-@Named
-@Singleton
 @Getter
+@Component
 public class ApplicationParams {
 
-    @Value("${ccd.defaultPageSize}")
-    private String defaultPageSize;
-
-    @Value("${ccd.defaultPageNumber}")
-    private String defaultPageNumber;
+    @Value("${cpo.defaultPageSize}")
+    private Integer defaultPageSize;
 }

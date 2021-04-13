@@ -9,6 +9,8 @@ import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface CasePaymentOrderMapper {
 
@@ -25,4 +27,7 @@ public interface CasePaymentOrderMapper {
     void mergeIntoEntity(@MappingTarget CasePaymentOrderEntity target,
                          UpdateCasePaymentOrderRequest updateCasePaymentOrderRequest,
                          String createdBy);
+
+    List<CasePaymentOrder> toDomainModelList(List<CasePaymentOrderEntity> casePaymentOrderEntities);
 }
+

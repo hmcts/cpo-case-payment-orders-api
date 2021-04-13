@@ -83,3 +83,7 @@ oidc:
 azure:
   application-insights:
     instrumentation-key: ${cpo.AppInsightsInstrumentationKey:00000000-0000-0000-0000-000000000000}
+
+cpo:
+  defaultPageSize: 20
+
