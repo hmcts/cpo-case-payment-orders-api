@@ -26,4 +26,5 @@ public final class ValidationError {
     // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
     private ValidationError() {
     }
+
 }

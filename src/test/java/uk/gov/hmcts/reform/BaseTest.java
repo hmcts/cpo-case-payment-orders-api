@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform;
 
+import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 
@@ -51,6 +52,18 @@ public interface BaseTest {
             .build();
     }
 
+    default CasePaymentOrderEntity createCasePaymentOrderEntity() {
+        CasePaymentOrderEntity entity = new CasePaymentOrderEntity();
+        entity.setEffectiveFrom(EFFECTIVE_FROM);
+        entity.setCaseId(Long.parseLong(CASE_ID_VALID_1));
+        entity.setAction(ACTION);
+        entity.setResponsibleParty(RESPONSIBLE_PARTY);
+        entity.setOrderReference(ORDER_REFERENCE);
+        entity.setCreatedBy(CREATED_BY);
+        entity.setCreatedTimestamp(CREATED_TIMESTAMP);
+        return entity;
+    }
+
     default UpdateCasePaymentOrderRequest createUpdateCasePaymentOrderRequest() {
         return new UpdateCasePaymentOrderRequest(
             CPO_ID_VALID_1,
@@ -63,4 +76,3 @@ public interface BaseTest {
     }
 
 }
-

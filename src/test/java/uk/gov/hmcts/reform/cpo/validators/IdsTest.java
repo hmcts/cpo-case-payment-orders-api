@@ -71,4 +71,5 @@ class IdsTest implements BaseTest {
         idsValidator.validate(valueToBeTested, errors);
         assertTrue("There should be any error for " + valueToBeTested + " value.", !errors.isEmpty());
     }
+
 }

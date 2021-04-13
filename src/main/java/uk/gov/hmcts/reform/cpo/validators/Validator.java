@@ -18,6 +18,7 @@ interface Validator<T> {
     }
 
     default boolean isValidCaseId(String caseId) {
+
         return caseId != null
             && caseId.matches(CASE_ID_RG)
             && LUHN_CHECK_DIGIT.isValid(caseId);

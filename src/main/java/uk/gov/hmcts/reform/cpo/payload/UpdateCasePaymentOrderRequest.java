@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo.payload;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
@@ -46,5 +48,10 @@ public class UpdateCasePaymentOrderRequest {
     @ApiModelProperty(value = "Description of the party responsible for the case payment order", required = true,
         example = "Jane Doe")
     private String responsibleParty;
+
+    @JsonIgnore
+    public UUID getUUID() {
+        return UUID.fromString(this.id);
+    }
 
 }

@@ -71,4 +71,5 @@ class CaseIdsTest implements BaseTest {
         caseIdsValidator.validate(valueToBeTested, errors);
         assertTrue("There should be any error for " + valueToBeTested + " value.", !errors.isEmpty());
     }
+
 }
