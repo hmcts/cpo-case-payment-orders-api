@@ -28,7 +28,6 @@ public class SwaggerConfiguration {
             .paths(PathSelectors.any())
             .build().useDefaultResponseMessages(false)
             .apiInfo(apiInfo())
-            .enableUrlTemplating(true)
             .globalRequestParameters(Arrays.asList(
                 headerServiceAuthorization(),
                 headerAuthorization()
