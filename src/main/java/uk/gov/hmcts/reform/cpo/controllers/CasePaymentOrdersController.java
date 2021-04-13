@@ -15,23 +15,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
+import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
+import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
+import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
+import javax.validation.Valid;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
-import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.security.AuthError;
-import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 
-import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
 @RestController
@@ -50,6 +53,60 @@ public class CasePaymentOrdersController {
         this.applicationParams = applicationParams;
     }
 
+    @PostMapping(path = CASE_PAYMENT_ORDERS_PATH, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Create Case Payment Order", notes = "Create Case Payment Order")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ApiResponses({
+        @ApiResponse(
+            code = 201,
+            message = "Case Payment Order Created"
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "One or more of the following reasons:"
+                + "\n1) " + ValidationError.CASE_ID_INVALID
+                + "\n2) " + ValidationError.CASE_ID_REQUIRED
+                + "\n3) " + ValidationError.EFFECTIVE_FROM_REQUIRED
+                + "\n4) " + ValidationError.ACTION_REQUIRED
+                + "\n5) " + ValidationError.RESPONSIBLE_PARTY_REQUIRED
+                + "\n6) " + ValidationError.ORDER_REFERENCE_REQUIRED
+                + "\n7) " + ValidationError.ORDER_REFERENCE_INVALID
+                + "\n8) " + ValidationError.IDAM_ID_NOT_FOUND,
+            response = String.class,
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\n"
+                        + "   \"status\": \"400\",\n"
+                        + "   \"error\": \"Bad Request\",\n"
+                        + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
+                        + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
+                        + "   \"details\": [ \""  + ValidationError.CASE_ID_INVALID + "\" ]\n"
+                        + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 401,
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID
+        ),
+        @ApiResponse(
+            code = 403,
+            message = AuthError.UNAUTHORISED_S2S_SERVICE
+        ),
+        @ApiResponse(
+            code = 409,
+            message = ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE
+        ),
+        @ApiResponse(
+            code = 500,
+            message = "Unexpected server error"
+        )
+    })
+
+    public CasePaymentOrder createCasePaymentOrderRequest(@Valid @RequestBody CreateCasePaymentOrderRequest
+                                                              requestPayload) {
+        return casePaymentOrdersService.createCasePaymentOrder(requestPayload);
+    }
 
     @GetMapping(value = CASE_PAYMENT_ORDERS_PATH, produces = {APPLICATION_JSON_VALUE})
     public Page<CasePaymentOrderEntity> getCasePaymentOrders(@ApiParam("list of ids")
