@@ -29,7 +29,7 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
         int deleteByIds = casePaymentOrdersJpaRepository.deleteByIdIsIn(uuids);
 
         if (deleteByIds != uuids.size()) {
-            throw new CasePaymentOrderCouldNotBeFoundException(ValidationError.CPO_NO_FOUND_BY_ID);
+            throw new CasePaymentOrderCouldNotBeFoundException(ValidationError.CPO_NOT_FOUND_BY_ID);
         }
     }
 

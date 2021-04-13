@@ -14,7 +14,7 @@ public final class ValidationError {
     public static final String ORDER_REFERENCE_REQUIRED = "Order Reference Party is required.";
     public static final String RESPONSIBLE_PARTY_REQUIRED = "Responsible Party is required.";
 
-    public static final String CPO_NO_FOUND_BY_ID = "Case Payment Order specified by IDs does not exist";
+    public static final String CPO_NOT_FOUND_BY_ID = "Case Payment Order specified by IDs does not exist";
     public static final String CPO_NOT_FOUND_BY_CASE_ID = "Case Payment Order specified by Case IDs does not exist";
     public static final String CANNOT_DELETE_USING_IDS_AND_CASE_IDS =
             "Cannot delete Case Payment Orders by both ids and case-ids";

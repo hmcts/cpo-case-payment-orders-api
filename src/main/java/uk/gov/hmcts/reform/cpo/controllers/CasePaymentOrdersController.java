@@ -94,7 +94,7 @@ public class CasePaymentOrdersController {
             message = "One or more of the following reasons:"
                         + "\n1) " + ValidationError.ID_INVALID
                         + "\n2) " + ValidationError.CASE_ID_INVALID
-                        + "\n3) " + ValidationError.CPO_NO_FOUND_BY_ID
+                        + "\n3) " + ValidationError.CPO_NOT_FOUND_BY_ID
                         + "\n4) " + ValidationError.CPO_NOT_FOUND_BY_CASE_ID
                         + "\n5) " + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS,
             examples = @Example(value = {

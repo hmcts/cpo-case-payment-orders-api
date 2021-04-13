@@ -115,7 +115,7 @@ public class CasePaymentOrderControllerIT extends BaseTest {
 
             mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, savedEntitiesUuidsString))
                     .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.message", is(ValidationError.CPO_NO_FOUND_BY_ID)));
+                    .andExpect(jsonPath("$.message", is(ValidationError.CPO_NOT_FOUND_BY_ID)));
             assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
         }
 
