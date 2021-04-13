@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Transactional(rollbackFor = CasePaymentOrderCouldNotBeFoundException.class)
-public interface CasePaymentOrdersRepository {
+public interface CasePaymentOrdersRepository  {
     void deleteByUuids(List<UUID> uuids);
 
     void deleteAuditEntriesByUuids(List<UUID> uuids);
