@@ -144,7 +144,7 @@ public class CasePaymentOrdersController {
     @ApiResponses({
         @ApiResponse(
             code = 204,
-            message = ""
+            message = "Case Payment Orders Deleted"
         ),
         @ApiResponse(
             code = 400,
