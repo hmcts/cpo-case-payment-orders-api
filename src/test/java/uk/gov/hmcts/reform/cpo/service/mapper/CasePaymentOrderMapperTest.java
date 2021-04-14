@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
+import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 
 import java.time.LocalDateTime;
@@ -19,7 +20,7 @@ import static org.springframework.test.util.AssertionErrors.assertNotNull;
 class CasePaymentOrderMapperTest implements BaseTest {
 
     private CasePaymentOrderMapperImpl mapper;
-
+    private CreateCasePaymentOrderRequest request;
     private CasePaymentOrder casePaymentOrder;
     private CasePaymentOrderEntity entity;
 
@@ -27,9 +28,30 @@ class CasePaymentOrderMapperTest implements BaseTest {
     public void setUp() {
         mapper = new CasePaymentOrderMapperImpl();
 
-        // create entity and domain model from same sample data in `BaseTest`
-        entity = createCasePaymentOrderEntity();
-        casePaymentOrder = createCasePaymentOrder();
+        LocalDateTime date = LocalDateTime.now();
+
+        entity = new CasePaymentOrderEntity();
+        entity.setCreatedTimestamp(date);
+        entity.setEffectiveFrom(date);
+        entity.setCaseId(1_234_123_412_341_234L);
+        entity.setAction("Case Creation");
+        entity.setResponsibleParty("The executor on the will");
+        entity.setOrderReference("Bob123");
+        entity.setCreatedBy("Bob");
+
+        casePaymentOrder = CasePaymentOrder.builder()
+            .createdTimestamp(entity.getCreatedTimestamp())
+            .effectiveFrom(date)
+            .caseId(1_234_123_412_341_234L)
+            .action("Case Creation")
+            .responsibleParty("The executor on the will")
+            .orderReference("Bob123")
+            .createdBy("Bob")
+            .build();
+
+        request = new CreateCasePaymentOrderRequest(date, "1122334455667788",
+                                                    "Case Submit", "Jane Doe",
+                                                    "2021-918425346");
     }
 
     @Test
@@ -55,7 +77,8 @@ class CasePaymentOrderMapperTest implements BaseTest {
     @Test
     void successfulDomainMapping() {
         CasePaymentOrder mappedDomainObject = mapper.toDomainModel(entity);
-        assertEquals("Mapped domain model created timestamp should equals mocked domain model created timestamp",
+        assertEquals("Mapped domain model created timestamp should equals mocked domain model"
+                         + " created timestamp",
                      casePaymentOrder.getCreatedTimestamp(), mappedDomainObject.getCreatedTimestamp());
         assertEquals("Mapped domain model effective from should equals mocked domain model effective from",
                      casePaymentOrder.getEffectiveFrom(), mappedDomainObject.getEffectiveFrom());
@@ -63,7 +86,8 @@ class CasePaymentOrderMapperTest implements BaseTest {
                      casePaymentOrder.getCaseId(), mappedDomainObject.getCaseId());
         assertEquals("Mapped domain model action should equals mocked domain model action",
                      casePaymentOrder.getAction(), mappedDomainObject.getAction());
-        assertEquals("Mapped domain model responsible party should equals mocked domain model responsible party",
+        assertEquals("Mapped domain model responsible party should equals mocked domain model "
+                         + "responsible party",
                      casePaymentOrder.getResponsibleParty(), mappedDomainObject.getResponsibleParty());
         assertEquals("Mapped domain model order reference should equals mocked domain model order reference",
                      casePaymentOrder.getOrderReference(), mappedDomainObject.getOrderReference());
@@ -134,6 +158,23 @@ class CasePaymentOrderMapperTest implements BaseTest {
         assertNotNull("Responsible party should remain populated", entity.getResponsibleParty());
         assertNotNull("Order reference should remain populated", entity.getOrderReference());
 
+    }
+
+    @Test
+    void successfulRequestToEntityMapping() {
+        CasePaymentOrderEntity mappedRequestEntity = mapper.toEntity(request, "Jane");
+        assertEquals("Mapped entity effective from should equals mocked entity effective from",
+                     request.getEffectiveFrom(), mappedRequestEntity.getEffectiveFrom());
+        assertEquals("Mapped entity case id should equals mocked entity case id",
+                     1_122_334_455_667_788L, mappedRequestEntity.getCaseId());
+        assertEquals("Mapped entity action should equals mocked entity action",
+                     request.getAction(), mappedRequestEntity.getAction());
+        assertEquals("Mapped entity responsible party should equals mocked entity responsible party",
+                     request.getResponsibleParty(), mappedRequestEntity.getResponsibleParty());
+        assertEquals("Mapped entity order reference should equals mocked entity order reference",
+                     request.getOrderReference(), mappedRequestEntity.getOrderReference());
+        assertEquals("Mapped entity created by should equals mocked entity created by",
+                     "Jane", mappedRequestEntity.getCreatedBy());
     }
 
 }

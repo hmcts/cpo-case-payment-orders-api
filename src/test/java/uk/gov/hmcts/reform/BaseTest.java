@@ -27,7 +27,7 @@ public interface BaseTest {
     String CPO_ID_INVALID_1 = "160924";
     String CPO_ID_INVALID_2 = "160924 ";
 
-    String ORDER_REFERENCE = "orderReference";
+    String ORDER_REFERENCE = "2021-11223344556";
     String ACTION = "action";
     String RESPONSIBLE_PARTY = "responsibleParty";
     LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24, 11, 48, 32);

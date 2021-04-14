@@ -23,12 +23,16 @@ import uk.gov.hmcts.reform.TestIdamConfiguration;
 import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
+import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
@@ -40,14 +44,21 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH;
 
-
 public class CasePaymentOrdersControllerTest implements BaseTest {
+
+    private static final LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24,
+                                                                         11, 48, 32
+    );
+    private static final Long CASE_ID = 6_551_341_964_128_977L;
+    private static final String ORDER_REFERENCE = "2021-11223344556";
+    private static final UUID ID = UUID.randomUUID();
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
@@ -75,6 +86,70 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
 
         @Autowired
         protected ObjectMapper objectMapper;
+
+    }
+
+    @Nested
+    @DisplayName("POST /case-payment-orders")
+    class CreateCasePaymentOrder extends BaseMvcTest {
+
+        private CreateCasePaymentOrderRequest createCasePaymentOrderRequest;
+        private CasePaymentOrder casePaymentOrder;
+
+
+        @BeforeEach
+        void setUp() {
+
+            createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(EFFECTIVE_FROM, "6551341964128977",
+                                                                              ACTION, RESPONSIBLE_PARTY,
+                                                                              ORDER_REFERENCE
+            );
+
+            casePaymentOrder = CasePaymentOrder.builder()
+                .caseId(CASE_ID)
+                .effectiveFrom(EFFECTIVE_FROM)
+                .action(ACTION)
+                .responsibleParty(RESPONSIBLE_PARTY)
+                .orderReference(ORDER_REFERENCE)
+                .id(ID)
+                .createdBy(CREATED_BY)
+                .createdTimestamp(CREATED_TIMESTAMP)
+                .build();
+
+        }
+
+        @DisplayName("happy path test without mockMvc")
+        @Test
+        void directCallHappyPath() {
+            given(casePaymentOrdersService.createCasePaymentOrder(createCasePaymentOrderRequest))
+                .willReturn(casePaymentOrder);
+            CasePaymentOrdersController controller = new CasePaymentOrdersController(
+                casePaymentOrdersService,
+                applicationParams
+            );
+            CasePaymentOrder response = controller.createCasePaymentOrderRequest(createCasePaymentOrderRequest);
+            assertThat(response).isNotNull();
+            assertEquals("Case Payment Order returned", response, casePaymentOrder);
+
+        }
+
+
+        @DisplayName("happy path test with mockMvc")
+        @Test
+        void shouldSuccessfullyCreateCasePaymentOrder() throws Exception {
+            given(casePaymentOrdersService.createCasePaymentOrder(any(CreateCasePaymentOrderRequest.class)))
+                .willReturn(casePaymentOrder);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+            this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.id", is(ID.toString())))
+                .andExpect(jsonPath("$.created_timestamp", is(CREATED_TIMESTAMP.format(formatter))));
+        }
 
     }
 
@@ -435,9 +510,9 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             );
 
             // WHEN
-            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                                             .contentType(MediaType.APPLICATION_JSON)
-                                                             .content(objectMapper.writeValueAsString(request)));
+            ResultActions result = this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                            .contentType(MediaType.APPLICATION_JSON)
+                                                            .content(objectMapper.writeValueAsString(request)));
 
             // THEN
             assertBadRequestResponse(result, ValidationError.RESPONSIBLE_PARTY_REQUIRED);

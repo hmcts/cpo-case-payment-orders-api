@@ -41,7 +41,7 @@ public class BaseTest {
     public static final String CPO_ID_VALID_1 = "df54651b-3227-4067-9f23-6ffb32e2c6bd";
     public static final String CPO_ID_INVALID = "INVALID_NON_NUMERIC";
 
-    public static final String ORDER_REFERENCE = "orderReference";
+    public static final String ORDER_REFERENCE = "2021-11223344556";
     public static final String ACTION = "action";
     public static final String RESPONSIBLE_PARTY = "responsibleParty";
     public static final LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24, 11, 48, 32);
