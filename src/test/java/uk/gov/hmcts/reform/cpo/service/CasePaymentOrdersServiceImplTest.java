@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
@@ -93,12 +95,42 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
         assertTrue("The getNumberOfElements should be 0.", pages.getNumberOfElements() == 3);
     }
 
+    @Test
+    void failForListCasesIds() {
+        final ArrayList<CasePaymentOrderEntity> casePaymentOrders = new ArrayList<>();
+        final Page<CasePaymentOrderEntity> pageImpl = new PageImpl<CasePaymentOrderEntity>(
+            casePaymentOrders,
+            getPageRequest(),
+            3
+        );
+        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
+            .cpoIds(Collections.emptyList())
+            .caseIds(casesIds)
+            .pageable(getPageRequest())
+            .build();
+
+        when(casePaymentOrdersRepository.findByCaseIdIn(anyList(), ArgumentMatchers.<Pageable>any())).thenReturn(
+            pageImpl);
+
+
+        final Page<CasePaymentOrder> pages;
+        try {
+            casePaymentOrdersService.getCasePaymentOrders(
+                casePaymentOrderQueryFilter);
+        } catch (CasePaymentOrderCouldNotBeFoundException exception) {
+            assertTrue(
+                "The error message was not the expected.",
+                "Case Payment Order does not exist.".equals(exception.getMessage())
+            );
+            return;
+        }
+        fail();
+    }
+
     private Page<CasePaymentOrderEntity> getEntityPages() {
         final PageRequest pageRequest = getPageRequest();
         return new PageImpl<CasePaymentOrderEntity>(createListOfCasePaymentOrderEntity(), pageRequest, 3);
     }
-
-
 
 
     private List<CasePaymentOrderEntity> createListOfCasePaymentOrderEntity() {

@@ -6,11 +6,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
+import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import javax.transaction.Transactional;
 
@@ -55,6 +57,9 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
     private Page<CasePaymentOrder> getPageOfCasePaymentOrder(Page<CasePaymentOrderEntity> casePaymentOrderEntities) {
 
+        if (casePaymentOrderEntities.isEmpty()) {
+            throw new CasePaymentOrderCouldNotBeFoundException(ValidationError.CPO_NOT_FOUND);
+        }
         return casePaymentOrderEntities.map(casePaymentOrderEntity ->
                                                 casePaymentOrderMapper.toDomainModel(casePaymentOrderEntity)
         );
