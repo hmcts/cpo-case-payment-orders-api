@@ -49,15 +49,6 @@ import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CA
 
 public class CasePaymentOrdersControllerTest implements BaseTest {
 
-    @Autowired
-    protected MockMvc mockMvc;
-
-    @Autowired
-    protected ObjectMapper objectMapper;
-
-    @Autowired
-    protected ApplicationParams applicationParams;
-
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     @BeforeEach
@@ -122,7 +113,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
 
         @DisplayName("should delegate to service for a valid request")
         @Test
-        void shouldSuccessfullyCreateCasePaymentOrder() throws Exception {
+        void shouldSuccessfullyUpdateCasePaymentOrder() throws Exception {
 
             // WHEN
             this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
