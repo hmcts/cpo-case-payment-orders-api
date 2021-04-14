@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.cpo.service;
+package uk.gov.hmcts.reform.cpo.service.impl;
 
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundExceptio
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
-import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;

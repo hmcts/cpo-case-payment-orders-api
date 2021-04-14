@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.cpo.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter;
-import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
+import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import java.time.format.DateTimeFormatter;
@@ -68,7 +68,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         protected MockMvc mockMvc;
 
         @MockBean
-        protected CasePaymentOrdersServiceImpl casePaymentOrdersServiceImpl;
+        protected CasePaymentOrdersService casePaymentOrdersService;
 
         @MockBean
         protected ApplicationParams applicationParams;
@@ -92,7 +92,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
 
             casePaymentOrder = createCasePaymentOrder();
 
-            given(casePaymentOrdersServiceImpl.updateCasePaymentOrder(any(UpdateCasePaymentOrderRequest.class)))
+            given(casePaymentOrdersService.updateCasePaymentOrder(any(UpdateCasePaymentOrderRequest.class)))
                 .willReturn(casePaymentOrder);
         }
 
@@ -101,7 +101,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         void directCallHappyPath() {
 
             // GIVEN
-            CasePaymentOrdersController controller = new CasePaymentOrdersController(casePaymentOrdersServiceImpl,
+            CasePaymentOrdersController controller = new CasePaymentOrdersController(casePaymentOrdersService,
                                                                                      applicationParams);
 
             // WHEN
@@ -128,7 +128,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // verify service call
             ArgumentCaptor<UpdateCasePaymentOrderRequest> captor =
                 ArgumentCaptor.forClass(UpdateCasePaymentOrderRequest.class);
-            verify(casePaymentOrdersServiceImpl).updateCasePaymentOrder(captor.capture());
+            verify(casePaymentOrdersService).updateCasePaymentOrder(captor.capture());
             assertEquals("Service called with request data: ID",
                          request.getId(), captor.getValue().getId());
             assertEquals("Service called with request data: Effective from",
