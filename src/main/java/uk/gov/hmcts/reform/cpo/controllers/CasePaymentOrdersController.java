@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.cpo.controllers;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -7,6 +9,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
@@ -52,7 +56,6 @@ public class CasePaymentOrdersController {
     }
 
 
-
     @GetMapping(value = "case-payment-orders", produces = {"application/json"})
     @ApiOperation(value = "Get payment orders for a case", notes = "Get payment orders for a case")
     @ApiResponses({
@@ -74,7 +77,7 @@ public class CasePaymentOrdersController {
                         + "   \"error\": \"Bad Request\",\n"
                         + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
                         + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
-                        + "   \"details\": [ \""  + ValidationError.CASE_ID_INVALID + "\" ]\n"
+                        + "   \"details\": [ \"" + ValidationError.CASE_ID_INVALID + "\" ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
             })
@@ -88,6 +91,10 @@ public class CasePaymentOrdersController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE
         )
     })
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "page", value = "page number", paramType = "query"),
+        @ApiImplicitParam(name = "size", value = "page size", paramType = "query")
+    })
     public Page<CasePaymentOrder> getCasePaymentOrders(@ApiParam("list of case payment orders ids")
                                                        @ValidCpoId
                                                        @RequestParam(name = "ids", required = false)
@@ -96,18 +103,14 @@ public class CasePaymentOrdersController {
                                                        @ValidCaseId
                                                        @RequestParam(name = "case-ids", required = false)
                                                        Optional<List<String>> caseIds,
-                                                       @RequestParam(name = "pageSize", required = false)
-                                                       Optional<Integer> pageSize,
-                                                       @RequestParam(name = "pageNumber", required = false)
-                                                       Optional<Integer> pageNumber
+                                                       @ApiIgnore("This is ignored by swagger") Pageable pageable
 
     ) {
 
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
             .cpoIds(ids.orElse(Collections.emptyList()))
             .caseIds(caseIds.orElse(Collections.emptyList()))
-            .pageNumber(pageNumber.orElse(DEFAULT_PAGE_NUMBER_MINUS_ONE))
-            .pageSize(pageSize.orElse(applicationParams.getDefaultPageSize()))
+            .pageable(pageable)
             .build();
 
         if (casePaymentOrderQueryFilter.noFilters()) {
@@ -145,7 +148,7 @@ public class CasePaymentOrdersController {
                         + "   \"error\": \"Bad Request\",\n"
                         + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
                         + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
-                        + "   \"details\": [ \""  + ValidationError.ID_REQUIRED + "\" ]\n"
+                        + "   \"details\": [ \"" + ValidationError.ID_REQUIRED + "\" ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
             })

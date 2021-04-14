@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.cpo.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
@@ -40,7 +40,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     public Page<CasePaymentOrder> getCasePaymentOrders(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
 
         final Page<CasePaymentOrderEntity> casePaymentOrderEntities;
-        final PageRequest pageRequest = casePaymentOrderQueryFilter.getPageRequest();
+        final Pageable pageRequest = casePaymentOrderQueryFilter.getPageRequest();
         if (casePaymentOrderQueryFilter.isFindByCaseIdQuery()) {
             casePaymentOrderEntities = casePaymentOrdersRepository.findByCaseIdIn(
                 casePaymentOrderQueryFilter.getListOfLongCasesIds(), pageRequest);

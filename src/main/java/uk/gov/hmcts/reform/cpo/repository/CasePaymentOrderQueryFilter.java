@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.cpo.repository;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
@@ -16,10 +17,10 @@ import java.util.stream.Collectors;
 @Getter
 public class CasePaymentOrderQueryFilter {
 
-    private Integer pageSize;
-    private Integer pageNumber;
+
     private List<String> cpoIds;
     private List<String> caseIds;
+    private Pageable pageable;
 
 
     public boolean isFindByCaseIdQuery() {
@@ -46,10 +47,10 @@ public class CasePaymentOrderQueryFilter {
         return caseIds.stream().map(Long::parseLong).collect(Collectors.toList());
     }
 
-    public PageRequest getPageRequest() {
+    public Pageable getPageRequest() {
         return PageRequest.of(
-            this.getPageNumber(),
-            this.getPageSize(),
+            pageable.getPageNumber(),
+            pageable.getPageSize(),
             Sort.by(
                 Sort.Order.asc(CasePaymentOrderEntity.CASE_ID),
                 Sort.Order.asc(CasePaymentOrderEntity.ORDER_REFERENCE)
