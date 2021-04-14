@@ -27,7 +27,7 @@ public class CreateCasePaymentOrderRequest {
     @NotNull(message = ValidationError.CASE_ID_REQUIRED)
     @Size(min = 16, max = 16, message = ValidationError.CASE_ID_INVALID_LENGTH)
     @LuhnCheck(message = ValidationError.CASE_ID_INVALID)
-    @ApiModelProperty(value = "Case Id for which the record applies", required = true, example = "6551341964128977")
+    @ApiModelProperty(value = "Case Id for which the record applies", required = true, example = "2061729969689088")
     private String caseId;
 
     @NotEmpty(message = ValidationError.ACTION_REQUIRED)
@@ -43,6 +43,6 @@ public class CreateCasePaymentOrderRequest {
     @Pattern(regexp = "^2[0-9]{3}-[0-9]{11}$", message = ValidationError.ORDER_REFERENCE_INVALID)
     @NotEmpty(message = ValidationError.ORDER_REFERENCE_REQUIRED)
     @ApiModelProperty(value = "Description of the Payments system order reference", required = true,
-        example = "2021-918425346")
+        example = "2021-11223344556")
     private String orderReference;
 }
