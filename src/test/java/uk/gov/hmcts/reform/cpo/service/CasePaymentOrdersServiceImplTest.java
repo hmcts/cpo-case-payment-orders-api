@@ -61,12 +61,11 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
             .cpoIds(ids)
             .caseIds(Collections.emptyList())
-            .pageNumber(PAGE_NUMBER)
-            .pageSize(PAGE_SIZE)
+            .pageable(getPageRequest())
             .build();
 
         when(casePaymentOrdersRepository.findByIdIn(anyList(), ArgumentMatchers.<Pageable>any())).thenReturn(
-            getEntityPages(casePaymentOrderQueryFilter));
+            getEntityPages());
 
         when(casePaymentOrderMapper.toDomainModelList(anyList())).thenReturn(createListOfCasePaymentOrder());
         final Page<CasePaymentOrder> pages = casePaymentOrdersService.getCasePaymentOrders(
@@ -80,12 +79,11 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
             .cpoIds(Collections.emptyList())
             .caseIds(casesIds)
-            .pageNumber(PAGE_NUMBER)
-            .pageSize(PAGE_SIZE)
+            .pageable(getPageRequest())
             .build();
 
         when(casePaymentOrdersRepository.findByCaseIdIn(anyList(), ArgumentMatchers.<Pageable>any())).thenReturn(
-            getEntityPages(casePaymentOrderQueryFilter));
+            getEntityPages());
 
         when(casePaymentOrderMapper.toDomainModelList(anyList())).thenReturn(createListOfCasePaymentOrder());
 
@@ -95,8 +93,8 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
         assertTrue("The getNumberOfElements should be 0.", pages.getNumberOfElements() == 3);
     }
 
-    private Page<CasePaymentOrderEntity> getEntityPages(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
-        final PageRequest pageRequest = getPageRequest(casePaymentOrderQueryFilter);
+    private Page<CasePaymentOrderEntity> getEntityPages() {
+        final PageRequest pageRequest = getPageRequest();
         return new PageImpl<CasePaymentOrderEntity>(createListOfCasePaymentOrderEntity(), pageRequest, 3);
     }
 

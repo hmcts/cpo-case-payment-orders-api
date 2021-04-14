@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.cpo.repository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
@@ -36,8 +36,7 @@ class CasePaymentOrderQueryFilterTest implements BaseTest {
         return CasePaymentOrderQueryFilter.builder()
             .cpoIds(ids)
             .caseIds(casesIds)
-            .pageNumber(0)
-            .pageSize(20)
+            .pageable(getPageRequest())
             .build();
     }
 
@@ -74,9 +73,9 @@ class CasePaymentOrderQueryFilterTest implements BaseTest {
             casesIds,
             Collections.emptyList()
         );
-        final PageRequest pageRequest = casePaymentOrderQueryFilter.getPageRequest();
+        final Pageable pageRequest = casePaymentOrderQueryFilter.getPageRequest();
 
         assertThat(pageRequest.getPageNumber(), is(0));
-        assertThat(pageRequest.getPageSize(), is(20));
+        assertThat(pageRequest.getPageSize(), is(3));
     }
 }

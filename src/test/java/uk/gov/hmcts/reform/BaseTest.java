@@ -27,6 +27,7 @@ public interface BaseTest {
     String IDS = "ids";
     String CASE_IDS = "case-ids";
     int PAGE_SIZE = 3;
+
     String CASE_ID_VALID_1 = "9511425043588823";
     String CASE_ID_VALID_2 = "9716401307140455";
     String CASE_ID_VALID_3 = "4444333322221111";
@@ -86,20 +87,18 @@ public interface BaseTest {
         return CasePaymentOrderQueryFilter.builder()
             .cpoIds(ids)
             .caseIds(casesIds)
-            .pageNumber(PAGE_NUMBER_MINUS_ONE)
-            .pageSize(pageSize)
             .build();
     }
 
-    default PageRequest getPageRequest(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+    default PageRequest getPageRequest() {
         return PageRequest.of(
-            casePaymentOrderQueryFilter.getPageNumber(),
-            casePaymentOrderQueryFilter.getPageSize()
+            PAGE_NUMBER_MINUS_ONE,
+            PAGE_SIZE
         );
     }
 
-    default Page<CasePaymentOrder> getDomainPages(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
-        final PageRequest pageRequest = getPageRequest(casePaymentOrderQueryFilter);
+    default Page<CasePaymentOrder> getDomainPages() {
+        final PageRequest pageRequest = getPageRequest();
         return new PageImpl<CasePaymentOrder>(createListOfCasePaymentOrder(), pageRequest, 3);
     }
 

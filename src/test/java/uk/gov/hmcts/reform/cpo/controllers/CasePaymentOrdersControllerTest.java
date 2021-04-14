@@ -498,7 +498,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         void passPathForIds() {
 
             casePaymentOrderQueryFilter = getACasePaymentOrderQueryFilter(PAGE_SIZE, Collections.emptyList(), ids);
-            final Page<CasePaymentOrder> getDomainPages = getDomainPages(casePaymentOrderQueryFilter);
+            final Page<CasePaymentOrder> getDomainPages = getDomainPages();
 
             when(casePaymentOrdersServiceImpl.getCasePaymentOrders(any(CasePaymentOrderQueryFilter.class)))
                 .thenReturn(getDomainPages);
@@ -513,8 +513,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             Page<CasePaymentOrder> response = controller.getCasePaymentOrders(
                 Optional.of(ids),
                 Optional.empty(),
-                Optional.empty(),
-                Optional.empty()
+                getPageRequest()
             );
 
             // THEN
@@ -531,7 +530,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         void passForCasesIds() {
 
             casePaymentOrderQueryFilter = getACasePaymentOrderQueryFilter(PAGE_SIZE, casesIds, Collections.emptyList());
-            final Page<CasePaymentOrder> getDomainPages = getDomainPages(casePaymentOrderQueryFilter);
+            final Page<CasePaymentOrder> getDomainPages = getDomainPages();
 
             when(casePaymentOrdersServiceImpl.getCasePaymentOrders(any(CasePaymentOrderQueryFilter.class)))
                 .thenReturn(getDomainPages);
@@ -546,8 +545,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             Page<CasePaymentOrder> response = controller.getCasePaymentOrders(
                 Optional.empty(),
                 Optional.of(casesIds),
-                Optional.empty(),
-                Optional.empty()
+                getPageRequest()
             );
 
             // THEN
