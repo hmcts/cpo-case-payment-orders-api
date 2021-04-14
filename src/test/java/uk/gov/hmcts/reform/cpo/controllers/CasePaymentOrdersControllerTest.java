@@ -25,12 +25,15 @@ import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
+import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import javax.validation.ConstraintViolationException;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
@@ -50,18 +53,13 @@ import static org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_IDS;
 import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH;
-import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.util.UUID;
-
 import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.IDS;
 
 
@@ -563,7 +561,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         @Test
         void shouldDeleteCasePaymentOrderById() throws Exception {
             this.mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).param(IDS, UUID.randomUUID().toString()))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isNoContent());
         }
 
         @DisplayName("should Fail With 400 BadRequest When Id Is Not a UUID")
@@ -599,7 +597,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         @Test
         void shouldDeleteCasePaymentOrderById() throws Exception {
             this.mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).param(CASE_IDS, CASE_ID_VALID_1))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isNoContent());
         }
 
         @DisplayName("should Fail With 400 BadRequest When Case Id Is Not a valid length Case Id")
@@ -645,7 +643,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         void shouldReturn200OkWhenNoOptionalRequestParametersAreSpecified() throws Exception {
             this.mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH))
                     .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isOk());
+                    .andExpect(status().isNoContent());
         }
 
         @DisplayName("should Fail With 4xx when both ids and case-ids request parameter are specified")

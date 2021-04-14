@@ -198,7 +198,7 @@ public class CasePaymentOrdersControllerIT extends BaseTest {
                     casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
             assertTrue(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
             mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, savedEntity.getId().toString()))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isNoContent());
 
             assertFalse(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
             assertFalse(casePaymentOrdersAuditJpaRepository.findById(savedEntity.getId()).isPresent());
@@ -218,7 +218,7 @@ public class CasePaymentOrdersControllerIT extends BaseTest {
             String[] savedEntitiesUuidsString = savedEntitiesUuids.stream().map(UUID::toString).toArray(String[]::new);
 
             mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, savedEntitiesUuidsString))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isNoContent());
 
             assertTrue(casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
             assertTrue(casePaymentOrdersAuditJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
@@ -259,7 +259,7 @@ public class CasePaymentOrdersControllerIT extends BaseTest {
             casePaymentOrdersJpaRepository.saveAndFlush(savedEntity);
 
             mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, savedEntity.getId().toString()))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isNoContent());
 
             assertFalse(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
             assertFalse(casePaymentOrdersAuditJpaRepository.findById(savedEntity.getId()).isPresent());
@@ -300,7 +300,7 @@ public class CasePaymentOrdersControllerIT extends BaseTest {
                     casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
             assertTrue(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
             mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(CASE_IDS, savedEntity.getCaseId().toString()))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isNoContent());
 
             assertFalse(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
             assertFalse(casePaymentOrdersAuditJpaRepository.findById(savedEntity.getId()).isPresent());
@@ -325,7 +325,7 @@ public class CasePaymentOrdersControllerIT extends BaseTest {
 
             mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
                     .queryParam(CASE_IDS, savedEntitiesCaseIds.toArray(String[]::new)))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isNoContent());
 
             assertTrue(casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
             assertTrue(casePaymentOrdersAuditJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
@@ -351,7 +351,7 @@ public class CasePaymentOrdersControllerIT extends BaseTest {
 
             mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
                     .queryParam(CASE_IDS, savedEntityCaseId))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isNoContent());
 
             assertTrue(casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
             assertTrue(casePaymentOrdersAuditJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
@@ -397,7 +397,7 @@ public class CasePaymentOrdersControllerIT extends BaseTest {
             casePaymentOrdersJpaRepository.saveAndFlush(savedEntity);
 
             mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(CASE_IDS, savedEntity.getCaseId().toString()))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isNoContent());
 
             assertFalse(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
             assertFalse(casePaymentOrdersAuditJpaRepository.findById(savedEntity.getId()).isPresent());

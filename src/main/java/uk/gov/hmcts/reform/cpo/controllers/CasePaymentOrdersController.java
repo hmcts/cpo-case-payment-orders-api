@@ -139,11 +139,11 @@ public class CasePaymentOrdersController {
     }
 
     @DeleteMapping(path = CASE_PAYMENT_ORDERS_PATH)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "Delete specified case payment orders")
     @ApiResponses({
         @ApiResponse(
-            code = 200,
+            code = 204,
             message = ""
         ),
         @ApiResponse(
