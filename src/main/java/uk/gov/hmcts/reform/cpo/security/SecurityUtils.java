@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.exception.UnauthorisedServiceException;
+
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.List;
