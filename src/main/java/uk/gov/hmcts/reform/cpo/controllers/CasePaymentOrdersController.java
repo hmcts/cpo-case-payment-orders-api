@@ -68,8 +68,8 @@ public class CasePaymentOrdersController {
                 + "\n3) " + ValidationError.EFFECTIVE_FROM_REQUIRED
                 + "\n4) " + ValidationError.ACTION_REQUIRED
                 + "\n5) " + ValidationError.RESPONSIBLE_PARTY_REQUIRED
-                + "\n6) " + ValidationError.ORDER_REFERENCE_REQUIRED
-                + "\n7) " + ValidationError.ORDER_REFERENCE_INVALID
+                + "\n6) " + ValidationError.ORDER_REFERENCE_INVALID
+                + "\n7) " + ValidationError.ORDER_REFERENCE_REQUIRED
                 + "\n8) " + ValidationError.IDAM_ID_NOT_FOUND,
             response = String.class,
             examples = @Example({
@@ -131,19 +131,21 @@ public class CasePaymentOrdersController {
     @ApiResponses({
         @ApiResponse(
             code = 202,
-            message = ""
+            message = "Case Payment Order Updated"
         ),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
-                + "\n1) " + ValidationError.ID_REQUIRED
-                + "\n2) " + ValidationError.ID_INVALID
-                + "\n3) " + ValidationError.EFFECTIVE_FROM_REQUIRED
+                + "\n1) " + ValidationError.ID_INVALID
+                + "\n2) " + ValidationError.ID_REQUIRED
+                + "\n3) " + ValidationError.CASE_ID_INVALID
                 + "\n4) " + ValidationError.CASE_ID_REQUIRED
-                + "\n5) " + ValidationError.CASE_ID_INVALID
-                + "\n6) " + ValidationError.ORDER_REFERENCE_REQUIRED
-                + "\n7) " + ValidationError.ACTION_REQUIRED
-                + "\n8) " + ValidationError.RESPONSIBLE_PARTY_REQUIRED,
+                + "\n5) " + ValidationError.EFFECTIVE_FROM_REQUIRED
+                + "\n6) " + ValidationError.ACTION_REQUIRED
+                + "\n7) " + ValidationError.RESPONSIBLE_PARTY_REQUIRED
+                + "\n8) " + ValidationError.ORDER_REFERENCE_INVALID
+                + "\n9) " + ValidationError.ORDER_REFERENCE_REQUIRED
+                + "\n10) " + ValidationError.IDAM_ID_NOT_FOUND,
             response = String.class,
             examples = @Example({
                 @ExampleProperty(
