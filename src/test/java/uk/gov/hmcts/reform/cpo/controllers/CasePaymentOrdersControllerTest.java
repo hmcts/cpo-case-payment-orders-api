@@ -22,7 +22,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.TestIdamConfiguration;
-import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
@@ -66,9 +65,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @Autowired
-    protected ApplicationParams applicationParams;
-
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     @BeforeEach
@@ -90,8 +86,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         @MockBean
         protected CasePaymentOrdersServiceImpl casePaymentOrdersServiceImpl;
 
-        @MockBean
-        protected ApplicationParams applicationParams;
 
         @Autowired
         protected ObjectMapper objectMapper;
@@ -122,8 +116,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
 
             // GIVEN
             CasePaymentOrdersController controller = new CasePaymentOrdersController(
-                casePaymentOrdersServiceImpl,
-                applicationParams
+                casePaymentOrdersServiceImpl
             );
 
             // WHEN
@@ -505,8 +498,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
 
             // GIVEN
             CasePaymentOrdersController controller = new CasePaymentOrdersController(
-                casePaymentOrdersServiceImpl,
-                applicationParams
+                casePaymentOrdersServiceImpl
             );
 
             // WHEN
@@ -519,7 +511,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // THEN
             assertTrue(
                 "The total of expected elements should be" + PAGE_SIZE,
-                response.getTotalElements() == PAGE_SIZE
+                response.getContent().size() == PAGE_SIZE
             );
 
             assertArrayEquals(response.getContent().toArray(), getDomainPages.getContent().toArray());
@@ -537,8 +529,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
 
             // GIVEN
             CasePaymentOrdersController controller = new CasePaymentOrdersController(
-                casePaymentOrdersServiceImpl,
-                applicationParams
+                casePaymentOrdersServiceImpl
             );
 
             // WHEN
@@ -551,7 +542,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // THEN
             assertTrue(
                 "The total of expected elements should be" + PAGE_SIZE,
-                response.getTotalElements() == PAGE_SIZE
+                response.getContent().size()     == PAGE_SIZE
             );
 
             assertArrayEquals(response.getContent().toArray(), getDomainPages.getContent().toArray());
@@ -564,8 +555,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
 
             // GIVEN
             CasePaymentOrdersController controller = new CasePaymentOrdersController(
-                casePaymentOrdersServiceImpl,
-                applicationParams
+                casePaymentOrdersServiceImpl
             );
 
             // WHEN
@@ -591,8 +581,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
                 "getCasePaymentOrders.ids: These ids: XXXX are incorrect.";
             // GIVEN
             CasePaymentOrdersController controller = new CasePaymentOrdersController(
-                casePaymentOrdersServiceImpl,
-                applicationParams
+                casePaymentOrdersServiceImpl
             );
 
             // WHEN
@@ -617,8 +606,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
                 "Case ID has to be a valid 16-digit Luhn number.";
             // GIVEN
             CasePaymentOrdersController controller = new CasePaymentOrdersController(
-                casePaymentOrdersServiceImpl,
-                applicationParams
+                casePaymentOrdersServiceImpl
             );
 
             // WHEN

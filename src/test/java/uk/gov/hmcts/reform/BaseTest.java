@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public interface BaseTest {
 
-    int PAGE_NUMBER_MINUS_ONE = 0;
+    int PAGE_NUMBER = 1;
     String IDS = "ids";
     String CASE_IDS = "case-ids";
     int PAGE_SIZE = 3;
@@ -92,7 +92,7 @@ public interface BaseTest {
 
     default PageRequest getPageRequest() {
         return PageRequest.of(
-            PAGE_NUMBER_MINUS_ONE,
+            PAGE_NUMBER,
             PAGE_SIZE
         );
     }

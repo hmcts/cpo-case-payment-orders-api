@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
-import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
@@ -41,18 +40,14 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Validated
 public class CasePaymentOrdersController {
 
-    private static final Integer DEFAULT_PAGE_NUMBER_MINUS_ONE = 0;
 
     @SuppressWarnings({"squid:S1075"})
     public static final String CASE_PAYMENT_ORDERS_PATH = "/case-payment-orders";
 
     private final CasePaymentOrdersService casePaymentOrdersService;
-    private final ApplicationParams applicationParams;
 
-    public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersService,
-                                       ApplicationParams applicationParams) {
+    public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersService) {
         this.casePaymentOrdersService = casePaymentOrdersService;
-        this.applicationParams = applicationParams;
     }
 
 

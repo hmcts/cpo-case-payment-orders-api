@@ -14,6 +14,7 @@ public final class ValidationError {
     public static final String ORDER_REFERENCE_REQUIRED = "Order Reference Party is required.";
     public static final String RESPONSIBLE_PARTY_REQUIRED = "Responsible Party is required.";
     public static final String CPO_FILER_ERROR = "Case payment orders cannot be filtered by both id and case id.";
+    public static final String CPO_PAGE_ERROR = "Case Payment Order, Page index must not zero or be less than zero!";
 
 
     // additional constraints etc..

@@ -18,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.TestIdamConfiguration;
-import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
@@ -48,9 +47,6 @@ class RestExceptionHandlerTest implements BaseTest {
     @MockBean
     protected CasePaymentOrdersServiceImpl service;
 
-    @MockBean
-    protected ApplicationParams applicationParams;
-
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -72,9 +68,9 @@ class RestExceptionHandlerTest implements BaseTest {
 
         /// WHEN
         setupMockServiceToThrowException(expectedException);
-        ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                                         .contentType(MediaType.APPLICATION_JSON)
-                                                         .content(objectMapper.writeValueAsString(request)));
+        ResultActions result = this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                        .contentType(MediaType.APPLICATION_JSON)
+                                                        .content(objectMapper.writeValueAsString(request)));
 
         // THEN
         assertHttpErrorResponse(result, HttpStatus.CONFLICT, expectedException.getMessage());
@@ -93,9 +89,9 @@ class RestExceptionHandlerTest implements BaseTest {
 
         /// WHEN
         setupMockServiceToThrowException(expectedException);
-        ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                                         .contentType(MediaType.APPLICATION_JSON)
-                                                         .content(objectMapper.writeValueAsString(request)));
+        ResultActions result = this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                        .contentType(MediaType.APPLICATION_JSON)
+                                                        .content(objectMapper.writeValueAsString(request)));
 
         // THEN
         assertHttpErrorResponse(result, HttpStatus.NOT_FOUND, expectedException.getMessage());

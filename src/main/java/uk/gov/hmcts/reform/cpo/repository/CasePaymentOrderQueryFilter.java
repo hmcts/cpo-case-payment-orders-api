@@ -49,13 +49,17 @@ public class CasePaymentOrderQueryFilter {
 
     public Pageable getPageRequest() {
         return PageRequest.of(
-            pageable.getPageNumber(),
+            getPageNumberMinusOne(),
             pageable.getPageSize(),
             Sort.by(
                 Sort.Order.asc(CasePaymentOrderEntity.CASE_ID),
                 Sort.Order.asc(CasePaymentOrderEntity.ORDER_REFERENCE)
             )
         );
+    }
+
+    private int getPageNumberMinusOne() {
+        return pageable.getPageNumber() - 1;
     }
 
     public void validateCasePaymentOrdersFiltering() {

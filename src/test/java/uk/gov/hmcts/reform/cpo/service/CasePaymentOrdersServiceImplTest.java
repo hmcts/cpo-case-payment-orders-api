@@ -13,10 +13,12 @@ import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
+import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,9 +41,6 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
     private final List<String> ids = createInitialValuesList(new String[]{"df54651b-3227-4067-9f23-6ffb32e2c6bd",
         "d702ef36-0ca7-46e9-8a00-ef044d78453e",
         "d702ef36-0ca7-46e9-8a00-ef044d78453e"}).get();
-
-    private static final Integer PAGE_NUMBER = 0;
-    private static final Integer PAGE_SIZE = 5;
 
     @Mock
     private CasePaymentOrderMapper casePaymentOrderMapper;
@@ -121,6 +120,41 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
             assertTrue(
                 "The error message was not the expected.",
                 "Case Payment Order does not exist.".equals(exception.getMessage())
+            );
+            return;
+        }
+        fail();
+    }
+
+
+    @Test
+    void failForIncorrectPageNumber() {
+        final ArrayList<CasePaymentOrderEntity> casePaymentOrders = new ArrayList<>();
+        final Page<CasePaymentOrderEntity> pageImpl = new PageImpl<CasePaymentOrderEntity>(
+            casePaymentOrders,
+            PageRequest.of(
+                0,
+                PAGE_SIZE
+            ),
+            3
+        );
+        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
+            .cpoIds(Collections.emptyList())
+            .caseIds(casesIds)
+            .pageable(PageRequest.of(0, PAGE_SIZE))
+            .build();
+
+        when(casePaymentOrdersRepository.findByCaseIdIn(anyList(), ArgumentMatchers.<Pageable>any())).thenReturn(
+            pageImpl);
+
+
+        final Page<CasePaymentOrder> pages;
+        try {
+            casePaymentOrdersService.getCasePaymentOrders(
+                casePaymentOrderQueryFilter);
+        } catch (CasePaymentOrdersFilterException exception) {
+            assertTrue(
+                "The error message was not the expected.", ValidationError.CPO_PAGE_ERROR.equals(exception.getMessage())
             );
             return;
         }

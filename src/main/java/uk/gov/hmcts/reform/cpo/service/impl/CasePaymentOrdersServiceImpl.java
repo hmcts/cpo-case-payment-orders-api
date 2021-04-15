@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
@@ -41,18 +42,22 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     @Override
     public Page<CasePaymentOrder> getCasePaymentOrders(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
 
-        final Page<CasePaymentOrderEntity> casePaymentOrderEntities;
-        final Pageable pageRequest = casePaymentOrderQueryFilter.getPageRequest();
-        if (casePaymentOrderQueryFilter.isFindByCaseIdQuery()) {
-            casePaymentOrderEntities = casePaymentOrdersRepository.findByCaseIdIn(
-                casePaymentOrderQueryFilter.getListOfLongCasesIds(), pageRequest);
-        } else {
-            casePaymentOrderEntities = casePaymentOrdersRepository.findByIdIn(
-                casePaymentOrderQueryFilter.getListUUID(),
-                pageRequest
-            );
+        try {
+            final Page<CasePaymentOrderEntity> casePaymentOrderEntities;
+            final Pageable pageRequest = casePaymentOrderQueryFilter.getPageRequest();
+            if (casePaymentOrderQueryFilter.isFindByCaseIdQuery()) {
+                casePaymentOrderEntities = casePaymentOrdersRepository.findByCaseIdIn(
+                    casePaymentOrderQueryFilter.getListOfLongCasesIds(), pageRequest);
+            } else {
+                casePaymentOrderEntities = casePaymentOrdersRepository.findByIdIn(
+                    casePaymentOrderQueryFilter.getListUUID(),
+                    pageRequest
+                );
+            }
+            return getPageOfCasePaymentOrder(casePaymentOrderEntities);
+        } catch (IllegalArgumentException exception) {
+            throw new CasePaymentOrdersFilterException(ValidationError.CPO_PAGE_ERROR);
         }
-        return getPageOfCasePaymentOrder(casePaymentOrderEntities);
     }
 
     private Page<CasePaymentOrder> getPageOfCasePaymentOrder(Page<CasePaymentOrderEntity> casePaymentOrderEntities) {
