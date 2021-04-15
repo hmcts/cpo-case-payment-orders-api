@@ -23,8 +23,6 @@ import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapperImpl;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -49,33 +47,7 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
     private CasePaymentOrderMapperImpl mapper;
 
     @Mock
-    private CasePaymentOrder casePaymentOrderIncoming;
-
-    @Mock
     private SecurityUtils securityUtils;
-
-    @Mock
-    private CreateCasePaymentOrderRequest createCasePaymentOrderRequest;
-
-    @Mock
-    private UserInfo userInfo;
-
-    @Mock
-    CasePaymentOrderEntity requestEntity;
-
-    @Mock
-    CasePaymentOrderEntity savedEntity;
-
-    private static final LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24, 11, 48,
-                                                                         32
-    );
-    private static final Long CASE_ID = 1_122_334_455_667_788L;
-    private static final String ACTION = "action";
-    private static final String RESPONSIBLE_PARTY = "responsibleParty";
-    private static final String ORDER_REFERENCE = "orderReference";
-    private static final UUID ID = UUID.randomUUID();
-    private static final String CREATED_BY = "createdBy";
-    private static final LocalDateTime CREATED_TIMESTAMP = LocalDateTime.now();
 
     @BeforeEach
     public void setUp() {
@@ -86,69 +58,41 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
     @DisplayName("Create Case Payment Order")
     class CreateCasePaymentOrder {
 
+        private CreateCasePaymentOrderRequest createCasePaymentOrderRequest;
+
+        private CasePaymentOrder casePaymentOrderIncoming;
+
+        private CasePaymentOrderEntity requestEntity;
+
+        private CasePaymentOrderEntity savedEntity;
+
         @BeforeEach
         public void setUp() {
 
+            setupSecurityUtilsMock();
 
-            userInfo = UserInfo.builder()
-                .uid(CREATED_BY)
-                .build();
-
-            casePaymentOrdersService = new CasePaymentOrdersServiceImpl(casePaymentOrdersRepository,
-                                                                        securityUtils, mapper
-            );
-            createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(
-                EFFECTIVE_FROM,
-                "1122334455667788",
-                ACTION,
-                RESPONSIBLE_PARTY,
-                ORDER_REFERENCE
-            );
-
-            casePaymentOrderIncoming = CasePaymentOrder.builder()
-                .effectiveFrom(EFFECTIVE_FROM)
-                .caseId(CASE_ID)
-                .action(ACTION)
-                .responsibleParty(RESPONSIBLE_PARTY)
-                .orderReference(ORDER_REFERENCE)
-                .createdBy(CREATED_BY)
-                .id(ID)
-                .createdTimestamp(CREATED_TIMESTAMP)
-                .build();
-
-            requestEntity.setEffectiveFrom(EFFECTIVE_FROM);
-            requestEntity.setCaseId(CASE_ID);
-            requestEntity.setAction(ACTION);
-            requestEntity.setResponsibleParty(RESPONSIBLE_PARTY);
-            requestEntity.setOrderReference(ORDER_REFERENCE);
-            requestEntity.setCreatedBy(CREATED_BY);
-
-            savedEntity.setEffectiveFrom(EFFECTIVE_FROM);
-            savedEntity.setCaseId(CASE_ID);
-            savedEntity.setAction(ACTION);
-            savedEntity.setResponsibleParty(RESPONSIBLE_PARTY);
-            savedEntity.setOrderReference(ORDER_REFERENCE);
-            savedEntity.setCreatedBy(CREATED_BY);
-            savedEntity.setCreatedTimestamp(CREATED_TIMESTAMP);
+            // create entity and domain model from same sample data in `BaseTest`
+            createCasePaymentOrderRequest = createCreateCasePaymentOrderRequest();
+            casePaymentOrderIncoming = createCasePaymentOrder();
+            requestEntity = createCasePaymentOrderEntity();
+            savedEntity = createCasePaymentOrderEntity();
         }
 
         @Test
         @DisplayName("Should create CasePaymentOrder successfully")
         void shouldCreateCasePaymentOrder() {
-            given(securityUtils.getUserInfo()).willReturn(userInfo);
             given(mapper.toEntity(createCasePaymentOrderRequest, CREATED_BY)).willReturn(requestEntity);
             given(casePaymentOrdersRepository.saveAndFlush(requestEntity)).willReturn(savedEntity);
             given(mapper.toDomainModel(savedEntity)).willReturn(casePaymentOrderIncoming);
             CasePaymentOrder caseOrderReturn = casePaymentOrdersService
                 .createCasePaymentOrder(createCasePaymentOrderRequest);
-            assertThat("UUID does not match expected", caseOrderReturn.getId().equals(ID));
+            assertThat("UUID does not match expected", caseOrderReturn.getId().toString().equals(CPO_ID_VALID_1));
             assertThat("Returned entity does not match expected", caseOrderReturn.equals(casePaymentOrderIncoming));
         }
 
         @Test
         @DisplayName("Should throw error when request has non-unique order reference and case id pairing")
         void shouldErrorWhenNonUniquePairing() {
-            given(securityUtils.getUserInfo()).willReturn(userInfo);
             given(mapper.toEntity(createCasePaymentOrderRequest, CREATED_BY)).willReturn(requestEntity);
             ConstraintViolationException exception =
                 new ConstraintViolationException(
@@ -190,16 +134,14 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
 
             setupSecurityUtilsMock();
 
-            // update request
+            // create entity and domain model from same sample data in `BaseTest`
+            // :: update request
             updateCasePaymentOrderRequest = createUpdateCasePaymentOrderRequest();
-
-            // loaded entity
+            // :: loaded entity
             casePaymentOrderEntity = createCasePaymentOrderEntity();
-
-            // saved entity
+            // :: saved entity
             savedEntity = createCasePaymentOrderEntity();
-
-            // response model
+            // :: response model
             casePaymentOrderResponse = createCasePaymentOrder();
         }
 
@@ -297,6 +239,18 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
             // WHEN / THEN
             assertThatThrownBy(() -> casePaymentOrdersService.updateCasePaymentOrder(updateCasePaymentOrderRequest))
                 .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Should throw error when IdAM Id cannot be retrieved")
+        void shouldErrorWhenCannotRetrieveIdamId() {
+            // GIVEN
+            given(securityUtils.getUserInfo()).willThrow(new RuntimeException());
+
+            // WHEN / THEN
+            assertThatThrownBy(() -> casePaymentOrdersService.updateCasePaymentOrder(updateCasePaymentOrderRequest))
+                .isInstanceOf(IdAMIdCannotBeRetrievedException.class)
+                .hasMessageContaining(IDAM_ID_NOT_FOUND);
         }
 
     }

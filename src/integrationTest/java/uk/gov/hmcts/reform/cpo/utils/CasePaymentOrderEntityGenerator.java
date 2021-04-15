@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.cpo.utils;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.cpo.BaseTest;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
@@ -35,7 +36,7 @@ public class CasePaymentOrderEntityGenerator {
                 .action("Action " + RandomUtils.nextInt())
                 .caseId(useSameCaseId ? caseId : Long.parseLong(uidService.generateUID()))
                 .createdBy("Created by " + RandomUtils.nextBytes(2))
-                .orderReference("order ref " + RandomUtils.nextBytes(3))
+                .orderReference(BaseTest.ORDER_REFERENCE_VALID)
                 .effectiveFrom(LocalDateTime.now())
                 .createdTimestamp(LocalDateTime.now())
                 .responsibleParty("ResponsibleParty" + RandomUtils.nextBytes(2))

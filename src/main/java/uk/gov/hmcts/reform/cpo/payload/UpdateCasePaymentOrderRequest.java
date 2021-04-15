@@ -5,12 +5,14 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import uk.gov.hmcts.reform.cpo.validators.Validator;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -32,12 +34,8 @@ public class UpdateCasePaymentOrderRequest {
 
     @NotEmpty(message = ValidationError.CASE_ID_REQUIRED)
     @ValidCaseId
-    @ApiModelProperty(value = "Case Id for which the record applies", required = true, example = "1617288400189308")
+    @ApiModelProperty(value = "Case Id for which the record applies", required = true, example = "2061729969689088")
     private String caseId;
-
-    @NotEmpty(message = ValidationError.ORDER_REFERENCE_REQUIRED)
-    @ApiModelProperty(value = "Description of the Payments system order reference", required = true, example = "1111")
-    private String orderReference;
 
     @NotEmpty(message = ValidationError.ACTION_REQUIRED)
     @ApiModelProperty(value = "Action that initiated the creation of the case payment order", required = true,
@@ -48,6 +46,12 @@ public class UpdateCasePaymentOrderRequest {
     @ApiModelProperty(value = "Description of the party responsible for the case payment order", required = true,
         example = "Jane Doe")
     private String responsibleParty;
+
+    @NotNull(message = ValidationError.ORDER_REFERENCE_REQUIRED)
+    @Pattern(regexp = Validator.ORDER_REFERENCE_RG, message = ValidationError.ORDER_REFERENCE_INVALID)
+    @ApiModelProperty(value = "Description of the Payments system order reference", required = true,
+        example = "2021-11223344556")
+    private String orderReference;
 
     @JsonIgnore
     public UUID getUUID() {

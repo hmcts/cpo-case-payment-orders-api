@@ -65,13 +65,12 @@ public class CasePaymentOrdersController {
             message = "One or more of the following reasons:"
                 + "\n1) " + ValidationError.CASE_ID_INVALID
                 + "\n2) " + ValidationError.CASE_ID_REQUIRED
-                + "\n3) " + ValidationError.CASE_ID_INVALID_LENGTH
-                + "\n4) " + ValidationError.EFFECTIVE_FROM_REQUIRED
-                + "\n5) " + ValidationError.ACTION_REQUIRED
-                + "\n6) " + ValidationError.RESPONSIBLE_PARTY_REQUIRED
-                + "\n7) " + ValidationError.ORDER_REFERENCE_REQUIRED
-                + "\n8) " + ValidationError.ORDER_REFERENCE_INVALID
-                + "\n9) " + ValidationError.IDAM_ID_NOT_FOUND,
+                + "\n3) " + ValidationError.EFFECTIVE_FROM_REQUIRED
+                + "\n4) " + ValidationError.ACTION_REQUIRED
+                + "\n5) " + ValidationError.RESPONSIBLE_PARTY_REQUIRED
+                + "\n6) " + ValidationError.ORDER_REFERENCE_REQUIRED
+                + "\n7) " + ValidationError.ORDER_REFERENCE_INVALID
+                + "\n8) " + ValidationError.IDAM_ID_NOT_FOUND,
             response = String.class,
             examples = @Example({
                 @ExampleProperty(
@@ -96,13 +95,8 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 409,
             message = ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE
-        ),
-        @ApiResponse(
-            code = 500,
-            message = "Unexpected server error"
         )
     })
-
     public CasePaymentOrder createCasePaymentOrderRequest(@Valid @RequestBody CreateCasePaymentOrderRequest
                                                               requestPayload) {
         return casePaymentOrdersService.createCasePaymentOrder(requestPayload);

@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
-
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,25 +50,13 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     @Transactional
     @Override
     public CasePaymentOrder createCasePaymentOrder(CreateCasePaymentOrderRequest createCasePaymentOrderRequest) {
-        String createdBy;
-        try {
-            createdBy = securityUtils.getUserInfo().getUid();
-        } catch (Exception e) {
-            throw new IdAMIdCannotBeRetrievedException(IDAM_ID_NOT_FOUND);
-        }
+        String createdBy = getUserId();
+
         CasePaymentOrderEntity requestEntity = mapper.toEntity(createCasePaymentOrderRequest, createdBy);
 
-        try {
-            CasePaymentOrderEntity savedEntity = casePaymentOrdersRepository.saveAndFlush(requestEntity);
-            return mapper.toDomainModel(savedEntity);
-        } catch (DataIntegrityViolationException exception) {
-            if (exception.getCause() instanceof ConstraintViolationException
-                && isDuplicateCaseIdOrderRefPairing(exception)) {
-                throw new CaseIdOrderReferenceUniqueConstraintException(ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE);
-            } else {
-                throw exception;
-            }
-        }
+        CasePaymentOrderEntity savedEntity = saveEntity(requestEntity);
+
+        return mapper.toDomainModel(savedEntity);
     }
 
 
@@ -99,27 +86,13 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     @Transactional
     @Override
     public CasePaymentOrder updateCasePaymentOrder(UpdateCasePaymentOrderRequest updateCasePaymentOrderRequest) {
-        String createdBy = securityUtils.getUserInfo().getUid();
+        String createdBy = getUserId();
 
         CasePaymentOrderEntity casePaymentOrderEntity = verifyCpoExists(updateCasePaymentOrderRequest.getUUID());
 
         mapper.mergeIntoEntity(casePaymentOrderEntity, updateCasePaymentOrderRequest, createdBy);
 
-        CasePaymentOrderEntity updatedEntity;
-
-        try {
-            // save and flush to force unique constraint to apply now
-            updatedEntity = casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity);
-
-        } catch (DataIntegrityViolationException exception) {
-            if (exception.getCause() instanceof ConstraintViolationException
-                && isDuplicateCaseIdOrderRefPairing(exception)) {
-
-                throw new CaseIdOrderReferenceUniqueConstraintException(ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE);
-            } else {
-                throw exception;
-            }
-        }
+        CasePaymentOrderEntity updatedEntity = saveEntity(casePaymentOrderEntity);
 
         return mapper.toDomainModel(updatedEntity);
     }
@@ -135,6 +108,14 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         );
     }
 
+    private String getUserId() {
+        try {
+            return securityUtils.getUserInfo().getUid();
+        } catch (Exception e) {
+            throw new IdAMIdCannotBeRetrievedException(IDAM_ID_NOT_FOUND);
+        }
+    }
+
     private void validateCasePaymentOrderQueryFilter(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
         if (casePaymentOrderQueryFilter.isAnIdsAndCasesIdQuery()) {
             throw new CasePaymentOrdersQueryException(
@@ -145,6 +126,22 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     private boolean isDuplicateCaseIdOrderRefPairing(DataIntegrityViolationException exception) {
         return ((ConstraintViolationException) exception.getCause()).getConstraintName()
             .equals(UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT);
+    }
+
+    private CasePaymentOrderEntity saveEntity(CasePaymentOrderEntity entity) {
+        try {
+            // save and flush to force unique constraint to apply now
+            return casePaymentOrdersRepository.saveAndFlush(entity);
+
+        } catch (DataIntegrityViolationException exception) {
+            if (exception.getCause() instanceof ConstraintViolationException
+                && isDuplicateCaseIdOrderRefPairing(exception)) {
+
+                throw new CaseIdOrderReferenceUniqueConstraintException(ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE);
+            } else {
+                throw exception;
+            }
+        }
     }
 
     private CasePaymentOrderEntity verifyCpoExists(UUID id) {
