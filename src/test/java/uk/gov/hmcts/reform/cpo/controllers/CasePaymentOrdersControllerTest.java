@@ -22,19 +22,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.TestIdamConfiguration;
+import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter;
-import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
+import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
-
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasItem;
@@ -55,15 +51,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH;
+import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 
 
 public class CasePaymentOrdersControllerTest implements BaseTest {
 
-    @Autowired
-    protected MockMvc mockMvc;
+    private static final LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24,
+                                                                         11, 48, 32
+    );
+    private static final Long CASE_ID = 6_551_341_964_128_977L;
+    private static final String ORDER_REFERENCE = "2021-11223344556";
+    private static final UUID ID = UUID.randomUUID();
 
-    @Autowired
-    protected ObjectMapper objectMapper;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
@@ -84,11 +91,77 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         protected MockMvc mockMvc;
 
         @MockBean
-        protected CasePaymentOrdersServiceImpl casePaymentOrdersServiceImpl;
+        protected CasePaymentOrdersService casePaymentOrdersService;
 
+        @MockBean
+        protected ApplicationParams applicationParams;
 
         @Autowired
         protected ObjectMapper objectMapper;
+
+    }
+
+    @Nested
+    @DisplayName("POST /case-payment-orders")
+    class CreateCasePaymentOrder extends BaseMvcTest {
+
+        private CreateCasePaymentOrderRequest createCasePaymentOrderRequest;
+        private CasePaymentOrder casePaymentOrder;
+
+
+        @BeforeEach
+        void setUp() {
+
+            createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(EFFECTIVE_FROM, "6551341964128977",
+                                                                              ACTION, RESPONSIBLE_PARTY,
+                                                                              ORDER_REFERENCE
+            );
+
+            casePaymentOrder = CasePaymentOrder.builder()
+                .caseId(CASE_ID)
+                .effectiveFrom(EFFECTIVE_FROM)
+                .action(ACTION)
+                .responsibleParty(RESPONSIBLE_PARTY)
+                .orderReference(ORDER_REFERENCE)
+                .id(ID)
+                .createdBy(CREATED_BY)
+                .createdTimestamp(CREATED_TIMESTAMP)
+                .build();
+
+        }
+
+        @DisplayName("happy path test without mockMvc")
+        @Test
+        void directCallHappyPath() {
+            given(casePaymentOrdersService.createCasePaymentOrder(createCasePaymentOrderRequest))
+                .willReturn(casePaymentOrder);
+            CasePaymentOrdersController controller = new CasePaymentOrdersController(
+                casePaymentOrdersService,
+                applicationParams
+            );
+            CasePaymentOrder response = controller.createCasePaymentOrderRequest(createCasePaymentOrderRequest);
+            assertThat(response).isNotNull();
+            assertEquals("Case Payment Order returned", response, casePaymentOrder);
+
+        }
+
+
+        @DisplayName("happy path test with mockMvc")
+        @Test
+        void shouldSuccessfullyCreateCasePaymentOrder() throws Exception {
+            given(casePaymentOrdersService.createCasePaymentOrder(any(CreateCasePaymentOrderRequest.class)))
+                .willReturn(casePaymentOrder);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+            this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.id", is(ID.toString())))
+                .andExpect(jsonPath("$.created_timestamp", is(CREATED_TIMESTAMP.format(formatter))));
+        }
 
     }
 
@@ -106,7 +179,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
 
             casePaymentOrder = createCasePaymentOrder();
 
-            given(casePaymentOrdersServiceImpl.updateCasePaymentOrder(any(UpdateCasePaymentOrderRequest.class)))
+            given(casePaymentOrdersService.updateCasePaymentOrder(any(UpdateCasePaymentOrderRequest.class)))
                 .willReturn(casePaymentOrder);
         }
 
@@ -115,9 +188,8 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         void directCallHappyPath() {
 
             // GIVEN
-            CasePaymentOrdersController controller = new CasePaymentOrdersController(
-                casePaymentOrdersServiceImpl
-            );
+            CasePaymentOrdersController controller = new CasePaymentOrdersController(casePaymentOrdersService,
+                                                                                     applicationParams);
 
             // WHEN
             CasePaymentOrder response = controller.updateCasePaymentOrderRequest(request);
@@ -143,25 +215,19 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // verify service call
             ArgumentCaptor<UpdateCasePaymentOrderRequest> captor =
                 ArgumentCaptor.forClass(UpdateCasePaymentOrderRequest.class);
-            verify(casePaymentOrdersServiceImpl).updateCasePaymentOrder(captor.capture());
+            verify(casePaymentOrdersService).updateCasePaymentOrder(captor.capture());
             assertEquals("Service called with request data: ID",
-                         request.getId(), captor.getValue().getId()
-            );
+                         request.getId(), captor.getValue().getId());
             assertEquals("Service called with request data: Effective from",
-                         request.getEffectiveFrom(), captor.getValue().getEffectiveFrom()
-            );
+                         request.getEffectiveFrom(), captor.getValue().getEffectiveFrom());
             assertEquals("Service called with request data: Case ID",
-                         request.getCaseId(), captor.getValue().getCaseId()
-            );
+                         request.getCaseId(), captor.getValue().getCaseId());
             assertEquals("Service called with request data: Action",
-                         request.getAction(), captor.getValue().getAction()
-            );
+                         request.getAction(), captor.getValue().getAction());
             assertEquals("Service called with request data: ResponsibleParty",
-                         request.getResponsibleParty(), captor.getValue().getResponsibleParty()
-            );
+                         request.getResponsibleParty(), captor.getValue().getResponsibleParty());
             assertEquals("Service called with request data: Order reference",
-                         request.getOrderReference(), captor.getValue().getOrderReference()
-            );
+                         request.getOrderReference(), captor.getValue().getOrderReference());
 
         }
 
@@ -180,9 +246,9 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             );
 
             // WHEN
-            ResultActions result = this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                                            .contentType(MediaType.APPLICATION_JSON)
-                                                            .content(objectMapper.writeValueAsString(request)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
 
             // THEN
             assertBadRequestResponse(result, ValidationError.ID_REQUIRED);
@@ -203,9 +269,9 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             );
 
             // WHEN
-            ResultActions result = this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                                            .contentType(MediaType.APPLICATION_JSON)
-                                                            .content(objectMapper.writeValueAsString(request)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
 
             // THEN
             assertBadRequestResponse(result, ValidationError.ID_REQUIRED);
@@ -226,9 +292,9 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             );
 
             // WHEN
-            ResultActions result = this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                                            .contentType(MediaType.APPLICATION_JSON)
-                                                            .content(objectMapper.writeValueAsString(request)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
 
             // THEN
             assertBadRequestResponse(result, ValidationError.ID_INVALID);
@@ -249,9 +315,9 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             );
 
             // WHEN
-            ResultActions result = this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                                            .contentType(MediaType.APPLICATION_JSON)
-                                                            .content(objectMapper.writeValueAsString(request)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
 
             // THEN
             assertBadRequestResponse(result, ValidationError.EFFECTIVE_FROM_REQUIRED);
@@ -272,9 +338,9 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             );
 
             // WHEN
-            ResultActions result = this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                                            .contentType(MediaType.APPLICATION_JSON)
-                                                            .content(objectMapper.writeValueAsString(request)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
 
             // THEN
             assertBadRequestResponse(result, ValidationError.CASE_ID_REQUIRED);
@@ -295,9 +361,9 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             );
 
             // WHEN
-            ResultActions result = this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                                            .contentType(MediaType.APPLICATION_JSON)
-                                                            .content(objectMapper.writeValueAsString(request)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
 
             // THEN
             assertBadRequestResponse(result, ValidationError.CASE_ID_REQUIRED);
@@ -318,9 +384,9 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             );
 
             // WHEN
-            ResultActions result = this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                                            .contentType(MediaType.APPLICATION_JSON)
-                                                            .content(objectMapper.writeValueAsString(request)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
 
             // THEN
             assertBadRequestResponse(result, ValidationError.CASE_ID_INVALID);
@@ -341,9 +407,9 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             );
 
             // WHEN
-            ResultActions result = this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                                            .contentType(MediaType.APPLICATION_JSON)
-                                                            .content(objectMapper.writeValueAsString(request)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
 
             // THEN
             assertBadRequestResponse(result, ValidationError.ORDER_REFERENCE_REQUIRED);
@@ -364,9 +430,9 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             );
 
             // WHEN
-            ResultActions result = this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                                            .contentType(MediaType.APPLICATION_JSON)
-                                                            .content(objectMapper.writeValueAsString(request)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
 
             // THEN
             assertBadRequestResponse(result, ValidationError.ORDER_REFERENCE_REQUIRED);
@@ -387,9 +453,9 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             );
 
             // WHEN
-            ResultActions result = this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                                            .contentType(MediaType.APPLICATION_JSON)
-                                                            .content(objectMapper.writeValueAsString(request)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
 
             // THEN
             assertBadRequestResponse(result, ValidationError.ACTION_REQUIRED);
@@ -410,9 +476,9 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             );
 
             // WHEN
-            ResultActions result = this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                                            .contentType(MediaType.APPLICATION_JSON)
-                                                            .content(objectMapper.writeValueAsString(request)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
 
             // THEN
             assertBadRequestResponse(result, ValidationError.ACTION_REQUIRED);
@@ -433,9 +499,9 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             );
 
             // WHEN
-            ResultActions result = this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                                            .contentType(MediaType.APPLICATION_JSON)
-                                                            .content(objectMapper.writeValueAsString(request)));
+            ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                             .contentType(MediaType.APPLICATION_JSON)
+                                                             .content(objectMapper.writeValueAsString(request)));
 
             // THEN
             assertBadRequestResponse(result, ValidationError.RESPONSIBLE_PARTY_REQUIRED);
@@ -464,6 +530,17 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             assertBadRequestResponse(result, ValidationError.RESPONSIBLE_PARTY_REQUIRED);
         }
 
+    }
+
+    private void assertBadRequestResponse(ResultActions result,
+                                          String validationDetails) throws Exception {
+
+        result
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+            .andExpect(jsonPath("$.error").value(HttpStatus.BAD_REQUEST.getReasonPhrase()))
+            .andExpect(jsonPath("$.details", hasSize(1)))
+            .andExpect(jsonPath("$.details", hasItem(validationDetails)));
     }
 
     @Nested

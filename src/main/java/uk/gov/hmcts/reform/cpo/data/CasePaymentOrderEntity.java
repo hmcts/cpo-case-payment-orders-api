@@ -22,6 +22,7 @@ import java.util.UUID;
 @Audited(withModifiedFlag = true)
 public class CasePaymentOrderEntity {
 
+    public static final String UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT = "unique_case_id_order_reference";
     public static final String CASE_ID = "caseId";
     public static final String ORDER_REFERENCE = "orderReference";
 
@@ -51,5 +52,4 @@ public class CasePaymentOrderEntity {
 
     @Column(length = 70)
     private String createdBy;
-
 }
