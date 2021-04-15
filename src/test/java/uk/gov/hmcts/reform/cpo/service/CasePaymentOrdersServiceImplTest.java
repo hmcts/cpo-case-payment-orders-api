@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundExceptio
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
+import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
 import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
@@ -46,13 +47,16 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
     private CasePaymentOrderMapper casePaymentOrderMapper;
     @Mock
     private CasePaymentOrdersRepository casePaymentOrdersRepository;
+    @Mock
+    private SecurityUtils securityUtils;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         casePaymentOrdersService = new CasePaymentOrdersServiceImpl(
-            casePaymentOrderMapper,
-            casePaymentOrdersRepository
+            casePaymentOrdersRepository,
+            securityUtils,
+            casePaymentOrderMapper
         );
     }
 

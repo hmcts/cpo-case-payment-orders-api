@@ -13,26 +13,15 @@ import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundExceptio
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
 import uk.gov.hmcts.reform.cpo.exception.IdAMIdCannotBeRetrievedException;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
-import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
-import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
-import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
+import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
+import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
-import org.hibernate.exception.ConstraintViolationException;
-import org.springframework.dao.DataIntegrityViolationException;
-import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
-import uk.gov.hmcts.reform.cpo.validators.ValidationError;
-
-import static uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity.UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT;
-import static uk.gov.hmcts.reform.cpo.validators.ValidationError.IDAM_ID_NOT_FOUND;
-
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
 
 import static uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity.UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT;
 import static uk.gov.hmcts.reform.cpo.validators.ValidationError.IDAM_ID_NOT_FOUND;

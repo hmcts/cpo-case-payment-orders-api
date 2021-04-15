@@ -13,32 +13,29 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PostMapping;
 import springfox.documentation.annotations.ApiIgnore;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
-import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
-import javax.validation.Valid;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
-import uk.gov.hmcts.reform.cpo.ApplicationParams;
-import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.security.AuthError;
+import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 
+import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
 @RestController
@@ -49,12 +46,10 @@ public class CasePaymentOrdersController {
     public static final String CASE_PAYMENT_ORDERS_PATH = "/case-payment-orders";
 
     private final CasePaymentOrdersService casePaymentOrdersService;
-    private final ApplicationParams applicationParams;
 
-    public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersService,
-                                       ApplicationParams applicationParams) {
+
+    public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersService) {
         this.casePaymentOrdersService = casePaymentOrdersService;
-        this.applicationParams = applicationParams;
     }
 
     @PostMapping(path = CASE_PAYMENT_ORDERS_PATH, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
@@ -85,7 +80,7 @@ public class CasePaymentOrdersController {
                         + "   \"error\": \"Bad Request\",\n"
                         + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
                         + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
-                        + "   \"details\": [ \""  + ValidationError.CASE_ID_INVALID + "\" ]\n"
+                        + "   \"details\": [ \"" + ValidationError.CASE_ID_INVALID + "\" ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
             })
@@ -205,7 +200,7 @@ public class CasePaymentOrdersController {
                         + "   \"error\": \"Bad Request\",\n"
                         + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
                         + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
-                        + "   \"details\": [ \""  + ValidationError.ID_REQUIRED + "\" ]\n"
+                        + "   \"details\": [ \"" + ValidationError.ID_REQUIRED + "\" ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
             })
