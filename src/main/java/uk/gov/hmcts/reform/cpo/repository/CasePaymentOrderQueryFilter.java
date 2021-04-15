@@ -49,7 +49,7 @@ public class CasePaymentOrderQueryFilter {
 
     public Pageable getPageRequest() {
         return PageRequest.of(
-            getPageNumberMinusOne(),
+            getPageNumberZeroBased(),
             pageable.getPageSize(),
             Sort.by(
                 Sort.Order.asc(CasePaymentOrderEntity.CASE_ID),
@@ -58,7 +58,7 @@ public class CasePaymentOrderQueryFilter {
         );
     }
 
-    private int getPageNumberMinusOne() {
+    private int getPageNumberZeroBased() {
         return pageable.getPageNumber() - 1;
     }
 
