@@ -8,8 +8,8 @@
   "request" : {
     "_extends_": "Common_Request",
     "queryParams": {
-      "ids": "${[scenarioContext][siblingContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
-      "case_ids": "${[scenarioContext][siblingContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]}"
+      "ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
+      "case_ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][case_id]}"
     }
   },
 

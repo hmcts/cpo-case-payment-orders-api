@@ -6,7 +6,7 @@
   ],
 
   "request" : {
-    "id" : "${[scenarioContext][siblingContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
+    "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
     "effective_from" : "2021-01-01T00:00:00Z",
     "case_id" : "${[scenarioContext][customValues][GenerateCaseId]}",
     "case_type_id" : "attribute-to-be-removed",

@@ -3,17 +3,39 @@
   "_extends_" : "getCasePaymentOrderBase",
 
   "specs": [
+    "contains a set of ids from the case payment orders previously created",
+    "contains all the mandatory parameters",
+    "does not contain defined optional parameters for page_size And page_number",
+    "contains a 200 success OK code",
+    "case payment order CP1, CP2",
+    "has page_size default 20 and page_number default 1",
+    "to verify that a Case payment Order has been created"
+
   ],
 
   "request" : {
     "_extends_": "Common_Request",
     "queryParams": {
-      "ids": "${[scenarioContext][siblingContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]},${[scenarioContext][siblingContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}"
+      "ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]},${[scenarioContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][id]}"
     }
   },
 
   "expectedResponse" : {
-    "_extends_" : "Common_200_Response"
+    "_extends_" : "Common_200_Response",
+    "body" : {
+      "_extends_" : "Base_CPO_GET_Response_Data",
+      "content": [
+        {
+          "_extends_" : "Base_CPO_Response_Data"
+        },{
+          "_extends_" : "Base_CPO_Response_Data",
+          "order_reference" : "2021-12345678902"
+        }
+      ],
+      "total_elements": 2,
+      "number_of_elements": 2
+    }
+
 
   }
 }

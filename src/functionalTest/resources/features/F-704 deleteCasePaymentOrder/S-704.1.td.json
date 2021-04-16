@@ -1,0 +1,23 @@
+{
+  "_guid_" : "S-704.1",
+  "_extends_" : "deleteCasePaymentOrderBase",
+
+  "specs": [
+    "contains a set of ids from the case payment order just created above",
+    "contains all the mandatory parameters",
+    "contains a 204"
+
+
+  ],
+
+  "request" : {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]},${[scenarioContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_204_Response"
+  }
+}

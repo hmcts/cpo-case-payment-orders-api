@@ -11,7 +11,7 @@
   "request" : {
     "body": {
       "_extends_" : "Base_CPO_Data",
-      "id" : "${[scenarioContext][siblingContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
+      "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
       "responsible_party" : "party2"
     }
   },
@@ -20,7 +20,7 @@
     "_extends_" : "Common_201_Response",
     "body" : {
       "_extends_" : "Base_CPO_Response_Data",
-      "id" : "${[scenarioContext][siblingContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
+      "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
       "responsible_party" : "party2"
     }
 

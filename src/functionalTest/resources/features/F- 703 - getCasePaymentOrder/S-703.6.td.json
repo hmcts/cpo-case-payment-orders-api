@@ -3,6 +3,9 @@
   "_extends_" : "getCasePaymentOrderBase",
 
   "specs": [
+    "contains a set of case_ids that don't exist in the Case Payment Orders database",
+    "contains all the mandatory parameters",
+    "contains relevant error message"
   ],
 
   "request" : {

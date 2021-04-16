@@ -6,7 +6,7 @@
   ],
 
   "request" : {
-    "id" : "${[scenarioContext][siblingContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
+    "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
     "case_id" : "${[scenarioContext][customValues][GenerateCaseId]}",
     "action" : "payday",
     "case_type_id" : "attribute-to-be-removed",

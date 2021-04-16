@@ -1,19 +1,19 @@
 {
-  "_guid_" : "S-701.2.4",
+  "_guid_" : "S-701.2.2",
   "_extends_" : "S-702_Base",
 
   "specs": [
-    "does not contain the action parameter"
+    "does not contain the case_id parameter"
   ],
 
   "request" : {
     "_extends_": "Common_Request",
     "body": {
       "effective_from" : "2021-01-01T00:00:00Z",
-      "case_id" : "${[scenarioContext][customValues][GenerateCaseId]}",
       "case_type_id" : "FT_MasterCaseType",
+      "action" : "payday",
       "responsible_party" : "party1",
-      "order_reference" : "order1"
+      "order_reference" : "2021-12345678901"
     }
   },
 

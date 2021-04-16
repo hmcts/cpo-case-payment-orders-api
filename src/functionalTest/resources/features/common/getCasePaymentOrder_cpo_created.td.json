@@ -7,12 +7,21 @@
   ],
 
   "request" : {
+    "_extends_": "Common_Request",
     "queryParams": {
-      "ids": "${[scenarioContext][siblingContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}"
+      "ids": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
     }
   },
 
   "expectedResponse" : {
-
+    "_extends_" : "Common_200_Response",
+    "body" : {
+      "_extends_" : "Base_CPO_GET_Response_Data",
+      "content": [
+        {
+          "_extends_" : "Base_CPO_Response_Data"
+        }
+      ]
+    }
   }
 }

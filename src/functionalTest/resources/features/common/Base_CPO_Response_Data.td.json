@@ -4,10 +4,9 @@
   "created_timestamp" : "[[ANYTHING_PRESENT]]",
   "effective_from" : "[[ANYTHING_PRESENT]]",
   "case_id" : "${[scenarioContext][customValues][GetGeneratedCaseId]}",
-  "case_type_id" : "attribute-to-be-removed",
   "action" : "payday",
   "responsible_party" : "party1",
-  "order_reference" : "order1",
+  "order_reference" : "2021-12345678901",
   "created_by" : "[[ANYTHING_PRESENT]]"
 }
 

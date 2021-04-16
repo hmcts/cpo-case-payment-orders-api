@@ -1,0 +1,30 @@
+{
+  "_guid_" : "S-704.5",
+  "_extends_" : "deleteCasePaymentOrderBase",
+
+  "specs": [
+    "contains a set of ids from the case payment order just created above",
+    "does not contain the search criteria parameters",
+    "contains a 204",
+    "contains an id that doesn't exist in the Case Payment Orders database"
+
+
+  ],
+
+  "request" : {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]},${[scenarioContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][id]},f9a1b999-999a-4dbe-999a-adbfbb398836"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_404_Response",
+    "body" : {
+      "exception" : "uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException",
+      "message" : "Case Payment Order specified by IDs does not exist",
+      "path" : "/case-payment-orders",
+      "details" : null
+    }
+  }
+}

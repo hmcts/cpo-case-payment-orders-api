@@ -5,7 +5,7 @@
   "request" : {
     "_extends_": "Common_Request",
     "body": {
-      "id" : "${[scenarioContext][siblingContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}"
+      "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}"
     }
   }
 }

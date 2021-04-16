@@ -10,6 +10,6 @@
   },
 
   "body": {
-    "status": "400_Response"
+    "status": 400
   }
 }

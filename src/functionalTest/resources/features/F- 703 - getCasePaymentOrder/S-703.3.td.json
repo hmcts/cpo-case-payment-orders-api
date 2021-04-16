@@ -3,6 +3,8 @@
   "_extends_" : "getCasePaymentOrderBase",
 
   "specs": [
+    "does not contain the search criteria parameters",
+    "contains relevant error message"
   ],
 
   "request" : {

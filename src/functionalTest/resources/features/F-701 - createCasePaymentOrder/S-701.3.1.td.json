@@ -3,8 +3,8 @@
   "_extends_" : "createCasePaymentOrderBase",
 
   "specs": [
-    "an invalid mandatory parameter",
-    "an incorrect caseid format"
+    "contains an invalid mandatory parameter",
+    "contains an incorrect caseid format"
   ],
 
   "request" : {

@@ -3,7 +3,8 @@
   "_extends_" : "createCasePaymentOrderBase",
 
   "specs": [
-    "does not contain one or more of the mandatory parameters"
+    "does not contain one or more of the mandatory parameters",
+    "an active profile in CCD"
   ],
 
   "request" : {

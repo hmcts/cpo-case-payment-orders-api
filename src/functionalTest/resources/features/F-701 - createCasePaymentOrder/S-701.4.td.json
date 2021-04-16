@@ -3,13 +3,17 @@
   "_extends_" : "createCasePaymentOrderBase",
 
   "specs": [
-    "all the mandatory parameters",
-    "the same order_reference as used in the previously created CPO for the same case id"
+    "contains all the mandatory parameters",
+    "contains the same order_reference as used in the previously created CPO for the same case id"
   ],
 
   "request" : {
-    "_extends_" : "updateCasePaymentOrderPayloadData",
-    "order_reference" : "order2"
+    "_extends_": "Common_Request",
+
+    "body" : {
+      "_extends_" : "Base_CPO_Data",
+      "case_id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]}"
+    }
 
   },
 

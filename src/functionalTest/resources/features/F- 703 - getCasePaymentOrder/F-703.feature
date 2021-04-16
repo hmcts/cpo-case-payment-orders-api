@@ -4,7 +4,6 @@ Feature:
   Background:
     Given an appropriate test context as detailed in the test data source,
     And a user with [an active profile in CCD],
-    And a successful call [to create a case payment order CP1] as in [Prerequisite_Create_CPO],
 
   @S-703.1
   Scenario: AC1: Successfully allow the collection of existing payment order(s) from the Case Payment Order database (Happy Path 1 - Ids supplied in parameters)
@@ -14,7 +13,7 @@ Feature:
     And the request [contains a set of ids from the case payment orders previously created]
     And the request [contains all the mandatory parameters]
     And the request [does not contain defined optional parameters for page_size And page_number]
-    And it is submitted to call the [getCasePaymentOrder] operation of the [Case Payment Orders Microservice]
+    And it is submitted to call the [getCasePaymentOrder] operation of [Case Payment Orders Microservice]
     Then a positive response is received
     And the response [contains a 200 success OK code]
     And the response [case payment order CP1, CP2]
@@ -29,7 +28,7 @@ Feature:
     And the request [contains a set of case ids from the case payment orders previously created]
     And the request [contains all the mandatory parameters]
     And the request [does not contain defined optional parameters for page_size And page_number]
-    And it is submitted to call the [getCasePaymentOrder] operation of the [Case Payment Orders Microservice]
+    And it is submitted to call the [getCasePaymentOrder] operation of [Case Payment Orders Microservice]
     Then a positive response is received
     And the response [contains a 200 success OK code]
     And the response [case payment order CP1, CP2]
@@ -42,9 +41,9 @@ Feature:
     And a successful call [to create a case payment order CP2] as in [Prerequisite_Create_CPO_2],
     When a request is prepared with appropriate values
     And the request [does not contain the search criteria parameters]
-    And it is submitted to call the  [getCasePaymentOrder] operation of the [Case Payment Orders Microservice]
+    And it is submitted to call the [getCasePaymentOrder] operation of [Case Payment Orders Microservice]
     Then a negative response is received
-    And the response contains [relevant error message]
+    And the response [contains relevant error message]
     And the response has all other details as expected
 
   @S-703.4
@@ -53,9 +52,9 @@ Feature:
     And a successful call [to create a case payment order CP2] as in [Prerequisite_Create_CPO_2],
     When a request is prepared with appropriate values
     And the request [does not contain the user token parameter]
-    And it is submitted to call the  [getCasePaymentOrder] operation of the [Case Payment Orders Microservice]
+    And it is submitted to call the [getCasePaymentOrder] operation of [Case Payment Orders Microservice]
     Then a negative response is received
-    And the response contains [relevant error message]
+    And the response [contains relevant error message]
     And the response has all other details as expected
 
   @S-703.5
@@ -63,7 +62,7 @@ Feature:
     When a request is prepared with appropriate values
     And the request [contains a set of ids that don't exist in the Case Payment Orders database]
     And the request [contains all the mandatory parameters]
-    And it is submitted to call the [getCasePaymentOrder] operation of the [Case Payment Orders Microservice]
+    And it is submitted to call the [getCasePaymentOrder] operation of [Case Payment Orders Microservice]
     Then a negative response is received
     And the response [contains relevant error message]
     And the response has all other details as expected
@@ -73,7 +72,7 @@ Feature:
     When a request is prepared with appropriate values
     And the request [contains a set of case_ids that don't exist in the Case Payment Orders database]
     And the request [contains all the mandatory parameters]
-    And it is submitted to call the [getCasePaymentOrder] operation of the [Case Payment Orders Microservice]
+    And it is submitted to call the [getCasePaymentOrder] operation of [Case Payment Orders Microservice]
     Then a negative response is received
     And the response [contains relevant error message]
     And the response has all other details as expected
@@ -87,7 +86,7 @@ Feature:
     And the request [contains all the mandatory parameters]
     And the request [contains a defined optional parameter for page_size 10]
     And the request [contains a defined optional parameter for page_number 2]
-    And it is submitted to call the [getCasePaymentOrder] operation of the [Case Payment Orders Microservice]
+    And it is submitted to call the [getCasePaymentOrder] operation of [Case Payment Orders Microservice]
     Then a positive response is received
     And the response [contains a 200 success OK code]
     And the response has all other details as expected
@@ -101,7 +100,7 @@ Feature:
     And a successful call [to create a case payment order CP2] as in [Prerequisite_Create_CPO_2],
     When a request is prepared with appropriate values
     And the request [contains both the Ids And Case Ids query parameters]
-    And it is submitted to call the  [getCasePaymentOrder] operation of the [Case Payment Orders Microservice]
+    And it is submitted to call the [getCasePaymentOrder] operation of [Case Payment Orders Microservice]
     Then a negative response is received
     And the response contains [relevant error message]
     And the response has all other details as expected
