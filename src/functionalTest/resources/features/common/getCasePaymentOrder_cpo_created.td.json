@@ -1,0 +1,27 @@
+{
+  "_guid_" : "getCasePaymentOrder_cpo_created",
+  "_extends_" : "getCasePaymentOrderBase",
+
+  "specs" : [
+    "to verify that a Case payment Order has been created"
+  ],
+
+  "request" : {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "ids": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_200_Response",
+    "body" : {
+      "_extends_" : "Base_CPO_GET_Response_Data",
+      "content": [
+        {
+          "_extends_" : "Base_CPO_Response_Data"
+        }
+      ]
+    }
+  }
+}
