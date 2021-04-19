@@ -75,7 +75,7 @@ class CasePaymentOrderQueryFilterTest implements BaseTest {
         );
         final Pageable pageRequest = casePaymentOrderQueryFilter.getPageRequest();
 
-        assertThat(pageRequest.getPageNumber(), is(0));
+        assertThat(pageRequest.getPageNumber(), is(1));
         assertThat(pageRequest.getPageSize(), is(3));
     }
 }

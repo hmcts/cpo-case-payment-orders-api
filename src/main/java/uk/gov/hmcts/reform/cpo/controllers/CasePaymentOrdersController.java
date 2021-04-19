@@ -144,7 +144,7 @@ public class CasePaymentOrdersController {
         )
     })
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "page", value = "page number", paramType = "query"),
+        @ApiImplicitParam(name = "page", value = "page number, indexes from (0,1) to page-size.", paramType = "query"),
         @ApiImplicitParam(name = "size", value = "page size", paramType = "query")
     })
     public Page<CasePaymentOrder> getCasePaymentOrders(@ApiParam("list of case payment orders ids")
