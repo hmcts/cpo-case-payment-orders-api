@@ -18,8 +18,8 @@ public final class ValidationError {
     // additional constraints etc..
     public static final String CPO_NOT_FOUND = "Case Payment Order does not exist.";
     public static final String CASE_ID_ORDER_REFERENCE_UNIQUE
-        = "A case payment order with the specified Order Reference already exists on the case";
-    public static final String IDAM_ID_NOT_FOUND = "Idam ID cannot be retrieved";
+        = "A case payment order with the specified Order Reference already exists on the case.";
+    public static final String IDAM_ID_RETRIEVE_ERROR = "Idam ID cannot be retrieved.";
 
     public static final String ARGUMENT_NOT_VALID = "Input not valid";
 

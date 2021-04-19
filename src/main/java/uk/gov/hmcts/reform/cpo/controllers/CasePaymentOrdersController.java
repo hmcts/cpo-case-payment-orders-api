@@ -70,7 +70,7 @@ public class CasePaymentOrdersController {
                 + "\n5) " + ValidationError.RESPONSIBLE_PARTY_REQUIRED
                 + "\n6) " + ValidationError.ORDER_REFERENCE_INVALID
                 + "\n7) " + ValidationError.ORDER_REFERENCE_REQUIRED
-                + "\n8) " + ValidationError.IDAM_ID_NOT_FOUND,
+                + "\n8) " + ValidationError.IDAM_ID_RETRIEVE_ERROR,
             response = String.class,
             examples = @Example({
                 @ExampleProperty(
@@ -145,7 +145,7 @@ public class CasePaymentOrdersController {
                 + "\n7) " + ValidationError.RESPONSIBLE_PARTY_REQUIRED
                 + "\n8) " + ValidationError.ORDER_REFERENCE_INVALID
                 + "\n9) " + ValidationError.ORDER_REFERENCE_REQUIRED
-                + "\n10) " + ValidationError.IDAM_ID_NOT_FOUND,
+                + "\n10) " + ValidationError.IDAM_ID_RETRIEVE_ERROR,
             response = String.class,
             examples = @Example({
                 @ExampleProperty(

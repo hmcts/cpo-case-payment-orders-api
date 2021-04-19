@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Getter
 @ApiModel("Update Case Payment Order Request")
-public class UpdateCasePaymentOrderRequest extends CreateCasePaymentOrderRequest {
+public class UpdateCasePaymentOrderRequest extends BaseCasePaymentOrderRequest {
 
     @NotEmpty(message = ValidationError.ID_REQUIRED)
     @ValidCpoId

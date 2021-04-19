@@ -33,7 +33,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity.UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT;
 import static uk.gov.hmcts.reform.cpo.validators.ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE;
-import static uk.gov.hmcts.reform.cpo.validators.ValidationError.IDAM_ID_NOT_FOUND;
+import static uk.gov.hmcts.reform.cpo.validators.ValidationError.IDAM_ID_RETRIEVE_ERROR;
 
 class CasePaymentOrdersServiceImplTest implements BaseTest {
 
@@ -113,7 +113,7 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
             given(securityUtils.getUserInfo()).willThrow(new RuntimeException());
             assertThatThrownBy(() -> casePaymentOrdersService.createCasePaymentOrder(createCasePaymentOrderRequest))
                 .isInstanceOf(IdAMIdCannotBeRetrievedException.class)
-                .hasMessageContaining(IDAM_ID_NOT_FOUND);
+                .hasMessageContaining(IDAM_ID_RETRIEVE_ERROR);
         }
     }
 
@@ -250,7 +250,7 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
             // WHEN / THEN
             assertThatThrownBy(() -> casePaymentOrdersService.updateCasePaymentOrder(updateCasePaymentOrderRequest))
                 .isInstanceOf(IdAMIdCannotBeRetrievedException.class)
-                .hasMessageContaining(IDAM_ID_NOT_FOUND);
+                .hasMessageContaining(IDAM_ID_RETRIEVE_ERROR);
         }
 
     }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,9 +29,10 @@ import java.util.List;
 import java.util.UUID;
 
 import static uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity.UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT;
-import static uk.gov.hmcts.reform.cpo.validators.ValidationError.IDAM_ID_NOT_FOUND;
+import static uk.gov.hmcts.reform.cpo.validators.ValidationError.IDAM_ID_RETRIEVE_ERROR;
 
 @Service
+@Slf4j
 public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
     private final SecurityUtils securityUtils;
@@ -112,7 +114,8 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         try {
             return securityUtils.getUserInfo().getUid();
         } catch (Exception e) {
-            throw new IdAMIdCannotBeRetrievedException(IDAM_ID_NOT_FOUND);
+            log.error(IDAM_ID_RETRIEVE_ERROR, e);
+            throw new IdAMIdCannotBeRetrievedException(IDAM_ID_RETRIEVE_ERROR);
         }
     }
 
