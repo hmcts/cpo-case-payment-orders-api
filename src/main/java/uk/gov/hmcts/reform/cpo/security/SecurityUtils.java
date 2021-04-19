@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.cpo.exception.UnauthorisedServiceException;
-
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.List;
@@ -18,6 +16,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class SecurityUtils {
 
     public static final String BEARER = "Bearer ";
+    public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
     private final IdamRepository idamRepository;
     private final List<String> readOnlyServices;
@@ -48,16 +47,11 @@ public class SecurityUtils {
         return token.startsWith(BEARER) ? token.substring(BEARER.length()) : token;
     }
 
-    public void isReadOnlyService(String token) {
+    public boolean hasFullAccessToService(String token) {
         if (isBlank(token)) {
-            throw new UnauthorisedServiceException("The provided S2S token is missing or invalid");
+            return false;
         }
 
-        String serviceName = getServiceNameFromS2SToken(token);
-
-        if (readOnlyServices.contains(serviceName)) {
-            throw new UnauthorisedServiceException(
-                "Service does not possess the required CRUD permissions to access this resource");
-        }
+        return !readOnlyServices.contains(getServiceNameFromS2SToken(token));
     }
 }

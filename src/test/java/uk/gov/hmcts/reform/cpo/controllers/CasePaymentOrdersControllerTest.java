@@ -23,11 +23,17 @@ import uk.gov.hmcts.reform.TestIdamConfiguration;
 import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
+import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
+
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasItem;
@@ -38,17 +44,13 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH;
-import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.util.UUID;
-
+import static uk.gov.hmcts.reform.cpo.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
 
 public class CasePaymentOrdersControllerTest implements BaseTest {
@@ -59,7 +61,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
     private static final Long CASE_ID = 6_551_341_964_128_977L;
     private static final String ORDER_REFERENCE = "2021-11223344556";
     private static final UUID ID = UUID.randomUUID();
-
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
@@ -128,7 +129,8 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
                 casePaymentOrdersService,
                 applicationParams
             );
-            CasePaymentOrder response = controller.createCasePaymentOrderRequest(createCasePaymentOrderRequest);
+            CasePaymentOrder response = controller.createCasePaymentOrderRequest(createCasePaymentOrderRequest,
+                                                                                DUMMY_S2S_TOKEN_STRING);
             assertThat(response).isNotNull();
             assertEquals("Case Payment Order returned", response, casePaymentOrder);
 
@@ -144,8 +146,9 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
             this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
+                                    .header(SERVICE_AUTHORIZATION, DUMMY_S2S_TOKEN_STRING)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.id", is(ID.toString())))
@@ -181,7 +184,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
                                                                                      applicationParams);
 
             // WHEN
-            CasePaymentOrder response = controller.updateCasePaymentOrderRequest(request);
+            CasePaymentOrder response = controller.updateCasePaymentOrderRequest(request, DUMMY_S2S_TOKEN_STRING);
 
             // THEN
             assertThat(response).isNotNull().isEqualTo(casePaymentOrder);
@@ -193,6 +196,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
 
             // WHEN
             this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                     .header(SERVICE_AUTHORIZATION, DUMMY_S2S_TOKEN_STRING)
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(request)))
                 // THEN

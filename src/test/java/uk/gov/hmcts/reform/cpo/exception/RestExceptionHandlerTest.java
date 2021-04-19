@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH;
+import static uk.gov.hmcts.reform.cpo.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
 
 @WebMvcTest(controllers = CasePaymentOrdersController.class,
@@ -50,7 +51,6 @@ class RestExceptionHandlerTest implements BaseTest {
 
     @MockBean
     protected ApplicationParams applicationParams;
-
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -73,6 +73,7 @@ class RestExceptionHandlerTest implements BaseTest {
         /// WHEN
         setupMockServiceToThrowException(expectedException);
         ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                         .header(SERVICE_AUTHORIZATION, DUMMY_S2S_TOKEN_STRING)
                                                          .contentType(MediaType.APPLICATION_JSON)
                                                          .content(objectMapper.writeValueAsString(request)));
 
@@ -94,6 +95,7 @@ class RestExceptionHandlerTest implements BaseTest {
         /// WHEN
         setupMockServiceToThrowException(expectedException);
         ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                         .header(SERVICE_AUTHORIZATION, DUMMY_S2S_TOKEN_STRING)
                                                          .contentType(MediaType.APPLICATION_JSON)
                                                          .content(objectMapper.writeValueAsString(request)));
 

@@ -12,19 +12,22 @@ import uk.gov.hmcts.reform.cpo.BaseTest;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
+
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
+
 import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static uk.gov.hmcts.reform.BaseTest.DUMMY_S2S_TOKEN_STRING;
 import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH;
-
+import static uk.gov.hmcts.reform.cpo.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
 public class CasePaymentOrdersControllerIT {
 
@@ -82,6 +85,7 @@ public class CasePaymentOrdersControllerIT {
         void shouldSuccessfullyCreateCasePaymentOrder() throws Exception {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
             this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+                                     .header(SERVICE_AUTHORIZATION, DUMMY_S2S_TOKEN_STRING)
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
                 .andExpect(jsonPath("$.created_timestamp", is(LocalDateTime.now().format(formatter))))
@@ -132,11 +136,13 @@ public class CasePaymentOrdersControllerIT {
         @Test
         void shouldThrowNonUniquePairingErrors() throws Exception {
             this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+                    .header(SERVICE_AUTHORIZATION, DUMMY_S2S_TOKEN_STRING)
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
                 .andExpect(status().isCreated());
 
             this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+                    .header(SERVICE_AUTHORIZATION, DUMMY_S2S_TOKEN_STRING)
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
                 .andExpect(status().isConflict())

@@ -34,6 +34,8 @@ public interface BaseTest {
     String CREATED_BY = "createdBy";
     LocalDateTime CREATED_TIMESTAMP = LocalDateTime.now();
 
+    String DUMMY_S2S_TOKEN_STRING = "dummyS2STokenString";
+
     default <T> Optional<List<T>> createInitialValuesList(final T[] initialValues) {
         return Optional.of(Arrays.asList(initialValues));
     }

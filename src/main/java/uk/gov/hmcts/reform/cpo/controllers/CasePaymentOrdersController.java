@@ -8,10 +8,12 @@ import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +24,7 @@ import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import javax.validation.Valid;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.cpo.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
 import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
@@ -103,11 +106,14 @@ public class CasePaymentOrdersController {
             message = "Unexpected server error"
         )
     })
-
-    public CasePaymentOrder createCasePaymentOrderRequest(@Valid @RequestBody CreateCasePaymentOrderRequest
-                                                              requestPayload) {
+    @PreAuthorize("@securityUtils.hasFullAccessToService(#clientS2SToken)")
+    public CasePaymentOrder createCasePaymentOrderRequest(@Valid @RequestBody
+                                                                      CreateCasePaymentOrderRequest requestPayload,
+                                                              @RequestHeader(SERVICE_AUTHORIZATION)
+                                                                      String clientS2SToken) {
         return casePaymentOrdersService.createCasePaymentOrder(requestPayload);
     }
+
 
     @GetMapping(value = CASE_PAYMENT_ORDERS_PATH, produces = {APPLICATION_JSON_VALUE})
     public Page<CasePaymentOrderEntity> getCasePaymentOrders(@ApiParam("list of ids")
@@ -181,8 +187,11 @@ public class CasePaymentOrdersController {
             message = ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE
         )
     })
-    public CasePaymentOrder updateCasePaymentOrderRequest(@Valid @RequestBody UpdateCasePaymentOrderRequest
-                                                                  requestPayload) {
+    @PreAuthorize("@securityUtils.hasFullAccessToService(#clientS2SToken)")
+    public CasePaymentOrder updateCasePaymentOrderRequest(@Valid @RequestBody
+                                                                  UpdateCasePaymentOrderRequest requestPayload,
+                                                          @RequestHeader(SERVICE_AUTHORIZATION)
+                                                                  String clientS2SToken) {
         return casePaymentOrdersService.updateCasePaymentOrder(requestPayload);
     }
 
