@@ -1,0 +1,32 @@
+{
+  "_guid_" : "Base_CPO_GET_Response_Data",
+  "content": [
+
+  ],
+  "pageable": {
+    "sort": {
+      "sorted": true,
+      "unsorted": false,
+      "empty": false
+    },
+    "offset": 0,
+    "page_number": 1,
+    "page_size": 20,
+    "paged": true,
+    "unpaged": false
+  },
+  "last": true,
+  "total_pages": 1,
+  "total_elements": 1,
+  "number_of_elements": 1,
+  "size": 20,
+  "first": true,
+  "sort": {
+    "sorted": true,
+    "unsorted": false,
+    "empty": false
+  },
+  "number": 0,
+  "empty": false
+}
+

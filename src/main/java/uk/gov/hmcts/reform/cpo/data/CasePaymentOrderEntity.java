@@ -8,9 +8,9 @@ import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
 import javax.persistence.Column;
-import javax.persistence.Id;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -21,6 +21,8 @@ import java.util.UUID;
 @Table(name = "case_payment_orders")
 @Audited(withModifiedFlag = true)
 public class CasePaymentOrderEntity {
+
+    public static final String UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT = "unique_case_id_order_reference";
 
     @Id
     @GeneratedValue
