@@ -2,8 +2,17 @@
   "_guid_": "Base_Case_Payment_Order",
 
   "effective_from": "2021-02-10T03:02:30Z",
-  "case_id": "1612345678123456",
+  "case_id": "5277391326466289",
   "action": "Pay up",
   "responsible_party": "John Doe",
-  "order_reference": "2021-918425346"
+  "order_reference": "2021-91842534611"
+}
+
+{
+  "action": "Case Submit",
+  "case_id": 1617288400189308,
+  "effective_from": "2021-02-10T03:02:30Z",
+  "id": "77d30e7f-ead9-4529-a499-6bf8b0f2d08e",
+  "order_reference": 1111,
+  "responsible_party": "Jane Doe"
 }

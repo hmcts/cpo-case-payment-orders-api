@@ -5,6 +5,8 @@
   "specs" : ["to create a case payment order for the created case",
   "to create a case payment order CP1"],
 
+  "s2sClientId": "payment_app",
+
   "request" : {
     "body" : {
       "_extends_" : "Base_CPO_Data_Payload_data"

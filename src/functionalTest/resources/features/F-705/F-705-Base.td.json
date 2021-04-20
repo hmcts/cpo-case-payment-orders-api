@@ -11,8 +11,8 @@
     }
   },
 
-  "s2sClientId": "TODO",
-  "userTokenClientId": "TODO",
+  "s2sClientId": "xui_webapp",
+  "userTokenClientId": "xuiwebapp",
 
   "request": {
     "_extends_": "Common_Request"
