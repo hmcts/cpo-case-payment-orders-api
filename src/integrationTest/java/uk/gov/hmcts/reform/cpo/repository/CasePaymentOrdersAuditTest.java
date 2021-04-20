@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 class CasePaymentOrdersAuditTest extends BaseTest {
 
     @Autowired
-    private CasePaymentOrdersRepository casePaymentOrdersRepository;
+    private CasePaymentOrdersJpaRepository casePaymentOrdersRepository;
 
     @Autowired
     private CasePaymentOrderMapper casePaymentOrderMapper;
@@ -148,4 +148,5 @@ class CasePaymentOrdersAuditTest extends BaseTest {
 
         assertTrue(collect.containsAll(revisionTypes));
     }
+
 }

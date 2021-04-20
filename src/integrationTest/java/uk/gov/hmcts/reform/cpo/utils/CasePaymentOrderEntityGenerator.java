@@ -3,21 +3,21 @@ package uk.gov.hmcts.reform.cpo.utils;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.cpo.BaseTest;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
-import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
+import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersJpaRepository;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
 public class CasePaymentOrderEntityGenerator {
 
     @Autowired
-    private CasePaymentOrdersRepository casePaymentOrdersRepository;
+    private CasePaymentOrdersJpaRepository casePaymentOrdersJpaRepository;
 
     @Autowired
     private CasePaymentOrderMapper casePaymentOrderMapper;
@@ -35,16 +35,16 @@ public class CasePaymentOrderEntityGenerator {
             CasePaymentOrder casePaymentOrder = CasePaymentOrder.builder()
                 .action("Action " + RandomUtils.nextInt())
                 .caseId(useSameCaseId ? caseId : Long.parseLong(uidService.generateUID()))
-                .createdBy("Created by " + RandomUtils.nextBytes(2))
-                .orderReference(BaseTest.ORDER_REFERENCE_VALID)
+                .createdBy("Created by " + Arrays.toString(RandomUtils.nextBytes(2)))
+                .orderReference("2021-" + RandomUtils.nextLong(10000000000L, 99999999999L))
                 .effectiveFrom(LocalDateTime.now())
                 .createdTimestamp(LocalDateTime.now())
-                .responsibleParty("ResponsibleParty" + RandomUtils.nextBytes(2))
+                .responsibleParty("ResponsibleParty" + Arrays.toString(RandomUtils.nextBytes(2)))
                 .build();
 
 
             CasePaymentOrderEntity savedEntity =
-                casePaymentOrdersRepository.saveAndFlush(casePaymentOrderMapper.toEntity(casePaymentOrder));
+                casePaymentOrdersJpaRepository.saveAndFlush(casePaymentOrderMapper.toEntity(casePaymentOrder));
             returnValue.add(savedEntity);
         }
 

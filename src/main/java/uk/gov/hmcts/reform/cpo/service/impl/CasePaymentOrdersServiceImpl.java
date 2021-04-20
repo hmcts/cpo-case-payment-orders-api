@@ -29,11 +29,16 @@ import java.util.List;
 import java.util.UUID;
 
 import static uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity.UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT;
+import static uk.gov.hmcts.reform.cpo.validators.ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS;
 import static uk.gov.hmcts.reform.cpo.validators.ValidationError.IDAM_ID_RETRIEVE_ERROR;
 
 @Service
 @Slf4j
 public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
+
+    public static final String AUDIT_ENTRY_DELETION_ERROR = "Exception thrown when deleting audit entry for case "
+                                                            + "payment orders '{}'. Unwanted previous versions of the"
+                                                            + " case payment orders may remain";
 
     private final SecurityUtils securityUtils;
 
@@ -99,6 +104,35 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         return mapper.toDomainModel(updatedEntity);
     }
 
+    @Override
+    public void deleteCasePaymentOrders(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+        validateCasePaymentOrderQueryFilter(casePaymentOrderQueryFilter);
+
+        if (casePaymentOrderQueryFilter.isACasesIdQuery()) {
+            deleteCasePaymentOrdersByCaseIds(casePaymentOrderQueryFilter.getListOfLongCasesIds());
+        } else {
+            deleteCasePaymentOrdersByIds(casePaymentOrderQueryFilter.getListUUID());
+        }
+    }
+
+    private void deleteCasePaymentOrdersByIds(List<UUID> ids) {
+        casePaymentOrdersRepository.deleteByUuids(ids);
+        try {
+            casePaymentOrdersRepository.deleteAuditEntriesByUuids(ids);
+        } catch (Exception e) {
+            log.error(AUDIT_ENTRY_DELETION_ERROR, ids);
+        }
+    }
+
+    private void deleteCasePaymentOrdersByCaseIds(List<Long> caseIds) {
+        casePaymentOrdersRepository.deleteByCaseIds(caseIds);
+        try {
+            casePaymentOrdersRepository.deleteAuditEntriesByCaseIds(caseIds);
+        } catch (Exception e) {
+            log.error(AUDIT_ENTRY_DELETION_ERROR, caseIds);
+        }
+    }
+
     private PageRequest getPageRequest(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
         final List<Sort.Order> orders = new ArrayList<>();
         orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderQueryFilter.CASES_ID));
@@ -122,7 +156,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     private void validateCasePaymentOrderQueryFilter(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
         if (casePaymentOrderQueryFilter.isAnIdsAndCasesIdQuery()) {
             throw new CasePaymentOrdersQueryException(
-                "case-payment-orders cannot filter case payments orders by both id and cases-id.");
+                    CANNOT_DELETE_USING_IDS_AND_CASE_IDS);
         }
     }
 

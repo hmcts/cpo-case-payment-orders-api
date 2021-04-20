@@ -51,7 +51,6 @@ public class HttpError<T extends Serializable> implements Serializable {
         this(exception, request, null);
     }
 
-
     private Integer getStatusFromResponseStatus(ResponseStatus responseStatus, HttpStatus status) {
         if (status != null) {
             return status.value();

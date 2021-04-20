@@ -12,22 +12,27 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.cpo.BaseTest;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrderAuditRevision;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
-import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
+import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersAuditJpaRepository;
+import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersJpaRepository;
 import uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderAuditUtils;
 import uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderEntityGenerator;
 import uk.gov.hmcts.reform.cpo.utils.UIDService;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -38,6 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -54,7 +60,10 @@ class CasePaymentOrdersControllerIT extends BaseTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private CasePaymentOrdersRepository repository;
+    private CasePaymentOrdersAuditJpaRepository casePaymentOrdersAuditJpaRepository;
+
+    @Autowired
+    private CasePaymentOrdersJpaRepository casePaymentOrdersJpaRepository;
 
     @Autowired
     private CasePaymentOrderAuditUtils auditUtils;
@@ -65,14 +74,19 @@ class CasePaymentOrdersControllerIT extends BaseTest {
     @Autowired
     private UIDService uidService;
 
+    private static final String CASE_IDS = "case-ids";
+
     @BeforeEach
+    @Transactional
     public void setUp() {
-        repository.deleteAllInBatch();
+        casePaymentOrdersJpaRepository.deleteAllInBatch();
+        casePaymentOrdersAuditJpaRepository.deleteAllInBatch();
     }
+
 
     @Nested
     @DisplayName("POST /case-payment-orders")
-    class CreateCasePaymentOrder extends BaseTest {
+    class CreateCasePaymentOrder {
 
         private String caseId;
 
@@ -182,7 +196,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         private void verifyDbCpoValues(UUID id,
                                        CreateCasePaymentOrderRequest request,
                                        LocalDateTime beforeCreateTimestamp) {
-            Optional<CasePaymentOrderEntity> savedEntity = repository.findById(id);
+            Optional<CasePaymentOrderEntity> savedEntity = casePaymentOrdersJpaRepository.findById(id);
 
             assertTrue(savedEntity.isPresent());
             assertEquals(id, savedEntity.get().getId());
@@ -213,6 +227,249 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(CREATED_BY_IDAM_MOCK, latestRevision.getEntity().getCreatedBy());
             assertNotNull(latestRevision.getEntity().getCreatedTimestamp());
             assertTrue(beforeCreateTimestamp.isBefore(latestRevision.getEntity().getCreatedTimestamp()));
+        }
+    }
+
+
+    @Nested
+    @DisplayName("DELETE /case-payment-orders?ids=")
+    class DeleteCasePaymentOrdersByIds {
+
+        private static final String IDS = "ids";
+
+        @DisplayName("Successfully delete single case payment order specified by an id")
+        @Test
+        void shouldDeleteSingleCasePaymentSpecifiedById() throws Exception {
+
+            CasePaymentOrderEntity savedEntity =
+                    casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
+            assertTrue(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, savedEntity.getId().toString()))
+                    .andExpect(status().isNoContent());
+
+            assertFalse(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
+            assertFalse(casePaymentOrdersAuditJpaRepository.findById(savedEntity.getId()).isPresent());
+        }
+
+        @DisplayName("Successfully delete multiple case payments with specified ids")
+        @Test
+        void shouldDeleteMultipleCasePaymentsSpecifiedByIds() throws Exception {
+
+            List<CasePaymentOrderEntity> savedEntities
+                    = casePaymentOrderEntityGenerator.generateAndSaveEntities(3);
+            List<UUID> savedEntitiesUuids = savedEntities.stream()
+                    .map(CasePaymentOrderEntity::getId)
+                    .collect(Collectors.toList());
+            assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
+
+            String[] savedEntitiesUuidsString = savedEntitiesUuids.stream().map(UUID::toString).toArray(String[]::new);
+
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, savedEntitiesUuidsString))
+                    .andExpect(status().isNoContent());
+
+            assertTrue(casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
+            assertTrue(casePaymentOrdersAuditJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
+        }
+
+        @DisplayName("Fail if one case payment from list cannot be removed as specified ID does not exist")
+        @Test
+        void shouldFailWithNotFoundWhenDeleteNonExistentId() throws Exception {
+
+            List<CasePaymentOrderEntity> savedEntities =
+                    casePaymentOrderEntityGenerator.generateAndSaveEntities(3);
+            List<UUID> savedEntitiesUuids = savedEntities.stream()
+                    .map(CasePaymentOrderEntity::getId)
+                    .collect(Collectors.toList());
+            assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
+
+            List<UUID> entitiesToDelete = new ArrayList<>(savedEntitiesUuids);
+
+            entitiesToDelete.add(UUID.randomUUID());
+
+            String[] savedEntitiesUuidsString = entitiesToDelete.stream().map(UUID::toString).toArray(String[]::new);
+
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, savedEntitiesUuidsString))
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.message", is(ValidationError.CPO_NOT_FOUND_BY_ID)));
+            assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
+        }
+
+        @DisplayName("Should delete entity and all its corresponding audit revisions")
+        @Test
+        void testIdPresentMultipleTimesForCreateAndUpdate() throws Exception {
+
+            CasePaymentOrderEntity savedEntity =
+                    casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
+            assertTrue(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
+
+            savedEntity.setAction("NewAction");
+            casePaymentOrdersJpaRepository.saveAndFlush(savedEntity);
+
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, savedEntity.getId().toString()))
+                    .andExpect(status().isNoContent());
+
+            assertFalse(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
+            assertFalse(casePaymentOrdersAuditJpaRepository.findById(savedEntity.getId()).isPresent());
+        }
+
+        @DisplayName("Should fail with 400 Bad Request when invalid id (not a UUID) specified")
+        @Test
+        void shouldThrow400BadRequestWhenInvalidUuidIsSpecified() throws Exception {
+            final String invalidUuid = "123";
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, invalidUuid))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message",
+                            containsString("deleteCasePaymentOrdersById.ids: These ids: "
+                                    + invalidUuid
+                                    + " are incorrect.")));
+        }
+
+        @DisplayName("Should fail with 400 Bad Request when CaseIds and UUIDs are specified")
+        @Test
+        void shouldThrow400BadRequestWheUuidsAndCaseIdsAreSpecified() throws Exception {
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
+                    .queryParam(IDS, UUID.randomUUID().toString())
+                    .queryParam(CASE_IDS, uidService.generateUID()))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message",
+                            is(ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS)));
+        }
+    }
+
+    @Nested
+    @DisplayName("DELETE /case-payment-orders?case-ids=")
+    class DeleteCasePaymentOrdersByCaseIds {
+
+        @DisplayName("Successfully delete single case payment order specified by an id")
+        @Test
+        void shouldDeleteSingleCasePaymentSpecifiedByCaseId() throws Exception {
+            CasePaymentOrderEntity savedEntity =
+                    casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
+            assertTrue(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(CASE_IDS, savedEntity.getCaseId().toString()))
+                    .andExpect(status().isNoContent());
+
+            assertFalse(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
+            assertFalse(casePaymentOrdersAuditJpaRepository.findById(savedEntity.getId()).isPresent());
+        }
+
+        @DisplayName("Successfully delete multiple case payments with specified ids")
+        @Test
+        void shouldDeleteMultipleCasePaymentsSpecifiedByCaseIds() throws Exception {
+            List<CasePaymentOrderEntity> savedEntities =
+                    casePaymentOrderEntityGenerator.generateAndSaveEntities(3);
+
+            List<UUID> savedEntitiesUuids = savedEntities.stream()
+                    .map(CasePaymentOrderEntity::getId)
+                    .collect(Collectors.toList());
+
+            List<String> savedEntitiesCaseIds = savedEntities.stream()
+                    .map(CasePaymentOrderEntity::getCaseId)
+                    .map(caseId -> Long.toString(caseId))
+                    .collect(Collectors.toList());
+
+            assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
+
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
+                    .queryParam(CASE_IDS, savedEntitiesCaseIds.toArray(String[]::new)))
+                    .andExpect(status().isNoContent());
+
+            assertTrue(casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
+            assertTrue(casePaymentOrdersAuditJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
+        }
+
+        @DisplayName("Successfully delete multiple case payment orders with the same case id")
+        @Test
+        void shouldDeleteMultipleCasePaymentsSpecifiedByTheSameCaseId() throws Exception {
+            List<CasePaymentOrderEntity> savedEntities =
+                    casePaymentOrderEntityGenerator.generateAndSaveEntitiesWithSameCaseId(3);
+
+            List<UUID> savedEntitiesUuids = savedEntities.stream()
+                    .map(CasePaymentOrderEntity::getId)
+                    .collect(Collectors.toList());
+
+            String savedEntityCaseId = savedEntities.stream()
+                    .map(CasePaymentOrderEntity::getCaseId)
+                    .map(caseId -> Long.toString(caseId))
+                    .distinct()
+                    .collect(Collectors.joining());
+
+            assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
+
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
+                    .queryParam(CASE_IDS, savedEntityCaseId))
+                    .andExpect(status().isNoContent());
+
+            assertTrue(casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
+            assertTrue(casePaymentOrdersAuditJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
+        }
+
+
+        @DisplayName("Fail if one case payment from list cannot be removed as specified Case Id does not exist")
+        @Test
+        void shouldFailWithNotFoundWhenDeleteNonExistentCaseId() throws Exception {
+
+            List<CasePaymentOrderEntity> savedEntities =
+                    casePaymentOrderEntityGenerator.generateAndSaveEntities(3);
+            List<UUID> savedEntitiesUuids = savedEntities.stream()
+                    .map(CasePaymentOrderEntity::getId)
+                    .collect(Collectors.toList());
+            assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
+
+            List<String> savedEntitiesCaseIds = savedEntities.stream()
+                    .map(CasePaymentOrderEntity::getCaseId)
+                    .map(caseId -> Long.toString(caseId))
+                    .collect(Collectors.toList());
+            savedEntitiesCaseIds.add(uidService.generateUID());
+
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
+                    .queryParam(CASE_IDS, savedEntitiesCaseIds.toArray(String[]::new)))
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.message",
+                            is(ValidationError.CPO_NOT_FOUND_BY_CASE_ID)));
+
+
+            assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
+        }
+
+        @DisplayName("Should delete entity and all its corresponding audit revisions")
+        @Test
+        void testCaseIdPresentMultipleTimesForCreateAndUpdate() throws Exception {
+
+            CasePaymentOrderEntity savedEntity =
+                    casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
+            assertTrue(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
+
+            savedEntity.setAction("NewAction");
+            casePaymentOrdersJpaRepository.saveAndFlush(savedEntity);
+
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(CASE_IDS, savedEntity.getCaseId().toString()))
+                    .andExpect(status().isNoContent());
+
+            assertFalse(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
+            assertFalse(casePaymentOrdersAuditJpaRepository.findById(savedEntity.getId()).isPresent());
+        }
+
+        @DisplayName("Should fail with 400 Bad Request when invalid length caseId is specified")
+        @Test
+        void shouldThrow400BadRequestWhenInvalidLengthCaseIdSpecified() throws Exception {
+            final String invalidCaseId = "12345";
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(CASE_IDS, invalidCaseId))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message", containsString("These caseIDs: "
+                            + invalidCaseId
+                            + " are incorrect")));
+        }
+
+        @DisplayName("Should fail with 400 Bad Request when invalid caseId is specified")
+        @Test
+        void shouldThrow400BadRequestWhenInvalidCaseIdSpecified() throws Exception {
+            final String invalidLuhn = "1234567890123456";
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(CASE_IDS, invalidLuhn))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message", containsString("These caseIDs: "
+                            + invalidLuhn
+                            + " are incorrect")));
         }
     }
 
@@ -589,7 +846,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
         private void verifyDbCpoValues(UpdateCasePaymentOrderRequest request,
                                        LocalDateTime previousCreatedTimestamp) {
-            Optional<CasePaymentOrderEntity> updatedEntity = repository.findById(request.getUUID());
+            Optional<CasePaymentOrderEntity> updatedEntity = casePaymentOrdersJpaRepository.findById(request.getUUID());
 
             assertTrue(updatedEntity.isPresent());
             assertEquals(request.getId(), updatedEntity.get().getId().toString());
@@ -622,6 +879,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         }
 
     }
+
 
     private CasePaymentOrderAuditRevision getLatestAuditRevision(UUID id) {
 
