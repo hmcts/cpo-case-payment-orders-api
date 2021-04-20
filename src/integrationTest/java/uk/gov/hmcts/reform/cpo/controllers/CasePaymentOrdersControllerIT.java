@@ -49,7 +49,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_IDS;
 import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH;
+import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.IDS;
 
 class CasePaymentOrdersControllerIT extends BaseTest {
 
@@ -73,8 +75,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
     @Autowired
     private UIDService uidService;
-
-    private static final String CASE_IDS = "case-ids";
 
     @BeforeEach
     @Transactional
@@ -235,8 +235,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
     @DisplayName("DELETE /case-payment-orders?ids=")
     class DeleteCasePaymentOrdersByIds {
 
-        private static final String IDS = "ids";
-
         @DisplayName("Successfully delete single case payment order specified by an id")
         @Test
         void shouldDeleteSingleCasePaymentSpecifiedById() throws Exception {
@@ -290,7 +288,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, savedEntitiesUuidsString))
                     .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.message", is(ValidationError.CPO_NOT_FOUND_BY_ID)));
+                    .andExpect(jsonPath(ERROR_PATH_MESSAGE, is(ValidationError.CPO_NOT_FOUND_BY_ID)));
             assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
         }
 
@@ -318,7 +316,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             final String invalidUuid = "123";
             mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, invalidUuid))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message",
+                    .andExpect(jsonPath(ERROR_PATH_MESSAGE,
                             containsString("deleteCasePaymentOrdersById.ids: These ids: "
                                     + invalidUuid
                                     + " are incorrect.")));
@@ -331,7 +329,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                     .queryParam(IDS, UUID.randomUUID().toString())
                     .queryParam(CASE_IDS, uidService.generateUID()))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message",
+                    .andExpect(jsonPath(ERROR_PATH_MESSAGE,
                             is(ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS)));
         }
     }
@@ -425,7 +423,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
                     .queryParam(CASE_IDS, savedEntitiesCaseIds.toArray(String[]::new)))
                     .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.message",
+                    .andExpect(jsonPath(ERROR_PATH_MESSAGE,
                             is(ValidationError.CPO_NOT_FOUND_BY_CASE_ID)));
 
 
@@ -456,7 +454,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             final String invalidCaseId = "12345";
             mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(CASE_IDS, invalidCaseId))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message", containsString("These caseIDs: "
+                    .andExpect(jsonPath(ERROR_PATH_MESSAGE, containsString("These caseIDs: "
                             + invalidCaseId
                             + " are incorrect")));
         }
@@ -467,7 +465,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             final String invalidLuhn = "1234567890123456";
             mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(CASE_IDS, invalidLuhn))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message", containsString("These caseIDs: "
+                    .andExpect(jsonPath(ERROR_PATH_MESSAGE, containsString("These caseIDs: "
                             + invalidLuhn
                             + " are incorrect")));
         }
