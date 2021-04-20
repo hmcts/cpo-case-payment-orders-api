@@ -11,7 +11,8 @@ services:
       CPO_CASE_PAYMENT_ORDERS_DB_NAME: ${DB_NAME}
       CPO_CASE_PAYMENT_ORDERS_DB_USERNAME: ${DB_USERNAME}
       CPO_CASE_PAYMENT_ORDERS_DB_PASSWORD: ${DB_PASSWORD}
-      CPO_S2S_AUTHORISED_SERVICES: xui_webapp
+      CPO_S2S_AUTHORISED_SERVICES: xui_webapp,payment_app
+      CPO_S2S_READ_ONLY_SERVICES: xui_webapp
       IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
