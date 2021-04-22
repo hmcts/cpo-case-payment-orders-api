@@ -62,16 +62,16 @@ class CasePaymentOrdersServiceImplTest {
     void beforeEachTest() {
         listAppender.list.clear();
         uuidFilter = CasePaymentOrderQueryFilter.builder()
-            .listOfIds(uuidsToDelete.stream()
-                           .map(UUID::toString)
-                           .collect(Collectors.toList()))
-            .listOfCasesIds(Collections.emptyList())
+            .cpoIds(uuidsToDelete.stream()
+                        .map(UUID::toString)
+                        .collect(Collectors.toList()))
+            .caseIds(Collections.emptyList())
             .build();
         caseIdFilter = CasePaymentOrderQueryFilter.builder()
-            .listOfIds(Collections.emptyList())
-            .listOfCasesIds(caseIdsToDelete.stream()
-                                .map(Object::toString)
-                                .collect(Collectors.toList()))
+            .cpoIds(Collections.emptyList())
+            .caseIds(caseIdsToDelete.stream()
+                         .map(Object::toString)
+                         .collect(Collectors.toList()))
             .build();
     }
 
@@ -104,8 +104,10 @@ class CasePaymentOrdersServiceImplTest {
         List<ILoggingEvent> logsList = listAppender.list;
 
         assertEquals(1, logsList.size());
-        assertEquals(AUDIT_ENTRY_DELETION_ERROR.replace("{}", uuidsToDelete.toString()),
-                     logsList.get(0).getFormattedMessage());
+        assertEquals(
+            AUDIT_ENTRY_DELETION_ERROR.replace("{}", uuidsToDelete.toString()),
+            logsList.get(0).getFormattedMessage()
+        );
     }
 
     @Test
@@ -117,8 +119,10 @@ class CasePaymentOrdersServiceImplTest {
         List<ILoggingEvent> logsList = listAppender.list;
 
         assertEquals(1, logsList.size());
-        assertEquals(AUDIT_ENTRY_DELETION_ERROR.replace("{}", caseIdsToDelete.toString()),
-                     logsList.get(0).getFormattedMessage());
+        assertEquals(
+            AUDIT_ENTRY_DELETION_ERROR.replace("{}", caseIdsToDelete.toString()),
+            logsList.get(0).getFormattedMessage()
+        );
     }
 
     @Test

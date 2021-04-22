@@ -8,7 +8,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -21,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
-import springfox.documentation.annotations.ApiIgnore;
 import springfox.documentation.annotations.ApiIgnore;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
@@ -35,14 +32,11 @@ import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 
 import javax.validation.Valid;
-import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static java.util.Collections.emptyList;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
@@ -90,7 +84,7 @@ public class CasePaymentOrdersController {
                         + "   \"error\": \"Bad Request\",\n"
                         + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
                         + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
-                        + "   \"details\": [ \""  + ValidationError.CASE_ID_INVALID + "\" ]\n"
+                        + "   \"details\": [ \"" + ValidationError.CASE_ID_INVALID + "\" ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
             })
@@ -193,20 +187,20 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
-                        + "\n1) " + ValidationError.ID_INVALID
-                        + "\n2) " + ValidationError.CASE_ID_INVALID
-                        + "\n3) " + ValidationError.CPO_NOT_FOUND_BY_ID
-                        + "\n4) " + ValidationError.CPO_NOT_FOUND_BY_CASE_ID
-                        + "\n5) " + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS,
+                + "\n1) " + ValidationError.ID_INVALID
+                + "\n2) " + ValidationError.CASE_ID_INVALID
+                + "\n3) " + ValidationError.CPO_NOT_FOUND_BY_ID
+                + "\n4) " + ValidationError.CPO_NOT_FOUND_BY_CASE_ID
+                + "\n5) " + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS,
             examples = @Example(value = {
-                    @ExampleProperty(
+                @ExampleProperty(
                     value = "{\n"
-                            + "   \"status\": \"400\",\n"
-                            + "   \"error\": \"Bad Request\",\n"
-                            + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
-                            + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
-                            + "   \"details\": [ \""  + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS + "\" ]\n"
-                            + "}",
+                        + "   \"status\": \"400\",\n"
+                        + "   \"error\": \"Bad Request\",\n"
+                        + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
+                        + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
+                        + "   \"details\": [ \"" + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS + "\" ]\n"
+                        + "}",
                     mediaType = APPLICATION_JSON_VALUE
                 )
             })
@@ -226,12 +220,12 @@ public class CasePaymentOrdersController {
                                             @ApiParam("list of Case IDs")
                                             @ValidCaseId
                                             @RequestParam(name = CASE_IDS, required = false)
-                                                    Optional<List<String>> caseIds) {
+                                                Optional<List<String>> caseIds) {
 
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
-                .listOfIds(ids.orElse(emptyList()))
-                .listOfCasesIds(caseIds.orElse(emptyList()))
-                .build();
+            .cpoIds(ids.orElse(emptyList()))
+            .caseIds(caseIds.orElse(emptyList()))
+            .build();
 
         casePaymentOrdersService.deleteCasePaymentOrders(casePaymentOrderQueryFilter);
     }
@@ -263,7 +257,7 @@ public class CasePaymentOrdersController {
                         + "   \"error\": \"Bad Request\",\n"
                         + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
                         + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
-                        + "   \"details\": [ \""  + ValidationError.ID_REQUIRED + "\" ]\n"
+                        + "   \"details\": [ \"" + ValidationError.ID_REQUIRED + "\" ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
             })
@@ -286,7 +280,7 @@ public class CasePaymentOrdersController {
         )
     })
     public CasePaymentOrder updateCasePaymentOrderRequest(@Valid @RequestBody UpdateCasePaymentOrderRequest
-                                                                  requestPayload) {
+                                                              requestPayload) {
         return casePaymentOrdersService.updateCasePaymentOrder(requestPayload);
     }
 

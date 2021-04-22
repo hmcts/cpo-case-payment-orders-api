@@ -64,4 +64,13 @@ public class CasePaymentOrderQueryFilter {
         }
     }
 
+    public boolean isAnIdsAndCasesIdQuery() {
+        return isACasesIdQuery() && isAnIdsQuery();
+    }
+
+
+    public boolean isACasesIdQuery() {
+        return !caseIds.isEmpty();
+    }
+
 }
