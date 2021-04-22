@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.exception.CaseIdOrderReferenceUniqueConstraintException;
-import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
 import uk.gov.hmcts.reform.cpo.exception.IdAMIdCannotBeRetrievedException;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
@@ -101,7 +100,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         throw new UnsupportedOperationException("Implement me: see CPO-6");
     }
 
-    @Transactional(rollbackOn = CasePaymentOrderCouldNotBeFoundException.class)
+    @Transactional
     @Override
     public void deleteCasePaymentOrders(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
         validateCasePaymentOrderQueryFilter(casePaymentOrderQueryFilter);
