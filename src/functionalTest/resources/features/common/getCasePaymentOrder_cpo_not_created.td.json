@@ -12,13 +12,13 @@
     }
   },
 
-    "expectedResponse" : {
-      "_extends_" : "Common_200_Response",
-      "body" : {
-        "_extends_" : "Base_CPO_GET_Response_Data",
-        "content": [
+  "expectedResponse" : {
+    "_extends_" : "Common_200_Response",
+    "body" : {
+      "_extends_" : "Base_CPO_GET_Response_Data",
+      "content": [
 
-        ]
-      }
+      ]
     }
+  }
 }

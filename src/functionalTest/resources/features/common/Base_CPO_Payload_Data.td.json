@@ -1,5 +1,5 @@
 {
-  "_guid_" : "Base_CPO_Data_Payload_data",
+    "_guid_" : "Base_CPO_Data_Payload_data",
     "effective_from" : "2021-01-01T00:00:00Z",
     "case_id" : "${[scenarioContext][customValues][GenerateCaseId]}",
     "action" : "payday",

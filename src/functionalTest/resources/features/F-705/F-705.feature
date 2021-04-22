@@ -9,7 +9,7 @@ Background:
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # CPO-10 / AC-1
-@S-705.1 @GS
+@S-705.1
 Scenario: Must successfully allow access of the AddCasePaymentOrder API for a CRUD whitelisted service
 
   Given a user with [an active profile in CCD]
@@ -47,21 +47,22 @@ Scenario: Must successfully allow access of the UpdateCasePaymentOrder API for a
 @S-705.3
 Scenario: Must successfully allow access of the DeleteCasePaymentOrder API for a CRUD whitelisted service
 
-  Given [a new Case-Payment-Order microservice has been established],
-    And a successful call [to create a new Case Payment Order] as in [F-705_Prerequisite_Case_Payment_Order_Creation],
+  Given a user with [an active profile in CCD]
+    And [a new Case-Payment-Order microservice has been established] in the context,
+    And a successful call [to create a case payment order for the created case] as in [Prerequisite_Create_CPO],
     And [a CRUD whitelist exists for the invoking service] in the context of the scenario,
 
   When a request is prepared with appropriate values,
     And the request [intends to delete a new payment order],
     And the request [contains all the mandatory parameters],
-    And it is submitted to call the [DeleteCasePaymentOrder] operation of [Case Payment Order API],
+    And it is submitted to call the [deleteCasePaymentOrder] operation of [Case Payment Orders Microservice],
 
   Then a positive response is received
     And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # CPO-10 / AC-4
-@S-705.4 @GS
+@S-705.4
 Scenario: Must refuse access of the AddCasePaymentOrder API for a Non-CRUD whitelisted service
 
   Given a user with [an active profile in CCD]
@@ -99,14 +100,15 @@ Scenario: Must refuse access of the UpdateCasePaymentOrder API for a CRUD whitel
 @S-705.6
 Scenario: Must refuse access of the DeleteCasePaymentOrder API for a Non-CRUD whitelisted service
 
-  Given [a new Case-Payment-Order microservice has been established],
-    And a successful call [to create a new Case Payment Order] as in [F-705_Prerequisite_Case_Payment_Order_Creation],
-    And [a CRUD whitelist doesn't exists for the invoking service] in the context of the scenario,
+  Given a user with [an active profile in CCD]
+    And [a new Case-Payment-Order microservice has been established] in the context,
+    And a successful call [to create a case payment order for the created case] as in [Prerequisite_Create_CPO],
+    And [a CRUD whitelist doesn't exist for the invoking service] in the context of the scenario,
 
   When a request is prepared with appropriate values,
     And the request [intends to delete a payment order],
     And the request [contains all the mandatory parameters],
-    And it is submitted to call the [DeleteCasePaymentOrder] operation of [Case Payment Order API],
+    And it is submitted to call the [deleteCasePaymentOrder] operation of [Case Payment Orders Microservice],
 
   Then a negative response is received,
     And the response has all the details as expected.
@@ -116,14 +118,15 @@ Scenario: Must refuse access of the DeleteCasePaymentOrder API for a Non-CRUD wh
 @S-705.7
 Scenario: Must successfully allow READ access of the GetCasePaymentOrder API for a R permissions service (ExUI)
 
-  Given [a new Case-Payment-Order microservice has been established],
-    And a successful call [to create a new Case Payment Order] as in [F-705_Prerequisite_Case_Payment_Order_Creation],
+  Given a user with [an active profile in CCD]
+    And [a new Case-Payment-Order microservice has been established] in the context,
+    And a successful call [to create a case payment order for the created case] as in [Prerequisite_Create_CPO],
     And [a Read permission whitelist exists for the invoking service] in the context of the scenario,
 
   When a request is prepared with appropriate values,
     And the request [intends to get payment orders],
     And the request [contains all the mandatory parameters],
-    And it is submitted to call the [GetCasePaymentOrder] operation of [Case Payment Order API],
+    And it is submitted to call the [getCasePaymentOrder] operation of [Case Payment Orders Microservice],
 
   Then a positive response is received
     And the response has all the details as expected.

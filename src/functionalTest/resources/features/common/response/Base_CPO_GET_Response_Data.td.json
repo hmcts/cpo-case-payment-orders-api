@@ -10,8 +10,8 @@
       "empty": false
     },
     "offset": 0,
-    "page_number": 1,
-    "page_size": 20,
+    "page_number": 0,
+    "page_size": 2,
     "paged": true,
     "unpaged": false
   },
@@ -19,7 +19,7 @@
   "total_pages": 1,
   "total_elements": 1,
   "number_of_elements": 1,
-  "size": 20,
+  "size": 2,
   "first": true,
   "sort": {
     "sorted": true,
