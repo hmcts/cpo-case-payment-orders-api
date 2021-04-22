@@ -1,171 +1,134 @@
 package uk.gov.hmcts.reform.cpo.service;
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import uk.gov.hmcts.reform.BaseTest;
-import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
-import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
-import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
-import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
 import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
-import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.util.AssertionErrors.assertTrue;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl.AUDIT_ENTRY_DELETION_ERROR;
 
-class CasePaymentOrdersServiceImplTest implements BaseTest {
+@SuppressWarnings("PMD.JUnitAssertionsShouldIncludeMessage")
+@ExtendWith(MockitoExtension.class)
+class CasePaymentOrdersServiceImplTest {
 
-    private CasePaymentOrdersService casePaymentOrdersService;
-
-
-    private final List<String> casesIds = createInitialValuesList(new String[]{"1609243447569251",
-        "1609243447569252", "1609243447569253"}).get();
-
-    private final List<String> ids = createInitialValuesList(new String[]{"df54651b-3227-4067-9f23-6ffb32e2c6bd",
-        "d702ef36-0ca7-46e9-8a00-ef044d78453e",
-        "d702ef36-0ca7-46e9-8a00-ef044d78453e"}).get();
-
-    @Mock
-    private CasePaymentOrderMapper casePaymentOrderMapper;
     @Mock
     private CasePaymentOrdersRepository casePaymentOrdersRepository;
-    @Mock
-    private SecurityUtils securityUtils;
+
+    @InjectMocks
+    private CasePaymentOrdersServiceImpl casePaymentOrdersService;
+
+    @Captor
+    ArgumentCaptor<List<UUID>> uuidArgumentCaptor;
+
+    @Captor
+    ArgumentCaptor<List<Long>> caseIdsArgumentCaptor;
+
+    private static final List<UUID> uuidsToDelete = List.of(UUID.randomUUID(), UUID.randomUUID());
+
+    private final List<Long> caseIdsToDelete = List.of(123L, 456L);
+
+    private static final ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+
+    private CasePaymentOrderQueryFilter uuidFilter;
+
+    private CasePaymentOrderQueryFilter caseIdFilter;
+
+    @BeforeAll
+    static void setUp() {
+        createAndStartTestLogger();
+    }
 
     @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        casePaymentOrdersService = new CasePaymentOrdersServiceImpl(
-            casePaymentOrdersRepository,
-            securityUtils,
-            casePaymentOrderMapper
-        );
+    void beforeEachTest() {
+        listAppender.list.clear();
+        uuidFilter = CasePaymentOrderQueryFilter.builder()
+            .listOfIds(uuidsToDelete.stream()
+                           .map(UUID::toString)
+                           .collect(Collectors.toList()))
+            .listOfCasesIds(Collections.emptyList())
+            .build();
+        caseIdFilter = CasePaymentOrderQueryFilter.builder()
+            .listOfIds(Collections.emptyList())
+            .listOfCasesIds(caseIdsToDelete.stream()
+                                .map(Object::toString)
+                                .collect(Collectors.toList()))
+            .build();
     }
 
+    private static void createAndStartTestLogger() {
+        ch.qos.logback.classic.Logger logger =
+            (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(CasePaymentOrdersServiceImpl.class);
+        listAppender.start();
 
-    @Test
-    void passForListIds() {
-        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
-            .cpoIds(ids)
-            .caseIds(Collections.emptyList())
-            .pageable(getPageRequest())
-            .build();
-
-        when(casePaymentOrdersRepository.findByIdIn(anyList(), ArgumentMatchers.<Pageable>any())).thenReturn(
-            getEntityPages());
-
-        when(casePaymentOrderMapper.toDomainModelList(anyList())).thenReturn(createListOfCasePaymentOrder());
-        final Page<CasePaymentOrder> pages = casePaymentOrdersService.getCasePaymentOrders(
-            casePaymentOrderQueryFilter);
-
-        assertTrue("The getNumberOfElements should be 0.", pages.getNumberOfElements() == 3);
+        logger.addAppender(listAppender);
     }
 
     @Test
-    void passForListCasesIds() {
-        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
-            .cpoIds(Collections.emptyList())
-            .caseIds(casesIds)
-            .pageable(getPageRequest())
-            .build();
+    void deleteCasePaymentOrdersById() {
+        casePaymentOrdersService.deleteCasePaymentOrders(uuidFilter);
 
-        when(casePaymentOrdersRepository.findByCaseIdIn(anyList(), ArgumentMatchers.<Pageable>any())).thenReturn(
-            getEntityPages());
+        verify(casePaymentOrdersRepository).deleteByUuids(uuidArgumentCaptor.capture());
+        assertEquals(uuidArgumentCaptor.getValue(), uuidsToDelete);
 
-        when(casePaymentOrderMapper.toDomainModelList(anyList())).thenReturn(createListOfCasePaymentOrder());
-
-        final Page<CasePaymentOrder> pages = casePaymentOrdersService.getCasePaymentOrders(
-            casePaymentOrderQueryFilter);
-
-        assertTrue("The getNumberOfElements should be 0.", pages.getNumberOfElements() == 3);
+        verify(casePaymentOrdersRepository).deleteAuditEntriesByUuids(uuidArgumentCaptor.capture());
+        assertEquals(uuidArgumentCaptor.getValue(), uuidsToDelete);
     }
 
     @Test
-    void failForListCasesIds() {
-        final ArrayList<CasePaymentOrderEntity> casePaymentOrders = new ArrayList<>();
-        final Page<CasePaymentOrderEntity> pageImpl = new PageImpl<CasePaymentOrderEntity>(
-            casePaymentOrders,
-            getPageRequest(),
-            3
-        );
-        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
-            .cpoIds(Collections.emptyList())
-            .caseIds(casesIds)
-            .pageable(getPageRequest())
-            .build();
-
-        when(casePaymentOrdersRepository.findByCaseIdIn(anyList(), ArgumentMatchers.<Pageable>any())).thenReturn(
-            pageImpl);
+    void deleteCasePaymentOrdersById_UserNotifiedIfAuditIsNotDeleted() {
+        doThrow(IllegalStateException.class).when(casePaymentOrdersRepository).deleteAuditEntriesByUuids(anyList());
 
 
-        final Page<CasePaymentOrder> pages;
-        try {
-            casePaymentOrdersService.getCasePaymentOrders(
-                casePaymentOrderQueryFilter);
-        } catch (CasePaymentOrderCouldNotBeFoundException exception) {
-            assertTrue(
-                "The error message was not the expected.",
-                "Case Payment Order does not exist.".equals(exception.getMessage())
-            );
-            return;
-        }
-        fail();
+        casePaymentOrdersService.deleteCasePaymentOrders(uuidFilter);
+
+        List<ILoggingEvent> logsList = listAppender.list;
+
+        assertEquals(1, logsList.size());
+        assertEquals(AUDIT_ENTRY_DELETION_ERROR.replace("{}", uuidsToDelete.toString()),
+                     logsList.get(0).getFormattedMessage());
     }
 
-    private Page<CasePaymentOrderEntity> getEntityPages() {
-        final PageRequest pageRequest = getPageRequest();
-        return new PageImpl<CasePaymentOrderEntity>(createListOfCasePaymentOrderEntity(), pageRequest, 3);
+    @Test
+    void deleteCasePaymentOrdersByCaseId_UserNotifiedIfAuditIsNotDeleted() {
+        doThrow(IllegalStateException.class).when(casePaymentOrdersRepository).deleteAuditEntriesByCaseIds(anyList());
+
+        casePaymentOrdersService.deleteCasePaymentOrders(caseIdFilter);
+
+        List<ILoggingEvent> logsList = listAppender.list;
+
+        assertEquals(1, logsList.size());
+        assertEquals(AUDIT_ENTRY_DELETION_ERROR.replace("{}", caseIdsToDelete.toString()),
+                     logsList.get(0).getFormattedMessage());
     }
 
+    @Test
+    void deleteCasePaymentOrdersByCaseIds() {
+        casePaymentOrdersService.deleteCasePaymentOrders(caseIdFilter);
 
-    private List<CasePaymentOrderEntity> createListOfCasePaymentOrderEntity() {
-        final ArrayList<CasePaymentOrderEntity> casePaymentOrders = new ArrayList<>();
+        verify(casePaymentOrdersRepository).deleteByCaseIds(caseIdsArgumentCaptor.capture());
+        assertEquals(caseIdsArgumentCaptor.getValue(), caseIdsToDelete);
 
-        final CasePaymentOrderEntity casePaymentOrderEntity = new CasePaymentOrderEntity();
-        casePaymentOrderEntity.setAction("action");
-        casePaymentOrderEntity.setCaseId(Long.parseLong("1609243447569251"));
-        casePaymentOrderEntity.setCreatedBy("action1");
-        casePaymentOrderEntity.setOrderReference("action1");
-        casePaymentOrderEntity.setEffectiveFrom(LocalDateTime.now());
-        casePaymentOrderEntity.setCreatedTimestamp(LocalDateTime.now());
-        casePaymentOrderEntity.setResponsibleParty("setResponsibleParty");
-        casePaymentOrders.add(casePaymentOrderEntity);
-
-        final CasePaymentOrderEntity casePaymentOrderEntity1 = new CasePaymentOrderEntity();
-        casePaymentOrderEntity1.setAction("action");
-        casePaymentOrderEntity1.setCaseId(Long.parseLong("1609243447569252"));
-        casePaymentOrderEntity1.setCreatedBy("action1");
-        casePaymentOrderEntity1.setOrderReference("Baction2");
-        casePaymentOrderEntity1.setEffectiveFrom(LocalDateTime.now());
-        casePaymentOrderEntity1.setCreatedTimestamp(LocalDateTime.now());
-        casePaymentOrderEntity1.setResponsibleParty("setResponsibleParty");
-        casePaymentOrders.add(casePaymentOrderEntity1);
-
-        final CasePaymentOrderEntity casePaymentOrderEntity2 = new CasePaymentOrderEntity();
-        casePaymentOrderEntity2.setAction("action");
-        casePaymentOrderEntity2.setCaseId(Long.parseLong("1609243447569253"));
-        casePaymentOrderEntity2.setCreatedBy("action1");
-        casePaymentOrderEntity2.setOrderReference("Caction3");
-        casePaymentOrderEntity2.setEffectiveFrom(LocalDateTime.now());
-        casePaymentOrderEntity2.setCreatedTimestamp(LocalDateTime.now());
-        casePaymentOrderEntity2.setResponsibleParty("setResponsibleParty");
-        casePaymentOrders.add(casePaymentOrderEntity2);
-        return casePaymentOrders;
+        verify(casePaymentOrdersRepository).deleteAuditEntriesByCaseIds(caseIdsArgumentCaptor.capture());
+        assertEquals(caseIdsArgumentCaptor.getValue(), caseIdsToDelete);
     }
 }

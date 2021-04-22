@@ -18,6 +18,11 @@ public final class ValidationError {
     public static final String CPO_FILER_ERROR = "Case payment orders cannot be filtered by both id and case id.";
     public static final String CPO_PAGE_ERROR = "Case Payment Order, Page index must not zero or be less than zero!";
 
+    public static final String CPO_NOT_FOUND_BY_ID = "Case Payment Order specified by IDs does not exist";
+    public static final String CPO_NOT_FOUND_BY_CASE_ID = "Case Payment Order specified by Case IDs does not exist";
+    public static final String CANNOT_DELETE_USING_IDS_AND_CASE_IDS =
+            "Cannot delete Case Payment Orders by both ids and case-ids";
+
     // additional constraints etc..
     public static final String CPO_NOT_FOUND = "Case Payment Order does not exist.";
     public static final String CASE_ID_ORDER_REFERENCE_UNIQUE = "Case ID and Order Reference pairing must be unique.";

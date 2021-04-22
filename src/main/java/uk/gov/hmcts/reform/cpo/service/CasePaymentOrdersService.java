@@ -15,4 +15,5 @@ public interface CasePaymentOrdersService {
 
     CasePaymentOrder updateCasePaymentOrder(UpdateCasePaymentOrderRequest request);
 
+    void deleteCasePaymentOrders(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter);
 }

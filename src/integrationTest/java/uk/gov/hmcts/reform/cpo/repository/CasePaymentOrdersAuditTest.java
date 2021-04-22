@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class CasePaymentOrdersAuditTest extends BaseTest {
 
     @Autowired
-    private CasePaymentOrdersRepository casePaymentOrdersRepository;
+    private CasePaymentOrdersJpaRepository casePaymentOrdersRepository;
 
     @Autowired
     private CasePaymentOrderMapper casePaymentOrderMapper;

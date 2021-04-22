@@ -20,7 +20,7 @@ public class CaseIdsValidator implements ConstraintValidator<ValidCaseId, Option
         if (errors.isEmpty()) {
             return true;
         }
-        buildErrors(context, "These casesIds: ", errors);
+        buildErrors(context, "These caseIDs: ", errors);
         return false;
     }
 
