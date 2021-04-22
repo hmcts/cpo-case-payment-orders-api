@@ -183,13 +183,16 @@ public class CasePaymentOrdersController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE
         )
     })
+    @PreAuthorize("@securityUtils.hasFullAccessToService(#clientS2SToken)")
     public void deleteCasePaymentOrdersById(@ApiParam("list of IDs")
                                             @ValidCpoId
                                             @RequestParam(name = IDS, required = false) Optional<List<String>> ids,
                                             @ApiParam("list of Case IDs")
                                             @ValidCaseId
                                             @RequestParam(name = CASE_IDS, required = false)
-                                                    Optional<List<String>> caseIds) {
+                                                    Optional<List<String>> caseIds,
+                                            @RequestHeader(SERVICE_AUTHORIZATION)
+                                                        String clientS2SToken) {
 
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
                 .listOfIds(ids.orElse(emptyList()))

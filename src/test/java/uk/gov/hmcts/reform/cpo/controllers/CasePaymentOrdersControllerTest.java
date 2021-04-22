@@ -557,7 +557,8 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
                     = new CasePaymentOrdersController(casePaymentOrdersService, applicationParams);
 
             controller.deleteCasePaymentOrdersById(Optional.of(List.of(UUID.randomUUID().toString())),
-                    Optional.of(List.of()));
+                    Optional.of(List.of()),
+                    DUMMY_S2S_TOKEN_STRING);
         }
 
         @DisplayName("should delete case payment order specified by id")
@@ -593,7 +594,8 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             CasePaymentOrdersController controller
                     = new CasePaymentOrdersController(casePaymentOrdersService, applicationParams);
             controller.deleteCasePaymentOrdersById(Optional.of(Collections.emptyList()),
-                    Optional.of(List.of(CASE_ID_VALID_1)));
+                    Optional.of(List.of(CASE_ID_VALID_1)),
+                    DUMMY_S2S_TOKEN_STRING);
         }
 
         @DisplayName("should delete case payment order specified by case id")

@@ -4,6 +4,8 @@
 
   "title": "Must successfully allow access of the UpdateCasePaymentOrder API for a CRUD whitelisted service",
 
+  "s2sClientId": "payment_app",
+
   "specs": [
     "a new Case-Payment-Order microservice has been established",
     "a CRUD whitelist exists for the invoking service",
