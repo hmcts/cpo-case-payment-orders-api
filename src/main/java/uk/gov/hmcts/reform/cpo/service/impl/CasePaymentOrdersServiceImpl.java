@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.cpo.service.impl;
 
 import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -12,15 +10,15 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.exception.CaseIdOrderReferenceUniqueConstraintException;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
 import uk.gov.hmcts.reform.cpo.exception.IdAMIdCannotBeRetrievedException;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
-import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
-import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
-import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
+import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
+import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
-
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
@@ -29,19 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static uk.gov.hmcts.reform.cpo.validators.ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS;
-
 import static uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity.UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT;
+import static uk.gov.hmcts.reform.cpo.validators.ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS;
 import static uk.gov.hmcts.reform.cpo.validators.ValidationError.IDAM_ID_NOT_FOUND;
 
 @Service
 public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(CasePaymentOrdersServiceImpl.class);
-
-    public static final String AUDIT_ENTRY_DELETION_ERROR = "Exception thrown when deleting audit entry for case "
-                                                            + "payment orders '{}'. Unwanted previous versions of the"
-                                                            + " case payment orders may remain";
 
     private final SecurityUtils securityUtils;
 
@@ -81,7 +72,6 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         }
     }
 
-
     @Override
     public Page<CasePaymentOrderEntity> getCasePaymentOrders(
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
@@ -111,6 +101,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         throw new UnsupportedOperationException("Implement me: see CPO-6");
     }
 
+    @Transactional(rollbackOn = CasePaymentOrderCouldNotBeFoundException.class)
     @Override
     public void deleteCasePaymentOrders(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
         validateCasePaymentOrderQueryFilter(casePaymentOrderQueryFilter);
@@ -124,20 +115,12 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
     private void deleteCasePaymentOrdersByIds(List<UUID> ids) {
         casePaymentOrdersRepository.deleteByUuids(ids);
-        try {
-            casePaymentOrdersRepository.deleteAuditEntriesByUuids(ids);
-        } catch (Exception e) {
-            LOG.error(AUDIT_ENTRY_DELETION_ERROR, ids);
-        }
+        casePaymentOrdersRepository.deleteAuditEntriesByUuids(ids);
     }
 
     private void deleteCasePaymentOrdersByCaseIds(List<Long> caseIds) {
         casePaymentOrdersRepository.deleteByCaseIds(caseIds);
-        try {
-            casePaymentOrdersRepository.deleteAuditEntriesByCaseIds(caseIds);
-        } catch (Exception e) {
-            LOG.error(AUDIT_ENTRY_DELETION_ERROR, caseIds);
-        }
+        casePaymentOrdersRepository.deleteAuditEntriesByCaseIds(caseIds);
     }
 
     private PageRequest getPageRequest(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {

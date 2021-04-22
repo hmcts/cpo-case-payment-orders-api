@@ -28,6 +28,8 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
     public void deleteByUuids(List<UUID> uuids) {
         int deleteByIds = casePaymentOrdersJpaRepository.deleteByIdIsIn(uuids);
 
+        casePaymentOrdersJpaRepository.flush();
+
         if (deleteByIds != uuids.size()) {
             throw new CasePaymentOrderCouldNotBeFoundException(ValidationError.CPO_NOT_FOUND_BY_ID);
         }
@@ -40,14 +42,13 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
 
     @Override
     public void deleteByCaseIds(List<Long> caseIds) {
-
         for (Long cid : caseIds) {
             if (casePaymentOrdersJpaRepository.findAllByCaseId(cid).isEmpty()) {
                 throw new CasePaymentOrderCouldNotBeFoundException(ValidationError.CPO_NOT_FOUND_BY_CASE_ID);
             }
         }
-
         casePaymentOrdersJpaRepository.deleteByCaseIdIsIn(caseIds);
+        casePaymentOrdersJpaRepository.flush();
     }
 
     @Override
