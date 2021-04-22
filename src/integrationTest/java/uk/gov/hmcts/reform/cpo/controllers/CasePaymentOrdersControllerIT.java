@@ -123,7 +123,7 @@ public class CasePaymentOrdersControllerIT extends BaseTest {
             this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
-                    .andExpect(jsonPath("$.created_timestamp", is(LocalDateTime.now().format(formatter))))
+                    .andExpect(jsonPath("$.created_timestamp").exists())
                     .andExpect(status().isCreated())
                     .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                     .andExpect(jsonPath("$.id", notNullValue()))
