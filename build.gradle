@@ -272,6 +272,9 @@ dependencies {
   compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
   compile group: 'commons-validator', name: 'commons-validator', version: '1.7'
 
+  // CVE-2021-29425
+  compile group: 'commons-io', name: 'commons-io', version: '2.8.0'
+
   annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: versions.mapstruct
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
