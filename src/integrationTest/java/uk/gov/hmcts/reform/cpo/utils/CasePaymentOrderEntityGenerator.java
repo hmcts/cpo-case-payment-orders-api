@@ -40,6 +40,7 @@ public class CasePaymentOrderEntityGenerator {
                 .effectiveFrom(LocalDateTime.now())
                 .createdTimestamp(LocalDateTime.now())
                 .responsibleParty("ResponsibleParty" + Arrays.toString(RandomUtils.nextBytes(2)))
+                .historyExists(false)
                 .build();
 
 
