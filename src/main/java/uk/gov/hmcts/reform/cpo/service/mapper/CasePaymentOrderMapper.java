@@ -22,7 +22,7 @@ public interface CasePaymentOrderMapper {
     CasePaymentOrder toDomainModel(CasePaymentOrderEntity casePaymentOrderEntity);
 
     @Mapping(target = "createdTimestamp", expression = "java(java.time.LocalDateTime.now())")
-    @Mapping(target = "historyExists", expression = "java(false)")
+    @Mapping(target = "historyExists", expression = "java(true)")
     void mergeIntoEntity(@MappingTarget CasePaymentOrderEntity target,
                          UpdateCasePaymentOrderRequest updateCasePaymentOrderRequest,
                          String createdBy);
