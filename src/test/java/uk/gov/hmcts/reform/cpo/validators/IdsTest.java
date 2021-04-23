@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.BaseTest;
 
 import javax.validation.ConstraintValidatorContext;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +19,7 @@ import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 class IdsTest implements BaseTest {
 
-    private IdsValidator idsValidator = new IdsValidator();
+    private final IdsValidator idsValidator = new IdsValidator();
 
     @Mock
     private ConstraintValidatorContext constraintValidatorContext;
@@ -36,7 +37,7 @@ class IdsTest implements BaseTest {
 
         final Optional<List<String>> valuesToBeTested = createInitialValuesList(testedData);
         final boolean result = idsValidator.isValid(valuesToBeTested, constraintValidatorContext);
-        assertTrue("The values: " + testedData + " should be valid", result);
+        assertTrue("The values: " + Arrays.toString(testedData) + " should be valid", result);
     }
 
     @Test
@@ -61,7 +62,7 @@ class IdsTest implements BaseTest {
         when(constraintValidatorContext.buildConstraintViolationWithTemplate(anyString())).thenReturn(
             constraintViolationBuilder);
         final boolean result = idsValidator.isValid(valuesToBeTested, constraintValidatorContext);
-        assertFalse("The values: " + testedData + " should not be valid", result);
+        assertFalse("The values: " + Arrays.toString(testedData) + " should not be valid", result);
     }
 
     @Test
