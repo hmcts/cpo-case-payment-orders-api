@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.cpo.validators.annotation;
 
 import uk.gov.hmcts.reform.cpo.validators.IdValidator;
 import uk.gov.hmcts.reform.cpo.validators.IdsValidator;
+import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -17,7 +18,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface ValidCpoId {
 
-    String message() default "Invalid CpoId";
+    String message() default ValidationError.ID_INVALID;
 
     Class<?>[] groups() default {};
 

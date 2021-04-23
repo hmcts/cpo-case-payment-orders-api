@@ -21,10 +21,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.TestIdamConfiguration;
-import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
-import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter;
@@ -83,9 +82,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         @MockBean
         protected CasePaymentOrdersService casePaymentOrdersService;
 
-        @MockBean
-        protected ApplicationParams applicationParams;
-
         @Autowired
         protected ObjectMapper objectMapper;
 
@@ -113,8 +109,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             given(casePaymentOrdersService.createCasePaymentOrder(createCasePaymentOrderRequest))
                 .willReturn(casePaymentOrder);
             CasePaymentOrdersController controller = new CasePaymentOrdersController(
-                casePaymentOrdersService,
-                applicationParams
+                casePaymentOrdersService
             );
             CasePaymentOrder response = controller.createCasePaymentOrderRequest(createCasePaymentOrderRequest);
             assertThat(response).isNotNull();
@@ -164,8 +159,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         void directCallHappyPath() {
 
             // GIVEN
-            CasePaymentOrdersController controller = new CasePaymentOrdersController(casePaymentOrdersService,
-                                                                                     applicationParams);
+            CasePaymentOrdersController controller = new CasePaymentOrdersController(casePaymentOrdersService);
 
             // WHEN
             CasePaymentOrder response = controller.updateCasePaymentOrderRequest(updateCasePaymentOrderRequest);
@@ -564,32 +558,32 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         @Test
         void directCallHappyPath() throws Exception {
             CasePaymentOrdersController controller
-                    = new CasePaymentOrdersController(casePaymentOrdersService, applicationParams);
+                = new CasePaymentOrdersController(casePaymentOrdersService);
 
             controller.deleteCasePaymentOrdersById(Optional.of(List.of(UUID.randomUUID().toString())),
-                    Optional.of(List.of()));
+                                                   Optional.of(List.of()));
         }
 
         @DisplayName("should delete case payment order specified by id")
         @Test
         void shouldDeleteCasePaymentOrderById() throws Exception {
             this.mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).param(IDS, UUID.randomUUID().toString()))
-                    .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent());
         }
 
         @DisplayName("should Fail With 400 BadRequest When Id Is Not a UUID")
         @Test
         void shouldFailWithBadRequestWhenIdIsNotUUID() throws Exception {
             this.mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).param(IDS, "123"))
-                    .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest());
         }
 
         @DisplayName("should Fail With 400 BadRequest When IDs are mix of valid and invalid UUIDs")
         @Test
         void shouldFailWithBadRequestWhenIdListContainsValidAndInvalidUUID() throws Exception {
             this.mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
-                    .param(IDS, UUID.randomUUID().toString(), "123", UUID.randomUUID().toString()))
-                    .andExpect(status().isBadRequest());
+                                     .param(IDS, UUID.randomUUID().toString(), "123", UUID.randomUUID().toString()))
+                .andExpect(status().isBadRequest());
         }
     }
 
@@ -601,16 +595,16 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         @Test
         void directCallHappyPath() {
             CasePaymentOrdersController controller
-                    = new CasePaymentOrdersController(casePaymentOrdersService, applicationParams);
+                = new CasePaymentOrdersController(casePaymentOrdersService);
             controller.deleteCasePaymentOrdersById(Optional.of(Collections.emptyList()),
-                    Optional.of(List.of(CASE_ID_VALID_1)));
+                                                   Optional.of(List.of(CASE_ID_VALID_1)));
         }
 
         @DisplayName("should delete case payment order specified by case id")
         @Test
         void shouldDeleteCasePaymentOrderById() throws Exception {
             this.mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).param(CASE_IDS, CASE_ID_VALID_1))
-                    .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent());
         }
 
         @DisplayName("should Fail With 400 BadRequest When Case Id Is Not a valid length Case Id")
@@ -618,9 +612,9 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         void shouldFailWithBadRequestWhenIdIsNotValidLengthCaseId() throws Exception {
             doThrow(ConstraintViolationException.class).when(casePaymentOrdersService).deleteCasePaymentOrders(any());
             this.mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).param(CASE_IDS, "123"))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(content().string(containsString("deleteCasePaymentOrdersById.caseIds: "
-                            + "These caseIDs: 123 are incorrect")));
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("deleteCasePaymentOrdersById.caseIds: "
+                                                               + "These caseIDs: 123 are incorrect")));
         }
 
         @DisplayName("should Fail With 400 BadRequest When Case Id Is Not a valid Luhn")
@@ -628,22 +622,22 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         void shouldFailWithBadRequestWhenCaseIdIsNotValidLuhn() throws Exception {
             //doThrow(ConstraintViolationException.class).when(casePaymentOrdersService).deleteCasePaymentOrders(any());
             this.mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).param(CASE_IDS, CASE_ID_INVALID_LUHN))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(content().string(
-                            containsString("deleteCasePaymentOrdersById.caseIds: These caseIDs: "
-                                    + CASE_ID_INVALID_LUHN
-                                    + " are incorrect.")));
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(
+                    containsString("deleteCasePaymentOrdersById.caseIds: These caseIDs: "
+                                       + CASE_ID_INVALID_LUHN
+                                       + " are incorrect.")));
         }
 
         @DisplayName("should Fail With 400 BadRequest When IDs are mix of valid and invalid LUHNs")
         @Test
         void shouldFailWithBadRequestWhenIdListContainsValidAndInvalidCaseIds() throws Exception {
             this.mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
-                    .param(CASE_IDS, CASE_ID_VALID_1, CASE_ID_INVALID_LUHN, CASE_ID_VALID_2))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(content().string(containsString("deleteCasePaymentOrdersById.caseIds: These caseIDs: "
-                            + CASE_ID_INVALID_LUHN
-                            + " are incorrect.")));
+                                     .param(CASE_IDS, CASE_ID_VALID_1, CASE_ID_INVALID_LUHN, CASE_ID_VALID_2))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("deleteCasePaymentOrdersById.caseIds: These caseIDs: "
+                                                               + CASE_ID_INVALID_LUHN
+                                                               + " are incorrect.")));
         }
     }
 
@@ -655,20 +649,20 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         @Test
         void shouldReturn200OkWhenNoOptionalRequestParametersAreSpecified() throws Exception {
             this.mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH))
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isNoContent());
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isNoContent());
         }
 
         @DisplayName("should Fail With 4xx when both ids and case-ids request parameter are specified")
         @Test
         void shouldFailWhenIdAndCaseIdRequestParameterIsSpecified() throws Exception {
-            doThrow(CasePaymentOrdersQueryException.class)
-                    .when(casePaymentOrdersService).deleteCasePaymentOrders(any());
+            doThrow(CasePaymentOrdersFilterException.class)
+                .when(casePaymentOrdersService).deleteCasePaymentOrders(any());
             this.mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
-                    .param(IDS, UUID.randomUUID().toString(), UUID.randomUUID().toString())
-                    .param(CASE_IDS, CASE_ID_VALID_1, CASE_ID_VALID_2))
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().is4xxClientError());
+                                     .param(IDS, UUID.randomUUID().toString(), UUID.randomUUID().toString())
+                                     .param(CASE_IDS, CASE_ID_VALID_1, CASE_ID_VALID_2))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError());
         }
     }
 
