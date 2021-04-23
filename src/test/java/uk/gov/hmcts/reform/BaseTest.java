@@ -14,10 +14,10 @@ import java.util.UUID;
 
 public interface BaseTest {
 
-    public static final String ERROR_PATH_DETAILS = "$.details";
-    public static final String ERROR_PATH_ERROR = "$.error";
-    public static final String ERROR_PATH_MESSAGE = "$.message";
-    public static final String ERROR_PATH_STATUS = "$.status";
+    String ERROR_PATH_DETAILS = "$.details";
+    String ERROR_PATH_ERROR = "$.error";
+    String ERROR_PATH_MESSAGE = "$.message";
+    String ERROR_PATH_STATUS = "$.status";
 
     String CASE_ID_VALID_1 = "9511425043588823";
     String CASE_ID_VALID_2 = "9716401307140455";
@@ -33,14 +33,15 @@ public interface BaseTest {
     String CPO_ID_INVALID_1 = "160924";
     String CPO_ID_INVALID_2 = "160924 ";
 
-    public static final String ORDER_REFERENCE_VALID = "2021-11223344556";
-    public static final String ORDER_REFERENCE_INVALID = "2021-918425346";
+    String ORDER_REFERENCE_VALID = "2021-11223344556";
+    String ORDER_REFERENCE_INVALID = "2021-918425346";
     String ACTION = "action";
     String RESPONSIBLE_PARTY = "responsibleParty";
     LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24, 11, 48, 32);
 
     String CREATED_BY = "createdBy";
     LocalDateTime CREATED_TIMESTAMP = LocalDateTime.now();
+    Boolean HISTORY_EXISTS = false;
 
     default <T> Optional<List<T>> createInitialValuesList(final T[] initialValues) {
         return Optional.of(Arrays.asList(initialValues));
@@ -56,6 +57,7 @@ public interface BaseTest {
             .id(UUID.fromString(CPO_ID_VALID_1))
             .createdBy(CREATED_BY)
             .createdTimestamp(CREATED_TIMESTAMP)
+            .historyExists(false)
             .build();
     }
 
@@ -68,6 +70,7 @@ public interface BaseTest {
         entity.setOrderReference(ORDER_REFERENCE_VALID);
         entity.setCreatedBy(CREATED_BY);
         entity.setCreatedTimestamp(CREATED_TIMESTAMP);
+        entity.setHistoryExists(HISTORY_EXISTS);
         return entity;
     }
 

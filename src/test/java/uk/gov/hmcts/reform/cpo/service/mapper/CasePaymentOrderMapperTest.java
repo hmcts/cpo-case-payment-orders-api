@@ -54,6 +54,8 @@ class CasePaymentOrderMapperTest implements BaseTest {
                      casePaymentOrder.getOrderReference(), mappedEntity.getOrderReference());
         assertEquals("Mapped entity created by should equals mocked entity created by",
                      casePaymentOrder.getCreatedBy(), mappedEntity.getCreatedBy());
+        assertEquals("Mapped entity created by should equals mocked entity history exists",
+                     casePaymentOrder.getHistoryExists(), mappedEntity.getHistoryExists());
     }
 
     @Test
@@ -82,6 +84,8 @@ class CasePaymentOrderMapperTest implements BaseTest {
                      entity.getOrderReference(), mappedDomainObject.getOrderReference());
         assertEquals("Mapped domain model created by should equals mocked domain model created by",
                      entity.getCreatedBy(), mappedDomainObject.getCreatedBy());
+        assertEquals("Mapped domain model created by should equals mocked domain model history exists",
+                     entity.getHistoryExists(), mappedDomainObject.getHistoryExists());
     }
 
     @DisplayName("should successfully map an create request into an entity")
@@ -107,6 +111,8 @@ class CasePaymentOrderMapperTest implements BaseTest {
                      request.getOrderReference(), mappedRequestEntity.getOrderReference());
         assertEquals("Mapped entity created by should equals mocked entity created by",
                      CREATED_BY, mappedRequestEntity.getCreatedBy());
+        assertEquals("Mapped entity created by should equals mocked entity history exists",
+                     HISTORY_EXISTS, mappedRequestEntity.getHistoryExists());
     }
 
     @DisplayName("should successfully merge an update request into an entity")
@@ -136,6 +142,8 @@ class CasePaymentOrderMapperTest implements BaseTest {
         assertNotNull("Merged created timestamp should be set", entity.getCreatedTimestamp());
         assertNotEquals("Merged created timestamp should have changed",
                         originalCreatedTimestamp, entity.getCreatedTimestamp());
+        assertNotEquals("Merged history exists should have changed",
+                        HISTORY_EXISTS, entity.getHistoryExists());
         // standard property checks
         assertEquals("Merged effective from should equal source effective from",
                      updateRequest.getEffectiveFrom(), entity.getEffectiveFrom());
@@ -174,6 +182,7 @@ class CasePaymentOrderMapperTest implements BaseTest {
         assertNotNull("Action should remain populated", entity.getAction());
         assertNotNull("Responsible party should remain populated", entity.getResponsibleParty());
         assertNotNull("Order reference should remain populated", entity.getOrderReference());
+        assertNotNull("History exists should remain populated", entity.getHistoryExists());
 
     }
 
