@@ -11,23 +11,21 @@ import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import java.util.Collections;
 import java.util.List;
 
-import static junit.framework.TestCase.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 class CasePaymentOrderQueryFilterTest implements BaseTest {
 
-    private final List<String> casesIds = createInitialValuesList(new String[]{"1609243447569251",
-        "1609243447569252", "1609243447569253"}).get();
+    private final List<String> casesIds = List.of("1609243447569251", "1609243447569252", "1609243447569253");
 
-    private final List<String> ids = createInitialValuesList(new String[]{"df54651b-3227-4067-9f23-6ffb32e2c6bd",
-        "d702ef36-0ca7-46e9-8a00-ef044d78453e",
-        "d702ef36-0ca7-46e9-8a00-ef044d78453e"}).get();
+    private final List<String> ids = List.of("df54651b-3227-4067-9f23-6ffb32e2c6bd",
+                                             "d702ef36-0ca7-46e9-8a00-ef044d78453e",
+                                             "d702ef36-0ca7-46e9-8a00-ef044d78453e");
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
-
+        MockitoAnnotations.openMocks(this);
     }
 
     private CasePaymentOrderQueryFilter getCasePaymentOrderQueryFilter(final List<String> casesIds,
@@ -53,17 +51,14 @@ class CasePaymentOrderQueryFilterTest implements BaseTest {
 
     @Test
     void failValidation() {
-        try {
-            final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = getCasePaymentOrderQueryFilter(
-                casesIds,
-                ids
-            );
-            casePaymentOrderQueryFilter.validateCasePaymentOrdersFiltering();
-            fail();
-        } catch (CasePaymentOrdersFilterException casePaymentOrdersQueryException) {
-            assertThat(casePaymentOrdersQueryException.getMessage(), is(ValidationError.CPO_FILER_ERROR));
-        }
+        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = getCasePaymentOrderQueryFilter(
+            casesIds,
+            ids
+        );
 
+        assertThatThrownBy(casePaymentOrderQueryFilter::validateCasePaymentOrdersFiltering)
+            .isInstanceOf(CasePaymentOrdersFilterException.class)
+            .hasMessageContaining(ValidationError.CPO_FILER_ERROR);
     }
 
     @Test

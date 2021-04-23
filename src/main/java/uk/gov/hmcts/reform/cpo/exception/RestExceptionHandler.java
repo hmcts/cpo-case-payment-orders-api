@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.cpo.exception;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,39 +19,45 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import java.io.Serializable;
 
+@Slf4j
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
-
-    private static final Logger LOG = LoggerFactory.getLogger(RestExceptionHandler.class);
 
     @ExceptionHandler({ApiException.class})
     @ResponseBody
     public ResponseEntity<HttpError<Serializable>> handleApiException(final HttpServletRequest request,
                                                                       final Exception exception) {
-        LOG.error(exception.getMessage(), exception);
+        log.error(exception.getMessage(), exception);
         final HttpError<Serializable> error = new HttpError<>(exception, request);
         return ResponseEntity
             .status(error.getStatus())
             .body(error);
     }
 
-    @ExceptionHandler({CasePaymentOrdersFilterException.class, ConstraintViolationException.class})
+    @ExceptionHandler({
+        ConstraintViolationException.class,
+        MethodArgumentTypeMismatchException.class
+    })
     @ResponseBody
-    public ResponseEntity<HttpError<Serializable>> handleCasePaymentOrdersQueryException(
-        final HttpServletRequest request,
-        final Exception exception) {
-        return getHttpErrorBadRequest(request, exception);
+    public ResponseEntity<HttpError<Serializable>> handleCommonExceptionsAsBadRequest(final HttpServletRequest request,
+                                                                                      final Exception exception) {
+        log.error(exception.getMessage(), exception);
+        final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
+            .withDetails(exception.getCause());
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(error);
     }
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception,
-                                                                  HttpHeaders headers,
-                                                                  HttpStatus status,
-                                                                  WebRequest request) {
+    protected @NonNull ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception,
+                                                                           @NonNull HttpHeaders headers,
+                                                                           @NonNull HttpStatus status,
+                                                                           @NonNull WebRequest request) {
         String[] errors = exception.getBindingResult().getFieldErrors().stream()
             .map(DefaultMessageSourceResolvable::getDefaultMessage)
             .toArray(String[]::new);
-        LOG.debug("MethodArgumentNotValidException:{}", exception.getLocalizedMessage());
+        log.debug("MethodArgumentNotValidException:{}", exception.getLocalizedMessage());
         final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
             .withMessage(ValidationError.ARGUMENT_NOT_VALID)
             .withDetails(errors);
@@ -60,19 +66,4 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             .body(error);
     }
 
-    private ResponseEntity<HttpError<Serializable>> getHttpErrorBadRequest(HttpServletRequest request,
-                                                                           Exception exception) {
-        LOG.error(exception.getMessage(), exception);
-        final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
-            .withDetails(exception.getCause());
-        return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(error);
-    }
-
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<HttpError<Serializable>> handleMethodArgumentTypeMismatchException(
-            final HttpServletRequest request, final Exception exception) {
-        return getHttpErrorBadRequest(request, exception);
-    }
 }

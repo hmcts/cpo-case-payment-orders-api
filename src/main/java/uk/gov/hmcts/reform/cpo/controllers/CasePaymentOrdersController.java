@@ -106,7 +106,7 @@ public class CasePaymentOrdersController {
         return casePaymentOrdersService.createCasePaymentOrder(requestPayload);
     }
 
-    @GetMapping(value = "case-payment-orders", produces = {"application/json"})
+    @GetMapping(path = CASE_PAYMENT_ORDERS_PATH, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get payment orders for a case", notes = "Get payment orders for a case")
     @ApiResponses({
         @ApiResponse(
@@ -147,17 +147,17 @@ public class CasePaymentOrdersController {
     })
     public Page<CasePaymentOrder> getCasePaymentOrders(@ApiParam("list of case payment orders ids")
                                                        @ValidCpoId
-                                                       @RequestParam(name = "ids", required = false)
+                                                       @RequestParam(name = IDS, required = false)
                                                            Optional<List<String>> ids,
                                                        @ApiParam("list of ccd case reference numbers")
                                                        @ValidCaseId
-                                                       @RequestParam(name = "case-ids", required = false)
+                                                       @RequestParam(name = CASE_IDS, required = false)
                                                            Optional<List<String>> caseIds,
                                                        @ApiIgnore("This is ignored by swagger") Pageable pageable
 
     ) {
 
-        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
+        final var casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
             .cpoIds(ids.orElse(Collections.emptyList()))
             .caseIds(caseIds.orElse(Collections.emptyList()))
             .pageable(pageable)
@@ -216,7 +216,7 @@ public class CasePaymentOrdersController {
                                             @RequestParam(name = CASE_IDS, required = false)
                                                 Optional<List<String>> caseIds) {
 
-        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
+        final var casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
             .cpoIds(ids.orElse(emptyList()))
             .caseIds(caseIds.orElse(emptyList()))
             .build();

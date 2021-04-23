@@ -66,7 +66,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     public CasePaymentOrder updateCasePaymentOrder(UpdateCasePaymentOrderRequest updateCasePaymentOrderRequest) {
         String createdBy = getUserId();
 
-        CasePaymentOrderEntity casePaymentOrderEntity = verifyCpoExists(updateCasePaymentOrderRequest.getUUID());
+        var casePaymentOrderEntity = verifyCpoExists(updateCasePaymentOrderRequest.getUUID());
 
         mapper.mergeIntoEntity(casePaymentOrderEntity, updateCasePaymentOrderRequest, createdBy);
 
@@ -144,9 +144,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         if (casePaymentOrderEntities.isEmpty()) {
             throw new CasePaymentOrderCouldNotBeFoundException(ValidationError.CPO_NOT_FOUND);
         }
-        return casePaymentOrderEntities.map(casePaymentOrderEntity ->
-                                                mapper.toDomainModel(casePaymentOrderEntity)
-        );
+        return casePaymentOrderEntities.map(mapper::toDomainModel);
     }
 
     private CasePaymentOrderEntity saveEntity(CasePaymentOrderEntity entity) {
