@@ -54,6 +54,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         String createdBy = getUserId();
 
         CasePaymentOrderEntity requestEntity = mapper.toEntity(createCasePaymentOrderRequest, createdBy);
+        requestEntity.setHistoryExists(false);
 
         CasePaymentOrderEntity savedEntity = saveEntity(requestEntity);
 
@@ -67,9 +68,9 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         String createdBy = getUserId();
 
         var casePaymentOrderEntity = verifyCpoExists(updateCasePaymentOrderRequest.getUUID());
-        casePaymentOrderEntity.setHistoryExists(true);
 
         mapper.mergeIntoEntity(casePaymentOrderEntity, updateCasePaymentOrderRequest, createdBy);
+        casePaymentOrderEntity.setHistoryExists(true);
 
         CasePaymentOrderEntity updatedEntity = saveEntity(casePaymentOrderEntity);
 

@@ -57,7 +57,7 @@ public interface BaseTest {
 
     String CREATED_BY = "createdBy";
     LocalDateTime CREATED_TIMESTAMP = LocalDateTime.now();
-    Boolean HISTORY_EXISTS = false;
+    boolean HISTORY_EXISTS_DEFAULT = false;
 
     default <T> Optional<List<T>> createInitialValuesList(final T[] initialValues) {
         return Optional.of(Arrays.asList(initialValues));
@@ -74,7 +74,7 @@ public interface BaseTest {
             .id(UUID.fromString(CPO_ID_VALID_1))
             .createdBy(CREATED_BY)
             .createdTimestamp(CREATED_TIMESTAMP)
-            .historyExists(HISTORY_EXISTS)
+            .historyExists(HISTORY_EXISTS_DEFAULT)
             .build();
     }
 
@@ -87,7 +87,7 @@ public interface BaseTest {
         entity.setOrderReference(ORDER_REFERENCE_VALID);
         entity.setCreatedBy(CREATED_BY);
         entity.setCreatedTimestamp(CREATED_TIMESTAMP);
-        entity.setHistoryExists(HISTORY_EXISTS);
+        entity.setHistoryExists(HISTORY_EXISTS_DEFAULT);
         return entity;
     }
 

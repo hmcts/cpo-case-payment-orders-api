@@ -138,7 +138,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                     .andExpect(jsonPath("$.effective_from", is(EFFECTIVE_FROM.format(formatter))))
                     .andExpect(jsonPath("$.created_by", is(CREATED_BY_IDAM_MOCK)))
                     .andExpect(jsonPath("$.created_timestamp").exists())
-                    .andExpect(jsonPath("$.history_exists" , is(!HISTORY_EXISTS)))
+                    .andExpect(jsonPath("$.history_exists", is(HISTORY_EXISTS_DEFAULT)))
                 .andReturn();
 
             UUID id = UUID.fromString(
@@ -209,7 +209,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(CREATED_BY_IDAM_MOCK, savedEntity.get().getCreatedBy());
             assertNotNull(savedEntity.get().getCreatedTimestamp());
             assertTrue(beforeCreateTimestamp.isBefore(savedEntity.get().getCreatedTimestamp()));
-            assertFalse(savedEntity.get().getHistoryExists());
+            assertFalse(savedEntity.get().isHistoryExists());
         }
 
         private void verifyDbCpoAuditValues(UUID id,
@@ -229,7 +229,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(CREATED_BY_IDAM_MOCK, latestRevision.getEntity().getCreatedBy());
             assertNotNull(latestRevision.getEntity().getCreatedTimestamp());
             assertTrue(beforeCreateTimestamp.isBefore(latestRevision.getEntity().getCreatedTimestamp()));
-            assertFalse(latestRevision.getEntity().getHistoryExists());
+            assertFalse(latestRevision.getEntity().isHistoryExists());
         }
     }
 
@@ -843,7 +843,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                 .andExpect(jsonPath("$.responsible_party").value(request.getResponsibleParty()))
                 .andExpect(jsonPath("$.created_by").value(CREATED_BY_IDAM_MOCK))
                 .andExpect(jsonPath("$.created_timestamp").exists())
-                .andExpect(jsonPath("$.history_exists", is(HISTORY_EXISTS)));
+                .andExpect(jsonPath("$.history_exists", is(HISTORY_EXISTS_UPDATED)));
         }
 
         private void verifyDbCpoValues(UpdateCasePaymentOrderRequest request,
@@ -860,7 +860,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(CREATED_BY_IDAM_MOCK, updatedEntity.get().getCreatedBy());
             assertNotNull(updatedEntity.get().getCreatedTimestamp());
             assertTrue(previousCreatedTimestamp.isBefore(updatedEntity.get().getCreatedTimestamp()));
-            assertTrue(updatedEntity.get().getHistoryExists());
+            assertTrue(updatedEntity.get().isHistoryExists());
         }
 
         private void verifyDbCpoAuditValues(UpdateCasePaymentOrderRequest request,
@@ -879,7 +879,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(CREATED_BY_IDAM_MOCK, latestRevision.getEntity().getCreatedBy());
             assertNotNull(latestRevision.getEntity().getCreatedTimestamp());
             assertTrue(previousCreatedTimestamp.isBefore(latestRevision.getEntity().getCreatedTimestamp()));
-            assertTrue(latestRevision.getEntity().getHistoryExists());
+            assertTrue(latestRevision.getEntity().isHistoryExists());
         }
 
     }

@@ -46,7 +46,8 @@ public class BaseTest {
     public static final String ACTION = "action";
     public static final String RESPONSIBLE_PARTY = "responsibleParty";
     public static final LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24, 11, 48, 32);
-    public static final boolean HISTORY_EXISTS = true;
+    public static final boolean HISTORY_EXISTS_DEFAULT = false;
+    public static final boolean HISTORY_EXISTS_UPDATED = true;
 
     public static final String CREATED_BY_IDAM_MOCK = "e8275d41-7f22-4ee7-8ed3-14644d6db096";
 
