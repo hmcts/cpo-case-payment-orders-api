@@ -6,6 +6,8 @@ import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface CasePaymentOrderMapper {
 
@@ -17,4 +19,7 @@ public interface CasePaymentOrderMapper {
                                                 String createdBy);
 
     CasePaymentOrder toDomainModel(CasePaymentOrderEntity casePaymentOrderEntity);
+
+    List<CasePaymentOrder> toDomainModelList(List<CasePaymentOrderEntity> casePaymentOrderEntities);
 }
+

@@ -2,13 +2,17 @@ package uk.gov.hmcts.reform.cpo.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Builder
 @Getter
+@EqualsAndHashCode
+@ToString
 public class CasePaymentOrder {
 
     private UUID id;

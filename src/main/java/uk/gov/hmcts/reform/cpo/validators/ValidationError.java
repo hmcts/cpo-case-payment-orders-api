@@ -15,7 +15,8 @@ public final class ValidationError {
     public static final String ORDER_REFERENCE_REQUIRED = "Order Reference is required.";
     public static final String RESPONSIBLE_PARTY_REQUIRED = "Responsible Party is required.";
     public static final String ORDER_REFERENCE_INVALID = "Order Reference has invalid format.";
-
+    public static final String CPO_FILER_ERROR = "Case payment orders cannot be filtered by both id and case id.";
+    public static final String CPO_PAGE_ERROR = "Case Payment Order, Page index must not zero or be less than zero!";
 
     public static final String CPO_NOT_FOUND_BY_ID = "Case Payment Order specified by IDs does not exist";
     public static final String CPO_NOT_FOUND_BY_CASE_ID = "Case Payment Order specified by Case IDs does not exist";

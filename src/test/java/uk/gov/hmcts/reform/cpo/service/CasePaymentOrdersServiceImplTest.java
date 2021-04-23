@@ -47,17 +47,17 @@ class CasePaymentOrdersServiceImplTest {
     @BeforeEach
     void beforeEachTest() {
         uuidFilter = CasePaymentOrderQueryFilter.builder()
-                .listOfIds(uuidsToDelete.stream()
+            .cpoIds(uuidsToDelete.stream()
                         .map(UUID::toString)
                         .collect(Collectors.toList()))
-                .listOfCasesIds(Collections.emptyList())
-                .build();
+            .caseIds(Collections.emptyList())
+            .build();
         caseIdFilter = CasePaymentOrderQueryFilter.builder()
-                .listOfIds(Collections.emptyList())
-                .listOfCasesIds(caseIdsToDelete.stream()
-                        .map(Object::toString)
-                        .collect(Collectors.toList()))
-                .build();
+            .cpoIds(Collections.emptyList())
+            .caseIds(caseIdsToDelete.stream()
+                         .map(Object::toString)
+                         .collect(Collectors.toList()))
+            .build();
     }
 
     @Test

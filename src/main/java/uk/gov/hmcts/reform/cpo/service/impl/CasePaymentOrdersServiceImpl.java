@@ -4,13 +4,13 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.exception.CaseIdOrderReferenceUniqueConstraintException;
-import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersQueryException;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
 import uk.gov.hmcts.reform.cpo.exception.IdAMIdCannotBeRetrievedException;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -71,28 +70,6 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         }
     }
 
-    @Override
-    public Page<CasePaymentOrderEntity> getCasePaymentOrders(
-        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
-
-        if (casePaymentOrderQueryFilter.isItAnEmptyCriteria()) {
-            return Page.empty();
-        }
-        validateCasePaymentOrderQueryFilter(casePaymentOrderQueryFilter);
-
-        final PageRequest pageRequest = getPageRequest(casePaymentOrderQueryFilter);
-        if (casePaymentOrderQueryFilter.isACasesIdQuery()) {
-            return casePaymentOrdersRepository.findByCaseIdIn(
-                casePaymentOrderQueryFilter.getListOfLongCasesIds(),
-                pageRequest
-            );
-        } else {
-            return casePaymentOrdersRepository.findByIdIn(
-                casePaymentOrderQueryFilter.getListUUID(),
-                pageRequest
-            );
-        }
-    }
 
     @Transactional
     @Override
@@ -122,21 +99,10 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         casePaymentOrdersRepository.deleteAuditEntriesByCaseIds(caseIds);
     }
 
-    private PageRequest getPageRequest(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
-        final List<Sort.Order> orders = new ArrayList<>();
-        orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderQueryFilter.CASES_ID));
-        orders.add(new Sort.Order(Sort.Direction.ASC, CasePaymentOrderQueryFilter.ORDER_REFERENCE));
-        return PageRequest.of(
-            casePaymentOrderQueryFilter.getPageNumber(),
-            casePaymentOrderQueryFilter.getPageSize(),
-            Sort.by(orders)
-        );
-    }
-
     private void validateCasePaymentOrderQueryFilter(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
         if (casePaymentOrderQueryFilter.isAnIdsAndCasesIdQuery()) {
-            throw new CasePaymentOrdersQueryException(
-                    CANNOT_DELETE_USING_IDS_AND_CASE_IDS);
+            throw new CasePaymentOrdersFilterException(
+                CANNOT_DELETE_USING_IDS_AND_CASE_IDS);
         }
     }
 
@@ -144,4 +110,36 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         return ((ConstraintViolationException) exception.getCause()).getConstraintName()
             .equals(UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT);
     }
+
+    @Override
+    public Page<CasePaymentOrder> getCasePaymentOrders(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
+
+        try {
+            final Page<CasePaymentOrderEntity> casePaymentOrderEntities;
+            final Pageable pageRequest = casePaymentOrderQueryFilter.getPageRequest();
+            if (casePaymentOrderQueryFilter.isFindByCaseIdQuery()) {
+                casePaymentOrderEntities = casePaymentOrdersRepository.findByCaseIdIn(
+                    casePaymentOrderQueryFilter.getListOfLongCasesIds(), pageRequest);
+            } else {
+                casePaymentOrderEntities = casePaymentOrdersRepository.findByIdIn(
+                    casePaymentOrderQueryFilter.getListUUID(),
+                    pageRequest
+                );
+            }
+            return getPageOfCasePaymentOrder(casePaymentOrderEntities);
+        } catch (IllegalArgumentException exception) {
+            throw new CasePaymentOrdersFilterException(ValidationError.CPO_PAGE_ERROR);
+        }
+    }
+
+    private Page<CasePaymentOrder> getPageOfCasePaymentOrder(Page<CasePaymentOrderEntity> casePaymentOrderEntities) {
+
+        if (casePaymentOrderEntities.isEmpty()) {
+            throw new CasePaymentOrderCouldNotBeFoundException(ValidationError.CPO_NOT_FOUND);
+        }
+        return casePaymentOrderEntities.map(casePaymentOrderEntity ->
+                                                mapper.toDomainModel(casePaymentOrderEntity)
+        );
+    }
 }
+

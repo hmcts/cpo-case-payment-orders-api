@@ -1,13 +1,15 @@
 package uk.gov.hmcts.reform.cpo.controllers;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,8 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.cpo.ApplicationParams;
-import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
+import springfox.documentation.annotations.ApiIgnore;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
@@ -31,6 +32,7 @@ import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,13 +50,10 @@ public class CasePaymentOrdersController {
     public static final String IDS = "ids";
 
     private final CasePaymentOrdersService casePaymentOrdersService;
-    private final ApplicationParams applicationParams;
 
-    @Autowired
-    public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersService,
-                                       ApplicationParams applicationParams) {
+
+    public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersService) {
         this.casePaymentOrdersService = casePaymentOrdersService;
-        this.applicationParams = applicationParams;
     }
 
     @PostMapping(path = CASE_PAYMENT_ORDERS_PATH, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
@@ -85,7 +84,7 @@ public class CasePaymentOrdersController {
                         + "   \"error\": \"Bad Request\",\n"
                         + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
                         + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
-                        + "   \"details\": [ \""  + ValidationError.CASE_ID_INVALID + "\" ]\n"
+                        + "   \"details\": [ \"" + ValidationError.CASE_ID_INVALID + "\" ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
             })
@@ -113,29 +112,67 @@ public class CasePaymentOrdersController {
         return casePaymentOrdersService.createCasePaymentOrder(requestPayload);
     }
 
-    @GetMapping(value = CASE_PAYMENT_ORDERS_PATH, produces = {APPLICATION_JSON_VALUE})
-    public Page<CasePaymentOrderEntity> getCasePaymentOrders(@ApiParam("list of IDs")
-                                                             @ValidCpoId
-                                                             @RequestParam(name = IDS, required = false)
-                                                                         Optional<List<String>> ids,
-                                                             @ApiParam("list of caseIDs")
-                                                             @ValidCaseId
-                                                             @RequestParam(name = CASE_IDS, required = false)
-                                                                     Optional<List<String>> casesId,
-                                                             @RequestParam(name = "pageSize", required = false)
-                                                                         Optional<Integer> pageSize,
-                                                             @RequestParam(name = "pageNumber", required = false)
-                                                                         Optional<Integer> pageNumber
+    @GetMapping(value = "case-payment-orders", produces = {"application/json"})
+    @ApiOperation(value = "Get payment orders for a case", notes = "Get payment orders for a case")
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = ""
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "One or more of the following reasons:"
+                + "\n1) " + ValidationError.CPO_FILER_ERROR
+                + "\n2) " + ValidationError.CASE_ID_INVALID
+                + "\n3) " + ValidationError.ID_INVALID,
+            response = String.class,
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\n"
+                        + "   \"status\": \"400\",\n"
+                        + "   \"error\": \"Bad Request\",\n"
+                        + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
+                        + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
+                        + "   \"details\": [ \"" + ValidationError.CASE_ID_INVALID + "\" ]\n"
+                        + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 401,
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID
+        ),
+        @ApiResponse(
+            code = 403,
+            message = AuthError.UNAUTHORISED_S2S_SERVICE
+        )
+    })
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "page", value = "page number, indexes from (0,1) to page-size.", paramType = "query"),
+        @ApiImplicitParam(name = "size", value = "page size", paramType = "query")
+    })
+    public Page<CasePaymentOrder> getCasePaymentOrders(@ApiParam("list of case payment orders ids")
+                                                       @ValidCpoId
+                                                       @RequestParam(name = "ids", required = false)
+                                                           Optional<List<String>> ids,
+                                                       @ApiParam("list of ccd case reference numbers")
+                                                       @ValidCaseId
+                                                       @RequestParam(name = "case-ids", required = false)
+                                                           Optional<List<String>> caseIds,
+                                                       @ApiIgnore("This is ignored by swagger") Pageable pageable
 
     ) {
-        final List<String> listOfIds = ids.orElse(emptyList());
-        final List<String> listOfCasesIds = casesId.orElse(emptyList());
+
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
-                .listOfIds(listOfIds)
-                .listOfCasesIds(listOfCasesIds)
-                .pageNumber(pageNumber.orElse(Integer.parseInt(applicationParams.getDefaultPageNumber())))
-                .pageSize(pageSize.orElse(Integer.parseInt(applicationParams.getDefaultPageSize())))
-                .build();
+            .cpoIds(ids.orElse(Collections.emptyList()))
+            .caseIds(caseIds.orElse(Collections.emptyList()))
+            .pageable(pageable)
+            .build();
+
+        if (casePaymentOrderQueryFilter.noFilters()) {
+            return Page.empty();
+        }
+        casePaymentOrderQueryFilter.validateCasePaymentOrdersFiltering();
         return casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter);
     }
 
@@ -150,20 +187,20 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
-                        + "\n1) " + ValidationError.ID_INVALID
-                        + "\n2) " + ValidationError.CASE_ID_INVALID
-                        + "\n3) " + ValidationError.CPO_NOT_FOUND_BY_ID
-                        + "\n4) " + ValidationError.CPO_NOT_FOUND_BY_CASE_ID
-                        + "\n5) " + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS,
+                + "\n1) " + ValidationError.ID_INVALID
+                + "\n2) " + ValidationError.CASE_ID_INVALID
+                + "\n3) " + ValidationError.CPO_NOT_FOUND_BY_ID
+                + "\n4) " + ValidationError.CPO_NOT_FOUND_BY_CASE_ID
+                + "\n5) " + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS,
             examples = @Example(value = {
-                    @ExampleProperty(
+                @ExampleProperty(
                     value = "{\n"
-                            + "   \"status\": \"400\",\n"
-                            + "   \"error\": \"Bad Request\",\n"
-                            + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
-                            + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
-                            + "   \"details\": [ \""  + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS + "\" ]\n"
-                            + "}",
+                        + "   \"status\": \"400\",\n"
+                        + "   \"error\": \"Bad Request\",\n"
+                        + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
+                        + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
+                        + "   \"details\": [ \"" + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS + "\" ]\n"
+                        + "}",
                     mediaType = APPLICATION_JSON_VALUE
                 )
             })
@@ -183,12 +220,12 @@ public class CasePaymentOrdersController {
                                             @ApiParam("list of Case IDs")
                                             @ValidCaseId
                                             @RequestParam(name = CASE_IDS, required = false)
-                                                    Optional<List<String>> caseIds) {
+                                                Optional<List<String>> caseIds) {
 
         final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
-                .listOfIds(ids.orElse(emptyList()))
-                .listOfCasesIds(caseIds.orElse(emptyList()))
-                .build();
+            .cpoIds(ids.orElse(emptyList()))
+            .caseIds(caseIds.orElse(emptyList()))
+            .build();
 
         casePaymentOrdersService.deleteCasePaymentOrders(casePaymentOrderQueryFilter);
     }
@@ -220,7 +257,7 @@ public class CasePaymentOrdersController {
                         + "   \"error\": \"Bad Request\",\n"
                         + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
                         + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
-                        + "   \"details\": [ \""  + ValidationError.ID_REQUIRED + "\" ]\n"
+                        + "   \"details\": [ \"" + ValidationError.ID_REQUIRED + "\" ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
             })
@@ -243,7 +280,7 @@ public class CasePaymentOrdersController {
         )
     })
     public CasePaymentOrder updateCasePaymentOrderRequest(@Valid @RequestBody UpdateCasePaymentOrderRequest
-                                                                  requestPayload) {
+                                                              requestPayload) {
         return casePaymentOrdersService.updateCasePaymentOrder(requestPayload);
     }
 
