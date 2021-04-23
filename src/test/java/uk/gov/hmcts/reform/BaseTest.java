@@ -57,7 +57,7 @@ public interface BaseTest {
             .id(UUID.fromString(CPO_ID_VALID_1))
             .createdBy(CREATED_BY)
             .createdTimestamp(CREATED_TIMESTAMP)
-            .historyExists(false)
+            .historyExists(HISTORY_EXISTS)
             .build();
     }
 

@@ -84,7 +84,7 @@ class CasePaymentOrderMapperTest implements BaseTest {
                      entity.getOrderReference(), mappedDomainObject.getOrderReference());
         assertEquals("Mapped domain model created by should equals mocked domain model created by",
                      entity.getCreatedBy(), mappedDomainObject.getCreatedBy());
-        assertEquals("Mapped domain model created by should equals mocked domain model history exists",
+        assertEquals("Mapped domain model history exists should equals mocked domain model history exists",
                      entity.getHistoryExists(), mappedDomainObject.getHistoryExists());
     }
 
@@ -111,7 +111,7 @@ class CasePaymentOrderMapperTest implements BaseTest {
                      request.getOrderReference(), mappedRequestEntity.getOrderReference());
         assertEquals("Mapped entity created by should equals mocked entity created by",
                      CREATED_BY, mappedRequestEntity.getCreatedBy());
-        assertEquals("Mapped entity created by should equals mocked entity history exists",
+        assertEquals("Mapped entity history exists should equals mocked entity history exists",
                      HISTORY_EXISTS, mappedRequestEntity.getHistoryExists());
     }
 

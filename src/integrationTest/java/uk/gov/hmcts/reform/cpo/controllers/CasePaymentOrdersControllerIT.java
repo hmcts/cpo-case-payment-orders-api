@@ -138,7 +138,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                     .andExpect(jsonPath("$.effective_from", is(EFFECTIVE_FROM.format(formatter))))
                     .andExpect(jsonPath("$.created_by", is(CREATED_BY_IDAM_MOCK)))
                     .andExpect(jsonPath("$.created_timestamp").exists())
-                    .andExpect(jsonPath("$.history_exists").exists())
+                    .andExpect(jsonPath("$.history_exists" , is(!HISTORY_EXISTS)))
                 .andReturn();
 
             UUID id = UUID.fromString(
@@ -843,7 +843,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                 .andExpect(jsonPath("$.responsible_party").value(request.getResponsibleParty()))
                 .andExpect(jsonPath("$.created_by").value(CREATED_BY_IDAM_MOCK))
                 .andExpect(jsonPath("$.created_timestamp").exists())
-                .andExpect(jsonPath("$.history_exists").exists());
+                .andExpect(jsonPath("$.history_exists", is(HISTORY_EXISTS)));
         }
 
         private void verifyDbCpoValues(UpdateCasePaymentOrderRequest request,

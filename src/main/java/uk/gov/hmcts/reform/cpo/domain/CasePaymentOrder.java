@@ -29,5 +29,5 @@ public class CasePaymentOrder {
 
     private String createdBy;
 
-    private Boolean historyExists;
+    private boolean historyExists;
 }

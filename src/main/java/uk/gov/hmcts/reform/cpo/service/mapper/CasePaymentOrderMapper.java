@@ -15,14 +15,12 @@ public interface CasePaymentOrderMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdTimestamp", ignore = true)
-    @Mapping(target = "historyExists", expression = "java(false)")
     CasePaymentOrderEntity toEntity(CreateCasePaymentOrderRequest createCasePaymentOrderRequest,
                                                 String createdBy);
 
     CasePaymentOrder toDomainModel(CasePaymentOrderEntity casePaymentOrderEntity);
 
     @Mapping(target = "createdTimestamp", expression = "java(java.time.LocalDateTime.now())")
-    @Mapping(target = "historyExists", expression = "java(true)")
     void mergeIntoEntity(@MappingTarget CasePaymentOrderEntity target,
                          UpdateCasePaymentOrderRequest updateCasePaymentOrderRequest,
                          String createdBy);

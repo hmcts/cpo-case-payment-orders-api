@@ -96,6 +96,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         String createdBy = getUserId();
 
         CasePaymentOrderEntity casePaymentOrderEntity = verifyCpoExists(updateCasePaymentOrderRequest.getUUID());
+        casePaymentOrderEntity.setHistoryExists(true);
 
         mapper.mergeIntoEntity(casePaymentOrderEntity, updateCasePaymentOrderRequest, createdBy);
 
