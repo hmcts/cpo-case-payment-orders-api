@@ -19,7 +19,8 @@ def secrets = [
 
   ],
   's2s-${env}': [
-    secret('microservicekey-xui-webapp', 'BEFTA_S2S_CLIENT_SECRET_OF_XUI_WEBAPP')
+    secret('microservicekey-xui-webapp', 'BEFTA_S2S_CLIENT_SECRET_OF_XUI_WEBAPP'),
+    secret('microservicekey-payment-app', 'BEFTA_S2S_CLIENT_SECRET_OF_PAYMENT_APP')
   ]
 ]
 
@@ -54,6 +55,7 @@ def setBeftaEnvVariables() {
   env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
   // :: for `"s2sClientId": "xui_webapp"`
   env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
+  env.BEFTA_S2S_CLIENT_ID_OF_PAYMENT_APP = "payment_app"
   // :: configure `xui_webapp` as the default value for `s2sClientId`
   env.BEFTA_S2S_CLIENT_ID = env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP
   env.BEFTA_S2S_CLIENT_SECRET = env.BEFTA_S2S_CLIENT_SECRET_OF_XUI_WEBAPP

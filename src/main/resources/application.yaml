@@ -94,5 +94,5 @@ azure:
 
 service-authorization:
   permissions:
-    payment_app: R
-    xui_webapp: R
+    "[payment_app]": "R"
+    "[xui_webapp]": "CRUD"
