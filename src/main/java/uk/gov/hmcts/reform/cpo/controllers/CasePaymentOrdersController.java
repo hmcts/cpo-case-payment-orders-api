@@ -11,6 +11,7 @@ import io.swagger.annotations.ExampleProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -101,6 +102,7 @@ public class CasePaymentOrdersController {
             message = ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE
         )
     })
+    @PreAuthorize("@securityUtils.hasCreatePermission()")
     public CasePaymentOrder createCasePaymentOrderRequest(@Valid @RequestBody CreateCasePaymentOrderRequest
                                                               requestPayload) {
         return casePaymentOrdersService.createCasePaymentOrder(requestPayload);
@@ -145,6 +147,7 @@ public class CasePaymentOrdersController {
         @ApiImplicitParam(name = "page", value = "page number, indexes from (0,1) to page-size.", paramType = "query"),
         @ApiImplicitParam(name = "size", value = "page size", paramType = "query")
     })
+    @PreAuthorize("@securityUtils.hasReadPermission()")
     public Page<CasePaymentOrder> getCasePaymentOrders(@ApiParam("list of case payment orders ids")
                                                        @ValidCpoId
                                                        @RequestParam(name = IDS, required = false)
@@ -208,6 +211,7 @@ public class CasePaymentOrdersController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE
         )
     })
+    @PreAuthorize("@securityUtils.hasDeletePermission()")
     public void deleteCasePaymentOrdersById(@ApiParam("list of IDs")
                                             @ValidCpoId
                                             @RequestParam(name = IDS, required = false) Optional<List<String>> ids,
@@ -275,6 +279,7 @@ public class CasePaymentOrdersController {
             message = ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE
         )
     })
+    @PreAuthorize("@securityUtils.hasUpdatePermission()")
     public CasePaymentOrder updateCasePaymentOrderRequest(@Valid @RequestBody UpdateCasePaymentOrderRequest
                                                               requestPayload) {
         return casePaymentOrdersService.updateCasePaymentOrder(requestPayload);

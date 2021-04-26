@@ -1,0 +1,9 @@
+service-authorization:
+  permissions:
+    payment_app: R
+    anotherService: UD
+    xui_webapp: CRUD
+
+#spring:
+#  jackson:
+#    property-naming-strategy: SNAKE_CASE
