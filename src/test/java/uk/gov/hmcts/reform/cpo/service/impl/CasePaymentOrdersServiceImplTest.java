@@ -379,7 +379,6 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
         @DisplayName("Should successfully set fields when updating CasePaymentOrder")
         void shouldSetFieldsWhenUpdatingCasePayment() {
 
-            LocalDateTime previousCreateDateTime = casePaymentOrderEntity.getCreatedTimestamp();
 
             // GIVEN
             // :: the load
@@ -390,6 +389,7 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
             // :: the conversion
             given(mapper.toDomainModel(savedEntity)).willReturn(casePaymentOrderResponse);
 
+            LocalDateTime previousCreateDateTime = casePaymentOrderEntity.getCreatedTimestamp();
             // WHEN
             casePaymentOrdersService.updateCasePaymentOrder(updateCasePaymentOrderRequest);
 
