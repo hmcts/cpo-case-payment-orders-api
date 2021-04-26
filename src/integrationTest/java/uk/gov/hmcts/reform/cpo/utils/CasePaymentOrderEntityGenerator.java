@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -32,18 +33,18 @@ public class CasePaymentOrderEntityGenerator {
 
         for (int i = 0; i < numberToGenerate; i++) {
             CasePaymentOrder casePaymentOrder = CasePaymentOrder.builder()
-                    .action("Action " + RandomUtils.nextInt())
-                    .caseId(useSameCaseId ? caseId : Long.parseLong(uidService.generateUID()))
-                    .createdBy("Created by " + RandomUtils.nextBytes(2))
-                    .orderReference("order ref " + RandomUtils.nextBytes(3))
-                    .effectiveFrom(LocalDateTime.now())
-                    .createdTimestamp(LocalDateTime.now())
-                    .responsibleParty("ResponsibleParty" + RandomUtils.nextBytes(2))
-                    .build();
+                .action("Action " + RandomUtils.nextInt())
+                .caseId(useSameCaseId ? caseId : Long.parseLong(uidService.generateUID()))
+                .createdBy("Created by " + Arrays.toString(RandomUtils.nextBytes(2)))
+                .orderReference("2021-" + RandomUtils.nextLong(10000000000L, 99999999999L))
+                .effectiveFrom(LocalDateTime.now())
+                .createdTimestamp(LocalDateTime.now())
+                .responsibleParty("ResponsibleParty" + Arrays.toString(RandomUtils.nextBytes(2)))
+                .build();
 
 
             CasePaymentOrderEntity savedEntity =
-                    casePaymentOrdersJpaRepository.saveAndFlush(casePaymentOrderMapper.toEntity(casePaymentOrder));
+                casePaymentOrdersJpaRepository.saveAndFlush(casePaymentOrderMapper.toEntity(casePaymentOrder));
             returnValue.add(savedEntity);
         }
 

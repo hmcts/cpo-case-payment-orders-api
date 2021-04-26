@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -13,9 +14,9 @@ import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundExceptio
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
 import uk.gov.hmcts.reform.cpo.exception.IdAMIdCannotBeRetrievedException;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
+import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
-import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
@@ -27,9 +28,10 @@ import java.util.UUID;
 
 import static uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity.UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT;
 import static uk.gov.hmcts.reform.cpo.validators.ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS;
-import static uk.gov.hmcts.reform.cpo.validators.ValidationError.IDAM_ID_NOT_FOUND;
+import static uk.gov.hmcts.reform.cpo.validators.ValidationError.IDAM_ID_RETRIEVE_ERROR;
 
 @Service
+@Slf4j
 public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
     private final SecurityUtils securityUtils;
@@ -49,32 +51,28 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     @Transactional
     @Override
     public CasePaymentOrder createCasePaymentOrder(CreateCasePaymentOrderRequest createCasePaymentOrderRequest) {
-        String createdBy;
-        try {
-            createdBy = securityUtils.getUserInfo().getUid();
-        } catch (Exception e) {
-            throw new IdAMIdCannotBeRetrievedException(IDAM_ID_NOT_FOUND);
-        }
+        String createdBy = getUserId();
+
         CasePaymentOrderEntity requestEntity = mapper.toEntity(createCasePaymentOrderRequest, createdBy);
 
-        try {
-            CasePaymentOrderEntity savedEntity = casePaymentOrdersRepository.saveAndFlush(requestEntity);
-            return mapper.toDomainModel(savedEntity);
-        } catch (DataIntegrityViolationException exception) {
-            if (exception.getCause() instanceof ConstraintViolationException
-                && isDuplicateCaseIdOrderRefPairing(exception)) {
-                throw new CaseIdOrderReferenceUniqueConstraintException(ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE);
-            } else {
-                throw exception;
-            }
-        }
+        CasePaymentOrderEntity savedEntity = saveEntity(requestEntity);
+
+        return mapper.toDomainModel(savedEntity);
     }
 
 
     @Transactional
     @Override
-    public CasePaymentOrder updateCasePaymentOrder(UpdateCasePaymentOrderRequest request) {
-        throw new UnsupportedOperationException("Implement me: see CPO-6");
+    public CasePaymentOrder updateCasePaymentOrder(UpdateCasePaymentOrderRequest updateCasePaymentOrderRequest) {
+        String createdBy = getUserId();
+
+        var casePaymentOrderEntity = verifyCpoExists(updateCasePaymentOrderRequest.getUUID());
+
+        mapper.mergeIntoEntity(casePaymentOrderEntity, updateCasePaymentOrderRequest, createdBy);
+
+        CasePaymentOrderEntity updatedEntity = saveEntity(casePaymentOrderEntity);
+
+        return mapper.toDomainModel(updatedEntity);
     }
 
     @Transactional
@@ -97,6 +95,15 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     private void deleteCasePaymentOrdersByCaseIds(List<Long> caseIds) {
         casePaymentOrdersRepository.deleteByCaseIds(caseIds);
         casePaymentOrdersRepository.deleteAuditEntriesByCaseIds(caseIds);
+    }
+
+    private String getUserId() {
+        try {
+            return securityUtils.getUserInfo().getUid();
+        } catch (Exception e) {
+            log.error(IDAM_ID_RETRIEVE_ERROR, e);
+            throw new IdAMIdCannotBeRetrievedException(IDAM_ID_RETRIEVE_ERROR);
+        }
     }
 
     private void validateCasePaymentOrderQueryFilter(final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter) {
@@ -137,9 +144,29 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         if (casePaymentOrderEntities.isEmpty()) {
             throw new CasePaymentOrderCouldNotBeFoundException(ValidationError.CPO_NOT_FOUND);
         }
-        return casePaymentOrderEntities.map(casePaymentOrderEntity ->
-                                                mapper.toDomainModel(casePaymentOrderEntity)
-        );
+        return casePaymentOrderEntities.map(mapper::toDomainModel);
     }
+
+    private CasePaymentOrderEntity saveEntity(CasePaymentOrderEntity entity) {
+        try {
+            // save and flush to force unique constraint to apply now
+            return casePaymentOrdersRepository.saveAndFlush(entity);
+
+        } catch (DataIntegrityViolationException exception) {
+            if (exception.getCause() instanceof ConstraintViolationException
+                && isDuplicateCaseIdOrderRefPairing(exception)) {
+
+                throw new CaseIdOrderReferenceUniqueConstraintException(ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE);
+            } else {
+                throw exception;
+            }
+        }
+    }
+
+    private CasePaymentOrderEntity verifyCpoExists(UUID id) {
+        return casePaymentOrdersRepository.findById(id)
+            .orElseThrow(() -> new CasePaymentOrderCouldNotBeFoundException(ValidationError.CPO_NOT_FOUND));
+    }
+
 }
 

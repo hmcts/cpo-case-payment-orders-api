@@ -16,7 +16,6 @@ import java.time.ZoneOffset;
 
 @Getter
 public class HttpError<T extends Serializable> implements Serializable {
-    private static final long serialVersionUID = 1501816452204696395L;
 
     public static final Integer DEFAULT_STATUS = HttpStatus.INTERNAL_SERVER_ERROR.value();
     public static final String DEFAULT_ERROR = "Unexpected Error";
@@ -102,4 +101,5 @@ public class HttpError<T extends Serializable> implements Serializable {
         this.message = message;
         return this;
     }
+
 }

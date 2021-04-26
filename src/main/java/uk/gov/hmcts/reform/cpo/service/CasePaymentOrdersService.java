@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 
 public interface CasePaymentOrdersService {
 
-
     CasePaymentOrder createCasePaymentOrder(CreateCasePaymentOrderRequest request);
 
     Page<CasePaymentOrder> getCasePaymentOrders(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter);
@@ -16,4 +15,5 @@ public interface CasePaymentOrdersService {
     CasePaymentOrder updateCasePaymentOrder(UpdateCasePaymentOrderRequest request);
 
     void deleteCasePaymentOrders(CasePaymentOrderQueryFilter casePaymentOrderQueryFilter);
+
 }

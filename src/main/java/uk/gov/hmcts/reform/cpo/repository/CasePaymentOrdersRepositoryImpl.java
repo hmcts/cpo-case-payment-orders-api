@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundExceptio
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -53,6 +54,11 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
     }
 
     @Override
+    public Optional<CasePaymentOrderEntity> findById(UUID id) {
+        return casePaymentOrdersJpaRepository.findById(id);
+    }
+
+    @Override
     public Page<CasePaymentOrderEntity> findByIdIn(List<UUID> ids, Pageable pageable) {
         return casePaymentOrdersJpaRepository.findByIdIn(ids, pageable);
     }
@@ -66,6 +72,5 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
     public CasePaymentOrderEntity saveAndFlush(CasePaymentOrderEntity casePaymentOrderEntity) {
         return casePaymentOrdersJpaRepository.saveAndFlush(casePaymentOrderEntity);
     }
-
 
 }

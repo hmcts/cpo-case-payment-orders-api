@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.BaseTest;
 
 import javax.validation.ConstraintValidatorContext;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +20,7 @@ import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 class CaseIdsTest implements BaseTest {
 
-    private CaseIdsValidator caseIdsValidator = new CaseIdsValidator();
+    private final CaseIdsValidator caseIdsValidator = new CaseIdsValidator();
 
     @Mock
     private ConstraintValidatorContext constraintValidatorContext;
@@ -36,7 +37,7 @@ class CaseIdsTest implements BaseTest {
         final String[] testedData = {CASE_ID_VALID_1, CASE_ID_VALID_2, CASE_ID_VALID_3};
         final Optional<List<String>> valuesToBeTested = createInitialValuesList(testedData);
         final boolean result = caseIdsValidator.isValid(valuesToBeTested, constraintValidatorContext);
-        assertTrue("The values: " + testedData + " should be valid", result);
+        assertTrue("The values: " + Arrays.toString(testedData) + " should be valid", result);
     }
 
     @Test
@@ -61,7 +62,7 @@ class CaseIdsTest implements BaseTest {
         when(constraintValidatorContext.buildConstraintViolationWithTemplate(anyString())).thenReturn(
             constraintViolationBuilder);
         final boolean result = caseIdsValidator.isValid(valuesToBeTested, constraintValidatorContext);
-        assertFalse("The values: " + testedData + " should not be valid", result);
+        assertFalse("The values: " + Arrays.toString(testedData) + " should not be valid", result);
     }
 
     @Test
@@ -71,4 +72,5 @@ class CaseIdsTest implements BaseTest {
         caseIdsValidator.validate(valueToBeTested, errors);
         assertTrue("There should be any error for " + valueToBeTested + " value.", !errors.isEmpty());
     }
+
 }

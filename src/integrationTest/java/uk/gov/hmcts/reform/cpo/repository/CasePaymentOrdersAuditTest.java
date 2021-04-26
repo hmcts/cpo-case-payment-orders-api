@@ -20,11 +20,14 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderAuditUtils.SELECT_DELETED_ENTITIES;
+import static uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderAuditUtils.SELECT_ENTITIES_ONLY;
+import static uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderAuditUtils.SELECT_REVISION_INFO_ONLY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CasePaymentOrdersAuditTest extends BaseTest {
+class CasePaymentOrdersAuditTest extends BaseTest {
 
     @Autowired
     private CasePaymentOrdersJpaRepository casePaymentOrdersRepository;
@@ -41,9 +44,6 @@ public class CasePaymentOrdersAuditTest extends BaseTest {
 
     private static final String ACTION_VALUE = "Action";
     private static final String NEW_ACTION_VALUE = "New Action";
-    private static final boolean SELECT_DELETED_ENTITIES = true;
-    private static final boolean SELECT_ENTITIES_ONLY = true;
-    private static final boolean SELECT_REVISION_INFO_ONLY = false;
 
     @BeforeEach
     void setUp() {
@@ -128,4 +128,5 @@ public class CasePaymentOrdersAuditTest extends BaseTest {
 
         assertTrue(collect.containsAll(revisionTypes));
     }
+
 }

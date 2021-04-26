@@ -5,7 +5,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.ResultActions;
+import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
+import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 
@@ -22,6 +24,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public interface BaseTest {
+
+    public static final String ERROR_PATH_DETAILS = "$.details";
+    public static final String ERROR_PATH_ERROR = "$.error";
+    public static final String ERROR_PATH_MESSAGE = "$.message";
+    public static final String ERROR_PATH_STATUS = "$.status";
 
     int PAGE_NUMBER = 1;
     String IDS = "ids";
@@ -42,15 +49,14 @@ public interface BaseTest {
     String CPO_ID_INVALID_1 = "160924";
     String CPO_ID_INVALID_2 = "160924 ";
 
-    String ORDER_REFERENCE = "orderReference";
+    public static final String ORDER_REFERENCE_VALID = "2021-11223344556";
+    public static final String ORDER_REFERENCE_INVALID = "2021-918425346";
     String ACTION = "action";
     String RESPONSIBLE_PARTY = "responsibleParty";
     LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24, 11, 48, 32);
 
     String CREATED_BY = "createdBy";
     LocalDateTime CREATED_TIMESTAMP = LocalDateTime.now();
-
-    String UN_EXPECTED_ERROR_IN_TEST = "Fail due an expected error in the test.";
 
     default <T> Optional<List<T>> createInitialValuesList(final T[] initialValues) {
         return Optional.of(Arrays.asList(initialValues));
@@ -63,11 +69,33 @@ public interface BaseTest {
             .effectiveFrom(EFFECTIVE_FROM)
             .action(ACTION)
             .responsibleParty(RESPONSIBLE_PARTY)
-            .orderReference(ORDER_REFERENCE)
+            .orderReference(ORDER_REFERENCE_VALID)
             .id(UUID.fromString(CPO_ID_VALID_1))
             .createdBy(CREATED_BY)
             .createdTimestamp(CREATED_TIMESTAMP)
             .build();
+    }
+
+    default CasePaymentOrderEntity createCasePaymentOrderEntity() {
+        CasePaymentOrderEntity entity = new CasePaymentOrderEntity();
+        entity.setEffectiveFrom(EFFECTIVE_FROM);
+        entity.setCaseId(Long.parseLong(CASE_ID_VALID_1));
+        entity.setAction(ACTION);
+        entity.setResponsibleParty(RESPONSIBLE_PARTY);
+        entity.setOrderReference(ORDER_REFERENCE_VALID);
+        entity.setCreatedBy(CREATED_BY);
+        entity.setCreatedTimestamp(CREATED_TIMESTAMP);
+        return entity;
+    }
+
+    default CreateCasePaymentOrderRequest createCreateCasePaymentOrderRequest() {
+        return new CreateCasePaymentOrderRequest(
+            EFFECTIVE_FROM,
+            CASE_ID_VALID_1,
+            ACTION,
+            RESPONSIBLE_PARTY,
+            ORDER_REFERENCE_VALID
+        );
     }
 
     default UpdateCasePaymentOrderRequest createUpdateCasePaymentOrderRequest() {
@@ -75,9 +103,9 @@ public interface BaseTest {
             CPO_ID_VALID_1,
             LocalDateTime.now(),
             CASE_ID_VALID_1,
-            ORDER_REFERENCE,
             ACTION,
-            RESPONSIBLE_PARTY
+            RESPONSIBLE_PARTY,
+            ORDER_REFERENCE_VALID
         );
     }
 
@@ -147,8 +175,8 @@ public interface BaseTest {
     default void assertGetCopPResponse(String expectedError, ResultActions response) throws Exception {
         response
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
-            .andExpect(jsonPath("$.error").value(HttpStatus.BAD_REQUEST.getReasonPhrase()))
-            .andExpect(jsonPath("$.message",containsString(expectedError)));
+            .andExpect(jsonPath(ERROR_PATH_STATUS).value(HttpStatus.BAD_REQUEST.value()))
+            .andExpect(jsonPath(ERROR_PATH_ERROR).value(HttpStatus.BAD_REQUEST.getReasonPhrase()))
+            .andExpect(jsonPath(ERROR_PATH_MESSAGE, containsString(expectedError)));
     }
 }

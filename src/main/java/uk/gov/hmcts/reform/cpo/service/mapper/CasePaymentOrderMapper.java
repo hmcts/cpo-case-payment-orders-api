@@ -2,11 +2,11 @@ package uk.gov.hmcts.reform.cpo.service.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
+import org.mapstruct.MappingTarget;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
-
-import java.util.List;
+import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
+import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 
 @Mapper(componentModel = "spring")
 public interface CasePaymentOrderMapper {
@@ -20,6 +20,10 @@ public interface CasePaymentOrderMapper {
 
     CasePaymentOrder toDomainModel(CasePaymentOrderEntity casePaymentOrderEntity);
 
-    List<CasePaymentOrder> toDomainModelList(List<CasePaymentOrderEntity> casePaymentOrderEntities);
+    @Mapping(target = "createdTimestamp", expression = "java(java.time.LocalDateTime.now())")
+    void mergeIntoEntity(@MappingTarget CasePaymentOrderEntity target,
+                         UpdateCasePaymentOrderRequest updateCasePaymentOrderRequest,
+                         String createdBy);
+
 }
 

@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 
-@SuppressWarnings("PMD")
 @Service
 public class UIDService {
 

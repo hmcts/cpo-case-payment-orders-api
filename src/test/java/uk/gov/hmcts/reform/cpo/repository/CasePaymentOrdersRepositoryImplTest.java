@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cpo.repository;
 
 import org.apache.commons.lang3.RandomUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -13,19 +14,23 @@ import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundExceptio
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings("PMD.JUnitAssertionsShouldIncludeMessage")
 @ExtendWith(MockitoExtension.class)
-public class CasePaymentOrdersRepositoryImplTest {
+class CasePaymentOrdersRepositoryImplTest {
     @Mock
     private CasePaymentOrdersJpaRepository casePaymentOrdersJpaRepository;
 
@@ -116,4 +121,46 @@ public class CasePaymentOrdersRepositoryImplTest {
         verify(casePaymentOrdersJpaRepository).deleteByCaseIdIsIn(casePaymentOrderCaseIdCaptor.capture());
         assertTrue(casePaymentOrderCaseIdCaptor.getValue().containsAll(caseIdToDelete));
     }
+
+    @Test
+    @DisplayName("Should use JPA Repository for findById")
+    void testFindById() {
+
+        // GIVEN
+        UUID cpoId = UUID.randomUUID();
+        CasePaymentOrderEntity expectedEntity = new CasePaymentOrderEntity();
+        when(casePaymentOrdersJpaRepository.findById(any(UUID.class))).thenReturn(Optional.of(expectedEntity));
+
+        // WHEN
+        Optional<CasePaymentOrderEntity> response = casePaymentOrdersRepository.findById(cpoId);
+
+        // THEN
+        verify(casePaymentOrdersJpaRepository, times(1)).findById(cpoId);
+
+        assertNotNull(response);
+        assertTrue(response.isPresent());
+        assertEquals(expectedEntity, response.get());
+    }
+
+    @Test
+    @DisplayName("Should use JPA Repository for saveAndFlush")
+    void testSaveAndFlush() {
+
+        // GIVEN
+        CasePaymentOrderEntity inputEntity = new CasePaymentOrderEntity();
+        CasePaymentOrderEntity expectedEntity = new CasePaymentOrderEntity();
+        when(casePaymentOrdersJpaRepository.saveAndFlush(any(CasePaymentOrderEntity.class))).thenReturn(expectedEntity);
+
+        // WHEN
+        CasePaymentOrderEntity response = casePaymentOrdersRepository.saveAndFlush(inputEntity);
+
+        // THEN
+        ArgumentCaptor<CasePaymentOrderEntity> entityCaptor = ArgumentCaptor.forClass(CasePaymentOrderEntity.class);
+        verify(casePaymentOrdersJpaRepository).saveAndFlush(entityCaptor.capture());
+        assertEquals(inputEntity, entityCaptor.getValue());
+
+        assertNotNull(response);
+        assertEquals(expectedEntity, response);
+    }
+
 }

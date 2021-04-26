@@ -69,13 +69,12 @@ public class CasePaymentOrdersController {
             message = "One or more of the following reasons:"
                 + "\n1) " + ValidationError.CASE_ID_INVALID
                 + "\n2) " + ValidationError.CASE_ID_REQUIRED
-                + "\n3) " + ValidationError.CASE_ID_INVALID_LENGTH
-                + "\n4) " + ValidationError.EFFECTIVE_FROM_REQUIRED
-                + "\n5) " + ValidationError.ACTION_REQUIRED
-                + "\n6) " + ValidationError.RESPONSIBLE_PARTY_REQUIRED
+                + "\n3) " + ValidationError.EFFECTIVE_FROM_REQUIRED
+                + "\n4) " + ValidationError.ACTION_REQUIRED
+                + "\n5) " + ValidationError.RESPONSIBLE_PARTY_REQUIRED
+                + "\n6) " + ValidationError.ORDER_REFERENCE_INVALID
                 + "\n7) " + ValidationError.ORDER_REFERENCE_REQUIRED
-                + "\n8) " + ValidationError.ORDER_REFERENCE_INVALID
-                + "\n9) " + ValidationError.IDAM_ID_NOT_FOUND,
+                + "\n8) " + ValidationError.IDAM_ID_RETRIEVE_ERROR,
             response = String.class,
             examples = @Example({
                 @ExampleProperty(
@@ -100,19 +99,14 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 409,
             message = ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE
-        ),
-        @ApiResponse(
-            code = 500,
-            message = "Unexpected server error"
         )
     })
-
     public CasePaymentOrder createCasePaymentOrderRequest(@Valid @RequestBody CreateCasePaymentOrderRequest
                                                               requestPayload) {
         return casePaymentOrdersService.createCasePaymentOrder(requestPayload);
     }
 
-    @GetMapping(value = "case-payment-orders", produces = {"application/json"})
+    @GetMapping(path = CASE_PAYMENT_ORDERS_PATH, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get payment orders for a case", notes = "Get payment orders for a case")
     @ApiResponses({
         @ApiResponse(
@@ -153,17 +147,17 @@ public class CasePaymentOrdersController {
     })
     public Page<CasePaymentOrder> getCasePaymentOrders(@ApiParam("list of case payment orders ids")
                                                        @ValidCpoId
-                                                       @RequestParam(name = "ids", required = false)
+                                                       @RequestParam(name = IDS, required = false)
                                                            Optional<List<String>> ids,
                                                        @ApiParam("list of ccd case reference numbers")
                                                        @ValidCaseId
-                                                       @RequestParam(name = "case-ids", required = false)
+                                                       @RequestParam(name = CASE_IDS, required = false)
                                                            Optional<List<String>> caseIds,
                                                        @ApiIgnore("This is ignored by swagger") Pageable pageable
 
     ) {
 
-        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
+        final var casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
             .cpoIds(ids.orElse(Collections.emptyList()))
             .caseIds(caseIds.orElse(Collections.emptyList()))
             .pageable(pageable)
@@ -222,7 +216,7 @@ public class CasePaymentOrdersController {
                                             @RequestParam(name = CASE_IDS, required = false)
                                                 Optional<List<String>> caseIds) {
 
-        final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
+        final var casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
             .cpoIds(ids.orElse(emptyList()))
             .caseIds(caseIds.orElse(emptyList()))
             .build();
@@ -236,19 +230,21 @@ public class CasePaymentOrdersController {
     @ApiResponses({
         @ApiResponse(
             code = 202,
-            message = ""
+            message = "Case Payment Order Updated"
         ),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
-                + "\n1) " + ValidationError.ID_REQUIRED
-                + "\n2) " + ValidationError.ID_INVALID
-                + "\n3) " + ValidationError.EFFECTIVE_FROM_REQUIRED
+                + "\n1) " + ValidationError.ID_INVALID
+                + "\n2) " + ValidationError.ID_REQUIRED
+                + "\n3) " + ValidationError.CASE_ID_INVALID
                 + "\n4) " + ValidationError.CASE_ID_REQUIRED
-                + "\n5) " + ValidationError.CASE_ID_INVALID
-                + "\n6) " + ValidationError.ORDER_REFERENCE_REQUIRED
-                + "\n7) " + ValidationError.ACTION_REQUIRED
-                + "\n8) " + ValidationError.RESPONSIBLE_PARTY_REQUIRED,
+                + "\n5) " + ValidationError.EFFECTIVE_FROM_REQUIRED
+                + "\n6) " + ValidationError.ACTION_REQUIRED
+                + "\n7) " + ValidationError.RESPONSIBLE_PARTY_REQUIRED
+                + "\n8) " + ValidationError.ORDER_REFERENCE_INVALID
+                + "\n9) " + ValidationError.ORDER_REFERENCE_REQUIRED
+                + "\n10) " + ValidationError.IDAM_ID_RETRIEVE_ERROR,
             response = String.class,
             examples = @Example({
                 @ExampleProperty(

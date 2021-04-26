@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface CasePaymentOrdersRepository {
@@ -15,6 +16,8 @@ public interface CasePaymentOrdersRepository {
     void deleteByCaseIds(List<Long> caseIds);
 
     void deleteAuditEntriesByCaseIds(List<Long> caseIds);
+
+    Optional<CasePaymentOrderEntity> findById(UUID id);
 
     Page<CasePaymentOrderEntity> findByIdIn(List<UUID> ids, Pageable pageable);
 

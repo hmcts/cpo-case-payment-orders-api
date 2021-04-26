@@ -10,14 +10,13 @@
     },
     "jsonBody": {
       "sub": "user@hmcts.net",
-      "uid": "445",
+      "uid": "e8275d41-7f22-4ee7-8ed3-14644d6db096",
       "roles": [
-        "caseworker-test",
-        "pui-caa"
+        "caseworker-test"
       ],
-      "name": "Cloud Strife",
-      "given_name": "Cloud",
-      "family_name": "Strife"
+      "name": "Test User",
+      "given_name": "Test",
+      "family_name": "User"
     }
   }
 }
