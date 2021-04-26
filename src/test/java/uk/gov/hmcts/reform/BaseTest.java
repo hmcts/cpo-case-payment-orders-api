@@ -58,6 +58,7 @@ public interface BaseTest {
     String CREATED_BY = "createdBy";
     LocalDateTime CREATED_TIMESTAMP = LocalDateTime.now();
     boolean HISTORY_EXISTS_DEFAULT = false;
+    boolean HISTORY_EXISTS_UPDATED = true;
 
     default <T> Optional<List<T>> createInitialValuesList(final T[] initialValues) {
         return Optional.of(Arrays.asList(initialValues));

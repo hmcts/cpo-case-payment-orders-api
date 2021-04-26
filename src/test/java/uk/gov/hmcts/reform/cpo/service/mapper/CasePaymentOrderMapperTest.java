@@ -16,7 +16,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
-import static org.springframework.test.util.AssertionErrors.assertNotEquals;
 import static org.springframework.test.util.AssertionErrors.assertNotNull;
 
 class CasePaymentOrderMapperTest implements BaseTest {
@@ -123,7 +122,6 @@ class CasePaymentOrderMapperTest implements BaseTest {
                                               "Merge Action",
                                               "Merge Responsible Party",
                                               "Merge Order Reference");
-        final LocalDateTime originalCreatedTimestamp = entity.getCreatedTimestamp();
         final String sourceCreatedBy = "Merge Created By";
 
         // WHEN
@@ -133,9 +131,6 @@ class CasePaymentOrderMapperTest implements BaseTest {
         // check created/modifided data
         assertEquals("Merged created by should equals supplied created by",
                      sourceCreatedBy, entity.getCreatedBy());
-        assertNotNull("Merged created timestamp should be set", entity.getCreatedTimestamp());
-        assertNotEquals("Merged created timestamp should have changed",
-                        originalCreatedTimestamp, entity.getCreatedTimestamp());
 
         // standard property checks
         assertEquals("Merged effective from should equal source effective from",
@@ -157,7 +152,6 @@ class CasePaymentOrderMapperTest implements BaseTest {
 
         // GIVEN
         CasePaymentOrderEntity entity = createCasePaymentOrderEntity();
-        final LocalDateTime originalCreatedTimestamp = entity.getCreatedTimestamp();
         final String originalCreatedBy = entity.getCreatedBy();
 
         // WHEN
@@ -167,8 +161,6 @@ class CasePaymentOrderMapperTest implements BaseTest {
         // check created/modified data (UNCHANGED)
         assertEquals("Created by should be unchanged",
                      originalCreatedBy, entity.getCreatedBy());
-        assertEquals("Created timestamp should be unchanged",
-                     originalCreatedTimestamp, entity.getCreatedTimestamp());
         // standard property checks (not null: assume unchanged)
         assertNotNull("Effective from should remain populated", entity.getEffectiveFrom());
         assertNotNull("Case ID should remain populated", entity.getCaseId());

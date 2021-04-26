@@ -860,7 +860,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(CREATED_BY_IDAM_MOCK, updatedEntity.get().getCreatedBy());
             assertNotNull(updatedEntity.get().getCreatedTimestamp());
             assertTrue(previousCreatedTimestamp.isBefore(updatedEntity.get().getCreatedTimestamp()));
-            assertTrue(updatedEntity.get().isHistoryExists());
+            assertEquals(HISTORY_EXISTS_UPDATED, updatedEntity.get().isHistoryExists());
         }
 
         private void verifyDbCpoAuditValues(UpdateCasePaymentOrderRequest request,
@@ -879,7 +879,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(CREATED_BY_IDAM_MOCK, latestRevision.getEntity().getCreatedBy());
             assertNotNull(latestRevision.getEntity().getCreatedTimestamp());
             assertTrue(previousCreatedTimestamp.isBefore(latestRevision.getEntity().getCreatedTimestamp()));
-            assertTrue(latestRevision.getEntity().isHistoryExists());
+            assertEquals(HISTORY_EXISTS_UPDATED, latestRevision.getEntity().isHistoryExists());
         }
 
     }

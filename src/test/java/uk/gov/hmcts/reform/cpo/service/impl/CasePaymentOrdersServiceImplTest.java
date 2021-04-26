@@ -112,6 +112,26 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
                 .createCasePaymentOrder(createCasePaymentOrderRequest);
             assertThat("UUID does not match expected", caseOrderReturn.getId().toString().equals(CPO_ID_VALID_1));
             assertThat("Returned entity does not match expected", caseOrderReturn.equals(casePaymentOrderIncoming));
+            assertEquals(HISTORY_EXISTS_DEFAULT, caseOrderReturn.isHistoryExists());
+        }
+
+        @Test
+        @DisplayName("Should successfully set fields when creating CasePaymentOrder")
+        void shouldSetFieldsWhenCreatingCasePayment() {
+            given(mapper.toEntity(createCasePaymentOrderRequest, CREATED_BY)).willReturn(requestEntity);
+            given(casePaymentOrdersRepository.saveAndFlush(requestEntity)).willReturn(savedEntity);
+            given(mapper.toDomainModel(savedEntity)).willReturn(casePaymentOrderIncoming);
+
+            CasePaymentOrder caseOrderReturn = casePaymentOrdersService
+                .createCasePaymentOrder(createCasePaymentOrderRequest);
+
+            // verify service call
+            ArgumentCaptor<CasePaymentOrderEntity> captor =
+                ArgumentCaptor.forClass(CasePaymentOrderEntity.class);
+
+            // THEN
+            verify(casePaymentOrdersRepository, times(1)).saveAndFlush(captor.capture());
+            assertEquals(HISTORY_EXISTS_DEFAULT, caseOrderReturn.isHistoryExists());
         }
 
         @Test
@@ -352,6 +372,36 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
             verify(casePaymentOrdersRepository, times(1)).saveAndFlush(casePaymentOrderEntity);
             assertThat("UUID should match expected", response.getId().equals(id));
             assertThat("Returned model should match expected", response.equals(casePaymentOrderResponse));
+            assertEquals(HISTORY_EXISTS_UPDATED, casePaymentOrderEntity.isHistoryExists());
+        }
+
+        @Test
+        @DisplayName("Should successfully set fields when updating CasePaymentOrder")
+        void shouldSetFieldsWhenUpdatingCasePayment() {
+
+            LocalDateTime previousCreateDateTime = casePaymentOrderEntity.getCreatedTimestamp();
+
+            // GIVEN
+            // :: the load
+            UUID id = updateCasePaymentOrderRequest.getUUID();
+            given(casePaymentOrdersRepository.findById(id)).willReturn(Optional.of(casePaymentOrderEntity));
+            // :: the save
+            given(casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity)).willReturn(savedEntity);
+            // :: the conversion
+            given(mapper.toDomainModel(savedEntity)).willReturn(casePaymentOrderResponse);
+
+            // WHEN
+            casePaymentOrdersService.updateCasePaymentOrder(updateCasePaymentOrderRequest);
+
+            // verify service call
+            ArgumentCaptor<CasePaymentOrderEntity> captor =
+                ArgumentCaptor.forClass(CasePaymentOrderEntity.class);
+
+            // THEN
+            verify(casePaymentOrdersRepository, times(1)).saveAndFlush(captor.capture());
+
+            assertTrue("", previousCreateDateTime.isBefore(captor.getValue().getCreatedTimestamp()));
+            assertEquals(captor.getValue().isHistoryExists(), HISTORY_EXISTS_UPDATED);
         }
 
         @Test
