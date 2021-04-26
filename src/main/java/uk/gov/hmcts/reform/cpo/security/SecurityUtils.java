@@ -5,9 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
+import javax.servlet.http.HttpServletRequest;
 
 import static uk.gov.hmcts.reform.cpo.security.Permission.CREATE;
 import static uk.gov.hmcts.reform.cpo.security.Permission.DELETE;
@@ -65,10 +68,13 @@ public class SecurityUtils {
     }
 
     private boolean hasPermission(Permission permission) {
-        String serviceAuthorizationHeaderValue = ((ServletRequestAttributes)
-                RequestContextHolder.getRequestAttributes())
-                .getRequest()
-                .getHeader(SERVICE_AUTHORIZATION);
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+
+        String serviceAuthorizationHeaderValue = null;
+        if (requestAttributes != null) {
+            HttpServletRequest request = ((ServletRequestAttributes)requestAttributes).getRequest();
+            serviceAuthorizationHeaderValue = request.getHeader(SERVICE_AUTHORIZATION);
+        }
 
         if (serviceAuthorizationHeaderValue == null) {
             return false;

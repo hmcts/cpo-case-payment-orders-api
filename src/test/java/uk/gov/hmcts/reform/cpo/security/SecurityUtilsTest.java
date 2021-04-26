@@ -47,7 +47,7 @@ public class SecurityUtilsTest {
     private ArgumentCaptor<Permission> permissionArgumentCaptor;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         securityUtils = new SecurityUtils(idamRepository, serviceAuthorizationConfig);
     }
 
