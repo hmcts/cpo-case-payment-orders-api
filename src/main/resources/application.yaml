@@ -95,4 +95,4 @@ azure:
 service-authorization:
   permissions:
     payment_app: R
-    xui_webapp: CRUD
+    xui_webapp: R
