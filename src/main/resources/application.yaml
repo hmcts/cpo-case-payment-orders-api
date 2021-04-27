@@ -99,4 +99,4 @@ s2s:
       permission: "R"
     xui:
       id: "xui_webapp"
-      permission: "CRUD"
+      permission: "R"
