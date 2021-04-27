@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.cpo.BaseTest;
+import uk.gov.hmcts.reform.cpo.auditlog.AuditOperationType;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrderAuditRevision;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -126,6 +128,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             MvcResult result =
                 mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+                                    .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
                     .andExpect(status().isCreated())
@@ -136,7 +139,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                     .andExpect(jsonPath("$.responsible_party", is(RESPONSIBLE_PARTY)))
                     .andExpect(jsonPath("$.order_reference", is(ORDER_REFERENCE_VALID)))
                     .andExpect(jsonPath("$.effective_from", is(EFFECTIVE_FROM.format(formatter))))
-                    .andExpect(jsonPath("$.created_by", is(CREATED_BY_IDAM_MOCK)))
+                    .andExpect(jsonPath("$.created_by", is(IDAM_MOCK_USER_ID)))
                     .andExpect(jsonPath("$.created_timestamp").exists())
                 .andReturn();
 
@@ -145,14 +148,20 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             );
             verifyDbCpoValues(id, createCasePaymentOrderRequest, beforeCreateTimestamp);
             verifyDbCpoAuditValues(id, createCasePaymentOrderRequest, beforeCreateTimestamp);
+            verifyLogAuditValues(result,
+                                 AuditOperationType.CREATE_CASE_PAYMENT_ORDER,
+                                 AUTHORISED_CRUD_SERVICE,
+                                 id.toString(),
+                                 createCasePaymentOrderRequest.getCaseId());
         }
 
         @DisplayName("Null request fields throws errors")
         @Test
         void shouldThrowNotNullErrors() throws Exception {
             mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(createCasePaymentOrderRequestNull)))
+                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(createCasePaymentOrderRequestNull)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath(ERROR_PATH_MESSAGE, is(ValidationError.ARGUMENT_NOT_VALID)))
@@ -161,36 +170,60 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                 .andExpect(jsonPath(ERROR_PATH_DETAILS, hasItem(ValidationError.ORDER_REFERENCE_REQUIRED)))
                 .andExpect(jsonPath(ERROR_PATH_DETAILS, hasItem(ValidationError.CASE_ID_REQUIRED)))
                 .andExpect(jsonPath(ERROR_PATH_DETAILS, hasItem(ValidationError.EFFECTIVE_FROM_REQUIRED)))
-                .andExpect(jsonPath(ERROR_PATH_DETAILS, hasItem(ValidationError.RESPONSIBLE_PARTY_REQUIRED)));
+                .andExpect(jsonPath(ERROR_PATH_DETAILS, hasItem(ValidationError.RESPONSIBLE_PARTY_REQUIRED)))
+
+                .andExpect(hasGeneratedLogAudit(AuditOperationType.CREATE_CASE_PAYMENT_ORDER,
+                                                AUTHORISED_CRUD_SERVICE,
+                                                null,
+                                                createCasePaymentOrderRequest.getCaseId()));
         }
 
         @DisplayName("Invalid request fields throws errors")
         @Test
         void shouldThrowInvalidFormErrors() throws Exception {
             mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(createCasePaymentOrderRequestInvalid)))
+                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(createCasePaymentOrderRequestInvalid)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath(ERROR_PATH_MESSAGE, is(ValidationError.ARGUMENT_NOT_VALID)))
                 .andExpect(jsonPath(ERROR_PATH_DETAILS, hasSize(2)))
                 .andExpect(jsonPath(ERROR_PATH_DETAILS, hasItem(ValidationError.CASE_ID_INVALID)))
-                .andExpect(jsonPath(ERROR_PATH_DETAILS, hasItem(ValidationError.ORDER_REFERENCE_INVALID)));
+                .andExpect(jsonPath(ERROR_PATH_DETAILS, hasItem(ValidationError.ORDER_REFERENCE_INVALID)))
+                .andExpect(hasGeneratedLogAudit(AuditOperationType.CREATE_CASE_PAYMENT_ORDER,
+                                                AUTHORISED_CRUD_SERVICE,
+                                                null,
+                                                createCasePaymentOrderRequest.getCaseId()));
         }
 
         @DisplayName("Non-unique order reference and case id pairing throws errors")
         @Test
         void shouldThrowNonUniquePairingErrors() throws Exception {
-            mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
-                .andExpect(status().isCreated());
+
+            // GIVEN
+            // generate and save first entity
+            CasePaymentOrderEntity savedEntity =
+                casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
+
+            // make a request with matching Case-ID and OrderReference
+            createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(EFFECTIVE_FROM,
+                                                                              savedEntity.getCaseId().toString(),
+                                                                              ACTION,
+                                                                              RESPONSIBLE_PARTY,
+                                                                              savedEntity.getOrderReference());
 
             mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
+                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath(ERROR_PATH_MESSAGE, is(ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE)));
+                .andExpect(jsonPath(ERROR_PATH_MESSAGE, is(ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE)))
+
+                .andExpect(hasGeneratedLogAudit(AuditOperationType.CREATE_CASE_PAYMENT_ORDER,
+                                                AUTHORISED_CRUD_SERVICE,
+                                                null,
+                                                createCasePaymentOrderRequest.getCaseId()));
         }
 
         private void verifyDbCpoValues(UUID id,
@@ -205,7 +238,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(request.getAction(), savedEntity.get().getAction());
             assertEquals(request.getResponsibleParty(), savedEntity.get().getResponsibleParty());
             assertEquals(request.getOrderReference(), savedEntity.get().getOrderReference());
-            assertEquals(CREATED_BY_IDAM_MOCK, savedEntity.get().getCreatedBy());
+            assertEquals(IDAM_MOCK_USER_ID, savedEntity.get().getCreatedBy());
             assertNotNull(savedEntity.get().getCreatedTimestamp());
             assertTrue(beforeCreateTimestamp.isBefore(savedEntity.get().getCreatedTimestamp()));
         }
@@ -224,7 +257,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(request.getAction(), latestRevision.getEntity().getAction());
             assertEquals(request.getResponsibleParty(), latestRevision.getEntity().getResponsibleParty());
             assertEquals(request.getOrderReference(), latestRevision.getEntity().getOrderReference());
-            assertEquals(CREATED_BY_IDAM_MOCK, latestRevision.getEntity().getCreatedBy());
+            assertEquals(IDAM_MOCK_USER_ID, latestRevision.getEntity().getCreatedBy());
             assertNotNull(latestRevision.getEntity().getCreatedTimestamp());
             assertTrue(beforeCreateTimestamp.isBefore(latestRevision.getEntity().getCreatedTimestamp()));
         }
@@ -242,8 +275,16 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             CasePaymentOrderEntity savedEntity =
                     casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
             assertTrue(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
-            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, savedEntity.getId().toString()))
-                    .andExpect(status().isNoContent());
+
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
+                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                .queryParam(IDS, savedEntity.getId().toString()))
+                    .andExpect(status().isNoContent())
+
+                    .andExpect(hasGeneratedLogAudit(AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
+                                                    AUTHORISED_CRUD_SERVICE,
+                                                    savedEntity.getId().toString(),
+                                                    null));
 
             assertFalse(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
             assertFalse(casePaymentOrdersAuditJpaRepository.findById(savedEntity.getId()).isPresent());
@@ -262,8 +303,15 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             String[] savedEntitiesUuidsString = savedEntitiesUuids.stream().map(UUID::toString).toArray(String[]::new);
 
-            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, savedEntitiesUuidsString))
-                    .andExpect(status().isNoContent());
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
+                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                .queryParam(IDS, savedEntitiesUuidsString))
+                    .andExpect(status().isNoContent())
+
+                    .andExpect(hasGeneratedLogAudit(AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
+                                                    AUTHORISED_CRUD_SERVICE,
+                                                    Arrays.asList(savedEntitiesUuidsString),
+                                                    null));
 
             assertTrue(casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
             assertTrue(casePaymentOrdersAuditJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
@@ -286,9 +334,17 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             String[] savedEntitiesUuidsString = entitiesToDelete.stream().map(UUID::toString).toArray(String[]::new);
 
-            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, savedEntitiesUuidsString))
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
+                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                .queryParam(IDS, savedEntitiesUuidsString))
                     .andExpect(status().isNotFound())
-                    .andExpect(jsonPath(ERROR_PATH_MESSAGE, is(ValidationError.CPO_NOT_FOUND_BY_ID)));
+                    .andExpect(jsonPath(ERROR_PATH_MESSAGE, is(ValidationError.CPO_NOT_FOUND_BY_ID)))
+
+                    .andExpect(hasGeneratedLogAudit(AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
+                                                    AUTHORISED_CRUD_SERVICE,
+                                                    Arrays.asList(savedEntitiesUuidsString),
+                                                    null));
+
             assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
         }
 
@@ -303,8 +359,15 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             savedEntity.setAction("NewAction");
             casePaymentOrdersJpaRepository.saveAndFlush(savedEntity);
 
-            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, savedEntity.getId().toString()))
-                    .andExpect(status().isNoContent());
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
+                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                .queryParam(IDS, savedEntity.getId().toString()))
+                    .andExpect(status().isNoContent())
+
+                    .andExpect(hasGeneratedLogAudit(AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
+                                                    AUTHORISED_CRUD_SERVICE,
+                                                    savedEntity.getId().toString(),
+                                                    null));
 
             assertFalse(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
             assertFalse(casePaymentOrdersAuditJpaRepository.findById(savedEntity.getId()).isPresent());
@@ -314,23 +377,39 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         @Test
         void shouldThrow400BadRequestWhenInvalidUuidIsSpecified() throws Exception {
             final String invalidUuid = "123";
-            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(IDS, invalidUuid))
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
+                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                .queryParam(IDS, invalidUuid))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath(ERROR_PATH_MESSAGE,
                             containsString("deleteCasePaymentOrdersById.ids: These ids: "
                                     + invalidUuid
-                                    + " are incorrect.")));
+                                    + " are incorrect.")))
+
+                    .andExpect(hasGeneratedLogAudit(AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
+                                                    AUTHORISED_CRUD_SERVICE,
+                                                    invalidUuid,
+                                                    null));
         }
 
         @DisplayName("Should fail with 400 Bad Request when CaseIds and UUIDs are specified")
         @Test
         void shouldThrow400BadRequestWheUuidsAndCaseIdsAreSpecified() throws Exception {
+            String cpoId = UUID.randomUUID().toString();
+            String caseId = uidService.generateUID();
+
             mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
-                    .queryParam(IDS, UUID.randomUUID().toString())
-                    .queryParam(CASE_IDS, uidService.generateUID()))
+                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                .queryParam(IDS, cpoId)
+                                .queryParam(CASE_IDS, caseId))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath(ERROR_PATH_MESSAGE,
-                            is(ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS)));
+                            is(ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS)))
+
+                    .andExpect(hasGeneratedLogAudit(AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
+                                                    AUTHORISED_CRUD_SERVICE,
+                                                    cpoId,
+                                                    caseId));
         }
     }
 
@@ -344,8 +423,16 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             CasePaymentOrderEntity savedEntity =
                     casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
             assertTrue(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
-            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(CASE_IDS, savedEntity.getCaseId().toString()))
-                    .andExpect(status().isNoContent());
+
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
+                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                .queryParam(CASE_IDS, savedEntity.getCaseId().toString()))
+                    .andExpect(status().isNoContent())
+
+                    .andExpect(hasGeneratedLogAudit(AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
+                                                    AUTHORISED_CRUD_SERVICE,
+                                                    null,
+                                                    savedEntity.getCaseId().toString()));
 
             assertFalse(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
             assertFalse(casePaymentOrdersAuditJpaRepository.findById(savedEntity.getId()).isPresent());
@@ -369,8 +456,14 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
 
             mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
-                    .queryParam(CASE_IDS, savedEntitiesCaseIds.toArray(String[]::new)))
-                    .andExpect(status().isNoContent());
+                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                .queryParam(CASE_IDS, savedEntitiesCaseIds.toArray(String[]::new)))
+                    .andExpect(status().isNoContent())
+
+                    .andExpect(hasGeneratedLogAudit(AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
+                                                    AUTHORISED_CRUD_SERVICE,
+                                                    null,
+                                                    savedEntitiesCaseIds));
 
             assertTrue(casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
             assertTrue(casePaymentOrdersAuditJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
@@ -395,8 +488,14 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
 
             mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
-                    .queryParam(CASE_IDS, savedEntityCaseId))
-                    .andExpect(status().isNoContent());
+                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                .queryParam(CASE_IDS, savedEntityCaseId))
+                    .andExpect(status().isNoContent())
+
+                    .andExpect(hasGeneratedLogAudit(AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
+                                                    AUTHORISED_CRUD_SERVICE,
+                                                    null,
+                                                    savedEntityCaseId));
 
             assertTrue(casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
             assertTrue(casePaymentOrdersAuditJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
@@ -421,10 +520,16 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             savedEntitiesCaseIds.add(uidService.generateUID());
 
             mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
-                    .queryParam(CASE_IDS, savedEntitiesCaseIds.toArray(String[]::new)))
+                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                .queryParam(CASE_IDS, savedEntitiesCaseIds.toArray(String[]::new)))
                     .andExpect(status().isNotFound())
                     .andExpect(jsonPath(ERROR_PATH_MESSAGE,
-                            is(ValidationError.CPO_NOT_FOUND_BY_CASE_ID)));
+                            is(ValidationError.CPO_NOT_FOUND_BY_CASE_ID)))
+
+                    .andExpect(hasGeneratedLogAudit(AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
+                                                    AUTHORISED_CRUD_SERVICE,
+                                                    null,
+                                                    savedEntitiesCaseIds));
 
 
             assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
@@ -441,8 +546,15 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             savedEntity.setAction("NewAction");
             casePaymentOrdersJpaRepository.saveAndFlush(savedEntity);
 
-            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(CASE_IDS, savedEntity.getCaseId().toString()))
-                    .andExpect(status().isNoContent());
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
+                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                .queryParam(CASE_IDS, savedEntity.getCaseId().toString()))
+                    .andExpect(status().isNoContent())
+
+                    .andExpect(hasGeneratedLogAudit(AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
+                                                    AUTHORISED_CRUD_SERVICE,
+                                                    null,
+                                                    savedEntity.getCaseId().toString()));
 
             assertFalse(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
             assertFalse(casePaymentOrdersAuditJpaRepository.findById(savedEntity.getId()).isPresent());
@@ -452,22 +564,36 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         @Test
         void shouldThrow400BadRequestWhenInvalidLengthCaseIdSpecified() throws Exception {
             final String invalidCaseId = "12345";
-            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(CASE_IDS, invalidCaseId))
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
+                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                .queryParam(CASE_IDS, invalidCaseId))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath(ERROR_PATH_MESSAGE, containsString("These caseIDs: "
                             + invalidCaseId
-                            + " are incorrect")));
+                            + " are incorrect")))
+
+                    .andExpect(hasGeneratedLogAudit(AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
+                                                    AUTHORISED_CRUD_SERVICE,
+                                                    null,
+                                                    invalidCaseId));
         }
 
         @DisplayName("Should fail with 400 Bad Request when invalid caseId is specified")
         @Test
         void shouldThrow400BadRequestWhenInvalidCaseIdSpecified() throws Exception {
             final String invalidLuhn = "1234567890123456";
-            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).queryParam(CASE_IDS, invalidLuhn))
+            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
+                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                .queryParam(CASE_IDS, invalidLuhn))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath(ERROR_PATH_MESSAGE, containsString("These caseIDs: "
                             + invalidLuhn
-                            + " are incorrect")));
+                            + " are incorrect")))
+
+                    .andExpect(hasGeneratedLogAudit(AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
+                                                    AUTHORISED_CRUD_SERVICE,
+                                                    null,
+                                                    invalidLuhn));
         }
     }
 
@@ -497,6 +623,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             // WHEN
             ResultActions result =  mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                        .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
                                                         .contentType(MediaType.APPLICATION_JSON)
                                                         .content(objectMapper.writeValueAsString(request)));
 
@@ -505,6 +632,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             verifyUpdateResponse(request, result);
             verifyDbCpoValues(request, originalEntity.getCreatedTimestamp());
             verifyDbCpoAuditValues(request, originalEntity.getCreatedTimestamp());
+            verifyUpdateLogAuditValues(request, result);
         }
 
         @DisplayName("should fail with 400 bad request when ID is null")
@@ -527,6 +655,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             // WHEN
             ResultActions result =  mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                        .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
                                                         .contentType(MediaType.APPLICATION_JSON)
                                                         .content(objectMapper.writeValueAsString(request)));
 
@@ -534,6 +663,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertBadRequestResponse(result, ValidationError.ID_REQUIRED);
             // check latest audit does not show update (i.e. modified)
             assertNotSame(RevisionType.MOD, getLatestAuditRevision(originalEntity.getId()).getRevisionType());
+            verifyUpdateLogAuditValues(request, result);
         }
 
         @DisplayName("should fail with 400 bad request when Effective From is null")
@@ -556,6 +686,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             // WHEN
             ResultActions result =  mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                        .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
                                                         .contentType(MediaType.APPLICATION_JSON)
                                                         .content(objectMapper.writeValueAsString(request)));
 
@@ -563,6 +694,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertBadRequestResponse(result, ValidationError.EFFECTIVE_FROM_REQUIRED);
             // check latest audit does not show update (i.e. modified)
             assertNotSame(RevisionType.MOD, getLatestAuditRevision(request.getUUID()).getRevisionType());
+            verifyUpdateLogAuditValues(request, result);
         }
 
         @DisplayName("should fail with 400 bad request when Case ID is null")
@@ -585,6 +717,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             // WHEN
             ResultActions result =  mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                        .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
                                                         .contentType(MediaType.APPLICATION_JSON)
                                                         .content(objectMapper.writeValueAsString(request)));
 
@@ -592,6 +725,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertBadRequestResponse(result, ValidationError.CASE_ID_REQUIRED);
             // check latest audit does not show update (i.e. modified)
             assertNotSame(RevisionType.MOD, getLatestAuditRevision(request.getUUID()).getRevisionType());
+            verifyUpdateLogAuditValues(request, result);
         }
 
         @DisplayName("should fail with 400 bad request when many fields are missing")
@@ -614,6 +748,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             // WHEN
             ResultActions result =  mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                        .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
                                                         .contentType(MediaType.APPLICATION_JSON)
                                                         .content(objectMapper.writeValueAsString(request)));
 
@@ -628,6 +763,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                 .andExpect(jsonPath(ERROR_PATH_DETAILS, hasItem(ValidationError.RESPONSIBLE_PARTY_REQUIRED)));
             // check latest audit does not show update (i.e. modified)
             assertNotSame(RevisionType.MOD, getLatestAuditRevision(request.getUUID()).getRevisionType());
+            verifyUpdateLogAuditValues(request, result);
         }
 
         @DisplayName("should fail with 400 bad request when ID is invalid")
@@ -648,11 +784,13 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             // WHEN
             ResultActions result =  mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                        .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
                                                         .contentType(MediaType.APPLICATION_JSON)
                                                         .content(objectMapper.writeValueAsString(request)));
 
             // THEN
             assertBadRequestResponse(result, ValidationError.ID_INVALID);
+            verifyUpdateLogAuditValues(request, result);
         }
 
         @DisplayName("should fail with 400 bad request when Case ID is invalid")
@@ -676,12 +814,14 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             // WHEN
             ResultActions result =  mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
                                                         .contentType(MediaType.APPLICATION_JSON)
+                                                        .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
                                                         .content(objectMapper.writeValueAsString(request)));
 
             // THEN
             assertBadRequestResponse(result, ValidationError.CASE_ID_INVALID);
             // check latest audit does not show update (i.e. modified)
             assertNotSame(RevisionType.MOD, getLatestAuditRevision(request.getUUID()).getRevisionType());
+            verifyUpdateLogAuditValues(request, result);
         }
 
         @DisplayName("should fail with 400 bad request when Order Reference is invalid")
@@ -704,6 +844,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             // WHEN
             ResultActions result =  mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                        .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
                                                         .contentType(MediaType.APPLICATION_JSON)
                                                         .content(objectMapper.writeValueAsString(request)));
 
@@ -711,6 +852,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertBadRequestResponse(result, ValidationError.ORDER_REFERENCE_INVALID);
             // check latest audit does not show update (i.e. modified)
             assertNotSame(RevisionType.MOD, getLatestAuditRevision(request.getUUID()).getRevisionType());
+            verifyUpdateLogAuditValues(request, result);
         }
 
         @DisplayName("should fail with 400 bad request when many fields are invalid")
@@ -733,6 +875,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             // WHEN
             ResultActions result =  mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                        .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
                                                         .contentType(MediaType.APPLICATION_JSON)
                                                         .content(objectMapper.writeValueAsString(request)));
 
@@ -747,6 +890,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                 .andExpect(jsonPath(ERROR_PATH_DETAILS, hasItem(ValidationError.RESPONSIBLE_PARTY_REQUIRED)));
             // check latest audit does not show update (i.e. modified)
             assertNotSame(RevisionType.MOD, getLatestAuditRevision(request.getUUID()).getRevisionType());
+            verifyUpdateLogAuditValues(request, result);
         }
 
         @DisplayName("should fail with 409 Conflict when order_reference/case_id is non-unique")
@@ -772,6 +916,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             // WHEN
             ResultActions result =  mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                        .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
                                                         .contentType(MediaType.APPLICATION_JSON)
                                                         .content(objectMapper.writeValueAsString(request)));
 
@@ -779,6 +924,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertHttpErrorResponse(result, HttpStatus.CONFLICT, ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE);
             // check latest audit does not show update (i.e. modified)
             assertNotSame(RevisionType.MOD, getLatestAuditRevision(request.getUUID()).getRevisionType());
+            verifyUpdateLogAuditValues(request, result);
         }
 
         @DisplayName("should fail with 404 Not Found when specified case payment order does not exist")
@@ -799,12 +945,14 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             // WHEN
             ResultActions result =  mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                        .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
                                                         .contentType(MediaType.APPLICATION_JSON)
                                                         .content(objectMapper.writeValueAsString(request)));
 
             // THEN
             assertHttpErrorResponse(result, HttpStatus.NOT_FOUND, ValidationError.CPO_NOT_FOUND);
             assertTrue(auditUtils.getAuditRevisions(request.getUUID()).isEmpty());
+            verifyUpdateLogAuditValues(request, result);
         }
 
         private void assertBadRequestResponse(ResultActions result,
@@ -838,7 +986,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                 .andExpect(jsonPath("$.order_reference").value(request.getOrderReference()))
                 .andExpect(jsonPath("$.action").value(request.getAction()))
                 .andExpect(jsonPath("$.responsible_party").value(request.getResponsibleParty()))
-                .andExpect(jsonPath("$.created_by").value(CREATED_BY_IDAM_MOCK))
+                .andExpect(jsonPath("$.created_by").value(IDAM_MOCK_USER_ID))
                 .andExpect(jsonPath("$.created_timestamp").exists());
         }
 
@@ -853,7 +1001,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(request.getAction(), updatedEntity.get().getAction());
             assertEquals(request.getResponsibleParty(), updatedEntity.get().getResponsibleParty());
             assertEquals(request.getOrderReference(), updatedEntity.get().getOrderReference());
-            assertEquals(CREATED_BY_IDAM_MOCK, updatedEntity.get().getCreatedBy());
+            assertEquals(IDAM_MOCK_USER_ID, updatedEntity.get().getCreatedBy());
             assertNotNull(updatedEntity.get().getCreatedTimestamp());
             assertTrue(previousCreatedTimestamp.isBefore(updatedEntity.get().getCreatedTimestamp()));
         }
@@ -871,11 +1019,19 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(request.getAction(), latestRevision.getEntity().getAction());
             assertEquals(request.getResponsibleParty(), latestRevision.getEntity().getResponsibleParty());
             assertEquals(request.getOrderReference(), latestRevision.getEntity().getOrderReference());
-            assertEquals(CREATED_BY_IDAM_MOCK, latestRevision.getEntity().getCreatedBy());
+            assertEquals(IDAM_MOCK_USER_ID, latestRevision.getEntity().getCreatedBy());
             assertNotNull(latestRevision.getEntity().getCreatedTimestamp());
             assertTrue(previousCreatedTimestamp.isBefore(latestRevision.getEntity().getCreatedTimestamp()));
         }
 
+        private void verifyUpdateLogAuditValues(UpdateCasePaymentOrderRequest request,
+                                                ResultActions result) {
+            verifyLogAuditValues(result.andReturn(),
+                                 AuditOperationType.UPDATE_CASE_PAYMENT_ORDER,
+                                 AUTHORISED_CRUD_SERVICE,
+                                 request.getId(),
+                                 request.getCaseId());
+        }
     }
 
 
