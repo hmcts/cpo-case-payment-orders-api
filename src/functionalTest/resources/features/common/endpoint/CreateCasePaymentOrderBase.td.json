@@ -1,0 +1,28 @@
+{
+  "_guid_" : "createCasePaymentOrderBase",
+  "_extends_" : "Common_Request",
+
+  "productName": "Case Payment Orders Microservice",
+  "operationName": "createCasePaymentOrder",
+
+  "method": "POST",
+  "uri": "/case-payment-orders",
+
+  "specs": [
+    "intends to Create a case payment order",
+    "an active profile in CCD"
+  ],
+
+  "users": {
+    "invokingUser" : {
+      "_extends_" : "BeftaCaseworker1"
+    }
+  },
+
+  "s2sClientId": "xui_webapp",
+
+  "request" : {
+    "_extends_": "Common_Request"
+  }
+
+}

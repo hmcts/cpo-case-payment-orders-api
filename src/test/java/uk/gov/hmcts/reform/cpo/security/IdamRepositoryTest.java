@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
-public class IdamRepositoryTest {
+class IdamRepositoryTest {
 
     private static final String TEST_BEAR_TOKEN = "TestBearToken";
 

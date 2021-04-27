@@ -14,4 +14,10 @@
     <cve>CVE-2020-10663</cve>
     <cve>CVE-2020-7712</cve>
    </suppress>
+  <suppress>
+    <notes><![CDATA[
+        CVE is related to Apache Commons IO method FileNameUtils.normalize which is not used in this project
+    ]]></notes>
+    <cve>CVE-2021-29425</cve>
+  </suppress>
 </suppressions>

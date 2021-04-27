@@ -1,26 +1,36 @@
-version: '2.1'
+---
+version: '2.4'
 
 services:
-  cpo-case-payment-orders-api:
-    build:
-      context: .
-      args:
-        - http_proxy
-        - https_proxy
-        - no_proxy
-    image: hmctspublic.azurecr.io/spring-boot/template
+  case-payment-orders-api:
+    image: "hmctspublic.azurecr.io/cpo/case-payment-orders-api:latest"
+    container_name: case-payment-orders-api
     environment:
-      # these environment variables are used by java-logging library
-      - ROOT_APPENDER
-      - JSON_CONSOLE_PRETTY_PRINT
-      - ROOT_LOGGING_LEVEL
-      - REFORM_SERVICE_TYPE
-      - REFORM_SERVICE_NAME
-      - REFORM_TEAM
-      - REFORM_ENVIRONMENT
-      - LOGBACK_DATE_FORMAT
-      - LOGBACK_REQUIRE_THREAD
-      - LOGBACK_REQUIRE_ALERT_LEVEL=false
-      - LOGBACK_REQUIRE_ERROR_CODE=false
+      CPO_CASE_PAYMENT_ORDERS_DB_HOST: cpo-db
+      CPO_CASE_PAYMENT_ORDERS_DB_PORT: 5432
+      CPO_CASE_PAYMENT_ORDERS_DB_NAME: ${DB_NAME}
+      CPO_CASE_PAYMENT_ORDERS_DB_USERNAME: ${DB_USERNAME}
+      CPO_CASE_PAYMENT_ORDERS_DB_PASSWORD: ${DB_PASSWORD}
+      CPO_S2S_AUTHORISED_SERVICES: xui_webapp
+      IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
+      IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+      S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     ports:
-      - $SERVER_PORT:$SERVER_PORT
+      - 4457:4457
+    depends_on:
+      - cpo-db
+
+  cpo-db:
+    image: postgres:11.11
+    restart: always
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    ports:
+      - 6968:5432
+    volumes:
+      - cpo-database-data:/var/lib/postgresql/data
+
+volumes:
+  cpo-database-data:

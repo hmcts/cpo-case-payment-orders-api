@@ -4,11 +4,12 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.Column;
-import javax.persistence.Id;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -17,7 +18,12 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "case_payment_orders")
+@Audited(withModifiedFlag = true)
 public class CasePaymentOrderEntity {
+
+    public static final String UNIQUE_CASE_ID_ORDER_REF_CONSTRAINT = "unique_case_id_order_reference";
+    public static final String CASE_ID = "caseId";
+    public static final String ORDER_REFERENCE = "orderReference";
 
     @Id
     @GeneratedValue
@@ -34,9 +40,6 @@ public class CasePaymentOrderEntity {
     private Long caseId;
 
     @Column(length = 70, nullable = false)
-    private String caseTypeId;
-
-    @Column(length = 70, nullable = false)
     private String action;
 
     @Column(length = 1024, nullable = false)
@@ -47,4 +50,5 @@ public class CasePaymentOrderEntity {
 
     @Column(length = 70)
     private String createdBy;
+
 }

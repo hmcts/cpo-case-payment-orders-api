@@ -1,16 +1,15 @@
-# cpo-case-payment-orders-api
+# Case Payment Orders API
+
+This micro-service provides a set of APIs to manage case payment orders.
 
 [![API Docs](https://img.shields.io/badge/API%20Docs-site-e140ad.svg)](https://hmcts.github.io/reform-api-docs/swagger.html?url=https://hmcts.github.io/reform-api-docs/specs/cpo-case-payment-orders-api.json)
 
 [![Build Status](https://travis-ci.org/hmcts/cpo-case-payment-orders-api.svg?branch=master)](https://travis-ci.org/hmcts/cpo-case-payment-orders-api)
 
-## Notes
+## Getting Started
 
-Since Spring Boot 2.1 bean overriding is disabled. If you want to enable it you will need to set `spring.main.allow-bean-definition-overriding` to `true`.
-
-JUnit 5 is now enabled by default in the project. Please refrain from using JUnit4 and use the next generation
-
-## Building and deploying the application
+### Prerequisites
+- [JDK 11](https://java.com)
 
 ### Building the application
 
@@ -89,7 +88,6 @@ docker image rm <image-id>
 
 There is no need to remove postgres and java or similar core images.
 
-
 ## Developing
 
 ### Unit tests
@@ -114,21 +112,14 @@ export TEST_URL=http://localhost:4457
 ./gradlew functional
 ```
 
-> Note: These are the tests run against an environment.  This environment must include access to
-> IDAM and Service Auth Provider services.  All can be made available by installing and running the
-> CCD stack as advised in [ccd-docker](https://github.com/hmcts/ccd-docker), with the minimum
-> enabled services `sidam sidam-local sidam-local-ccd`.
+> Note: These are the tests run against an environment.
+> Please see [cpo-docker/README.md](./cpo-docker/README.md) for local environment testing.
 >
-> If you would like to test your local environment you'll need to export variables on your
-> `.bash_profile` script.  The [ccd-docker](https://github.com/hmcts/ccd-docker) repository
-> contains its own scripts to set the required environment variables.  Otherwise, the details of
-> the required minimum set of variables can be found by reviewing the contents of this project's
-> [Jenkinsfile_CNP](./Jenkinsfile_CNP) script (particularly the `secrets` mappings, and the
-> variables set by the `setBeftaEnvVariables` routine).
+> If you would like to test against AAT dependencies then run `docker-compose up`.
+> Also set the required environment variables that can be found by reviewing the contents of this project's
+> [Jenkinsfile_CNP](./Jenkinsfile_CNP) script (particularly the `secrets` mappings, and the variables set by
+> the `setBeftaEnvVariables` routine).
 >
-> Note: For details of the emails and passwords to use in a local environment see the
-> [Create users and roles](https://github.com/hmcts/ccd-docker#3-create-users-and-roles) steps in
-> [ccd-docker](https://github.com/hmcts/ccd-docker) project.
 
 ### Code quality checks
 We use [checkstyle](http://checkstyle.sourceforge.net/) and [PMD](https://pmd.github.io/).

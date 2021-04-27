@@ -15,12 +15,16 @@ management:
   health:
     probes:
       enabled: true
-
 spring:
   application:
     name: Case Payment Orders
   banner:
     location: classpath:case-payment-orders-banner.txt
+  cloud:
+    discovery:
+      client:
+        composite-indicator:
+          enabled: false
   config:
     import: "optional:configtree:/mnt/secrets/cpo/"
   jackson:
@@ -31,6 +35,13 @@ spring:
     cache-names: userInfoCache
     caffeine:
       spec: expireAfterAccess=1800s
+  data:
+    web:
+      pageable:
+        max-page-size: 20
+        default-page-size: 20
+        one-indexed-parameters: true
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${CPO_CASE_PAYMENT_ORDERS_DB_HOST:localhost}:${CPO_CASE_PAYMENT_ORDERS_DB_PORT:6968}/${CPO_CASE_PAYMENT_ORDERS_DB_NAME:cpo_case_payment_orders}${CPO_CASE_PAYMENT_ORDERS_DB_OPTIONS:}
@@ -46,6 +57,12 @@ spring:
       hibernate:
         jdbc:
           time_zone: UTC
+      org:
+        hibernate:
+          envers:
+            audit_table_suffix: _audit
+            store_data_at_delete: true
+
   flyway:
     out-of-order: true
     ignore-missing-migrations: true
@@ -59,6 +76,8 @@ spring:
           oidc:
             client-id: internal
             client-secret: internal
+
+
 idam:
   api:
     url: ${IDAM_API_URL:http://localhost:5000}
