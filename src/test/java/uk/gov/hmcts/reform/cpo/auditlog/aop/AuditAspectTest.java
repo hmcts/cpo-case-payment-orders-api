@@ -70,6 +70,7 @@ class AuditAspectTest implements BaseTest {
         List<String> caseIds = List.of(CASE_ID_VALID_1, CASE_ID_VALID_2);
 
         // WHEN
+        // NB: `getCpos` is configured to throw error
         assertThrows(RuntimeException.class, () -> controllerProxy.getCpos(cpoIds, caseIds));
         AuditContext context = AuditContextHolder.getAuditContext();
 
@@ -97,6 +98,7 @@ class AuditAspectTest implements BaseTest {
         UpdateCasePaymentOrderRequest updateRequest = createUpdateCasePaymentOrderRequest();
 
         // WHEN
+        // NB: `updateCpo` is configured with a bad LogAudit.cpoIds value expression
         controllerProxy.updateCpo(updateRequest);
         AuditContext context = AuditContextHolder.getAuditContext();
 
@@ -110,7 +112,7 @@ class AuditAspectTest implements BaseTest {
         assertEquals("Case ID should be populated as per LogAudit path",
                      updateRequest.getCaseId(), context.getCaseId());
         // lists of ID Values
-        assertNull("CPO ID list should be populated as per LogAudit path",
+        assertNull("CPO ID list should be null as LogAudit path is bad",
                    context.getCpoIds());
         assertNull("Case ID List should be populated as per LogAudit path",
                    context.getCaseIds());
