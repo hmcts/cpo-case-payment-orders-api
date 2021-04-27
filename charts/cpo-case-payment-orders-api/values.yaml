@@ -27,5 +27,7 @@ java:
     CPO_S2S_AUTHORISED_SERVICES: xui_webapp,payment_app
     S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     CPO_CASE_PAYMENT_ORDERS_DB_OPTIONS: "?stringtype=unspecified&gssEncMode=disable"
-    SERVICE-AUTHORIZATION_PERMISSIONS_[PAYMENT_APP]: R
-    SERVICE-AUTHORIZATION_PERMISSIONS_[XUI_WEBAPP]: R
+    S2S_AUTHORIZATIONS_XUI_ID: xui_webapp
+    S2S_AUTHORIZATIONS_XUI_PERMISSION: R
+    S2S_AUTHORIZATIONS_PAYMENT_ID: payment_app
+    S2S_AUTHORIZATIONS_PAYMENT_PERMISSION: R

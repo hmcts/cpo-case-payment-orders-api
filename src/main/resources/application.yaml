@@ -92,7 +92,11 @@ azure:
   application-insights:
     instrumentation-key: ${cpo.AppInsightsInstrumentationKey:00000000-0000-0000-0000-000000000000}
 
-service-authorization:
-  permissions:
-    "[payment_app]": "R"
-    "[xui_webapp]": "CRUD"
+s2s:
+  authorizations:
+    payment:
+      id: "payment_app"
+      permission: "R"
+    xui:
+      id: "xui_webapp"
+      permission: "CRUD"
