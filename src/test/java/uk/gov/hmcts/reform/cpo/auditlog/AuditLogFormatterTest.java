@@ -1,19 +1,36 @@
 package uk.gov.hmcts.reform.cpo.auditlog;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.BaseTest;
+import uk.gov.hmcts.reform.cpo.config.AuditConfiguration;
 import uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController;
 
 import java.util.List;
 
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 class AuditLogFormatterTest implements BaseTest {
 
-    private final AuditLogFormatter logFormatter = new AuditLogFormatter();
+    @InjectMocks
+    private AuditLogFormatter logFormatter;
+
+    @Mock
+    private AuditConfiguration auditConfiguration;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+
+        given(auditConfiguration.getAuditLogMaxListSize()).willReturn(0);
+    }
 
     @Test
     @DisplayName("Should have correct labels")
@@ -91,6 +108,34 @@ class AuditLogFormatterTest implements BaseTest {
 
         // THEN
         assertEquals("Should handle ID lists with comma",
+                     result,
+                     AuditLogFormatter.TAG + " "
+                         + "dateTime:2021-04-26 15:39:45,"
+                         + "endpointCalled:GET " + CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH + ","
+                         + "operationalOutcome:200,"
+                         + "cpoId:" + CPO_ID_VALID_1 + "," + CPO_ID_VALID_2 + ","
+                         + "caseId:" + CASE_ID_VALID_1 + "," + CASE_ID_VALID_2);
+    }
+
+    @Test
+    @DisplayName("Should handle lists with limit")
+    void shouldHandleListsWithLimit() {
+
+        // GIVEN
+        given(auditConfiguration.getAuditLogMaxListSize()).willReturn(2);
+        AuditEntry auditEntry = new AuditEntry();
+        auditEntry.setDateTime("2021-04-26 15:39:45");
+        auditEntry.setHttpMethod(HttpMethod.GET.name());
+        auditEntry.setHttpStatus(HttpStatus.OK.value());
+        auditEntry.setRequestPath(CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH);
+        auditEntry.setCpoIds(List.of(CPO_ID_VALID_1, CPO_ID_VALID_2, CPO_ID_VALID_3));
+        auditEntry.setCaseIds(List.of(CASE_ID_VALID_1, CASE_ID_VALID_2, CASE_ID_VALID_3));
+
+        // WHEN
+        String result = logFormatter.format(auditEntry);
+
+        // THEN
+        assertEquals("Should apply limit to ID lists",
                      result,
                      AuditLogFormatter.TAG + " "
                          + "dateTime:2021-04-26 15:39:45,"

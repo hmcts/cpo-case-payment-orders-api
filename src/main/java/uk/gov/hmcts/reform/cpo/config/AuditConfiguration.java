@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo.config;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -23,20 +24,27 @@ public class AuditConfiguration implements WebMvcConfigurer {
 
     private final AuditService auditService;
 
+    @Getter
     private final boolean auditLogEnabled;
 
     private final List<Integer> auditLogIgnoreStatuses;
+
+    @Getter
+    private final int auditLogMaxListSize;
 
     @Autowired
     public AuditConfiguration(final AuditService auditService,
                               @Value("${audit.log.enabled:true}")
                                   boolean auditLogEnabled,
                               @Value("#{'${audit.log.ignore.statuses}'.split(',')}")
-                                      List<Integer> auditLogIgnoreStatuses) {
+                                      List<Integer> auditLogIgnoreStatuses,
+                              @Value("${audit.log.max-list-size:0}")
+                                      int auditLogMaxListSize) {
         super();
         this.auditService = auditService;
         this.auditLogEnabled = auditLogEnabled;
         this.auditLogIgnoreStatuses = auditLogIgnoreStatuses;
+        this.auditLogMaxListSize = auditLogMaxListSize;
     }
 
     @Override
@@ -56,10 +64,6 @@ public class AuditConfiguration implements WebMvcConfigurer {
 
     private AuditInterceptor createAuditInterceptor() {
         return new AuditInterceptor(auditService, this);
-    }
-
-    public boolean isAuditLogEnabled() {
-        return this.auditLogEnabled;
     }
 
     public boolean isHttpStatusIgnored(int status) {
