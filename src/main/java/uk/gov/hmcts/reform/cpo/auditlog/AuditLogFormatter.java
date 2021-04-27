@@ -5,7 +5,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.PredicateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.cpo.config.AuditConfiguration;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-@Component
+@Repository
 public class AuditLogFormatter {
 
     private final AuditConfiguration config;
@@ -30,7 +30,7 @@ public class AuditLogFormatter {
     }
 
     public String format(AuditEntry entry) {
-        List<String> formatedPairs = Lists.newArrayList(
+        List<String> formattedPairs = Lists.newArrayList(
             getPair("dateTime", entry.getDateTime()),
             getPair("operationType", entry.getOperationType()),
             getPair("idamId", entry.getIdamId()),
@@ -42,9 +42,9 @@ public class AuditLogFormatter {
             getPair("X-Request-ID", entry.getRequestId())
         );
 
-        CollectionUtils.filter(formatedPairs, PredicateUtils.notNullPredicate());
+        CollectionUtils.filter(formattedPairs, PredicateUtils.notNullPredicate());
 
-        return TAG + " " + String.join(COMMA, formatedPairs);
+        return TAG + " " + String.join(COMMA, formattedPairs);
     }
 
     private String getPair(String label, String value) {

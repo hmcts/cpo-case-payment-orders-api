@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -119,8 +120,7 @@ class ExpressionEvaluatorTest implements BaseTest {
         EvaluationContext context = evaluator.createEvaluationContext(this, SampleMethods.class, method,
                                                                       new Object[]{stringValue, casePaymentOrder}
         );
-        assert method != null;
-        AnnotatedElementKey elementKey = new AnnotatedElementKey(method, SampleMethods.class);
+        AnnotatedElementKey elementKey = new AnnotatedElementKey(Objects.requireNonNull(method), SampleMethods.class);
 
         // WHEN / THEN
         assertThatThrownBy(() -> evaluator.condition("#casePaymentOrder.unknownProperty",

@@ -48,7 +48,7 @@ class AuditAspectTest implements BaseTest {
 
         // THEN
         assertNotNull("Context should exist", context);
-        assertEquals("OperationTyp should be populated as per LogAudit",
+        assertEquals("OperationType should be populated as per LogAudit",
                      AuditOperationType.CREATE_CASE_PAYMENT_ORDER, context.getAuditOperationType());
         // single ID values
         assertEquals("CPO ID should be populated as per LogAudit path",
@@ -76,7 +76,7 @@ class AuditAspectTest implements BaseTest {
 
         // THEN
         assertNotNull("Context should exist", context);
-        assertEquals("OperationTyp should be populated as per LogAudit",
+        assertEquals("OperationType should be populated as per LogAudit",
                      AuditOperationType.GET_CASE_PAYMENT_ORDER, context.getAuditOperationType());
         // single ID values
         assertNull("CPO ID should be populated as per LogAudit path",
@@ -104,7 +104,7 @@ class AuditAspectTest implements BaseTest {
 
         // THEN
         assertNotNull("Context should exist", context);
-        assertEquals("OperationTyp should be populated as per LogAudit",
+        assertEquals("OperationType should be populated as per LogAudit",
                      AuditOperationType.UPDATE_CASE_PAYMENT_ORDER, context.getAuditOperationType());
         // single ID values
         assertEquals("CPO ID should be populated as per LogAudit path",

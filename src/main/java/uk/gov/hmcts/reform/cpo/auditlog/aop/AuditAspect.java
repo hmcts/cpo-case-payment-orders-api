@@ -29,9 +29,11 @@ public class AuditAspect {
     @Around(value = "@annotation(logAudit)")
     public Object audit(ProceedingJoinPoint joinPoint, LogAudit logAudit) throws Throwable {
         Object result = null;
+
         try {
             result = joinPoint.proceed();
             return result;
+
         } finally {
             String cpoId =  getValue(joinPoint, logAudit.cpoId(), result, String.class);
             List<String> cpoIds =  getValueAsList(joinPoint, logAudit.cpoIds(), result);
@@ -51,6 +53,7 @@ public class AuditAspect {
     private <T> T getValue(JoinPoint joinPoint, String condition, Object result, Class<T> returnType) {
         if (StringUtils.isNotBlank(condition) && !(result == null && condition.contains(RESULT_VARIABLE))) {
             var method = ((MethodSignature) joinPoint.getSignature()).getMethod();
+
             try {
                 var evaluationContext = evaluator.createEvaluationContext(joinPoint.getThis(),
                                                                                         joinPoint.getThis().getClass(),
@@ -59,12 +62,15 @@ public class AuditAspect {
                 evaluationContext.setVariable(RESULT_VARIABLE, result);
                 var methodKey = new AnnotatedElementKey(method, joinPoint.getThis().getClass());
                 return evaluator.condition(condition, methodKey, evaluationContext, returnType);
+
             } catch (SpelEvaluationException ex) {
                 log.warn("Error evaluating LogAudit annotation expression:{} on method:{}",
                          condition, method.getName(), ex);
                 return null;
             }
+
         }
+
         return null;
     }
 
