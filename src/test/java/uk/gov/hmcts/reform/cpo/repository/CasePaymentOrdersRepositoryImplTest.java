@@ -72,9 +72,11 @@ class CasePaymentOrdersRepositoryImplTest {
 
     @Test
     void testExceptionThrownIfUnknownUuidCannotBeDeleted() {
+        List<UUID> uuids = List.of(UUID.randomUUID());
         when(casePaymentOrdersJpaRepository.deleteByIdIsIn(anyList())).thenReturn(0);
+
         assertThrows(CasePaymentOrderCouldNotBeFoundException.class, () -> {
-            casePaymentOrdersRepository.deleteByUuids(List.of(UUID.randomUUID()));
+            casePaymentOrdersRepository.deleteByUuids(uuids);
         });
     }
 
@@ -102,9 +104,11 @@ class CasePaymentOrdersRepositoryImplTest {
 
     @Test
     void testExceptionThrownIfUnknownCaseIdCannotBeDeleted() {
+        List<Long> caseIds = List.of(123L);
         when(casePaymentOrdersJpaRepository.findAllByCaseId(anyLong())).thenReturn(Collections.emptyList());
+
         assertThrows(CasePaymentOrderCouldNotBeFoundException.class,
-            () -> casePaymentOrdersRepository.deleteByCaseIds(List.of(123L)));
+            () -> casePaymentOrdersRepository.deleteByCaseIds(caseIds));
         verify(casePaymentOrdersJpaRepository, never()).deleteByCaseIdIsIn(anyList());
     }
 
