@@ -602,7 +602,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
     }
 
     @Nested
-    @DisplayName("DELETE /case-payment-orders?case-ids=")
+    @DisplayName("DELETE /case-payment-orders?case_ids=")
     class DeleteCasePaymentOrdersByCaseId extends BaseMvcTest {
 
         @DisplayName("happy path test without mockMvc")
@@ -770,7 +770,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
                     .param(CASE_IDS, "1574419234651640,1574932009200070")
             );
             // THEN
-            assertGetCopPResponse(ValidationError.CPO_FILER_ERROR, response);
+            assertGetCopPResponse(ValidationError.CPO_FILTER_ERROR, response);
         }
 
         @DisplayName("fail for ids only")

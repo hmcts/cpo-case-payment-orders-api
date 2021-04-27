@@ -46,6 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -414,7 +415,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
     }
 
     @Nested
-    @DisplayName("DELETE /case-payment-orders?case-ids=")
+    @DisplayName("DELETE /case-payment-orders?case_ids=")
     class DeleteCasePaymentOrdersByCaseIds {
 
         @DisplayName("Successfully delete single case payment order specified by an id")
@@ -594,6 +595,270 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                                     AUTHORISED_CRUD_SERVICE,
                                                     null,
                                                     invalidLuhn));
+        }
+    }
+
+
+    @Nested
+    @DisplayName("GET /case-payment-orders?ids=")
+    class GetCasePaymentOrdersByIds {
+
+        @DisplayName("Successfully get single case payment order specified by an id")
+        @Test
+        void shouldGetSingleCasePaymentSpecifiedById() throws Exception {
+
+            // GIVEN
+            CasePaymentOrderEntity savedEntity =
+                casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
+            assertTrue(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
+
+            // WHEN
+            mockMvc.perform(get(CASE_PAYMENT_ORDERS_PATH)
+                                .headers(createHttpHeaders(AUTHORISED_READ_SERVICE))
+                                .queryParam(IDS, savedEntity.getId().toString()))
+                // THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id", is(savedEntity.getId().toString())))
+
+                .andExpect(hasGeneratedLogAudit(AuditOperationType.GET_CASE_PAYMENT_ORDER,
+                                                AUTHORISED_READ_SERVICE,
+                                                savedEntity.getId().toString(),
+                                                null));
+
+        }
+
+        @DisplayName("Successfully get multiple case payments with specified ids")
+        @Test
+        void shouldGetMultipleCasePaymentsSpecifiedByIds() throws Exception {
+
+            // GIVEN
+            List<CasePaymentOrderEntity> savedEntities
+                = casePaymentOrderEntityGenerator.generateAndSaveEntities(3);
+            List<UUID> savedEntitiesUuids = savedEntities.stream()
+                .map(CasePaymentOrderEntity::getId)
+                .collect(Collectors.toList());
+            assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
+
+            String[] savedEntitiesUuidsString = savedEntitiesUuids.stream().map(UUID::toString).toArray(String[]::new);
+
+            // WHEN
+            mockMvc.perform(get(CASE_PAYMENT_ORDERS_PATH)
+                                .headers(createHttpHeaders(AUTHORISED_READ_SERVICE))
+                                .queryParam(IDS, savedEntitiesUuidsString))
+                // THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[*].id", hasItem(savedEntitiesUuidsString[0])))
+                .andExpect(jsonPath("$.content[*].id", hasItem(savedEntitiesUuidsString[1])))
+                .andExpect(jsonPath("$.content[*].id", hasItem(savedEntitiesUuidsString[2])))
+
+                .andExpect(hasGeneratedLogAudit(AuditOperationType.GET_CASE_PAYMENT_ORDER,
+                                                AUTHORISED_READ_SERVICE,
+                                                Arrays.asList(savedEntitiesUuidsString),
+                                                null));
+        }
+
+        @DisplayName("Should fail with 400 Bad Request when invalid id (not a UUID) specified")
+        @Test
+        void shouldThrow400BadRequestWhenInvalidUuidIsSpecified() throws Exception {
+
+            // GIVEN
+            final String invalidUuid = "123";
+
+            // WHEN
+            mockMvc.perform(get(CASE_PAYMENT_ORDERS_PATH)
+                                .headers(createHttpHeaders(AUTHORISED_READ_SERVICE))
+                                .queryParam(IDS, invalidUuid))
+                // THEN
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(ERROR_PATH_MESSAGE,
+                                    containsString("getCasePaymentOrders.ids: These ids: "
+                                                       + invalidUuid
+                                                       + " are incorrect.")))
+
+                .andExpect(hasGeneratedLogAudit(AuditOperationType.GET_CASE_PAYMENT_ORDER,
+                                                AUTHORISED_READ_SERVICE,
+                                                invalidUuid,
+                                                null));
+        }
+
+        @DisplayName("Should fail with 400 Bad Request when CaseIds and UUIDs are specified")
+        @Test
+        void shouldThrow400BadRequestWheUuidsAndCaseIdsAreSpecified() throws Exception {
+
+            // GIVEN
+            String cpoId = UUID.randomUUID().toString();
+            String caseId = uidService.generateUID();
+
+            // WHEN
+            mockMvc.perform(get(CASE_PAYMENT_ORDERS_PATH)
+                                .headers(createHttpHeaders(AUTHORISED_READ_SERVICE))
+                                .queryParam(IDS, cpoId)
+                                .queryParam(CASE_IDS, caseId))
+                // THEN
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(ERROR_PATH_MESSAGE,
+                                    is(ValidationError.CPO_FILTER_ERROR)))
+
+                .andExpect(hasGeneratedLogAudit(AuditOperationType.GET_CASE_PAYMENT_ORDER,
+                                                AUTHORISED_READ_SERVICE,
+                                                cpoId,
+                                                caseId));
+        }
+
+        @DisplayName("Should return empty results if neither CaseIds nor UUIDs are specified")
+        @Test
+        void shouldReturnEmptyResultIfNeitherUuidsNorCaseIdsAreSpecified() throws Exception {
+
+            // WHEN
+            mockMvc.perform(get(CASE_PAYMENT_ORDERS_PATH)
+                                .headers(createHttpHeaders(AUTHORISED_READ_SERVICE)))
+                // THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(0)))
+
+                .andExpect(hasGeneratedLogAudit(AuditOperationType.GET_CASE_PAYMENT_ORDER,
+                                                AUTHORISED_READ_SERVICE,
+                                                (String)null,
+                                                null));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /case-payment-orders?case_ids=")
+    class GetCasePaymentOrdersByCaseIds {
+
+        @DisplayName("Successfully get single case payment order specified by an id")
+        @Test
+        void shouldGetSingleCasePaymentSpecifiedByCaseId() throws Exception {
+
+            // GIVEN
+            CasePaymentOrderEntity savedEntity =
+                casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
+            assertTrue(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
+
+            // WHEN
+            mockMvc.perform(get(CASE_PAYMENT_ORDERS_PATH)
+                                .headers(createHttpHeaders(AUTHORISED_READ_SERVICE))
+                                .queryParam(CASE_IDS, savedEntity.getCaseId().toString()))
+                // THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id", is(savedEntity.getId().toString())))
+
+                .andExpect(hasGeneratedLogAudit(AuditOperationType.GET_CASE_PAYMENT_ORDER,
+                                                AUTHORISED_READ_SERVICE,
+                                                null,
+                                                savedEntity.getCaseId().toString()));
+        }
+
+        @DisplayName("Successfully get multiple case payments with specified ids")
+        @Test
+        void shouldGetMultipleCasePaymentsSpecifiedByCaseIds() throws Exception {
+
+            // GIVEN
+            List<CasePaymentOrderEntity> savedEntities =
+                casePaymentOrderEntityGenerator.generateAndSaveEntities(3);
+
+            List<UUID> savedEntitiesUuids = savedEntities.stream()
+                .map(CasePaymentOrderEntity::getId)
+                .collect(Collectors.toList());
+
+            List<String> savedEntitiesCaseIds = savedEntities.stream()
+                .map(CasePaymentOrderEntity::getCaseId)
+                .map(caseId -> Long.toString(caseId))
+                .collect(Collectors.toList());
+
+            // WHEN
+            mockMvc.perform(get(CASE_PAYMENT_ORDERS_PATH)
+                                .headers(createHttpHeaders(AUTHORISED_READ_SERVICE))
+                                .queryParam(CASE_IDS, savedEntitiesCaseIds.toArray(String[]::new)))
+                // THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[*].id", hasItem(savedEntitiesUuids.get(0).toString())))
+                .andExpect(jsonPath("$.content[*].id", hasItem(savedEntitiesUuids.get(1).toString())))
+                .andExpect(jsonPath("$.content[*].id", hasItem(savedEntitiesUuids.get(2).toString())))
+
+                .andExpect(hasGeneratedLogAudit(AuditOperationType.GET_CASE_PAYMENT_ORDER,
+                                                AUTHORISED_READ_SERVICE,
+                                                null,
+                                                savedEntitiesCaseIds));
+        }
+
+        @DisplayName("Successfully get multiple case payment orders with the same case id")
+        @Test
+        void shouldGetMultipleCasePaymentsSpecifiedByTheSameCaseId() throws Exception {
+            List<CasePaymentOrderEntity> savedEntities =
+                casePaymentOrderEntityGenerator.generateAndSaveEntitiesWithSameCaseId(3);
+
+            List<UUID> savedEntitiesUuids = savedEntities.stream()
+                .map(CasePaymentOrderEntity::getId)
+                .collect(Collectors.toList());
+
+            String savedEntityCaseId = savedEntities.stream()
+                .map(CasePaymentOrderEntity::getCaseId)
+                .map(caseId -> Long.toString(caseId))
+                .distinct()
+                .collect(Collectors.joining());
+
+            assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
+
+            mockMvc.perform(get(CASE_PAYMENT_ORDERS_PATH)
+                                .headers(createHttpHeaders(AUTHORISED_READ_SERVICE))
+                                .queryParam(CASE_IDS, savedEntityCaseId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[*].id", hasItem(savedEntitiesUuids.get(0).toString())))
+                .andExpect(jsonPath("$.content[*].id", hasItem(savedEntitiesUuids.get(1).toString())))
+                .andExpect(jsonPath("$.content[*].id", hasItem(savedEntitiesUuids.get(2).toString())))
+
+                .andExpect(hasGeneratedLogAudit(AuditOperationType.GET_CASE_PAYMENT_ORDER,
+                                                AUTHORISED_READ_SERVICE,
+                                                null,
+                                                savedEntityCaseId));
+        }
+
+        @DisplayName("Should fail with 400 Bad Request when invalid length caseId is specified")
+        @Test
+        void shouldThrow400BadRequestWhenInvalidLengthCaseIdSpecified() throws Exception {
+
+            // GIVEN
+            final String invalidCaseId = "12345";
+
+            // WHEN
+            mockMvc.perform(get(CASE_PAYMENT_ORDERS_PATH)
+                                .headers(createHttpHeaders(AUTHORISED_READ_SERVICE))
+                                .queryParam(CASE_IDS, invalidCaseId))
+                // THEN
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(ERROR_PATH_MESSAGE, containsString("These caseIDs: "
+                                                                           + invalidCaseId
+                                                                           + " are incorrect")))
+
+                .andExpect(hasGeneratedLogAudit(AuditOperationType.GET_CASE_PAYMENT_ORDER,
+                                                AUTHORISED_READ_SERVICE,
+                                                null,
+                                                invalidCaseId));
+        }
+
+        @DisplayName("Should fail with 400 Bad Request when invalid caseId is specified")
+        @Test
+        void shouldThrow400BadRequestWhenInvalidCaseIdSpecified() throws Exception {
+
+            // GIVEN
+            final String invalidLuhn = "1234567890123456";
+
+            // WHEN
+            mockMvc.perform(get(CASE_PAYMENT_ORDERS_PATH)
+                                .headers(createHttpHeaders(AUTHORISED_READ_SERVICE))
+                                .queryParam(CASE_IDS, invalidLuhn))
+                // THEN
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(ERROR_PATH_MESSAGE, containsString("These caseIDs: "
+                                                                           + invalidLuhn
+                                                                           + " are incorrect")))
+
+                .andExpect(hasGeneratedLogAudit(AuditOperationType.GET_CASE_PAYMENT_ORDER,
+                                                AUTHORISED_READ_SERVICE,
+                                                null,
+                                                invalidLuhn));
         }
     }
 

@@ -125,7 +125,7 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
-                + "\n1) " + ValidationError.CPO_FILER_ERROR
+                + "\n1) " + ValidationError.CPO_FILTER_ERROR
                 + "\n2) " + ValidationError.CASE_ID_INVALID
                 + "\n3) " + ValidationError.ID_INVALID,
             response = String.class,
