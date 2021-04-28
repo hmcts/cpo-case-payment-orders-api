@@ -42,7 +42,7 @@ def setBeftaEnvVariables() {
 
   // IDAM client auth
   env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
-// :: configure `xuiwebapp` as the default value for `idamClientId`
+  // :: configure `xuiwebapp` as the default value for `idamClientId`
   env.OAUTH2_CLIENT_ID = "xuiwebapp"
   env.OAUTH2_REDIRECT_URI = "https://manage-case.aat.platform.hmcts.net/oauth2/callback"
   env.OAUTH2_ACCESS_TOKEN_TYPE = "OIDC"
@@ -56,8 +56,6 @@ def setBeftaEnvVariables() {
 
   env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
   env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
-
-
   env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
   env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 }
