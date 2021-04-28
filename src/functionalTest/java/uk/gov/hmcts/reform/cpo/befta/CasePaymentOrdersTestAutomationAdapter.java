@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.cpo.befta;
 
-import io.cucumber.java.Before;
-import io.cucumber.java.Scenario;
 import uk.gov.hmcts.befta.BeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultBeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
