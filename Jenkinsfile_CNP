@@ -10,7 +10,8 @@ GradleBuilder builder = new GradleBuilder(this, product)
 
 def secrets = [
   'rpx-${env}': [
-    secret('mc-idam-client-secret', 'BEFTA_OAUTH2_CLIENT_SECRET_OF_XUIWEBAPP')
+    secret('mc-idam-client-secret', 'BEFTA_OAUTH2_CLIENT_SECRET_OF_XUIWEBAPP'),
+    secret('mc-idam-client-secret', 'OAUTH2_CLIENT_SECRET')
   ],
   'ccd-${env}': [
     // BEFTA user: Common_User_For_Request
@@ -43,7 +44,6 @@ def setBeftaEnvVariables() {
   env.OAUTH2_REDIRECT_URI = "https://manage-case.aat.platform.hmcts.net/oauth2/callback"
   env.OAUTH2_ACCESS_TOKEN_TYPE = "OIDC"
   env.OAUTH2_SCOPE_VARIABLES = "profile openid roles manage-user create-user"
-  env.OAUTH2_CLIENT_SECRET = env.BEFTA_OAUTH2_CLIENT_SECRET_OF_XUIWEBAPP
 
   // S2S auth
   env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
