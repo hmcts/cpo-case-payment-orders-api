@@ -14,12 +14,24 @@ public @interface LogAudit {
 
     AuditOperationType operationType();
 
+    /**
+     * Expression to parse when loading the Case Payment Order ID from a string value.
+     */
     String cpoId() default "";
 
+    /**
+     * Expression to parse when loading a list of Case Payment Order IDs.
+     */
     String cpoIds() default "";
 
+    /**
+     * Expression to parse when loading the Case ID from a string value.
+     */
     String caseId() default "";
 
+    /**
+     * Expression to parse when loading a list of Case IDs.
+     */
     String caseIds() default "";
 
 }

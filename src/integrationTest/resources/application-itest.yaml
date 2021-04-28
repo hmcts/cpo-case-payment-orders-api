@@ -1,7 +1,3 @@
-audit:
-  log:
-    enabled: true
-
 idam:
   api:
     url: http://localhost:${wiremock.server.port:5000}

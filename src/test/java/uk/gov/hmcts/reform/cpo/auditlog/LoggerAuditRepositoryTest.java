@@ -6,11 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.reform.BaseTest;
 
 import static org.mockito.Mockito.verify;
 
-class LoggerAuditRepositoryTest implements BaseTest {
+class LoggerAuditRepositoryTest {
 
     @InjectMocks
     private LoggerAuditRepository repository;

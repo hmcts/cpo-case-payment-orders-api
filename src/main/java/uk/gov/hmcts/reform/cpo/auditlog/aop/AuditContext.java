@@ -14,9 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class AuditContext {
 
-    private String cpoId;
     private List<String> cpoIds;
-    private String caseId;
     private List<String> caseIds;
     private AuditOperationType auditOperationType;
 

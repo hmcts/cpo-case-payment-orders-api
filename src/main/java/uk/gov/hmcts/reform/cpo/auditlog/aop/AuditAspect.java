@@ -13,6 +13,7 @@ import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.cpo.auditlog.LogAudit;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,10 +43,8 @@ public class AuditAspect {
 
             AuditContextHolder.setAuditContext(AuditContext.auditContextWith()
                                                    .auditOperationType(logAudit.operationType())
-                                                   .cpoId(cpoId)
-                                                   .cpoIds(cpoIds)
-                                                   .caseId(caseId)
-                                                   .caseIds(caseIds)
+                                                   .cpoIds(combineStringAndList(cpoIds, cpoId))
+                                                   .caseIds(combineStringAndList(caseIds, caseId))
                                                    .build());
         }
     }
@@ -78,6 +77,17 @@ public class AuditAspect {
         List<?> response = getValue(joinPoint, condition, result, List.class);
 
         return response != null ? response.stream().map(Object::toString).collect(Collectors.toList()) : null;
+    }
+
+    private List<String> combineStringAndList(List<String> list, String value) {
+        if (StringUtils.isNotBlank(value)) {
+            if (list == null) {
+                list = new ArrayList<>();
+            }
+            list.add(value);
+        }
+
+        return list;
     }
 
 }

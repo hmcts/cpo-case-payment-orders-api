@@ -3,33 +3,25 @@ package uk.gov.hmcts.reform.cpo.auditlog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.BaseTest;
-import uk.gov.hmcts.reform.cpo.config.AuditConfiguration;
 import uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController;
 
 import java.util.List;
 
-import static org.mockito.BDDMockito.given;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 class AuditLogFormatterTest implements BaseTest {
 
-    @InjectMocks
     private AuditLogFormatter logFormatter;
-
-    @Mock
-    private AuditConfiguration auditConfiguration;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        given(auditConfiguration.getAuditLogMaxListSize()).willReturn(0);
+        logFormatter = new AuditLogFormatter(0);
     }
 
     @Test
@@ -122,7 +114,6 @@ class AuditLogFormatterTest implements BaseTest {
     void shouldHandleListsWithLimit() {
 
         // GIVEN
-        given(auditConfiguration.getAuditLogMaxListSize()).willReturn(2);
         AuditEntry auditEntry = new AuditEntry();
         auditEntry.setDateTime("2021-04-26 15:39:45");
         auditEntry.setHttpMethod(HttpMethod.GET.name());
@@ -130,6 +121,9 @@ class AuditLogFormatterTest implements BaseTest {
         auditEntry.setRequestPath(CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH);
         auditEntry.setCpoIds(List.of(CPO_ID_VALID_1, CPO_ID_VALID_2, CPO_ID_VALID_3));
         auditEntry.setCaseIds(List.of(CASE_ID_VALID_1, CASE_ID_VALID_2, CASE_ID_VALID_3));
+
+        int auditLogMaxListSize = 2;
+        logFormatter = new AuditLogFormatter(auditLogMaxListSize);
 
         // WHEN
         String result = logFormatter.format(auditEntry);

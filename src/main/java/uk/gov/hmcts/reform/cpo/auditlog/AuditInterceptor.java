@@ -29,20 +29,25 @@ public class AuditInterceptor implements AsyncHandlerInterceptor {
                                 HttpServletResponse response,
                                 Object handler,
                                 @Nullable Exception ex) {
+
         if (config.isAuditLogEnabled() && hasAuditAnnotation(handler)) {
             if (!config.isHttpStatusIgnored(response.getStatus())) {
+
                 var auditContext = AuditContextHolder.getAuditContext();
                 auditContext = populateHttpSemantics(auditContext, request, response);
+
                 var logAuditAnnotation = ((HandlerMethod) handler).getMethodAnnotation((LogAudit.class));
                 if (logAuditAnnotation != null) {
                     auditContext.setAuditOperationType(logAuditAnnotation.operationType());
                 }
+
                 try {
                     auditService.audit(auditContext);
                 } catch (Exception e) {  // Ignoring audit failures
                     log.error("Error while auditing the request data:{}", e.getMessage());
                 }
             }
+
             AuditContextHolder.remove();
         }
     }

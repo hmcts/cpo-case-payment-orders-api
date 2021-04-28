@@ -804,7 +804,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
 
     @Nested
     @DisplayName("Build ID lists for LogAudit")
-    class BuildIdListsForLogAudit extends BaseMvcTest {
+    class BuildIdListsForLogAudit {
 
         @Test
         void buildIdLists_shouldReturnEmptyListWhenEmptyPassed() {
