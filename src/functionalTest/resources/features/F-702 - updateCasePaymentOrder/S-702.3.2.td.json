@@ -4,14 +4,26 @@
   "_extends_" : "updateCasePaymentOrderBase",
 
   "specs": [
+    "intends to update a previously created payment order",
+    "contains an invalid datetime format"
   ],
 
   "request" : {
-    "_extends_": "updateCasePaymentOrderPayloadData",
-    "effective_from" : "18-03-2021 15:56:55"
+    "body" : {
+      "_extends_" : "Base_CPO_Data",
+      "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
+      "case_id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]}",
+      "effective_from" : "18-03-2021 15:56:55"
+    }
   },
 
   "expectedResponse" : {
-
+    "_extends_": "Common_400_Response",
+    "body" : {
+      "exception" : "org.springframework.web.bind.MethodArgumentNotValidException",
+      "message" : "Input not valid",
+      "path" : "/case-payment-orders",
+      "details" : [ "INVALID DATE TIME FORMAT? WE ARE GETTING NO MESSAGE"]
+    }
   }
 }

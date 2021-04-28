@@ -18,10 +18,12 @@
       "_extends_" : "Base_CPO_GET_Response_Data",
       "content": [
         {
-          "_extends_" : "Base_CPO_Response_Data"
+          "_extends_" : "Base_CPO_Response_Data",
+          "case_id" : "${[scenarioContext][parentContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]}"
         },{
           "_extends_" : "Base_CPO_Response_Data",
-          "order_reference" : "2021-12345678902"
+          "case_id" : "${[scenarioContext][parentContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][case_id]}",
+          "order_reference" : "${[scenarioContext][parentContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][order_reference]}"
         }
       ],
       "total_elements": 2,

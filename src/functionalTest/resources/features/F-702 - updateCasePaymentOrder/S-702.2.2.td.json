@@ -1,20 +1,24 @@
 {
   "_guid_" : "S-702.2.2",
-  "_extends_" : "updateCasePaymentOrderBase",
+  "_extends_" : "S-702.2_Base",
 
   "specs": [
+    "does not contain the case_id parameter"
   ],
 
   "request" : {
-    "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
-    "effective_from" : "2021-01-01T00:00:00Z",
-    "action" : "payday",
-    "case_type_id" : "attribute-to-be-removed",
-    "responsible_party" : "party1",
-    "order_reference" : "order1"
+    "body" : {
+      "_extends_" : "Base_CPO_Data",
+      "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
+      "case_id" : ""
+    }
   },
 
   "expectedResponse" : {
-
+    "body" : {
+      "details": [
+        "Case ID is required."
+      ]
+    }
   }
 }

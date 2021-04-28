@@ -17,7 +17,7 @@
   },
 
   "expectedResponse" : {
-    "_extends_" : "Common_201_Response",
+    "_extends_" : "Common_202_Response",
     "body" : {
       "_extends_" : "Base_CPO_Response_Data",
       "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",

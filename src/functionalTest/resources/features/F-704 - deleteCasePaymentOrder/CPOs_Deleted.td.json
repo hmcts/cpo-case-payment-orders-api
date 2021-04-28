@@ -13,12 +13,12 @@
   },
 
   "expectedResponse" : {
-    "_extends_" : "Common_200_Response",
+    "_extends_" : "Common_404_Response",
     "body" : {
-      "_extends_" : "Base_CPO_GET_Response_Data",
-      "content": [
-
-      ]
+      "exception" : "uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException",
+      "message" : "Case Payment Order does not exist.",
+      "path" : "/case-payment-orders",
+      "details" : null
     }
   }
 }

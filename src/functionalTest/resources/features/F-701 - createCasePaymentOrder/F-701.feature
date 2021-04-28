@@ -1,5 +1,5 @@
 @F-701
-Feature: blah
+Feature: CREATE Case Payment Order Endpoint
 
 
   Background:

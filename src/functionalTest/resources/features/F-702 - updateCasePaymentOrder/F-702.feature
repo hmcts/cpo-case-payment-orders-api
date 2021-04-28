@@ -1,11 +1,10 @@
-Feature:
+@F-702
+Feature: UPDATE Case Payment Order Endpoint
 
   Background:
     Given an appropriate test context as detailed in the test data source,
     And a user with [an active profile in CCD],
     And a successful call [to create a case payment order for the created case] as in [Prerequisite_Create_CPO],
-
-
 
   @S-702.1
   Scenario: AC1: Successfully allow the update of a previously created payment order in the Case Payment Order database
@@ -17,11 +16,8 @@ Feature:
     And the response [contains a 200 success OK code]
     And the response [contains a valid UUID of the case order record]
     And the response has all other details as expected
-    And a call [to verify that the Case payment Order has been updated] will get the expected response as in [YYY].
+    And a call [to verify that the Case payment Order has been updated] will get the expected response as in [getCasePaymentOrder_cpo_updated].
 
-
-#todo break out into indiviudal fields
-  @S-702.2
   Scenario Outline: AC2- Must return error if one or more of the mandatory parameters have not been provided (Please refer to the mandatory parameter list in the description)**
     When a request is prepared with appropriate values
     And the request [intends to update a previously created payment order]
@@ -30,7 +26,7 @@ Feature:
     And it is submitted to call the [updateCasePaymentOrder] operation of [Case Payment Orders Microservice]
     Then a negative response is received
     And the response has all other details as expected
-    And a call [to verify that the case_payment_orders_previous_version table in the database has not has been updated with the current contents of the case_ payment_orders table] will get the expected response as in [YYY].
+    And a call [to verify that the Case payment Order has not been updated] will get the expected response as in [getCasePaymentOrder_cpo_not_updated].
 
   @S-702.2.1
     Examples:
@@ -45,12 +41,8 @@ Feature:
   @S-702.2.3
     Examples:
       | parameter        |
-      | case_type_id     |
-
-  @S-702.2.4
-    Examples:
-      | parameter        |
       | action           |
+
 
   @S-702.2.5
     Examples:
@@ -62,11 +54,10 @@ Feature:
       | parameter        |
       | order_reference  |
 
-  @S-702.3
   Scenario Outline: AC3 - Must return an error if the request contains an invalid mandatory parameter
     When a request is prepared with appropriate values
-    And the request intends to [update a previously created payment order]
-    And the request contains [an <parameter>]
+    And the request [intends to update a previously created payment order]
+    And the request [contains an <parameter>]
     And it is submitted to call the [updateCasePaymentOrder] operation of [Case Payment Orders Microservice]
     Then a negative response is received
     And the response has all other details as expected
@@ -92,7 +83,7 @@ Feature:
     And it is submitted to call the [updateCasePaymentOrder] operation of [Case Payment Orders Microservice]
     Then a negative response is received
     And the response has all other details as expected
-    And a call [to verify that a Case payment Order has not been updated in the database] will get the expected response as in [YYY].
+    And a call [to verify that a Case payment Order has not been updated in the database] will get the expected response as in [S-702.4_CP1_CP2_not_updated].
 
 
   @S-702.5
@@ -103,4 +94,4 @@ Feature:
     And it is submitted to call the [updateCasePaymentOrder] operation of [Case Payment Orders Microservice]
     Then a negative response is received
     And the response has all other details as expected
-    And a call [to verify that the case_payment_orders_previous_version table in the database has not has been updated with the current contents of the case_ payment_orders table] will get the expected response as in [YYY].
+    And a call [to verify that the Case payment Order has not been updated] will get the expected response as in [getCasePaymentOrder_cpo_not_updated].

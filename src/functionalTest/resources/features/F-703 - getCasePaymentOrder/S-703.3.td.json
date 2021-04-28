@@ -12,7 +12,7 @@
   },
 
   "expectedResponse" : {
-    "_extends_" : "400_Response"
+    "_extends_" : "Common_400_Response"
 
   }
 }

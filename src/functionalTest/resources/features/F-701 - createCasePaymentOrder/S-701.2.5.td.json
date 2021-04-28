@@ -18,7 +18,8 @@
   },
 
   "expectedResponse" : {
-    "_extends_" : "400_Response"
-
+    "body" : {
+      "details" : [ "Responsible Party is required." ]
+    }
   }
 }

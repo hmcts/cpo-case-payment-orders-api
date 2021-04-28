@@ -1,4 +1,5 @@
-Feature:
+@F-704
+Feature: DELETE Case Payment Order Endpoint
 
   Background:
     Given an appropriate test context as detailed in the test data source,
@@ -11,7 +12,7 @@ Feature:
     When a request is prepared with appropriate values
     And the request [contains a set of ids from the case payment order just created above]
     And the request [contains all the mandatory parameters]
-      And it is submitted to call the [deleteCasePaymentOrder] operation of [Case Payment Orders Microservice]
+    And it is submitted to call the [deleteCasePaymentOrder] operation of [Case Payment Orders Microservice]
     Then a positive response is received
     And the response [contains a 204]
     And the response has all other details as expected
@@ -60,7 +61,7 @@ Feature:
   Scenario: AC5b: Request to delete non-existing case payment order records
     When a request is prepared with appropriate values
     And the request [contains an case_ids that doesn't exist in the Case Payment Orders database]
-    And it is submitted to call the [deleteCasePaymentOrder] operation of the [Case Payment Orders Microservice]
+    And it is submitted to call the [deleteCasePaymentOrder] operation of [Case Payment Orders Microservice]
     Then a negative response is received
     And the response has all other details as expected
     And a call [to verify that the Case payment Orders CP1 And CP2 have not been deleted from the database] will get the expected response as in [CPO_Present].

@@ -3,13 +3,26 @@
   "_extends_" : "updateCasePaymentOrderBase",
 
   "specs": [
+    "intends to update a previously created payment order",
+    "contains a non extant record for the Given ID"
   ],
 
   "request" : {
-    "_extends_": "updateCasePaymentOrderPayloadData"
+    "body" : {
+      "_extends_" : "Base_CPO_Data",
+      "id" : "0cf9a99f-9b9d-9e99-9999-999c999f9bc9",
+      "case_id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]}",
+      "responsible_party" : "party2"
+    }
   },
 
   "expectedResponse" : {
-
+    "_extends_" : "Common_404_Response",
+    "body" : {
+      "exception" : "uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException",
+      "message" : "Case Payment Order does not exist.",
+      "path" : "/case-payment-orders",
+      "details" : null
+    }
   }
 }

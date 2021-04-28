@@ -14,7 +14,7 @@
   "request" : {
     "_extends_": "Common_Request",
     "queryParams": {
-      "ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]},${[scenarioContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][case_id]},${[scenarioContext][customValues][GenerateCaseId]}"
+      "case-ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]},${[scenarioContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][case_id]},${[scenarioContext][customValues][GenerateCaseId]}"
     }
   },
 
@@ -22,7 +22,7 @@
     "_extends_" : "Common_404_Response",
     "body" : {
       "exception" : "uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException",
-      "message" : "Case Payment Order specified by IDs does not exist",
+      "message" : "Case Payment Order specified by Case IDs does not exist",
       "path" : "/case-payment-orders",
       "details" : null
     }

@@ -3,14 +3,27 @@
   "_extends_" : "updateCasePaymentOrderBase",
 
   "specs": [
+    "intends to update a previously created payment order",
+    "contains an incorrect caseid format"
   ],
 
   "request" : {
-    "_extends_": "updateCasePaymentOrderPayloadData",
-    "case_id" : "12345"
+    "body" : {
+      "_extends_" : "Base_CPO_Data",
+      "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
+      "case_id" : "1234567890123456"
+    }
+
+
   },
 
   "expectedResponse" : {
-
+    "_extends_": "Common_400_Response",
+    "body" : {
+      "exception" : "org.springframework.web.bind.MethodArgumentNotValidException",
+      "message" : "Input not valid",
+      "path" : "/case-payment-orders",
+      "details" : [ "Case ID has to be a valid 16-digit Luhn number."]
+    }
   }
 }

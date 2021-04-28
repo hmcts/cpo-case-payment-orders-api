@@ -14,7 +14,7 @@
   "request" : {
     "_extends_": "Common_Request",
     "queryParams": {
-      "cases-ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]},${[scenarioContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][case_id]}"
+      "case-ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]},${[scenarioContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][case_id]}"
     }
   },
 

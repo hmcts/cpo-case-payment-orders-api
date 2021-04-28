@@ -18,8 +18,8 @@
     "_extends_": "Common_Request",
     "queryParams": {
       "ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]},${[scenarioContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][id]}",
-      "page_size" : 10,
-      "page_number" : 2
+      "size" : 10,
+      "page" : 2
 
     }
   },

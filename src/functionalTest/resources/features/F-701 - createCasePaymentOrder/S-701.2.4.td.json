@@ -18,7 +18,9 @@
   },
 
   "expectedResponse" : {
-    "_extends_" : "400_Response"
+    "body" : {
+      "details" : [ "Action is required." ]
 
+    }
   }
 }

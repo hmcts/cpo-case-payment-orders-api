@@ -1,0 +1,21 @@
+{
+  "_guid_" : "CPO_GET_Pagination_Response_No_Data",
+  "content": [
+
+  ],
+  "pageable" : "INSTANCE",
+  "last" : true,
+  "total_pages" : 1,
+  "total_elements" : 0,
+  "number_of_elements" : 0,
+  "size" : 0,
+  "sort" : {
+    "sorted" : false,
+    "unsorted" : true,
+    "empty" : true
+  },
+  "number" : 0,
+  "first" : true,
+  "empty" : true
+}
+

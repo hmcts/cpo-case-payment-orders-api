@@ -1,0 +1,32 @@
+{
+  "_guid_" : "S-702.4_CP1_CP2_not_updated",
+  "_extends_" : "getCasePaymentOrderBase",
+
+  "specs" : ["to verify that a Case payment Order has not been updated in the database"],
+
+  "request" : {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "ids": "${[scenarioContext][parentContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]},${[scenarioContext][parentContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][id]}"
+    }
+  },
+
+
+  "expectedResponse" : {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "_extends_": "Base_CPO_GET_Response_Data",
+      "content": [
+        {
+          "_extends_": "Base_CPO_Response_Data"
+        },
+        {
+          "_extends_": "Base_CPO_Response_Data",
+          "order_reference": "${[scenarioContext][parentContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][order_reference]}"
+        }
+      ],
+      "total_elements": 2,
+      "number_of_elements": 2
+    }
+  }
+}

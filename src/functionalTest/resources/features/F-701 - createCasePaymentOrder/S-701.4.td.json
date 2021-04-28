@@ -18,6 +18,12 @@
   },
 
   "expectedResponse" : {
-    "_extends_" : "400_Response"
+    "_extends_" : "Common_409_Response",
+    "body" : {
+      "exception" : "uk.gov.hmcts.reform.cpo.exception.CaseIdOrderReferenceUniqueConstraintException",
+      "message" : "A case payment order with the specified Order Reference already exists on the case.",
+      "path" : "/case-payment-orders",
+      "details" : null
+    }
   }
 }

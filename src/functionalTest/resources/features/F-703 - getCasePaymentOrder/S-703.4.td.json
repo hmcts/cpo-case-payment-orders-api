@@ -1,13 +1,10 @@
 {
-  "_guid_" : "S-704.4",
-  "_extends_" : "deleteCasePaymentOrderBase",
+  "_guid_" : "S-703.4",
+  "_extends_" : "getCasePaymentOrderBase",
 
   "specs": [
     "does not contain the user token parameter",
-    "contains a set of ids from the case payment order just created above",
-    "does not contain the search criteria parameters",
-    "contains a 204"
-
+    "contains relevant error message"
 
   ],
 
@@ -15,13 +12,15 @@
     "headers": {
       "Authorization": ""
     },
-    "_extends_": "Common_Request",
-    "queryParams": {
+    "body" : {
       "ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]},${[scenarioContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][id]}"
     }
   },
 
   "expectedResponse" : {
-    "_extends_" : "Common_401_Response"
+    "_extends_" : "Common_401_Response",
+    "body" : null
+
+
   }
 }

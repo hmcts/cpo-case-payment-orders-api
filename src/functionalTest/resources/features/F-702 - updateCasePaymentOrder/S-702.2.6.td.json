@@ -1,20 +1,24 @@
 {
   "_guid_" : "S-702.2.6",
-  "_extends_" : "updateCasePaymentOrderBase",
+  "_extends_" : "S-702.2_Base",
 
   "specs": [
+    "does not contain the order_reference parameter"
   ],
 
   "request" : {
-    "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
-    "effective_from" : "2021-01-01T00:00:00Z",
-    "case_id" : "${[scenarioContext][customValues][GenerateCaseId]}",
-    "action" : "payday",
-    "case_type_id" : "attribute-to-be-removed",
-    "responsible_party" : "party1"
+    "body" : {
+      "_extends_" : "Base_CPO_Data",
+      "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
+      "case_id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]}",
+      "order_reference" : ""
+    }
   },
 
   "expectedResponse" : {
+    "body" : {
+      "details" : [ "Order Reference has invalid format." ]
+    }
 
   }
 }

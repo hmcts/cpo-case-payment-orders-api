@@ -17,7 +17,10 @@
     }
   },
 
+
   "expectedResponse" : {
-    "_extends_" : "400_Response"
+    "body" : {
+      "details" : [ "Order Reference is required." ]
+    }
   }
 }

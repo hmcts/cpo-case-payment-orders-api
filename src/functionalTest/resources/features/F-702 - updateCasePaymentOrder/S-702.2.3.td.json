@@ -1,20 +1,23 @@
 {
   "_guid_" : "S-702.2.3",
-  "_extends_" : "updateCasePaymentOrderBase",
+  "_extends_" : "S-702.2_Base",
 
   "specs": [
+    "does not contain the action parameter"
   ],
 
   "request" : {
-    "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
-    "effective_from" : "2021-01-01T00:00:00Z",
-    "case_id" : "${[scenarioContext][customValues][GenerateCaseId]}",
-    "action" : "payday",
-    "responsible_party" : "party1",
-    "order_reference" : "order1"
+    "body" : {
+      "_extends_" : "Base_CPO_Data",
+      "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
+      "case_id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]}",
+      "action" : ""
+    }
   },
 
   "expectedResponse" : {
-
+    "body" : {
+      "details" : [ "Action is required." ]
+    }
   }
 }

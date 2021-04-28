@@ -11,11 +11,18 @@
   "request" : {
     "_extends_": "Common_Request",
     "queryParams": {
-      "case_ids": "1617017531060561,1617017629907038"
+      "case-ids": "1617017531060561,1617017629907038"
     }
   },
 
   "expectedResponse" : {
+    "_extends_" : "Common_404_Response",
+    "body" : {
+      "exception" : "uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException",
+      "message" : "Case Payment Order does not exist.",
+      "path" : "/case-payment-orders",
+      "details" : null
+    }
 
   }
 }

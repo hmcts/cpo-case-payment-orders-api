@@ -19,8 +19,8 @@
   },
 
   "expectedResponse" : {
-    "_extends_" : "400_Response"
-
-
+    "body" : {
+      "details" : [ "Effective From is required." ]
+    }
   }
 }
