@@ -75,6 +75,8 @@ withPipeline(type, product, component) {
 
   loadVaultSecrets(secrets)
 
+  setBeftaEnvVariables()
+
   enableAksStagingDeployment()
   disableLegacyDeployment()
 
