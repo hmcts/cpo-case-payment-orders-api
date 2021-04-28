@@ -8,7 +8,6 @@ public final class ValidationError {
     public static final String ACTION_REQUIRED = "Action is required.";
     public static final String CASE_ID_INVALID = "Case ID has to be a valid 16-digit Luhn number.";
     public static final String CASE_ID_REQUIRED = "Case ID is required.";
-    public static final String EFFECTIVE_FROM_REQUIRED = "Effective From is required.";
     public static final String ID_INVALID = "ID is invalid.";
     public static final String ID_REQUIRED = "ID is required.";
     public static final String ORDER_REFERENCE_REQUIRED = "Order Reference is required.";

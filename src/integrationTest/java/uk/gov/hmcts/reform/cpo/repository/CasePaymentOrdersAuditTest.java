@@ -53,7 +53,6 @@ class CasePaymentOrdersAuditTest extends BaseTest {
                 .action(ACTION_VALUE)
                 .caseId(new Random().nextLong())
                 .createdBy("gsullivan")
-                .effectiveFrom(LocalDateTime.now())
                 .responsibleParty("mrresponsible")
                 .build()
         );

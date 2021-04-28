@@ -42,8 +42,6 @@ class CasePaymentOrderMapperTest implements BaseTest {
         assertEquals("Mapped entity created timestamp should equals mocked entity created timestamp",
                      casePaymentOrder.getCreatedTimestamp().truncatedTo(ChronoUnit.SECONDS),
                      mappedEntity.getCreatedTimestamp().truncatedTo(ChronoUnit.SECONDS));
-        assertEquals("Mapped entity effective from should equals mocked entity effective from",
-                     casePaymentOrder.getEffectiveFrom(), mappedEntity.getEffectiveFrom());
         assertEquals("Mapped entity case id should equals mocked entity case id",
                      casePaymentOrder.getCaseId(), mappedEntity.getCaseId());
         assertEquals("Mapped entity action should equals mocked entity action",
@@ -69,8 +67,6 @@ class CasePaymentOrderMapperTest implements BaseTest {
         assertEquals("Mapped domain model created timestamp should equals mocked domain model"
                          + " created timestamp",
                      entity.getCreatedTimestamp(), mappedDomainObject.getCreatedTimestamp());
-        assertEquals("Mapped domain model effective from should equals mocked domain model effective from",
-                     entity.getEffectiveFrom(), mappedDomainObject.getEffectiveFrom());
         assertEquals("Mapped domain model case id should equals mocked domain model case id",
                      entity.getCaseId(), mappedDomainObject.getCaseId());
         assertEquals("Mapped domain model action should equals mocked domain model action",
@@ -95,8 +91,6 @@ class CasePaymentOrderMapperTest implements BaseTest {
         CasePaymentOrderEntity mappedRequestEntity = mapper.toEntity(request, CREATED_BY);
 
         // THEN
-        assertEquals("Mapped entity effective from should equals mocked entity effective from",
-                     request.getEffectiveFrom(), mappedRequestEntity.getEffectiveFrom());
         assertEquals("Mapped entity case id should equals mocked entity case id",
                      request.getCaseId(), mappedRequestEntity.getCaseId().toString());
         assertEquals("Mapped entity action should equals mocked entity action",
@@ -137,8 +131,6 @@ class CasePaymentOrderMapperTest implements BaseTest {
         assertNotEquals("Merged created timestamp should have changed",
                         originalCreatedTimestamp, entity.getCreatedTimestamp());
         // standard property checks
-        assertEquals("Merged effective from should equal source effective from",
-                     updateRequest.getEffectiveFrom(), entity.getEffectiveFrom());
         assertEquals("Merged case id should equal source case id",
                      updateRequest.getCaseId(), entity.getCaseId().toString());
         assertEquals("Merged action should equal source action",
@@ -169,7 +161,6 @@ class CasePaymentOrderMapperTest implements BaseTest {
         assertEquals("Created timestamp should be unchanged",
                      originalCreatedTimestamp, entity.getCreatedTimestamp());
         // standard property checks (not null: assume unchanged)
-        assertNotNull("Effective from should remain populated", entity.getEffectiveFrom());
         assertNotNull("Case ID should remain populated", entity.getCaseId());
         assertNotNull("Action should remain populated", entity.getAction());
         assertNotNull("Responsible party should remain populated", entity.getResponsibleParty());

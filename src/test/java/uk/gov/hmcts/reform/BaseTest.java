@@ -53,7 +53,6 @@ public interface BaseTest {
     public static final String ORDER_REFERENCE_INVALID = "2021-918425346";
     String ACTION = "action";
     String RESPONSIBLE_PARTY = "responsibleParty";
-    LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24, 11, 48, 32);
 
     String CREATED_BY = "createdBy";
     LocalDateTime CREATED_TIMESTAMP = LocalDateTime.now();
@@ -66,7 +65,6 @@ public interface BaseTest {
     default CasePaymentOrder createCasePaymentOrder() {
         return CasePaymentOrder.builder()
             .caseId(Long.parseLong(CASE_ID_VALID_1))
-            .effectiveFrom(EFFECTIVE_FROM)
             .action(ACTION)
             .responsibleParty(RESPONSIBLE_PARTY)
             .orderReference(ORDER_REFERENCE_VALID)
@@ -78,7 +76,6 @@ public interface BaseTest {
 
     default CasePaymentOrderEntity createCasePaymentOrderEntity() {
         CasePaymentOrderEntity entity = new CasePaymentOrderEntity();
-        entity.setEffectiveFrom(EFFECTIVE_FROM);
         entity.setCaseId(Long.parseLong(CASE_ID_VALID_1));
         entity.setAction(ACTION);
         entity.setResponsibleParty(RESPONSIBLE_PARTY);
@@ -90,7 +87,6 @@ public interface BaseTest {
 
     default CreateCasePaymentOrderRequest createCreateCasePaymentOrderRequest() {
         return new CreateCasePaymentOrderRequest(
-            EFFECTIVE_FROM,
             CASE_ID_VALID_1,
             ACTION,
             RESPONSIBLE_PARTY,
@@ -135,7 +131,6 @@ public interface BaseTest {
 
         final CasePaymentOrder casePaymentOrder = CasePaymentOrder.builder()
             .createdTimestamp(LocalDateTime.now())
-            .effectiveFrom(LocalDateTime.now())
             .caseId(1_234_123_412_341_234L)
             .action("Case Creation")
             .responsibleParty("The executor on the will")
@@ -147,7 +142,6 @@ public interface BaseTest {
 
         final CasePaymentOrder casePaymentOrder1 = CasePaymentOrder.builder()
             .createdTimestamp(LocalDateTime.now())
-            .effectiveFrom(LocalDateTime.now())
             .caseId(1_234_123_412_341_234L)
             .action("Case Creation")
             .responsibleParty("The executor on the will")
@@ -159,7 +153,6 @@ public interface BaseTest {
 
         final CasePaymentOrder casePaymentOrder2 = CasePaymentOrder.builder()
             .createdTimestamp(LocalDateTime.now())
-            .effectiveFrom(LocalDateTime.now())
             .caseId(1_234_123_412_341_234L)
             .action("Case Creation")
             .responsibleParty("The executor on the will")

@@ -22,13 +22,11 @@ public class UpdateCasePaymentOrderRequest extends BaseCasePaymentOrderRequest {
     private final String id;
 
     public UpdateCasePaymentOrderRequest(String id,
-                                         LocalDateTime effectiveFrom,
                                          String caseId,
                                          String action,
                                          String responsibleParty,
                                          String orderReference) {
-        super(effectiveFrom,
-              caseId,
+        super(caseId,
               action,
               responsibleParty,
               orderReference);
