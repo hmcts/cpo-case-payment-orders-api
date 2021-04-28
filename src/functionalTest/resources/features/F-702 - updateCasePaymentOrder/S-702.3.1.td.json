@@ -9,7 +9,7 @@
 
   "request" : {
     "body" : {
-      "_extends_" : "Base_CPO_Data",
+      "_extends_" : "Base_CPO_Data_Payload_data",
       "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
       "case_id" : "1234567890123456"
     }

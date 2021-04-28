@@ -7,7 +7,7 @@
 
   "request" : {
     "body" : {
-      "_extends_" : "Base_CPO_Data",
+      "_extends_" : "Base_CPO_Data_Payload_data",
       "order_reference" : "2021-12345678903",
       "case_id" : "${[scenarioContext][customValues][GetGeneratedCaseId]}"
     }

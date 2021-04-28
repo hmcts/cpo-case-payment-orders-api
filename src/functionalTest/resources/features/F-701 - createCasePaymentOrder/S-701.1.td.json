@@ -12,7 +12,7 @@
   "request" : {
     "_extends_": "Common_Request",
     "body": {
-      "_extends_" : "Base_CPO_Data"
+      "_extends_" : "Base_CPO_Data_Payload_data"
     }
   },
 

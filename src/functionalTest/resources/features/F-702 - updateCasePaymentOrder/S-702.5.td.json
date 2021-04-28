@@ -9,7 +9,7 @@
 
   "request" : {
     "body" : {
-      "_extends_" : "Base_CPO_Data",
+      "_extends_" : "Base_CPO_Data_Payload_data",
       "id" : "0cf9a99f-9b9d-9e99-9999-999c999f9bc9",
       "case_id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]}",
       "responsible_party" : "party2"

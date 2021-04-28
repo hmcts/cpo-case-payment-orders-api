@@ -10,7 +10,7 @@
 
   "request" : {
     "body" : {
-      "_extends_" : "Base_CPO_Data",
+      "_extends_" : "Base_CPO_Data_Payload_data",
       "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
       "case_id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]}",
       "effective_from" : "18-03-2021 15:56:55"

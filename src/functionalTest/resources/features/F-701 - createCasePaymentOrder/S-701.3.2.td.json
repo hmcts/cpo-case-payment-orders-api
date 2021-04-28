@@ -9,7 +9,7 @@
 
   "request" : {
     "body" : {
-      "_extends_" : "Base_CPO_Data",
+      "_extends_" : "Base_CPO_Data_Payload_data",
       "effective_from" : "18-03-2021 15:56:55"
     }
   },
