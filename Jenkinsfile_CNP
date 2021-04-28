@@ -42,7 +42,7 @@ def setBeftaEnvVariables() {
   env.BEFTA_OAUTH2_REDIRECT_URI_OF_XUIWEBAPP = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
   env.BEFTA_OAUTH2_ACCESS_TOKEN_TYPE_OF_XUIWEBAPP = "OIDC"
   env.BEFTA_OAUTH2_SCOPE_VARIABLES_OF_XUIWEBAPP = "profile openid roles manage-user create-user"
-  // :: configure `xui_webapp` as the default value for `s2sClientId`
+  // :: configure `xuiwebapp` as the default value for `idamClientId`
   env.OAUTH2_CLIENT_ID = env.BEFTA_OAUTH2_CLIENT_ID_OF_XUIWEBAPP
   env.OAUTH2_REDIRECT_URI = env.BEFTA_OAUTH2_REDIRECT_URI_OF_XUIWEBAPP
   env.OAUTH2_ACCESS_TOKEN_TYPE = env.BEFTA_OAUTH2_ACCESS_TOKEN_TYPE_OF_XUIWEBAPP
