@@ -15,22 +15,22 @@ import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderAuditUtils.SELECT_DELETED_ENTITIES;
+import static uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderAuditUtils.SELECT_ENTITIES_ONLY;
+import static uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderAuditUtils.SELECT_REVISION_INFO_ONLY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
-public class CasePaymentOrdersAuditTest extends BaseTest {
+class CasePaymentOrdersAuditTest extends BaseTest {
 
     @Autowired
-    private CasePaymentOrdersRepository casePaymentOrdersRepository;
+    private CasePaymentOrdersJpaRepository casePaymentOrdersRepository;
 
     @Autowired
     private CasePaymentOrderMapper casePaymentOrderMapper;
@@ -44,9 +44,6 @@ public class CasePaymentOrdersAuditTest extends BaseTest {
 
     private static final String ACTION_VALUE = "Action";
     private static final String NEW_ACTION_VALUE = "New Action";
-    private static final boolean SELECT_DELETED_ENTITIES = true;
-    private static final boolean SELECT_ENTITIES_ONLY = true;
-    private static final boolean SELECT_REVISION_INFO_ONLY = false;
 
     @BeforeEach
     void setUp() {
@@ -104,26 +101,9 @@ public class CasePaymentOrdersAuditTest extends BaseTest {
 
         List auditedEntries = getAuditQuery(SELECT_ENTITIES_ONLY).getResultList();
 
-        assertEquals(2, auditedEntries.size());
+        assertEquals(1, auditedEntries.size());
 
-        assertAuditRecordForDeletionOfEntityIsPresent();
-
-        assertAuditDataRevisionTypes(List.of(RevisionType.ADD, RevisionType.DEL));
-    }
-
-    private void assertAuditRecordForDeletionOfEntityIsPresent() {
-        CasePaymentOrderEntity updatedCasePaymentOrderEntity = null;
-
-        try {
-            updatedCasePaymentOrderEntity = (CasePaymentOrderEntity) auditReader
-                    .createQuery()
-                    .forEntitiesAtRevision(CasePaymentOrderEntity.class, 2)
-                    .add(AuditEntity.id().eq(casePaymentOrderEntity.getId()))
-                    .getSingleResult();
-            fail("NoResultException not thrown as expected");
-        } catch (NoResultException nre) {
-            assertNull(updatedCasePaymentOrderEntity);
-        }
+        assertAuditDataRevisionTypes(List.of(RevisionType.ADD));
     }
 
     private AuditQuery getAuditQuery(boolean shouldSelectEntitiesOnly) {
@@ -148,4 +128,5 @@ public class CasePaymentOrdersAuditTest extends BaseTest {
 
         assertTrue(collect.containsAll(revisionTypes));
     }
+
 }

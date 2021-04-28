@@ -18,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.TestIdamConfiguration;
-import uk.gov.hmcts.reform.cpo.ApplicationParams;
 import uk.gov.hmcts.reform.cpo.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
@@ -48,9 +47,6 @@ class RestExceptionHandlerTest implements BaseTest {
     @MockBean
     protected CasePaymentOrdersServiceImpl service;
 
-    @MockBean
-    protected ApplicationParams applicationParams;
-
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -58,6 +54,26 @@ class RestExceptionHandlerTest implements BaseTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+    }
+
+    @DisplayName("should return correct response when generic ApiException is thrown")
+    @Test
+    void shouldReturnGenericApiExceptionResponse() throws Exception {
+
+        // GIVEN
+        UpdateCasePaymentOrderRequest request = createUpdateCasePaymentOrderRequest();
+        String myUniqueExceptionMessage = "Generic Api Exception";
+        ApiException expectedException = new ApiException(myUniqueExceptionMessage);
+
+        /// WHEN
+        setupMockServiceToThrowException(expectedException);
+        ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                         .contentType(MediaType.APPLICATION_JSON)
+                                                         .content(objectMapper.writeValueAsString(request)));
+
+        // THEN
+        assertHttpErrorResponse(result, HttpStatus.INTERNAL_SERVER_ERROR, expectedException.getMessage());
+
     }
 
     @DisplayName("should return correct response when CaseIdOrderReferenceUniqueConstraint is thrown")
@@ -72,9 +88,9 @@ class RestExceptionHandlerTest implements BaseTest {
 
         /// WHEN
         setupMockServiceToThrowException(expectedException);
-        ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                                         .contentType(MediaType.APPLICATION_JSON)
-                                                         .content(objectMapper.writeValueAsString(request)));
+        ResultActions result = this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                        .contentType(MediaType.APPLICATION_JSON)
+                                                        .content(objectMapper.writeValueAsString(request)));
 
         // THEN
         assertHttpErrorResponse(result, HttpStatus.CONFLICT, expectedException.getMessage());
@@ -93,12 +109,54 @@ class RestExceptionHandlerTest implements BaseTest {
 
         /// WHEN
         setupMockServiceToThrowException(expectedException);
+        ResultActions result = this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                        .contentType(MediaType.APPLICATION_JSON)
+                                                        .content(objectMapper.writeValueAsString(request)));
+
+        // THEN
+        assertHttpErrorResponse(result, HttpStatus.NOT_FOUND, expectedException.getMessage());
+
+    }
+
+    @DisplayName("should return correct response when CasePaymentOrdersFilterException is thrown")
+    @Test
+    void shouldReturnCasePaymentOrdersFilterExceptionResponse() throws Exception {
+
+        // GIVEN
+        UpdateCasePaymentOrderRequest request = createUpdateCasePaymentOrderRequest();
+        String myUniqueExceptionMessage = "CPO filter error";
+        CasePaymentOrdersFilterException expectedException =
+            new CasePaymentOrdersFilterException(myUniqueExceptionMessage);
+
+        /// WHEN
+        setupMockServiceToThrowException(expectedException);
         ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
                                                          .contentType(MediaType.APPLICATION_JSON)
                                                          .content(objectMapper.writeValueAsString(request)));
 
         // THEN
-        assertHttpErrorResponse(result, HttpStatus.NOT_FOUND, expectedException.getMessage());
+        assertHttpErrorResponse(result, HttpStatus.BAD_REQUEST, expectedException.getMessage());
+
+    }
+
+    @DisplayName("should return correct response when IdAMIdCannotBeRetrievedException is thrown")
+    @Test
+    void shouldReturnIdAMIdCannotBeRetrievedResponse() throws Exception {
+
+        // GIVEN
+        UpdateCasePaymentOrderRequest request = createUpdateCasePaymentOrderRequest();
+        String myUniqueExceptionMessage = "IDAM ID could not be found";
+        IdAMIdCannotBeRetrievedException expectedException =
+            new IdAMIdCannotBeRetrievedException(myUniqueExceptionMessage);
+
+        /// WHEN
+        setupMockServiceToThrowException(expectedException);
+        ResultActions result =  this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                         .contentType(MediaType.APPLICATION_JSON)
+                                                         .content(objectMapper.writeValueAsString(request)));
+
+        // THEN
+        assertHttpErrorResponse(result, HttpStatus.BAD_REQUEST, expectedException.getMessage());
 
     }
 
@@ -111,11 +169,16 @@ class RestExceptionHandlerTest implements BaseTest {
                                          HttpStatus expectedStatus,
                                          String expectedMessage) throws Exception {
 
+        // check for alternative error description if default error response
+        String reasonPhrase = expectedStatus.value() == HttpError.DEFAULT_STATUS
+            ? HttpError.DEFAULT_ERROR
+            : expectedStatus.getReasonPhrase();
+
         result
             .andExpect(status().is(expectedStatus.value()))
-            .andExpect(jsonPath("$.status").value(expectedStatus.value()))
-            .andExpect(jsonPath("$.error").value(expectedStatus.getReasonPhrase()))
-            .andExpect(jsonPath("$.message").value(expectedMessage));
+            .andExpect(jsonPath(ERROR_PATH_STATUS).value(expectedStatus.value()))
+            .andExpect(jsonPath(ERROR_PATH_ERROR).value(reasonPhrase))
+            .andExpect(jsonPath(ERROR_PATH_MESSAGE).value(expectedMessage));
     }
 
 }

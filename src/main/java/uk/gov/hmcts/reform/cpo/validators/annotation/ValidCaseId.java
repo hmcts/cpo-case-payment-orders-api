@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.cpo.validators.annotation;
 
 import uk.gov.hmcts.reform.cpo.validators.CaseIdValidator;
 import uk.gov.hmcts.reform.cpo.validators.CaseIdsValidator;
+import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -17,7 +18,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface ValidCaseId {
 
-    String message() default "Invalid caseId";
+    String message() default ValidationError.CASE_ID_INVALID;
 
     Class<?>[] groups() default {};
 

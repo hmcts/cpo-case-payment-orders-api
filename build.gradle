@@ -173,7 +173,7 @@ sonarqube {
     property "sonar.projectKey", "uk.gov.hmcts.reform:cpo-case-payment-orders-api"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     property "sonar.coverage.exclusions", "**/security/SecurityUtils.java,**/CasePaymentOrdersServiceImpl.java,**/CasePaymentOrderQueryFilter.java,**/CasePaymentOrderEntity.java,**/CaseIdsValidator.java"
-    property "sonar.exclusions","**/config/SecurityConfiguration.java"
+    property "sonar.exclusions","**/config/SecurityConfiguration.java,**/config/HibernateEventListenerRegistryConfiguration.java"
 
   }
 }
@@ -268,13 +268,17 @@ dependencies {
   implementation group: 'org.hibernate', name: 'hibernate-envers', version: '5.4.30.Final'
 
   compile group: 'org.flywaydb', name: 'flyway-core', version: '7.7.0'
-  compile group: 'javax.inject', name: 'javax.inject', version: '1'
 
   compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
   compile group: 'commons-validator', name: 'commons-validator', version: '1.7'
 
+  // CVE-2021-29425
+  compile group: 'commons-io', name: 'commons-io', version: '2.8.0'
+
   annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: versions.mapstruct
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   testImplementation libraries.junit5
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
