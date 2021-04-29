@@ -29,7 +29,7 @@ public class HttpError<T extends Serializable> implements Serializable {
     private T details;
 
     public HttpError(Exception exception, String path, HttpStatus status) {
-        final ResponseStatus responseStatus = exception.getClass().getAnnotation(ResponseStatus.class);
+        final var responseStatus = exception.getClass().getAnnotation(ResponseStatus.class);
 
         this.exception = exception.getClass().getName();
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
@@ -56,7 +56,7 @@ public class HttpError<T extends Serializable> implements Serializable {
             return status.value();
         }
         if (null != responseStatus) {
-            final HttpStatus httpStatus = getHttpStatus(responseStatus);
+            final var httpStatus = getHttpStatus(responseStatus);
             if (null != httpStatus) {
                 return httpStatus.value();
             }
@@ -81,7 +81,7 @@ public class HttpError<T extends Serializable> implements Serializable {
                 return responseStatus.reason();
             }
 
-            final HttpStatus httpStatus = getHttpStatus(responseStatus);
+            final var httpStatus = getHttpStatus(responseStatus);
             if (null != httpStatus) {
                 return httpStatus.getReasonPhrase();
             }

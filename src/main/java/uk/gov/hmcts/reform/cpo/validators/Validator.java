@@ -13,7 +13,7 @@ public interface Validator<T> {
     String ORDER_REFERENCE_RG = "^2[0-9]{3}-[0-9]{11}$";
 
     default void buildErrors(final ConstraintValidatorContext context, final String message, List<String> errors) {
-        final String errorsCommaSeparated = String.join(",", errors);
+        final var errorsCommaSeparated = String.join(",", errors);
         context.buildConstraintViolationWithTemplate(message + errorsCommaSeparated + " are incorrect.")
             .addConstraintViolation();
     }

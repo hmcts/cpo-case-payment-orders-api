@@ -1,5 +1,6 @@
 plugins {
   id 'application'
+  id 'idea'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.11.RELEASE'
   id 'org.springframework.boot' version '2.4.4'
@@ -33,6 +34,16 @@ sourceSets {
       srcDir file('src/integrationTest/java')
     }
     resources.srcDir file('src/integrationTest/resources')
+  }
+}
+
+idea {
+  module {
+    // config to allow Intelij to mark test source and resource files correctly to help linting tools
+    testSourceDirs += project.sourceSets.functionalTest.java.srcDirs
+    testSourceDirs += project.sourceSets.integrationTest.java.srcDirs
+    testResourceDirs += project.sourceSets.functionalTest.resources.srcDirs
+    testResourceDirs += project.sourceSets.integrationTest.resources.srcDirs
   }
 }
 
@@ -172,9 +183,8 @@ sonarqube {
     property "sonar.projectName", "Reform :: cpo-case-payment-orders-api"
     property "sonar.projectKey", "uk.gov.hmcts.reform:cpo-case-payment-orders-api"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/security/SecurityUtils.java,**/CasePaymentOrdersServiceImpl.java,**/CasePaymentOrderQueryFilter.java,**/CasePaymentOrderEntity.java,**/CaseIdsValidator.java"
+    property "sonar.coverage.exclusions", "**/cpo/Application.java"
     property "sonar.exclusions","**/config/SecurityConfiguration.java,**/config/HibernateEventListenerRegistryConfiguration.java"
-
   }
 }
 
@@ -262,9 +272,7 @@ dependencies {
 
   implementation "com.github.ben-manes.caffeine:caffeine:3.0.1"
 
-  implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-  implementation group: 'org.mapstruct', name: 'mapstruct', version: versions.mapstruct
-
+  implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
   implementation group: 'org.hibernate', name: 'hibernate-envers', version: '5.4.30.Final'
 
   compile group: 'org.flywaydb', name: 'flyway-core', version: '7.7.0'
@@ -275,10 +283,16 @@ dependencies {
   // CVE-2021-29425
   compile group: 'commons-io', name: 'commons-io', version: '2.8.0'
 
+  compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  compileOnly group: 'org.mapstruct', name: 'mapstruct', version: versions.mapstruct
+
   annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: versions.mapstruct
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+
+  // NB: use a JSR305 implementation to import javax.annotation.meta.When enum
+  compileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
 
   testImplementation libraries.junit5
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
@@ -320,4 +334,3 @@ bootJar {
 wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
-

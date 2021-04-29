@@ -6,7 +6,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -31,7 +30,7 @@ public class JwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection
     @Override
     public Collection<GrantedAuthority> convert(Jwt jwt) {
         if (Boolean.TRUE.equals(jwt.containsClaim(TOKEN_NAME)) && jwt.getClaim(TOKEN_NAME).equals(ACCESS_TOKEN)) {
-            UserInfo userInfo = idamRepository.getUserInfo(BEARER + jwt.getTokenValue());
+            var userInfo = idamRepository.getUserInfo(BEARER + jwt.getTokenValue());
             return extractAuthorityFromClaims(userInfo.getRoles());
         }
         return Collections.emptyList();
