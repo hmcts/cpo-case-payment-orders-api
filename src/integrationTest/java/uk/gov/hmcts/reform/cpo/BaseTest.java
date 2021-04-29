@@ -13,8 +13,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.TestIdamConfiguration;
 
-import java.time.LocalDateTime;
-import java.time.Month;
 import java.time.format.DateTimeFormatter;
 
 import static org.mockito.Mockito.when;

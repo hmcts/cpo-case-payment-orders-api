@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -97,7 +96,6 @@ public interface BaseTest {
     default UpdateCasePaymentOrderRequest createUpdateCasePaymentOrderRequest() {
         return new UpdateCasePaymentOrderRequest(
             CPO_ID_VALID_1,
-            LocalDateTime.now(),
             CASE_ID_VALID_1,
             ACTION,
             RESPONSIBLE_PARTY,

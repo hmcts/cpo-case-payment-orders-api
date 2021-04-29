@@ -112,7 +112,6 @@ class CasePaymentOrderMapperTest implements BaseTest {
         // create UpdateRequest using DIFFERENT data to that in BaseTest
         UpdateCasePaymentOrderRequest updateRequest =
             new UpdateCasePaymentOrderRequest(UUID.randomUUID().toString(),
-                                              LocalDateTime.of(2020, 10, 1, 12, 30, 0, 0),
                                               CASE_ID_VALID_2,
                                               "Merge Action",
                                               "Merge Responsible Party",
