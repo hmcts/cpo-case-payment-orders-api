@@ -8,7 +8,7 @@
 
   "request" : {
     "queryParams": {
-      "ids": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+      "ids": "${[scenarioContext][parentContext][testData][request][body][case_id]}"
     }
   }
 
