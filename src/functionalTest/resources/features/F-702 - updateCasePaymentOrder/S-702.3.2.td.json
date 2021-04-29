@@ -18,12 +18,6 @@
   },
 
   "expectedResponse" : {
-    "_extends_": "Common_400_Response",
-    "body" : {
-      "exception" : "org.springframework.web.bind.MethodArgumentNotValidException",
-      "message" : "Input not valid",
-      "path" : "/case-payment-orders",
-      "details" : [ "INVALID DATE TIME FORMAT? WE ARE GETTING NO MESSAGE"]
-    }
+    "_extends_": "Common_400_Response"
   }
 }

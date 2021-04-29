@@ -36,11 +36,6 @@ Feature: CREATE Case Payment Order Endpoint
     | parameter        |
     | effective_from   |
 
-  @S-701.2.2
-  Examples:
-    | parameter        |
-    | case_id          |
-
   @S-701.2.4
   Examples:
     | parameter        |
@@ -56,8 +51,15 @@ Feature: CREATE Case Payment Order Endpoint
     | parameter        |
     | order_reference  |
 
-
-
+  @S-701.2.2
+  Scenario: AC2- Must return error if case id is not provided
+    When a request is prepared with appropriate values
+    And the request [intends to Create a case payment order]
+    And the request [does not contain one or more of the mandatory parameters]
+    And the request [does not contain the case_id parameter]
+    And it is submitted to call the [createCasePaymentOrder] operation of [Case Payment Orders Microservice],
+    Then a negative response is received
+    And the response has all other details as expected
 
   Scenario Outline: AC3 - Must return an error if the request contains an invalid mandatory parameter
     When a request is prepared with appropriate values
