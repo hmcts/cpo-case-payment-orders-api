@@ -10,7 +10,7 @@ Background:
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # CPO-10 / AC-1
 @S-705.1
-Scenario: Must successfully allow access of the AddCasePaymentOrder API for a CRUD whitelisted service
+Scenario: Must successfully allow access of the CreateCasePaymentOrder API for a CRUD whitelisted service
 
   Given a user with [an active profile in CCD]
     And [a new Case-Payment-Order microservice has been established] in the context,
@@ -63,7 +63,7 @@ Scenario: Must successfully allow access of the DeleteCasePaymentOrder API for a
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # CPO-10 / AC-4
 @S-705.4
-Scenario: Must refuse access of the AddCasePaymentOrder API for a Non-CRUD whitelisted service
+Scenario: Must refuse access of the CreateCasePaymentOrder API for a Non-CRUD whitelisted service
 
   Given a user with [an active profile in CCD]
     And [a new Case-Payment-Order microservice has been established] in the context,

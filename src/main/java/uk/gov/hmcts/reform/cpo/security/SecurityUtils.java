@@ -1,13 +1,14 @@
 package uk.gov.hmcts.reform.cpo.security;
 
 import com.auth0.jwt.JWT;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import static uk.gov.hmcts.reform.cpo.security.Permission.READ;
 import static uk.gov.hmcts.reform.cpo.security.Permission.UPDATE;
 
 @Service
+@Slf4j
 public class SecurityUtils {
 
     public static final String BEARER = "Bearer ";
@@ -68,7 +70,7 @@ public class SecurityUtils {
     }
 
     private boolean hasPermission(Permission permission) {
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        var requestAttributes = RequestContextHolder.getRequestAttributes();
 
         String serviceAuthorizationHeaderValue = null;
         if (requestAttributes != null) {
@@ -77,6 +79,7 @@ public class SecurityUtils {
         }
 
         if (serviceAuthorizationHeaderValue == null) {
+            log.warn(ValidationError.SERVICE_AUTHORIZATION_MISSING);
             return false;
         }
 

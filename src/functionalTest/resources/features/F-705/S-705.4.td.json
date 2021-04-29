@@ -2,7 +2,7 @@
   "_guid_": "S-705.4",
   "_extends_": "createCasePaymentOrderBase",
 
-  "title": "Must refuse access of the AddCasePaymentOrder API for a Non-CRUD whitelisted service",
+  "title": "Must refuse access of the CreateCasePaymentOrder API for a Non-CRUD whitelisted service",
 
   "s2sClientId": "payment_app",
 

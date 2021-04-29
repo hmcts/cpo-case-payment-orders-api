@@ -2,7 +2,7 @@
   "_guid_": "S-705.1",
   "_extends_": "createCasePaymentOrderBase",
 
-  "title": "Must successfully allow access of the AddCasePaymentOrder API for a CRUD whitelisted service",
+  "title": "Must successfully allow access of the CreateCasePaymentOrder API for a CRUD whitelisted service",
 
   "s2sClientId": "xui_webapp",
 

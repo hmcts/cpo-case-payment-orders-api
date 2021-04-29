@@ -27,7 +27,7 @@ import static uk.gov.hmcts.reform.cpo.security.Permission.UPDATE;
 import static uk.gov.hmcts.reform.cpo.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
 @ExtendWith(MockitoExtension.class)
-public class SecurityUtilsTest {
+class SecurityUtilsTest {
 
     private  static final String XUI_WEBAPP_SERVICE_NAME = "XUI_WEBAPP";
 

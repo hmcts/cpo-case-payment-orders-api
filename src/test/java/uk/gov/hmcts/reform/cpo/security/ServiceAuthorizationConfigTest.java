@@ -21,11 +21,11 @@ import static uk.gov.hmcts.reform.cpo.security.Permission.UPDATE;
 @ContextConfiguration(initializers = ConfigDataApplicationContextInitializer.class)
 @EnableConfigurationProperties(value = ServiceAuthorizationConfig.class)
 @ActiveProfiles("serviceAuthPermissions")
-public class ServiceAuthorizationConfigTest {
+class ServiceAuthorizationConfigTest {
 
-    private static final String PAYMENT_APP = "payment_app";
+    private static final String TAKE_MY_MONEY_APP = "take_my_money_app";
 
-    private static final String XUI_WEBAPP = "xui_webapp";
+    private static final String USER_INTERFACE_WEBAPP = "user_interface_webapp";
 
     private static final String ANOTHER_SERVICE = "anotherService";
 
@@ -39,12 +39,12 @@ public class ServiceAuthorizationConfigTest {
 
     @Test
     void testHasPermissions_ReturnsFalse_CheckReadOnlyAppHasCreatePermission() {
-        assertFalse(serviceAuthorizationConfig.hasPermissions(PAYMENT_APP, CREATE));
+        assertFalse(serviceAuthorizationConfig.hasPermissions(TAKE_MY_MONEY_APP, CREATE));
     }
 
     @Test
     void testHasPermissions_ReturnsTrue_CheckReadOnlyAppHasReadPermission() {
-        assertTrue(serviceAuthorizationConfig.hasPermissions(PAYMENT_APP, READ));
+        assertTrue(serviceAuthorizationConfig.hasPermissions(TAKE_MY_MONEY_APP, READ));
     }
 
     @Test
@@ -60,10 +60,10 @@ public class ServiceAuthorizationConfigTest {
     @Test
     void testHasPermissions_ReturnsTrue_Check_CRUD_AppHasAllPermissions() {
         assertAll(
-            () -> assertTrue(serviceAuthorizationConfig.hasPermissions(XUI_WEBAPP, CREATE)),
-            () -> assertTrue(serviceAuthorizationConfig.hasPermissions(XUI_WEBAPP, READ)),
-            () -> assertTrue(serviceAuthorizationConfig.hasPermissions(XUI_WEBAPP, UPDATE)),
-            () -> assertTrue(serviceAuthorizationConfig.hasPermissions(XUI_WEBAPP, DELETE))
+            () -> assertTrue(serviceAuthorizationConfig.hasPermissions(USER_INTERFACE_WEBAPP, CREATE)),
+            () -> assertTrue(serviceAuthorizationConfig.hasPermissions(USER_INTERFACE_WEBAPP, READ)),
+            () -> assertTrue(serviceAuthorizationConfig.hasPermissions(USER_INTERFACE_WEBAPP, UPDATE)),
+            () -> assertTrue(serviceAuthorizationConfig.hasPermissions(USER_INTERFACE_WEBAPP, DELETE))
         );
     }
 }

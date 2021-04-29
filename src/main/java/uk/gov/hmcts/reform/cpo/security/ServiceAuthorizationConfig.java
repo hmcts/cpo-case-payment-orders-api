@@ -5,8 +5,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.Map;
+
+import static java.util.stream.Collectors.toMap;
 
 @Component
 @Validated
@@ -20,11 +21,10 @@ public class ServiceAuthorizationConfig {
     }
 
     public void setAuthorizations(Map<String, @Valid ServicePermissionInfo> authorizations) {
-        permissions = new HashMap<>();
-        authorizations
-               .values()
-               .forEach(servicePermissionInfo -> permissions.put(servicePermissionInfo.getId(),
-                                                                    servicePermissionInfo.getPermission()));
+        permissions = authorizations
+                .values()
+                .stream()
+                .collect(toMap(ServicePermissionInfo::getId, ServicePermissionInfo::getPermission));
     }
 }
 

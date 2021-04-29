@@ -1,11 +1,11 @@
 s2s:
   authorizations:
-    payment:
-      id: "payment_app"
+    myTestPaymentService:
+      id: "take_my_money_app"
       permission: "R"
     anotherService:
       id: "anotherService"
       permission: "UD"
-    xui:
-      id: "xui_webapp"
+    myuserInterfaceApp:
+      id: "user_interface_webapp"
       permission: "CRUD"
