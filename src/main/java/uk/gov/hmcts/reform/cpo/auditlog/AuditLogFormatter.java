@@ -16,7 +16,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 @Component
 public class AuditLogFormatter {
 
-    public static final String TAG = "CLA-CPO";
+    public static final String TAG = "LA-CPO";
 
     private static final String COMMA = ",";
     private static final String COLON = ":";
