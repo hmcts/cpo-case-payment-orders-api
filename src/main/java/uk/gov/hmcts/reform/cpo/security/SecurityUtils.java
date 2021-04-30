@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.cpo.security;
 
 import com.auth0.jwt.JWT;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -22,8 +23,9 @@ import static uk.gov.hmcts.reform.cpo.security.Permission.UPDATE;
 @Slf4j
 public class SecurityUtils {
 
-    public static final String BEARER = "Bearer ";
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+
+    public static final String BEARER = "Bearer ";
 
     private final IdamRepository idamRepository;
     private final ServiceAuthorizationConfig serviceAuthorizationConfig;
@@ -35,7 +37,7 @@ public class SecurityUtils {
     }
 
     public String getUserToken() {
-        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return BEARER + jwt.getTokenValue();
     }
 
@@ -44,12 +46,17 @@ public class SecurityUtils {
     }
 
     public String getServiceNameFromS2SToken(String serviceAuthenticationToken) {
+        String token = removeBearerFromToken(serviceAuthenticationToken);
+
         // NB: this grabs the service name straight from the token under the assumption
         // that the S2S token has already been verified elsewhere
-        return JWT.decode(removeBearerFromToken(serviceAuthenticationToken)).getSubject();
+        return token != null ? JWT.decode(token).getSubject() : null;
     }
 
     private String removeBearerFromToken(String token) {
+        if (StringUtils.isBlank(token)) {
+            return null;
+        }
         return token.startsWith(BEARER) ? token.substring(BEARER.length()) : token;
     }
 
