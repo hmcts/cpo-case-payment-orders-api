@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cpo.exception;
 
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
@@ -50,10 +49,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected @NonNull ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception,
-                                                                           @NonNull HttpHeaders headers,
-                                                                           @NonNull HttpStatus status,
-                                                                           @NonNull WebRequest request) {
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception,
+                                                                  HttpHeaders headers,
+                                                                  HttpStatus status,
+                                                                  WebRequest request) {
         String[] errors = exception.getBindingResult().getFieldErrors().stream()
             .map(DefaultMessageSourceResolvable::getDefaultMessage)
             .toArray(String[]::new);

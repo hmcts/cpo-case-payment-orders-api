@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.exception.CaseIdOrderReferenceUniqueConstraintException;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
 import uk.gov.hmcts.reform.cpo.exception.IdAMIdCannotBeRetrievedException;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
@@ -278,6 +279,38 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
             assertThatThrownBy(() -> casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter))
                 .isInstanceOf(CasePaymentOrderCouldNotBeFoundException.class)
                 .hasMessageContaining(ValidationError.CPO_NOT_FOUND);
+        }
+
+        @Test
+        @DisplayName("Should throw CasePaymentOrdersFilterException when ID search throws IllegalArgumentException")
+        void failWithCpoFilterExceptionWhenIdSearchThrowsIllegalArgumentException() {
+            final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
+                .cpoIds(ids)
+                .caseIds(Collections.emptyList())
+                .pageable(getPageRequest())
+                .build();
+
+            when(casePaymentOrdersRepository.findByIdIn(anyList(), any())).thenThrow(
+                new IllegalArgumentException());
+
+            assertThatThrownBy(() -> casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter))
+                .isInstanceOf(CasePaymentOrdersFilterException.class);
+        }
+
+        @Test
+        @DisplayName("Should throw CasePaymentOrdersFilterException when CaseID search throws IllegalArgumentException")
+        void failWithCpoFilterExceptionWhenCaseIdSearchThrowsIllegalArgumentException() {
+            final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
+                .pageable(getPageRequest())
+                .cpoIds(Collections.emptyList())
+                .caseIds(casesIds)
+                .build();
+
+            when(casePaymentOrdersRepository.findByCaseIdIn(anyList(), any())).thenThrow(
+                new IllegalArgumentException());
+
+            assertThatThrownBy(() -> casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter))
+                .isInstanceOf(CasePaymentOrdersFilterException.class);
         }
 
         private Page<CasePaymentOrderEntity> getEntityPages() {

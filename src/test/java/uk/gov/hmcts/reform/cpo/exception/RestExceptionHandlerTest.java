@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.TestIdamConfiguration;
+import uk.gov.hmcts.reform.cpo.config.AuditConfiguration;
 import uk.gov.hmcts.reform.cpo.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
@@ -36,7 +37,7 @@ import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CA
 @WebMvcTest(controllers = CasePaymentOrdersController.class,
     includeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes = MapperConfig.class),
     excludeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes =
-        {SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class}))
+        {SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class, AuditConfiguration.class}))
 @AutoConfigureMockMvc(addFilters = false)
 @ImportAutoConfiguration(TestIdamConfiguration.class)
 class RestExceptionHandlerTest implements BaseTest {
