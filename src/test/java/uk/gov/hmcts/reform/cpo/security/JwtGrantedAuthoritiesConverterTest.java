@@ -57,12 +57,26 @@ class JwtGrantedAuthoritiesConverterTest {
 
     @Test
     @DisplayName("Should return empty authorities when roles are empty")
-    void shouldReturnEmptyAuthoritiesWhenIdamReturnsNoUsers() {
+    void shouldReturnEmptyAuthoritiesWhenIdamReturnsNoUserRoles() {
         when(jwt.containsClaim(TOKEN_NAME)).thenReturn(true);
         when(jwt.getClaim(TOKEN_NAME)).thenReturn(ACCESS_TOKEN);
         when(jwt.getTokenValue()).thenReturn(ACCESS_TOKEN);
         UserInfo userInfo = mock(UserInfo.class);
         List<String> roles = new ArrayList<>();
+        when(userInfo.getRoles()).thenReturn(roles);
+        when(idamRepository.getUserInfo(BEARER + ACCESS_TOKEN)).thenReturn(userInfo);
+        Collection<GrantedAuthority> authorities = converter.convert(jwt);
+        assertEquals(0, authorities.size(), "size must be empty");
+    }
+
+    @Test
+    @DisplayName("Should return empty authorities when roles are null")
+    void shouldReturnEmptyAuthoritiesWhenIdamReturnsNullUserRoles() {
+        when(jwt.containsClaim(TOKEN_NAME)).thenReturn(true);
+        when(jwt.getClaim(TOKEN_NAME)).thenReturn(ACCESS_TOKEN);
+        when(jwt.getTokenValue()).thenReturn(ACCESS_TOKEN);
+        UserInfo userInfo = mock(UserInfo.class);
+        List<String> roles = null;
         when(userInfo.getRoles()).thenReturn(roles);
         when(idamRepository.getUserInfo(BEARER + ACCESS_TOKEN)).thenReturn(userInfo);
         Collection<GrantedAuthority> authorities = converter.convert(jwt);

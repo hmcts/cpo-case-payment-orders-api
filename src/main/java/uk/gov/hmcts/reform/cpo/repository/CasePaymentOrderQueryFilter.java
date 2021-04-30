@@ -60,7 +60,7 @@ public class CasePaymentOrderQueryFilter {
 
     public void validateCasePaymentOrdersFiltering() {
         if (this.isFilterByBothIdAndCaseId()) {
-            throw new CasePaymentOrdersFilterException(ValidationError.CPO_FILER_ERROR);
+            throw new CasePaymentOrdersFilterException(ValidationError.CPO_FILTER_ERROR);
         }
     }
 
