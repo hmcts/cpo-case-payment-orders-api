@@ -89,7 +89,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         casePaymentOrdersAuditJpaRepository.deleteAllInBatch();
     }
 
-
     @Nested
     @DisplayName("POST /case-payment-orders")
     class CreateCasePaymentOrder {
@@ -266,7 +265,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertTrue(beforeCreateTimestamp.isBefore(latestRevision.getEntity().getCreatedTimestamp()));
         }
     }
-
 
     @Nested
     @DisplayName("DELETE /case-payment-orders?ids=")
