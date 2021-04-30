@@ -142,6 +142,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                     .andExpect(jsonPath("$.effective_from", is(EFFECTIVE_FROM.format(formatter))))
                     .andExpect(jsonPath("$.created_by", is(IDAM_MOCK_USER_ID)))
                     .andExpect(jsonPath("$.created_timestamp").exists())
+                    .andExpect(jsonPath("$.history_exists", is(HISTORY_EXISTS_DEFAULT)))
                 .andReturn();
 
             UUID id = UUID.fromString(
@@ -242,6 +243,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(IDAM_MOCK_USER_ID, savedEntity.get().getCreatedBy());
             assertNotNull(savedEntity.get().getCreatedTimestamp());
             assertTrue(beforeCreateTimestamp.isBefore(savedEntity.get().getCreatedTimestamp()));
+            assertFalse(savedEntity.get().isHistoryExists());
         }
 
         private void verifyDbCpoAuditValues(UUID id,
@@ -261,6 +263,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(IDAM_MOCK_USER_ID, latestRevision.getEntity().getCreatedBy());
             assertNotNull(latestRevision.getEntity().getCreatedTimestamp());
             assertTrue(beforeCreateTimestamp.isBefore(latestRevision.getEntity().getCreatedTimestamp()));
+            assertFalse(latestRevision.getEntity().isHistoryExists());
         }
     }
 
@@ -1252,7 +1255,8 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                 .andExpect(jsonPath("$.action").value(request.getAction()))
                 .andExpect(jsonPath("$.responsible_party").value(request.getResponsibleParty()))
                 .andExpect(jsonPath("$.created_by").value(IDAM_MOCK_USER_ID))
-                .andExpect(jsonPath("$.created_timestamp").exists());
+                .andExpect(jsonPath("$.created_timestamp").exists())
+                .andExpect(jsonPath("$.history_exists", is(HISTORY_EXISTS_UPDATED)));
         }
 
         private void verifyDbCpoValues(UpdateCasePaymentOrderRequest request,
@@ -1269,6 +1273,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(IDAM_MOCK_USER_ID, updatedEntity.get().getCreatedBy());
             assertNotNull(updatedEntity.get().getCreatedTimestamp());
             assertTrue(previousCreatedTimestamp.isBefore(updatedEntity.get().getCreatedTimestamp()));
+            assertEquals(HISTORY_EXISTS_UPDATED, updatedEntity.get().isHistoryExists());
         }
 
         private void verifyDbCpoAuditValues(UpdateCasePaymentOrderRequest request,
@@ -1287,6 +1292,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(IDAM_MOCK_USER_ID, latestRevision.getEntity().getCreatedBy());
             assertNotNull(latestRevision.getEntity().getCreatedTimestamp());
             assertTrue(previousCreatedTimestamp.isBefore(latestRevision.getEntity().getCreatedTimestamp()));
+            assertEquals(HISTORY_EXISTS_UPDATED, latestRevision.getEntity().isHistoryExists());
         }
 
         private void verifyUpdateLogAuditValues(UpdateCasePaymentOrderRequest request,

@@ -30,4 +30,6 @@ public class CasePaymentOrder {
     private String orderReference;
 
     private String createdBy;
+
+    private boolean historyExists;
 }
