@@ -1,0 +1,24 @@
+{
+  "_guid_" : "S-702_Base",
+  "_extends_" : "createCasePaymentOrderBase",
+
+  "specs": [
+    "does not contain one or more of the mandatory parameters",
+    "an active profile in CCD"
+  ],
+
+  "request" : {
+    "_extends_": "Common_Request"
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_400_Response",
+    "body" : {
+      "exception": "org.springframework.web.bind.MethodArgumentNotValidException",
+      "message": "Input not valid",
+      "path": "/case-payment-orders",
+      "details": [
+      ]
+    }
+  }
+}

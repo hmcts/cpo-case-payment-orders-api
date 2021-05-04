@@ -1,0 +1,23 @@
+{
+  "_guid_" : "S-702.2.3",
+  "_extends_" : "S-702.2_Base",
+
+  "specs": [
+    "does not contain the action parameter"
+  ],
+
+  "request" : {
+    "body" : {
+      "_extends_" : "Base_CPO_Data_Payload_data",
+      "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
+      "case_id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]}",
+      "action" : ""
+    }
+  },
+
+  "expectedResponse" : {
+    "body" : {
+      "details" : [ "Action is required." ]
+    }
+  }
+}

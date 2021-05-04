@@ -1,6 +1,6 @@
 {
   "_guid_" : "getCasePaymentOrder_cpo_not_created",
-  "_extends_" : "getCasePaymentOrderBase",
+  "_extends_" : "getCasePaymentOrder_cpo_not_found",
 
   "specs" : [
     "to verify that a Case payment Order has not been created in the database"
@@ -8,17 +8,8 @@
 
   "request" : {
     "queryParams": {
-      "ids": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+      "case_ids": "${[scenarioContext][parentContext][testData][request][body][case_id]}"
     }
-  },
+  }
 
-    "expectedResponse" : {
-      "_extends_" : "Common_200_Response",
-      "body" : {
-        "_extends_" : "Base_CPO_GET_Response_Data",
-        "content": [
-
-        ]
-      }
-    }
 }

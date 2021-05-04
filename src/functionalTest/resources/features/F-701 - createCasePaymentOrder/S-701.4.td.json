@@ -1,0 +1,29 @@
+{
+  "_guid_" : "S-701.4",
+  "_extends_" : "createCasePaymentOrderBase",
+
+  "specs": [
+    "contains all the mandatory parameters",
+    "contains the same order_reference as used in the previously created CPO for the same case id"
+  ],
+
+  "request" : {
+    "_extends_": "Common_Request",
+
+    "body" : {
+      "_extends_" : "Base_CPO_Data_Payload_data",
+      "case_id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]}"
+    }
+
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_409_Response",
+    "body" : {
+      "exception" : "uk.gov.hmcts.reform.cpo.exception.CaseIdOrderReferenceUniqueConstraintException",
+      "message" : "A case payment order with the specified Order Reference already exists on the case.",
+      "path" : "/case-payment-orders",
+      "details" : null
+    }
+  }
+}

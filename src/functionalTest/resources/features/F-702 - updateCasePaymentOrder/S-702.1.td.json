@@ -1,0 +1,28 @@
+{
+  "_guid_" : "S-702.1",
+  "_extends_" : "updateCasePaymentOrderBase",
+
+  "specs": [
+    "contains all the mandatory parameters",
+    "contains a 202 success code",
+    "contains a valid UUID of the case order record"
+  ],
+
+  "request" : {
+    "body": {
+      "_extends_" : "Base_CPO_Data_Payload_data",
+      "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
+      "responsible_party" : "party2"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_202_Response",
+    "body" : {
+      "_extends_" : "Base_CPO_Response_Data",
+      "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
+      "responsible_party" : "party2"
+    }
+
+  }
+}

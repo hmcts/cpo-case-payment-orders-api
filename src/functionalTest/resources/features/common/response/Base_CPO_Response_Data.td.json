@@ -8,6 +8,6 @@
   "responsible_party" : "party1",
   "order_reference" : "2021-12345678901",
   "created_by" : "[[ANYTHING_PRESENT]]",
-  "history_exists": "[[ANYTHING_PRESENT]]"
+  "history_exists" : "[[ANYTHING_PRESENT]]"
 }
 
