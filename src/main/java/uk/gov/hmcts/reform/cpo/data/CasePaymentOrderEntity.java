@@ -51,4 +51,6 @@ public class CasePaymentOrderEntity {
     @Column(length = 70)
     private String createdBy;
 
+    private boolean historyExists;
+
 }
