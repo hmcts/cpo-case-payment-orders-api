@@ -1,6 +1,11 @@
 idam:
   api:
     url: http://localhost:${wiremock.server.port:5000}
+  s2s-auth:
+    url: http://localhost:${wiremock.server.port:5000}/s2s
+  s2s-authorised:
+    services: test_read_service,test_crud_service
+
 spring:
   security:
     oauth2:
@@ -13,3 +18,8 @@ spring:
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
     url: jdbc:tc:postgresql:11:///databasename
+
+azure:
+  application-insights:
+    web:
+      enabled: false

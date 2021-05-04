@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.envers.RevisionType;
 import org.junit.jupiter.api.BeforeEach;
@@ -89,6 +90,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         casePaymentOrdersAuditJpaRepository.deleteAllInBatch();
     }
 
+
     @Nested
     @DisplayName("POST /case-payment-orders")
     class CreateCasePaymentOrder {
@@ -121,6 +123,64 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                                                                      ACTION, RESPONSIBLE_PARTY,
                                                                                      ORDER_REFERENCE_INVALID
             );
+
+        }
+
+
+        @Nested
+        @DisplayName("Negative Authentication Tests (GET)")
+        class NegativeAuthTest implements BaseMvcAuthChecks {
+
+            private MockHttpServletRequestBuilder happyPathRequestBuilder;
+
+            @BeforeEach
+            public void setUp() throws JsonProcessingException {
+                happyPathRequestBuilder = post(CASE_PAYMENT_ORDERS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest));
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_AUTH_MISSING)
+            public void should401ForMissingAuthToken() throws Exception {
+                assert401ForMissingAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_AUTH_MALFORMED)
+            public void should401ForMalformedAuthToken() throws Exception {
+                assert401ForMalformedAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_AUTH_EXPIRED)
+            public void should401ForExpiredAuthToken() throws Exception {
+                assert401ForExpiredAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_MISSING)
+            public void should401ForMissingServiceAuthToken() throws Exception {
+                assert401ForMissingServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_MALFORMED)
+            public void should401ForMalformedServiceAuthToken() throws Exception {
+                assert401ForMalformedServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_UNAUTHORISED)
+            public void should403ForUnauthorisedServiceAuthToken() throws Exception {
+                assert403ForUnauthorisedServiceAuthToken(mockMvc, happyPathRequestBuilder);
+            }
 
         }
 
@@ -269,9 +329,70 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         }
     }
 
+
     @Nested
     @DisplayName("DELETE /case-payment-orders?ids=")
     class DeleteCasePaymentOrdersByIds {
+
+        @Nested
+        @DisplayName("Negative Authentication Tests (DELETE?ids=)")
+        class NegativeAuthTest implements BaseMvcAuthChecks {
+
+            private MockHttpServletRequestBuilder happyPathRequestBuilder;
+
+            @BeforeEach
+            public void setUp() {
+                CasePaymentOrderEntity savedEntity =
+                    casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
+                assertTrue(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
+
+                happyPathRequestBuilder =  delete(CASE_PAYMENT_ORDERS_PATH)
+                                    .queryParam(IDS, savedEntity.getId().toString());
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_AUTH_MISSING)
+            public void should401ForMissingAuthToken() throws Exception {
+                assert401ForMissingAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_AUTH_MALFORMED)
+            public void should401ForMalformedAuthToken() throws Exception {
+                assert401ForMalformedAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_AUTH_EXPIRED)
+            public void should401ForExpiredAuthToken() throws Exception {
+                assert401ForExpiredAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_MISSING)
+            public void should401ForMissingServiceAuthToken() throws Exception {
+                assert401ForMissingServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_MALFORMED)
+            public void should401ForMalformedServiceAuthToken() throws Exception {
+                assert401ForMalformedServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_UNAUTHORISED)
+            public void should403ForUnauthorisedServiceAuthToken() throws Exception {
+                assert403ForUnauthorisedServiceAuthToken(mockMvc, happyPathRequestBuilder);
+            }
+
+        }
 
         @DisplayName("Successfully delete single case payment order specified by an id")
         @Test
@@ -393,9 +514,70 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         }
     }
 
+
     @Nested
     @DisplayName("DELETE /case-payment-orders?case_ids=")
     class DeleteCasePaymentOrdersByCaseIds {
+
+        @Nested
+        @DisplayName("Negative Authentication Tests (DELETE?case_ids=)")
+        class NegativeAuthTest implements BaseMvcAuthChecks {
+
+            private MockHttpServletRequestBuilder happyPathRequestBuilder;
+
+            @BeforeEach
+            public void setUp() {
+                CasePaymentOrderEntity savedEntity =
+                    casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
+                assertTrue(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
+
+                happyPathRequestBuilder = delete(CASE_PAYMENT_ORDERS_PATH)
+                    .queryParam(CASE_IDS, savedEntity.getCaseId().toString());
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_AUTH_MISSING)
+            public void should401ForMissingAuthToken() throws Exception {
+                assert401ForMissingAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_AUTH_MALFORMED)
+            public void should401ForMalformedAuthToken() throws Exception {
+                assert401ForMalformedAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_AUTH_EXPIRED)
+            public void should401ForExpiredAuthToken() throws Exception {
+                assert401ForExpiredAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_MISSING)
+            public void should401ForMissingServiceAuthToken() throws Exception {
+                assert401ForMissingServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_MALFORMED)
+            public void should401ForMalformedServiceAuthToken() throws Exception {
+                assert401ForMalformedServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_UNAUTHORISED)
+            public void should403ForUnauthorisedServiceAuthToken() throws Exception {
+                assert403ForUnauthorisedServiceAuthToken(mockMvc, happyPathRequestBuilder);
+            }
+
+        }
 
         @DisplayName("Successfully delete single case payment order specified by an id")
         @Test
@@ -549,9 +731,70 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         }
     }
 
+
     @Nested
     @DisplayName("GET /case-payment-orders?ids=")
     class GetCasePaymentOrdersByIds {
+
+        @Nested
+        @DisplayName("Negative Authentication Tests (GET?ids=)")
+        class NegativeAuthTest implements BaseMvcAuthChecks {
+
+            private MockHttpServletRequestBuilder happyPathRequestBuilder;
+
+            @BeforeEach
+            public void setUp() {
+                CasePaymentOrderEntity savedEntity =
+                    casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
+                assertTrue(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
+
+                happyPathRequestBuilder = get(CASE_PAYMENT_ORDERS_PATH)
+                    .queryParam(IDS, savedEntity.getId().toString());
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_AUTH_MISSING)
+            public void should401ForMissingAuthToken() throws Exception {
+                assert401ForMissingAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_AUTH_MALFORMED)
+            public void should401ForMalformedAuthToken() throws Exception {
+                assert401ForMalformedAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_AUTH_EXPIRED)
+            public void should401ForExpiredAuthToken() throws Exception {
+                assert401ForExpiredAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_MISSING)
+            public void should401ForMissingServiceAuthToken() throws Exception {
+                assert401ForMissingServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_MALFORMED)
+            public void should401ForMalformedServiceAuthToken() throws Exception {
+                assert401ForMalformedServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_UNAUTHORISED)
+            public void should403ForUnauthorisedServiceAuthToken() throws Exception {
+                assert403ForUnauthorisedServiceAuthToken(mockMvc, happyPathRequestBuilder);
+            }
+
+        }
 
         @DisplayName("Successfully get single case payment order specified by an id")
         @Test
@@ -679,9 +922,70 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         }
     }
 
+
     @Nested
     @DisplayName("GET /case-payment-orders?case_ids=")
     class GetCasePaymentOrdersByCaseIds {
+
+        @Nested
+        @DisplayName("Negative Authentication Tests (GET?case_ids=)")
+        class NegativeAuthTest implements BaseMvcAuthChecks {
+
+            private MockHttpServletRequestBuilder happyPathRequestBuilder;
+
+            @BeforeEach
+            public void setUp() {
+                CasePaymentOrderEntity savedEntity =
+                    casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
+                assertTrue(casePaymentOrdersJpaRepository.findById(savedEntity.getId()).isPresent());
+
+                happyPathRequestBuilder = get(CASE_PAYMENT_ORDERS_PATH)
+                    .queryParam(CASE_IDS, savedEntity.getCaseId().toString());
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_AUTH_MISSING)
+            public void should401ForMissingAuthToken() throws Exception {
+                assert401ForMissingAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_AUTH_MALFORMED)
+            public void should401ForMalformedAuthToken() throws Exception {
+                assert401ForMalformedAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_AUTH_EXPIRED)
+            public void should401ForExpiredAuthToken() throws Exception {
+                assert401ForExpiredAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_MISSING)
+            public void should401ForMissingServiceAuthToken() throws Exception {
+                assert401ForMissingServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_MALFORMED)
+            public void should401ForMalformedServiceAuthToken() throws Exception {
+                assert401ForMalformedServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_UNAUTHORISED)
+            public void should403ForUnauthorisedServiceAuthToken() throws Exception {
+                assert403ForUnauthorisedServiceAuthToken(mockMvc, happyPathRequestBuilder);
+            }
+
+        }
 
         @DisplayName("Successfully get single case payment order specified by an id")
         @Test
@@ -824,9 +1128,78 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         }
     }
 
+
     @Nested
     @DisplayName("PUT /case-payment-orders")
     class UpdateCasePaymentOrder {
+
+        @Nested
+        @DisplayName("Negative Authentication Tests (PUT)")
+        class NegativeAuthTest implements BaseMvcAuthChecks {
+
+            private MockHttpServletRequestBuilder happyPathRequestBuilder;
+
+            @BeforeEach
+            public void setUp() throws JsonProcessingException {
+                CasePaymentOrderEntity originalEntity =
+                    casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
+                UpdateCasePaymentOrderRequest request = new UpdateCasePaymentOrderRequest(
+                    originalEntity.getId().toString(),
+                    EFFECTIVE_FROM,
+                    uidService.generateUID(),
+                    ACTION,
+                    RESPONSIBLE_PARTY,
+                    ORDER_REFERENCE_VALID
+                );
+
+                happyPathRequestBuilder = put(CASE_PAYMENT_ORDERS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request));
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_AUTH_MISSING)
+            public void should401ForMissingAuthToken() throws Exception {
+                assert401ForMissingAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_AUTH_MALFORMED)
+            public void should401ForMalformedAuthToken() throws Exception {
+                assert401ForMalformedAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_AUTH_EXPIRED)
+            public void should401ForExpiredAuthToken() throws Exception {
+                assert401ForExpiredAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_MISSING)
+            public void should401ForMissingServiceAuthToken() throws Exception {
+                assert401ForMissingServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_MALFORMED)
+            public void should401ForMalformedServiceAuthToken() throws Exception {
+                assert401ForMalformedServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_UNAUTHORISED)
+            public void should403ForUnauthorisedServiceAuthToken() throws Exception {
+                assert403ForUnauthorisedServiceAuthToken(mockMvc, happyPathRequestBuilder);
+            }
+
+        }
 
         @DisplayName("Successfully update a case payment order")
         @Test
@@ -1349,4 +1722,5 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
         }
     }
+
 }

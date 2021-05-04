@@ -6,14 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 @Service
 public class SecurityUtils {
 
-    public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+    public static final String SERVICE_AUTHORIZATION = ServiceAuthFilter.AUTHORISATION;
 
-    public static final String BEARER = "Bearer ";
+    public static final String BEARER = JwtGrantedAuthoritiesConverter.BEARER;
 
     private final IdamRepository idamRepository;
 
