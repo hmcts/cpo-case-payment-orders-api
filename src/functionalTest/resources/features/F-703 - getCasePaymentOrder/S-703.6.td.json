@@ -11,7 +11,7 @@
   "request" : {
     "_extends_": "Common_Request",
     "queryParams": {
-      "case-ids": "1617017531060561,1617017629907038"
+      "case_ids": "1617017531060561,1617017629907038"
     }
   },
 
