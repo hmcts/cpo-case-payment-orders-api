@@ -71,10 +71,6 @@ Feature: CREATE Case Payment Order Endpoint
       | parameter               |
       | incorrect caseid format |
 
-    @S-701.3.2
-    Examples:
-      | parameter               |
-      | invalid datetime format |
 
 
     @S-701.4
@@ -87,4 +83,3 @@ Feature: CREATE Case Payment Order Endpoint
     And it is submitted to call the [createCasePaymentOrder] operation of [Case Payment Orders Microservice],
     Then a negative response is received
     And the response has all other details as expected
-    And a call [to verify that a Case payment Order has not been created in the database which can be accessed or queried again at a later date] will get the expected response as in [getCasePaymentOrder_cpo_not_created].

@@ -63,10 +63,6 @@ Feature: UPDATE Case Payment Order Endpoint
       | parameter               |
       | incorrect caseid format |
 
-  @S-702.3.2
-    Examples:
-      | parameter               |
-      | invalid datetime format |
 
 
   @S-702.4
