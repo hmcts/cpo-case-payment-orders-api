@@ -40,12 +40,16 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
 
     @Override
     public void deleteByCaseIds(List<Long> caseIds) {
+        validateAllEntriesExistByCaseIds(caseIds);
+        casePaymentOrdersJpaRepository.deleteByCaseIdIsIn(caseIds);
+    }
+
+    private void validateAllEntriesExistByCaseIds(List<Long> caseIds) {
         for (Long cid : caseIds) {
             if (casePaymentOrdersJpaRepository.findAllByCaseId(cid).isEmpty()) {
                 throw new CasePaymentOrderCouldNotBeFoundException(ValidationError.CPO_NOT_FOUND_BY_CASE_ID);
             }
         }
-        casePaymentOrdersJpaRepository.deleteByCaseIdIsIn(caseIds);
     }
 
     @Override
@@ -60,12 +64,19 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
 
     @Override
     public Page<CasePaymentOrderEntity> findByIdIn(List<UUID> ids, Pageable pageable) {
-        return casePaymentOrdersJpaRepository.findByIdIn(ids, pageable);
+        Page<CasePaymentOrderEntity> findByIdResults = casePaymentOrdersJpaRepository.findByIdIn(ids, pageable);
+
+        if (findByIdResults.getTotalElements() != ids.size()) {
+            throw new CasePaymentOrderCouldNotBeFoundException(ValidationError.CPO_NOT_FOUND_BY_ID);
+        }
+
+        return findByIdResults;
     }
 
     @Override
-    public Page<CasePaymentOrderEntity> findByCaseIdIn(List<Long> casesId, Pageable pageable) {
-        return casePaymentOrdersJpaRepository.findByCaseIdIn(casesId, pageable);
+    public Page<CasePaymentOrderEntity> findByCaseIdIn(List<Long> caseIds, Pageable pageable) {
+        validateAllEntriesExistByCaseIds(caseIds);
+        return casePaymentOrdersJpaRepository.findByCaseIdIn(caseIds, pageable);
     }
 
     @Override
