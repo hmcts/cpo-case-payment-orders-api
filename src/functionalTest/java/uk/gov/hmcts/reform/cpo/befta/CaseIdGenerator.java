@@ -32,6 +32,7 @@ public class CaseIdGenerator {
         return String.valueOf(date).substring(0,11);
     }
 
+
     private String genRandomFourNumbers() {
         return RandomStringUtils.randomNumeric(4);
     }

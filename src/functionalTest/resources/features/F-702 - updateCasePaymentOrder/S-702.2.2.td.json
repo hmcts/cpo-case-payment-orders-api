@@ -1,0 +1,24 @@
+{
+  "_guid_" : "S-702.2.2",
+  "_extends_" : "S-702.2_Base",
+
+  "specs": [
+    "does not contain the case_id parameter"
+  ],
+
+  "request" : {
+    "body" : {
+      "_extends_" : "Base_CPO_Data_Payload_data",
+      "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
+      "case_id" : ""
+    }
+  },
+
+  "expectedResponse" : {
+    "body" : {
+      "details": [
+        "Case ID is required."
+      ]
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "_guid_" : "CPO_Present",
+  "_extends_" : "getCasePaymentOrderBase",
+
+  "specs" : [
+    "to verify that the Case payment Orders CP1 And CP2 have not been deleted from the database"
+  ],
+
+  "request" : {
+    "queryParams": {
+      "ids": "${[scenarioContext][parentContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]},${[scenarioContext][parentContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_200_Response",
+    "body" : {
+      "_extends_" : "Base_CPO_GET_Response_Data",
+      "content": [
+        {
+          "_extends_" : "Base_CPO_Response_Data",
+          "case_id" : "${[scenarioContext][parentContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]}"
+        },{
+          "_extends_" : "Base_CPO_Response_Data",
+          "case_id" : "${[scenarioContext][parentContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][case_id]}",
+          "order_reference" : "${[scenarioContext][parentContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][order_reference]}"
+        }
+      ],
+      "total_elements": 2,
+      "number_of_elements": 2
+    }
+
+
+  }
+}

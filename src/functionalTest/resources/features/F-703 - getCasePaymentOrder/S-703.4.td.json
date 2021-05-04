@@ -1,0 +1,26 @@
+{
+  "_guid_" : "S-703.4",
+  "_extends_" : "getCasePaymentOrderBase",
+
+  "specs": [
+    "does not contain the user token parameter",
+    "contains relevant error message"
+
+  ],
+
+  "request" : {
+    "headers": {
+      "Authorization": ""
+    },
+    "body" : {
+      "ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]},${[scenarioContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_401_Response",
+    "body" : null
+
+
+  }
+}

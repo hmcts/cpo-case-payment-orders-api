@@ -1,0 +1,51 @@
+{
+  "_guid_" : "S-703.9",
+  "_extends_" : "getCasePaymentOrderBase",
+
+  "specs": [
+    "contains a set of case ids from the case payment order just created above",
+    "contains all the mandatory parameters",
+    "contains a defined optional parameter for page_size 2",
+    "contains a defined optional parameter for page_number 1",
+    "contains a 200 success OK code",
+    "contains case payment order CP1, CP2",
+    "does not contain case payment order CP3",
+    "has a page_size parameter value 2",
+    "has a page_number parameter value of 1"
+
+  ],
+
+  "request" : {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]},${[scenarioContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][id]},${[scenarioContext][childContexts][Prerequisite_Create_CPO_3][testData][actualResponse][body][id]}",
+      "size" : "2",
+      "page" : "1"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_200_Response",
+    "body" : {
+      "_extends_" : "Base_CPO_GET_Response_Data",
+      "content": [
+        {
+          "_extends_" : "Base_CPO_Response_Data"
+        },{
+          "_extends_" : "Base_CPO_Response_Data",
+          "order_reference" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][order_reference]}"
+        }
+      ],
+      "last": false,
+      "pageable": {
+        "page_number": 0,
+        "page_size": 2
+      },
+      "total_pages": 2,
+      "size": 2,
+      "total_elements": 3,
+      "number_of_elements": 2
+    }
+
+  }
+}

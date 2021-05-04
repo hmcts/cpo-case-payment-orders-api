@@ -1,0 +1,21 @@
+{
+  "_guid_" : "S-702.2_Base",
+  "_extends_" : "updateCasePaymentOrderBase",
+
+  "specs": [
+    "does not contain one or more of the mandatory parameters",
+    "intends to update a previously created payment order"
+  ],
+
+  "expectedResponse" : {
+    "_extends_": "Common_400_Response",
+    "body": {
+      "exception": "org.springframework.web.bind.MethodArgumentNotValidException",
+      "message": "Input not valid",
+      "path": "/case-payment-orders",
+      "details": [
+      ]
+    }
+  }
+
+}
