@@ -1,0 +1,27 @@
+{
+  "_guid_" : "S-703.8",
+  "_extends_" : "getCasePaymentOrderBase",
+
+  "specs": [
+    "contains both the Ids And Case Ids query parameters",
+    "contains relevant error message"
+  ],
+
+  "request" : {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
+      "case_ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][case_id]}"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_400_Response",
+    "body" : {
+      "exception" : "uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException",
+      "message" : "Case payment orders cannot be filtered by both id and case id.",
+      "path" : "/case-payment-orders",
+      "details" : null
+    }
+  }
+}

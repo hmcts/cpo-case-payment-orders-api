@@ -1,0 +1,30 @@
+{
+  "_guid_" : "S-703.5",
+
+  "_extends_" : "getCasePaymentOrderBase",
+
+  "specs": [
+    "contains a set of ids that don't exist in the Case Payment Orders database",
+    "contains all the mandatory parameters",
+    "contains relevant error message"
+  ],
+
+  "request" : {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "ids": "f9a1b999-999a-4dbe-999a-adbfbb398836,f9a1b999-999a-4dbe-999a-adbfbb398836",
+      "case_id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]}"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_404_Response",
+    "body" : {
+      "exception" : "uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException",
+      "message" : "Case Payment Order does not exist.",
+      "path" : "/case-payment-orders",
+      "details" : null
+    }
+
+  }
+}

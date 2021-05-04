@@ -1,0 +1,25 @@
+{
+  "_guid_" : "S-701.2.4",
+  "_extends_" : "S-702_Base",
+
+  "specs": [
+    "does not contain the action parameter"
+  ],
+
+  "request" : {
+    "_extends_": "Common_Request",
+    "body": {
+      "effective_from" : "2021-01-01T00:00:00Z",
+      "case_id" : "${[scenarioContext][customValues][GenerateCaseId]}",
+      "responsible_party" : "party1",
+      "order_reference" : "2021-12345678901"
+    }
+  },
+
+  "expectedResponse" : {
+    "body" : {
+      "details" : [ "Action is required." ]
+
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "_guid_" : "S-701.3.1",
+  "_extends_" : "S-702_Base",
+
+  "specs": [
+    "contains an invalid mandatory parameter",
+    "contains an incorrect caseid format"
+  ],
+
+  "request" : {
+    "body" : {
+      "_extends_" : "Base_CPO_Data_Payload_data",
+      "case_id" : "12345"
+    }
+  },
+
+  "expectedResponse" : {
+    "body" : {
+      "details" : [ "Case ID has to be a valid 16-digit Luhn number." ]
+    }
+  }
+}

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo.controllers;
 
+import com.microsoft.applicationinsights.core.dependencies.google.common.collect.Lists;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
+import uk.gov.hmcts.reform.cpo.auditlog.AuditOperationType;
+import uk.gov.hmcts.reform.cpo.auditlog.LogAudit;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
@@ -42,11 +45,12 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @Validated
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class CasePaymentOrdersController {
 
     @SuppressWarnings({"squid:S1075"})
     public static final String CASE_PAYMENT_ORDERS_PATH = "/case-payment-orders";
-    public static final String CASE_IDS = "case-ids";
+    public static final String CASE_IDS = "case_ids";
     public static final String IDS = "ids";
 
     private final CasePaymentOrdersService casePaymentOrdersService;
@@ -100,6 +104,11 @@ public class CasePaymentOrdersController {
             message = ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE
         )
     })
+    @LogAudit(
+        operationType = AuditOperationType.CREATE_CASE_PAYMENT_ORDER,
+        cpoId = "#result.id",
+        caseId = "#requestPayload.caseId"
+    )
     public CasePaymentOrder createCasePaymentOrderRequest(@Valid @RequestBody CreateCasePaymentOrderRequest
                                                               requestPayload) {
         return casePaymentOrdersService.createCasePaymentOrder(requestPayload);
@@ -115,7 +124,7 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
-                + "\n1) " + ValidationError.CPO_FILER_ERROR
+                + "\n1) " + ValidationError.CPO_FILTER_ERROR
                 + "\n2) " + ValidationError.CASE_ID_INVALID
                 + "\n3) " + ValidationError.ID_INVALID,
             response = String.class,
@@ -144,6 +153,11 @@ public class CasePaymentOrdersController {
         @ApiImplicitParam(name = "page", value = "page number, indexes from (0,1) to page-size.", paramType = "query"),
         @ApiImplicitParam(name = "size", value = "page size", paramType = "query")
     })
+    @LogAudit(
+        operationType = AuditOperationType.GET_CASE_PAYMENT_ORDER,
+        cpoIds = "T(uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController).buildOptionalIds(#ids)",
+        caseIds  = "T(uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController).buildOptionalIds(#caseIds)"
+    )
     public Page<CasePaymentOrder> getCasePaymentOrders(@ApiParam("list of case payment orders ids")
                                                        @ValidCpoId
                                                        @RequestParam(name = IDS, required = false)
@@ -207,6 +221,11 @@ public class CasePaymentOrdersController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE
         )
     })
+    @LogAudit(
+        operationType = AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
+        cpoIds = "T(uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController).buildOptionalIds(#ids)",
+        caseIds  = "T(uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController).buildOptionalIds(#caseIds)"
+    )
     public void deleteCasePaymentOrdersById(@ApiParam("list of IDs")
                                             @ValidCpoId
                                             @RequestParam(name = IDS, required = false) Optional<List<String>> ids,
@@ -273,9 +292,18 @@ public class CasePaymentOrdersController {
             message = ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE
         )
     })
+    @LogAudit(
+        operationType = AuditOperationType.UPDATE_CASE_PAYMENT_ORDER,
+        cpoId = "#requestPayload.id",
+        caseId = "#requestPayload.caseId"
+    )
     public CasePaymentOrder updateCasePaymentOrderRequest(@Valid @RequestBody UpdateCasePaymentOrderRequest
                                                               requestPayload) {
         return casePaymentOrdersService.updateCasePaymentOrder(requestPayload);
+    }
+
+    public static List<String> buildOptionalIds(Optional<List<String>> optionalIds) {
+        return optionalIds.orElseGet(Lists::newArrayList);
     }
 
 }

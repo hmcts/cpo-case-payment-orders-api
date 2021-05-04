@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
-import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,14 +23,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public interface BaseTest {
 
-    public static final String ERROR_PATH_DETAILS = "$.details";
-    public static final String ERROR_PATH_ERROR = "$.error";
-    public static final String ERROR_PATH_MESSAGE = "$.message";
-    public static final String ERROR_PATH_STATUS = "$.status";
+    String ERROR_PATH_DETAILS = "$.details";
+    String ERROR_PATH_ERROR = "$.error";
+    String ERROR_PATH_MESSAGE = "$.message";
+    String ERROR_PATH_STATUS = "$.status";
 
     int PAGE_NUMBER = 1;
-    String IDS = "ids";
-    String CASE_IDS = "case-ids";
     int PAGE_SIZE = 3;
 
     String CASE_ID_VALID_1 = "9511425043588823";
@@ -48,18 +45,21 @@ public interface BaseTest {
     String CPO_ID_INVALID_1 = "160924";
     String CPO_ID_INVALID_2 = "160924 ";
 
-    public static final String ORDER_REFERENCE_VALID = "2021-11223344556";
-    public static final String ORDER_REFERENCE_INVALID = "2021-918425346";
+    String ORDER_REFERENCE_VALID = "2021-11223344556";
+    String ORDER_REFERENCE_INVALID = "2021-918425346";
     String ACTION = "action";
     String RESPONSIBLE_PARTY = "responsibleParty";
 
+    String REQUEST_ID = "Test Request ID";
+
     String CREATED_BY = "createdBy";
     LocalDateTime CREATED_TIMESTAMP = LocalDateTime.now();
+    boolean HISTORY_EXISTS_DEFAULT = false;
+    boolean HISTORY_EXISTS_UPDATED = true;
 
     default <T> Optional<List<T>> createInitialValuesList(final T[] initialValues) {
         return Optional.of(Arrays.asList(initialValues));
     }
-
 
     default CasePaymentOrder createCasePaymentOrder() {
         return CasePaymentOrder.builder()
@@ -70,6 +70,7 @@ public interface BaseTest {
             .id(UUID.fromString(CPO_ID_VALID_1))
             .createdBy(CREATED_BY)
             .createdTimestamp(CREATED_TIMESTAMP)
+            .historyExists(HISTORY_EXISTS_DEFAULT)
             .build();
     }
 
@@ -81,6 +82,7 @@ public interface BaseTest {
         entity.setOrderReference(ORDER_REFERENCE_VALID);
         entity.setCreatedBy(CREATED_BY);
         entity.setCreatedTimestamp(CREATED_TIMESTAMP);
+        entity.setHistoryExists(HISTORY_EXISTS_DEFAULT);
         return entity;
     }
 
@@ -103,15 +105,6 @@ public interface BaseTest {
         );
     }
 
-    default CasePaymentOrderQueryFilter getACasePaymentOrderQueryFilter(int  pageSize, List<String> casesIds,
-                                                                        List<String> ids) {
-
-        return CasePaymentOrderQueryFilter.builder()
-            .cpoIds(ids)
-            .caseIds(casesIds)
-            .build();
-    }
-
     default PageRequest getPageRequest() {
         return PageRequest.of(
             PAGE_NUMBER,
@@ -121,7 +114,7 @@ public interface BaseTest {
 
     default Page<CasePaymentOrder> getDomainPages() {
         final PageRequest pageRequest = getPageRequest();
-        return new PageImpl<CasePaymentOrder>(createListOfCasePaymentOrder(), pageRequest, 3);
+        return new PageImpl<>(createListOfCasePaymentOrder(), pageRequest, 3);
     }
 
     default List<CasePaymentOrder> createListOfCasePaymentOrder() {
@@ -170,4 +163,5 @@ public interface BaseTest {
             .andExpect(jsonPath(ERROR_PATH_ERROR).value(HttpStatus.BAD_REQUEST.getReasonPhrase()))
             .andExpect(jsonPath(ERROR_PATH_MESSAGE, containsString(expectedError)));
     }
+
 }

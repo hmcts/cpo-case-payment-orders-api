@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.TestIdamConfiguration;
+import uk.gov.hmcts.reform.cpo.config.AuditConfiguration;
 import uk.gov.hmcts.reform.cpo.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
@@ -62,6 +63,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH;
+import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_IDS;
+import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.IDS;
 
 public class CasePaymentOrdersControllerTest implements BaseTest {
 
@@ -75,7 +78,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
     @WebMvcTest(controllers = CasePaymentOrdersController.class,
         includeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes = MapperConfig.class),
         excludeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes =
-            {SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class}))
+            {SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class, AuditConfiguration.class}))
     @AutoConfigureMockMvc(addFilters = false)
     @ImportAutoConfiguration(TestIdamConfiguration.class)
     static class BaseMvcTest {
@@ -560,7 +563,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
     }
 
     @Nested
-    @DisplayName("DELETE /case-payment-orders?case-ids=")
+    @DisplayName("DELETE /case-payment-orders?case_ids=")
     class DeleteCasePaymentOrdersByCaseId extends BaseMvcTest {
 
         @DisplayName("happy path test without mockMvc")
@@ -728,7 +731,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
                     .param(CASE_IDS, "1574419234651640,1574932009200070")
             );
             // THEN
-            assertGetCopPResponse(ValidationError.CPO_FILER_ERROR, response);
+            assertGetCopPResponse(ValidationError.CPO_FILTER_ERROR, response);
         }
 
         @DisplayName("fail for ids only")
@@ -757,6 +760,51 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             );
             // THEN
             assertGetCopPResponse(ValidationError.CASE_ID_INVALID, response);
+        }
+    }
+
+    @Nested
+    @DisplayName("Build ID lists for LogAudit")
+    class BuildIdListsForLogAudit {
+
+        @Test
+        void buildIdLists_shouldReturnEmptyListWhenEmptyPassed() {
+            // WHEN
+            List<String> ids = CasePaymentOrdersController.buildOptionalIds(Optional.empty());
+
+            // THEN
+            assertThat(ids)
+                .isNotNull()
+                .isEmpty();
+        }
+
+        @Test
+        void buildIdLists_shouldReturnEmptyListWhenEmptyListPassed() {
+            // GIVEN
+            List<String> input = Collections.emptyList();
+
+            // WHEN
+            List<String> ids = CasePaymentOrdersController.buildOptionalIds(Optional.of(input));
+
+            // THEN
+            assertThat(ids)
+                .isNotNull()
+                .isEmpty();
+        }
+
+        @Test
+        void buildIdLists_shouldReturnEmptyListWhenPopulatedListIsPassed() {
+            // GIVEN
+            List<String> input = List.of("1", "2", "3");
+
+            // WHEN
+            List<String> ids = CasePaymentOrdersController.buildOptionalIds(Optional.of(input));
+
+            // THEN
+            assertThat(ids)
+                .isNotNull()
+                .hasSize(input.size())
+                .containsAll(input);
         }
     }
 

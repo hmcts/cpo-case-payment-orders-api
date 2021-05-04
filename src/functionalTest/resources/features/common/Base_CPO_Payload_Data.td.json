@@ -2,7 +2,6 @@
   "_guid_" : "Base_CPO_Data_Payload_data",
     "case_id" : "${[scenarioContext][customValues][GenerateCaseId]}",
     "action" : "payday",
-    "case_type_id" : "attribute-to-be-removed",
     "responsible_party" : "party1",
     "order_reference" : "2021-12345678901"
 }

@@ -39,6 +39,7 @@ public class CasePaymentOrderEntityGenerator {
                 .orderReference("2021-" + RandomUtils.nextLong(10000000000L, 99999999999L))
                 .createdTimestamp(LocalDateTime.now())
                 .responsibleParty("ResponsibleParty" + Arrays.toString(RandomUtils.nextBytes(2)))
+                .historyExists(false)
                 .build();
 
 

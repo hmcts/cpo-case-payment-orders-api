@@ -58,7 +58,7 @@ class CasePaymentOrderQueryFilterTest implements BaseTest {
 
         assertThatThrownBy(casePaymentOrderQueryFilter::validateCasePaymentOrdersFiltering)
             .isInstanceOf(CasePaymentOrdersFilterException.class)
-            .hasMessageContaining(ValidationError.CPO_FILER_ERROR);
+            .hasMessageContaining(ValidationError.CPO_FILTER_ERROR);
     }
 
     @Test

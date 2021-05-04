@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.exception.CaseIdOrderReferenceUniqueConstraintException;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
+import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException;
 import uk.gov.hmcts.reform.cpo.exception.IdAMIdCannotBeRetrievedException;
 import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
@@ -112,6 +113,26 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
                 .createCasePaymentOrder(createCasePaymentOrderRequest);
             assertThat("UUID does not match expected", caseOrderReturn.getId().toString().equals(CPO_ID_VALID_1));
             assertThat("Returned entity does not match expected", caseOrderReturn.equals(casePaymentOrderIncoming));
+            assertEquals(HISTORY_EXISTS_DEFAULT, caseOrderReturn.isHistoryExists());
+        }
+
+        @Test
+        @DisplayName("Should successfully set fields when creating CasePaymentOrder")
+        void shouldSetFieldsWhenCreatingCasePayment() {
+            given(mapper.toEntity(createCasePaymentOrderRequest, CREATED_BY)).willReturn(requestEntity);
+            given(casePaymentOrdersRepository.saveAndFlush(requestEntity)).willReturn(savedEntity);
+            given(mapper.toDomainModel(savedEntity)).willReturn(casePaymentOrderIncoming);
+
+            CasePaymentOrder caseOrderReturn = casePaymentOrdersService
+                .createCasePaymentOrder(createCasePaymentOrderRequest);
+
+            // verify service call
+            ArgumentCaptor<CasePaymentOrderEntity> captor =
+                ArgumentCaptor.forClass(CasePaymentOrderEntity.class);
+
+            // THEN
+            verify(casePaymentOrdersRepository, times(1)).saveAndFlush(captor.capture());
+            assertEquals(HISTORY_EXISTS_DEFAULT, caseOrderReturn.isHistoryExists());
         }
 
         @Test
@@ -260,6 +281,38 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
                 .hasMessageContaining(ValidationError.CPO_NOT_FOUND);
         }
 
+        @Test
+        @DisplayName("Should throw CasePaymentOrdersFilterException when ID search throws IllegalArgumentException")
+        void failWithCpoFilterExceptionWhenIdSearchThrowsIllegalArgumentException() {
+            final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
+                .cpoIds(ids)
+                .caseIds(Collections.emptyList())
+                .pageable(getPageRequest())
+                .build();
+
+            when(casePaymentOrdersRepository.findByIdIn(anyList(), any())).thenThrow(
+                new IllegalArgumentException());
+
+            assertThatThrownBy(() -> casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter))
+                .isInstanceOf(CasePaymentOrdersFilterException.class);
+        }
+
+        @Test
+        @DisplayName("Should throw CasePaymentOrdersFilterException when CaseID search throws IllegalArgumentException")
+        void failWithCpoFilterExceptionWhenCaseIdSearchThrowsIllegalArgumentException() {
+            final CasePaymentOrderQueryFilter casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
+                .pageable(getPageRequest())
+                .cpoIds(Collections.emptyList())
+                .caseIds(casesIds)
+                .build();
+
+            when(casePaymentOrdersRepository.findByCaseIdIn(anyList(), any())).thenThrow(
+                new IllegalArgumentException());
+
+            assertThatThrownBy(() -> casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter))
+                .isInstanceOf(CasePaymentOrdersFilterException.class);
+        }
+
         private Page<CasePaymentOrderEntity> getEntityPages() {
             final PageRequest pageRequest = getPageRequest();
             return new PageImpl<CasePaymentOrderEntity>(createListOfCasePaymentOrderEntity(), pageRequest, 3);
@@ -349,6 +402,36 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
             verify(casePaymentOrdersRepository, times(1)).saveAndFlush(casePaymentOrderEntity);
             assertThat("UUID should match expected", response.getId().equals(id));
             assertThat("Returned model should match expected", response.equals(casePaymentOrderResponse));
+            assertEquals(HISTORY_EXISTS_UPDATED, casePaymentOrderEntity.isHistoryExists());
+        }
+
+        @Test
+        @DisplayName("Should successfully set fields when updating CasePaymentOrder")
+        void shouldSetFieldsWhenUpdatingCasePayment() {
+
+
+            // GIVEN
+            // :: the load
+            UUID id = updateCasePaymentOrderRequest.getUUID();
+            given(casePaymentOrdersRepository.findById(id)).willReturn(Optional.of(casePaymentOrderEntity));
+            // :: the save
+            given(casePaymentOrdersRepository.saveAndFlush(casePaymentOrderEntity)).willReturn(savedEntity);
+            // :: the conversion
+            given(mapper.toDomainModel(savedEntity)).willReturn(casePaymentOrderResponse);
+
+            LocalDateTime previousCreateDateTime = casePaymentOrderEntity.getCreatedTimestamp();
+            // WHEN
+            casePaymentOrdersService.updateCasePaymentOrder(updateCasePaymentOrderRequest);
+
+            // verify service call
+            ArgumentCaptor<CasePaymentOrderEntity> captor =
+                ArgumentCaptor.forClass(CasePaymentOrderEntity.class);
+
+            // THEN
+            verify(casePaymentOrdersRepository, times(1)).saveAndFlush(captor.capture());
+
+            assertTrue("", previousCreateDateTime.isBefore(captor.getValue().getCreatedTimestamp()));
+            assertEquals(captor.getValue().isHistoryExists(), HISTORY_EXISTS_UPDATED);
         }
 
         @Test

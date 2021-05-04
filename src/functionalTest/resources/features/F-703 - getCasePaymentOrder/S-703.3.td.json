@@ -1,0 +1,21 @@
+{
+  "_guid_" : "S-703.3",
+  "_extends_" : "getCasePaymentOrderBase",
+
+  "specs": [
+    "does not contain the search criteria parameters",
+    "contains relevant error message"
+  ],
+
+  "request" : {
+    "_extends_": "Common_Request"
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_200_Response",
+    "body" : {
+      "_extends_" : "CPO_GET_Pagination_Response_No_Data"
+    }
+
+  }
+}
