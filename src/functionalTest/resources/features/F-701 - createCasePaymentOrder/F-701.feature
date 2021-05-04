@@ -31,10 +31,6 @@ Feature: CREATE Case Payment Order Endpoint
     And the response has all other details as expected
     And a call [to verify that a Case payment Order has not been created in the database] will get the expected response as in [getCasePaymentOrder_cpo_not_created].
 
-  @Ignore #@S-701.2.1 TODO re-enable after CPO-40 is fixed
-  Examples:
-    | parameter        |
-    | effective_from   |
 
   @S-701.2.4
   Examples:
@@ -69,7 +65,6 @@ Feature: CREATE Case Payment Order Endpoint
     And it is submitted to call the [createCasePaymentOrder] operation of [Case Payment Orders Microservice],
     Then a negative response is received
     And the response has all other details as expected
-#    And a call [to verify that a Case payment Order has not been created in the database] will get the expected response as in [CPO-5_getCasePaymentOrder_cpo_not_created].
 
     @S-701.3.1
     Examples:
@@ -92,4 +87,4 @@ Feature: CREATE Case Payment Order Endpoint
     And it is submitted to call the [createCasePaymentOrder] operation of [Case Payment Orders Microservice],
     Then a negative response is received
     And the response has all other details as expected
-#    And a call [to verify that a Case payment Order has not been created in the database which can be accessed or queried again at a later date] will get the expected response as in [CPO-5_getCasePaymentOrder_cpo_not_created].
+    And a call [to verify that a Case payment Order has not been created in the database which can be accessed or queried again at a later date] will get the expected response as in [getCasePaymentOrder_cpo_not_created].

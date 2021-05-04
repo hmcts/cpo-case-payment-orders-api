@@ -10,7 +10,6 @@
     "_extends_": "Common_Request",
     "body": {
       "effective_from" : "2021-01-01T00:00:00Z",
-      "case_type_id" : "FT_MasterCaseType",
       "action" : "payday",
       "responsible_party" : "party1",
       "order_reference" : "2021-12345678901"

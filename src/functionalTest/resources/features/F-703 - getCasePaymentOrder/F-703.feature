@@ -37,8 +37,6 @@ Feature: GET Case Payment Order Endpoint
 
   @S-703.3
   Scenario: AC3: Mandatory parameters missing from the request (Search Criteria Missing)
-    And a successful call [to create a case payment order CP1] as in [Prerequisite_Create_CPO],
-    And a successful call [to create a case payment order CP2] as in [Prerequisite_Create_CPO_2],
     When a request is prepared with appropriate values
     And the request [does not contain the search criteria parameters]
     And it is submitted to call the [getCasePaymentOrder] operation of [Case Payment Orders Microservice]

@@ -4,7 +4,7 @@
 
   "specs": [
     "contains all the mandatory parameters",
-    "contains a 200 success OK code",
+    "contains a 202 success code",
     "contains a valid UUID of the case order record"
   ],
 
