@@ -52,10 +52,10 @@ class CasePaymentOrdersRepositoryImplTest {
     @Test
     void testDeleteByUuids() {
         when(casePaymentOrdersJpaRepository.deleteByIdIsIn(anyList())).thenReturn(UUIDS.size());
-        when(casePaymentOrdersJpaRepository.countAllById(UUIDS.get(0)))
-                .thenReturn(1);
-        when(casePaymentOrdersJpaRepository.countAllById(UUIDS.get(1)))
-                .thenReturn(1);
+        when(casePaymentOrdersJpaRepository.existsById(UUIDS.get(0)))
+                .thenReturn(true);
+        when(casePaymentOrdersJpaRepository.existsById(UUIDS.get(1)))
+                .thenReturn(true);
 
         casePaymentOrdersRepository.deleteByUuids(UUIDS);
 
@@ -90,8 +90,8 @@ class CasePaymentOrdersRepositoryImplTest {
     @Test
     void testDeleteByCaseIds() {
         when(casePaymentOrdersJpaRepository.deleteByCaseIdIsIn(anyList())).thenReturn(CASE_IDS.size());
-        when(casePaymentOrdersJpaRepository.countAllByCaseId(anyLong()))
-                .thenReturn(1);
+        when(casePaymentOrdersJpaRepository.existsByCaseId(anyLong()))
+                .thenReturn(true);
 
         casePaymentOrdersRepository.deleteByCaseIds(CASE_IDS);
 
@@ -127,8 +127,8 @@ class CasePaymentOrdersRepositoryImplTest {
     @Test
     void testDeleteByCaseIdsMixOfExistingAndNonExistentCaseIds() {
         // Simulate 3 records existing with case id
-        when(casePaymentOrdersJpaRepository.countAllByCaseId(anyLong()))
-                .thenReturn(1);
+        when(casePaymentOrdersJpaRepository.existsByCaseId(anyLong()))
+                .thenReturn(true);
         when(casePaymentOrdersJpaRepository.deleteByCaseIdIsIn(anyList())).thenReturn(3);
 
         List<Long> caseIdToDelete = List.of(RandomUtils.nextLong());
