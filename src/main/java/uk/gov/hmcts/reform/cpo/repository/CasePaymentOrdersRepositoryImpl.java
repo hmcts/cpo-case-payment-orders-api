@@ -46,7 +46,7 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
     private void validateAllEntriesExistByCaseIds(List<Long> caseIds) {
         List<String> nonExistentCaseIds = new ArrayList<>();
         for (Long cid : caseIds) {
-            if (casePaymentOrdersJpaRepository.findAllByCaseId(cid).isEmpty()) {
+            if (casePaymentOrdersJpaRepository.countAllByCaseId(cid) == 0) {
                 nonExistentCaseIds.add(String.valueOf(cid));
             }
         }
@@ -56,7 +56,7 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
     private void validateAllEntriesExistByUuid(List<UUID> uuids) {
         List<String> nonExistentUuids = new ArrayList<>();
         for (UUID uuid : uuids) {
-            if (casePaymentOrdersJpaRepository.findAllById(uuid).isEmpty()) {
+            if (casePaymentOrdersJpaRepository.countAllById(uuid) == 0) {
                 nonExistentUuids.add(uuid.toString());
             }
         }
