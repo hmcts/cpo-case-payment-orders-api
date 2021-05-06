@@ -11,17 +11,11 @@ import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
 @ApiModel("Common case payment order request properties")
 public class BaseCasePaymentOrderRequest {
-
-    @NotNull(message = ValidationError.EFFECTIVE_FROM_REQUIRED)
-    @ApiModelProperty(value = "The date/time from which the record is valid", required = true,
-        example = "2021-02-10T03:02:30Z")
-    private LocalDateTime effectiveFrom;
 
     @NotEmpty(message = ValidationError.CASE_ID_REQUIRED)
     @ValidCaseId

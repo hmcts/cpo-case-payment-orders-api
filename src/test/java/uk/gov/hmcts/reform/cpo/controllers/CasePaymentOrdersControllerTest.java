@@ -195,8 +195,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             verify(casePaymentOrdersService).updateCasePaymentOrder(captor.capture());
             assertEquals("Service called with request data: ID",
                          updateCasePaymentOrderRequest.getId(), captor.getValue().getId());
-            assertEquals("Service called with request data: Effective from",
-                         updateCasePaymentOrderRequest.getEffectiveFrom(), captor.getValue().getEffectiveFrom());
             assertEquals("Service called with request data: Case ID",
                          updateCasePaymentOrderRequest.getCaseId(), captor.getValue().getCaseId());
             assertEquals("Service called with request data: Action",
@@ -215,7 +213,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // GIVEN
             updateCasePaymentOrderRequest = new UpdateCasePaymentOrderRequest(
                 null,
-                EFFECTIVE_FROM,
                 CASE_ID_VALID_1,
                 ACTION,
                 RESPONSIBLE_PARTY,
@@ -239,7 +236,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // GIVEN
             updateCasePaymentOrderRequest = new UpdateCasePaymentOrderRequest(
                 "",
-                EFFECTIVE_FROM,
                 CASE_ID_VALID_1,
                 ACTION,
                 RESPONSIBLE_PARTY,
@@ -263,7 +259,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // GIVEN
             updateCasePaymentOrderRequest = new UpdateCasePaymentOrderRequest(
                 CPO_ID_INVALID_1,
-                EFFECTIVE_FROM,
                 CASE_ID_VALID_1,
                 ACTION,
                 RESPONSIBLE_PARTY,
@@ -280,30 +275,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             assertBadRequestResponse(result, ValidationError.ID_INVALID);
         }
 
-        @DisplayName("should fail with 400 bad request when Effective From is null")
-        @Test
-        void shouldFailWithBadRequestWhenEffectiveFromIsNull() throws Exception {
-
-            // GIVEN
-            updateCasePaymentOrderRequest = new UpdateCasePaymentOrderRequest(
-                CPO_ID_VALID_1,
-                null,
-                CASE_ID_VALID_1,
-                ACTION,
-                RESPONSIBLE_PARTY,
-                ORDER_REFERENCE_VALID
-            );
-
-            // WHEN
-            ResultActions result =
-                this.mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                         .contentType(MediaType.APPLICATION_JSON)
-                                         .content(objectMapper.writeValueAsString(updateCasePaymentOrderRequest)));
-
-            // THEN
-            assertBadRequestResponse(result, ValidationError.EFFECTIVE_FROM_REQUIRED);
-        }
-
         @DisplayName("should fail with 400 bad request when Case ID is null")
         @Test
         void shouldFailWithBadRequestWhenCaseIdIsNull() throws Exception {
@@ -311,7 +282,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // GIVEN
             updateCasePaymentOrderRequest = new UpdateCasePaymentOrderRequest(
                 CPO_ID_VALID_1,
-                EFFECTIVE_FROM,
                 null,
                 ACTION,
                 RESPONSIBLE_PARTY,
@@ -335,7 +305,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // GIVEN
             updateCasePaymentOrderRequest = new UpdateCasePaymentOrderRequest(
                 CPO_ID_VALID_1,
-                EFFECTIVE_FROM,
                 "",
                 ACTION,
                 RESPONSIBLE_PARTY,
@@ -359,7 +328,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // GIVEN
             updateCasePaymentOrderRequest = new UpdateCasePaymentOrderRequest(
                 CPO_ID_VALID_1,
-                EFFECTIVE_FROM,
                 CASE_ID_INVALID_LUHN,
                 ACTION,
                 RESPONSIBLE_PARTY,
@@ -383,7 +351,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // GIVEN
             updateCasePaymentOrderRequest = new UpdateCasePaymentOrderRequest(
                 CPO_ID_VALID_1,
-                EFFECTIVE_FROM,
                 CASE_ID_VALID_1,
                 null,
                 RESPONSIBLE_PARTY,
@@ -407,7 +374,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // GIVEN
             updateCasePaymentOrderRequest = new UpdateCasePaymentOrderRequest(
                 CPO_ID_VALID_1,
-                EFFECTIVE_FROM,
                 CASE_ID_VALID_1,
                 "",
                 RESPONSIBLE_PARTY,
@@ -431,7 +397,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // GIVEN
             updateCasePaymentOrderRequest = new UpdateCasePaymentOrderRequest(
                 CPO_ID_VALID_1,
-                EFFECTIVE_FROM,
                 CASE_ID_VALID_1,
                 ACTION,
                 null,
@@ -455,7 +420,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // GIVEN
             updateCasePaymentOrderRequest = new UpdateCasePaymentOrderRequest(
                 CPO_ID_VALID_1,
-                EFFECTIVE_FROM,
                 CASE_ID_VALID_1,
                 ACTION,
                 "",
@@ -479,7 +443,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // GIVEN
             updateCasePaymentOrderRequest = new UpdateCasePaymentOrderRequest(
                 CPO_ID_VALID_1,
-                EFFECTIVE_FROM,
                 CASE_ID_VALID_1,
                 ACTION,
                 RESPONSIBLE_PARTY,
@@ -503,7 +466,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // GIVEN
             updateCasePaymentOrderRequest = new UpdateCasePaymentOrderRequest(
                 CPO_ID_VALID_1,
-                EFFECTIVE_FROM,
                 CASE_ID_VALID_1,
                 ACTION,
                 RESPONSIBLE_PARTY,
@@ -527,7 +489,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // GIVEN
             updateCasePaymentOrderRequest = new UpdateCasePaymentOrderRequest(
                 CPO_ID_VALID_1,
-                EFFECTIVE_FROM,
                 CASE_ID_VALID_1,
                 ACTION,
                 RESPONSIBLE_PARTY,
