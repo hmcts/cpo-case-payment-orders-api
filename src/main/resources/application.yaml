@@ -91,10 +91,19 @@ idam:
   s2s-auth:
     url: ${S2S_URL:http://localhost:4502}
   s2s-authorised:
-    services: ${CPO_S2S_AUTHORISED_SERVICES:xui_webapp}
+    services: ${CPO_S2S_AUTHORISED_SERVICES:xui_webapp,payment_app}
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
 azure:
   application-insights:
     instrumentation-key: ${cpo.AppInsightsInstrumentationKey:00000000-0000-0000-0000-000000000000}
+
+s2s:
+  authorizations:
+    payment:
+      id: "payment_app"
+      permission: "R"
+    xui:
+      id: "xui_webapp"
+      permission: "R"

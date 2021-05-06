@@ -2,3 +2,7 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
+
+  environment:
+    S2S_AUTHORIZATIONS_XUI_ID: xui_webapp
+    S2S_AUTHORIZATIONS_XUI_PERMISSION: CRUD

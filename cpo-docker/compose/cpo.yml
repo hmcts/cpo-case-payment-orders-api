@@ -12,10 +12,10 @@ services:
       CPO_CASE_PAYMENT_ORDERS_DB_NAME: ${DB_NAME}
       CPO_CASE_PAYMENT_ORDERS_DB_USERNAME: ${DB_USERNAME}
       CPO_CASE_PAYMENT_ORDERS_DB_PASSWORD: ${DB_PASSWORD}
+      CPO_S2S_AUTHORISED_SERVICES: xui_webapp,payment_app
       IDAM_API_URL: "${IDAM_STUB_SERVICE_NAME:-http://idam-api:5000}"
       IDAM_OIDC_URL: "${IDAM_STUB_SERVICE_NAME:-http://idam-api:5000}"
       S2S_URL: http://service-auth-provider-api:8080
-      CPO_S2S_AUTHORISED_SERVICES: xui_webapp
     ports:
       - 4457:4457
     depends_on:

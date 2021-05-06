@@ -27,6 +27,9 @@ public final class ValidationError {
     public static final String IDAM_ID_RETRIEVE_ERROR = "Idam ID cannot be retrieved.";
 
     public static final String ARGUMENT_NOT_VALID = "Input not valid";
+    public static final String INVALID_PERMISSION_WHITELIST_VALUE = "Valid values for permission are: CRUD";
+    public static final String SERVICE_AUTHORIZATION_MISSING =
+            "No ServiceAuthorization header present when checking service whitelist permissions";
 
     // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
     private ValidationError() {

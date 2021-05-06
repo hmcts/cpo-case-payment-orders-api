@@ -1,0 +1,25 @@
+{
+  "_guid_": "S-705.6",
+  "_extends_": "deleteCasePaymentOrderBase",
+
+  "title": "Must refuse access of the DeleteCasePaymentOrder API for a Non-CRUD whitelisted service",
+
+  "specs": [
+    "a new Case-Payment-Order microservice has been established",
+    "a CRUD whitelist doesn't exist for the invoking service",
+    "intends to delete a payment order",
+    "contains all the mandatory parameters"
+  ],
+
+  "s2sClientId": "payment_app",
+
+  "request": {
+    "queryParams": {
+      "ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "CPO_403_Response"
+  }
+}

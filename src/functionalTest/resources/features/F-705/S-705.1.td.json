@@ -1,0 +1,28 @@
+{
+  "_guid_": "S-705.1",
+  "_extends_": "createCasePaymentOrderBase",
+
+  "title": "Must successfully allow access of the CreateCasePaymentOrder API for a CRUD whitelisted service",
+
+  "s2sClientId": "xui_webapp",
+
+  "specs": [
+    "a new Case-Payment-Order microservice has been established",
+    "a CRUD whitelist exists for the invoking service",
+    "contains all the mandatory parameters",
+    "an active profile in CCD"
+  ],
+
+  "request": {
+    "body": {
+      "_extends_": "Base_CPO_Data_Payload_data"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "CPO_201_Response",
+    "body": {
+      "_extends_": "Base_CPO_Response_Data"
+    }
+  }
+}
