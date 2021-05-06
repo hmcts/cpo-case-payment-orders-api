@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.cpo.config.AuditConfiguration;
 import uk.gov.hmcts.reform.cpo.utils.KeyGenUtil;
 
 import javax.inject.Inject;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,19 +46,22 @@ import static uk.gov.hmcts.reform.cpo.security.SecurityUtils.SERVICE_AUTHORIZATI
     Application.class,
     TestIdamConfiguration.class
 })
-@AutoConfigureMockMvc() // NB: no longer disabling filters to allow tests that authentication is enabled on endpoints
+@AutoConfigureMockMvc() // NB: don't disable filters as they are needed to test authentication is enabled on endpoints
 @AutoConfigureWireMock(port = 0, stubs = "classpath:/wiremock-stubs")
 @ActiveProfiles("itest")
 @SuppressWarnings({"squid:S2187"})
 public class BaseTest {
 
     public static final String AUTHORISED_CRUD_SERVICE = "test_crud_service";
+
+    public static final String AUTHORISED_CREATE_SERVICE = "test_create_service";
     public static final String AUTHORISED_READ_SERVICE = "test_read_service";
+    public static final String AUTHORISED_UPDATE_SERVICE = "test_update_service";
+    public static final String AUTHORISED_DELETE_SERVICE = "test_delete_service";
+
     public static final String UNAUTHORISED_SERVICE = "test_unauthorised_service";
 
     public static final long AUTH_TOKEN_TTL = 14400000;
-
-    protected final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     public static final String ERROR_PATH_DETAILS = "$.details";
     public static final String ERROR_PATH_ERROR = "$.error";

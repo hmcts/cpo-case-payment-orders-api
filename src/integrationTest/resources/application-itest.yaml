@@ -4,7 +4,7 @@ idam:
   s2s-auth:
     url: http://localhost:${wiremock.server.port:5000}/s2s
   s2s-authorised:
-    services: test_read_service,test_crud_service
+    services: test_create_service,test_read_service,test_update_service,test_delete_service,test_crud_service
 
 spring:
   security:
@@ -23,3 +23,21 @@ azure:
   application-insights:
     web:
       enabled: false
+
+s2s:
+  authorizations:
+    test_create_service:
+      id: "test_create_service"
+      permission: "C"
+    test_read_service:
+      id: "test_read_service"
+      permission: "R"
+    test_update_service:
+      id: "test_update_service"
+      permission: "U"
+    test_delete_service:
+      id: "test_delete_service"
+      permission: "D"
+    test_crud_service:
+      id: "test_crud_service"
+      permission: "CRUD"

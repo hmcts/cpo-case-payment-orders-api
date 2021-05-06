@@ -135,6 +135,13 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             @BeforeEach
             public void setUp() throws JsonProcessingException {
+                // NB: need a unique case ID when running happy path for a second time.
+                caseId = uidService.generateUID();
+                createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(caseId,
+                                                                                  ACTION, RESPONSIBLE_PARTY,
+                                                                                  ORDER_REFERENCE_VALID
+                );
+
                 happyPathRequestBuilder = post(CASE_PAYMENT_ORDERS_PATH)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest));
@@ -145,6 +152,8 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             @DisplayName(DISPLAY_ALL_AUTH_OK)
             public void should2xxSuccessfulForHappyPath() throws Exception {
                 assert2xxSuccessfulForHappyPath(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+                setUp(); // re-run setup to ensure CPO details are unique for second test call
+                assert2xxSuccessfulForHappyPath(mockMvc, happyPathRequestBuilder, AUTHORISED_CREATE_SERVICE);
             }
 
             @Test
@@ -187,6 +196,15 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             @DisplayName(DISPLAY_S2S_AUTH_UNAUTHORISED)
             public void should403ForUnauthorisedServiceAuthToken() throws Exception {
                 assert403ForUnauthorisedServiceAuthToken(mockMvc, happyPathRequestBuilder);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_PERMISSION_MISSING)
+            public void should403ForServiceMissingS2sPermission() throws Exception {
+                assert403ForServiceMissingS2sPermission(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+                assert403ForServiceMissingS2sPermission(mockMvc, happyPathRequestBuilder, AUTHORISED_UPDATE_SERVICE);
+                assert403ForServiceMissingS2sPermission(mockMvc, happyPathRequestBuilder, AUTHORISED_DELETE_SERVICE);
             }
 
             @Test
@@ -371,6 +389,8 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             @DisplayName(DISPLAY_ALL_AUTH_OK)
             public void should2xxSuccessfulForHappyPath() throws Exception {
                 assert2xxSuccessfulForHappyPath(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+                setUp(); // re-run setup to create a new CPO to delete
+                assert2xxSuccessfulForHappyPath(mockMvc, happyPathRequestBuilder, AUTHORISED_DELETE_SERVICE);
             }
 
             @Test
@@ -413,6 +433,15 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             @DisplayName(DISPLAY_S2S_AUTH_UNAUTHORISED)
             public void should403ForUnauthorisedServiceAuthToken() throws Exception {
                 assert403ForUnauthorisedServiceAuthToken(mockMvc, happyPathRequestBuilder);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_PERMISSION_MISSING)
+            public void should403ForServiceMissingS2sPermission() throws Exception {
+                assert403ForServiceMissingS2sPermission(mockMvc, happyPathRequestBuilder, AUTHORISED_CREATE_SERVICE);
+                assert403ForServiceMissingS2sPermission(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+                assert403ForServiceMissingS2sPermission(mockMvc, happyPathRequestBuilder, AUTHORISED_UPDATE_SERVICE);
             }
 
             @Test
@@ -577,6 +606,8 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             @DisplayName(DISPLAY_ALL_AUTH_OK)
             public void should2xxSuccessfulForHappyPath() throws Exception {
                 assert2xxSuccessfulForHappyPath(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+                setUp();  // re-run setup to create a new CPO to delete
+                assert2xxSuccessfulForHappyPath(mockMvc, happyPathRequestBuilder, AUTHORISED_DELETE_SERVICE);
             }
 
             @Test
@@ -619,6 +650,15 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             @DisplayName(DISPLAY_S2S_AUTH_UNAUTHORISED)
             public void should403ForUnauthorisedServiceAuthToken() throws Exception {
                 assert403ForUnauthorisedServiceAuthToken(mockMvc, happyPathRequestBuilder);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_PERMISSION_MISSING)
+            public void should403ForServiceMissingS2sPermission() throws Exception {
+                assert403ForServiceMissingS2sPermission(mockMvc, happyPathRequestBuilder, AUTHORISED_CREATE_SERVICE);
+                assert403ForServiceMissingS2sPermission(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+                assert403ForServiceMissingS2sPermission(mockMvc, happyPathRequestBuilder, AUTHORISED_UPDATE_SERVICE);
             }
 
             @Test
@@ -814,6 +854,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             @Override
             @DisplayName(DISPLAY_ALL_AUTH_OK)
             public void should2xxSuccessfulForHappyPath() throws Exception {
+                assert2xxSuccessfulForHappyPath(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
                 assert2xxSuccessfulForHappyPath(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
             }
 
@@ -821,35 +862,35 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             @Override
             @DisplayName(DISPLAY_AUTH_MISSING)
             public void should401ForMissingAuthToken() throws Exception {
-                assert401ForMissingAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+                assert401ForMissingAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
             }
 
             @Test
             @Override
             @DisplayName(DISPLAY_AUTH_MALFORMED)
             public void should401ForMalformedAuthToken() throws Exception {
-                assert401ForMalformedAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+                assert401ForMalformedAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
             }
 
             @Test
             @Override
             @DisplayName(DISPLAY_AUTH_EXPIRED)
             public void should401ForExpiredAuthToken() throws Exception {
-                assert401ForExpiredAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+                assert401ForExpiredAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
             }
 
             @Test
             @Override
             @DisplayName(DISPLAY_S2S_AUTH_MISSING)
             public void should401ForMissingServiceAuthToken() throws Exception {
-                assert401ForMissingServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+                assert401ForMissingServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
             }
 
             @Test
             @Override
             @DisplayName(DISPLAY_S2S_AUTH_MALFORMED)
             public void should401ForMalformedServiceAuthToken() throws Exception {
-                assert401ForMalformedServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+                assert401ForMalformedServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
             }
 
             @Test
@@ -861,16 +902,25 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             @Test
             @Override
+            @DisplayName(DISPLAY_S2S_PERMISSION_MISSING)
+            public void should403ForServiceMissingS2sPermission() throws Exception {
+                assert403ForServiceMissingS2sPermission(mockMvc, happyPathRequestBuilder, AUTHORISED_CREATE_SERVICE);
+                assert403ForServiceMissingS2sPermission(mockMvc, happyPathRequestBuilder, AUTHORISED_UPDATE_SERVICE);
+                assert403ForServiceMissingS2sPermission(mockMvc, happyPathRequestBuilder, AUTHORISED_DELETE_SERVICE);
+            }
+
+            @Test
+            @Override
             @DisplayName(DISPLAY_AUTH_SERVICE_UNAVAILABLE)
             public void should401IfAuthServiceUnavailable() throws Exception {
-                assert401IfIdamUnavailable(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+                assert401IfIdamUnavailable(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
             }
 
             @Test
             @Override
             @DisplayName(DISPLAY_S2S_AUTH_SERVICE_UNAVAILABLE)
             public void should401IfS2sAuthServiceUnavailable() throws Exception {
-                assert401IfS2sAuthServiceUnavailable(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+                assert401IfS2sAuthServiceUnavailable(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
             }
 
         }
@@ -1026,6 +1076,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             @Override
             @DisplayName(DISPLAY_ALL_AUTH_OK)
             public void should2xxSuccessfulForHappyPath() throws Exception {
+                assert2xxSuccessfulForHappyPath(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
                 assert2xxSuccessfulForHappyPath(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
             }
 
@@ -1033,35 +1084,35 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             @Override
             @DisplayName(DISPLAY_AUTH_MISSING)
             public void should401ForMissingAuthToken() throws Exception {
-                assert401ForMissingAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+                assert401ForMissingAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
             }
 
             @Test
             @Override
             @DisplayName(DISPLAY_AUTH_MALFORMED)
             public void should401ForMalformedAuthToken() throws Exception {
-                assert401ForMalformedAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+                assert401ForMalformedAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
             }
 
             @Test
             @Override
             @DisplayName(DISPLAY_AUTH_EXPIRED)
             public void should401ForExpiredAuthToken() throws Exception {
-                assert401ForExpiredAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+                assert401ForExpiredAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
             }
 
             @Test
             @Override
             @DisplayName(DISPLAY_S2S_AUTH_MISSING)
             public void should401ForMissingServiceAuthToken() throws Exception {
-                assert401ForMissingServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+                assert401ForMissingServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
             }
 
             @Test
             @Override
             @DisplayName(DISPLAY_S2S_AUTH_MALFORMED)
             public void should401ForMalformedServiceAuthToken() throws Exception {
-                assert401ForMalformedServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+                assert401ForMalformedServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
             }
 
             @Test
@@ -1073,16 +1124,25 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             @Test
             @Override
+            @DisplayName(DISPLAY_S2S_PERMISSION_MISSING)
+            public void should403ForServiceMissingS2sPermission() throws Exception {
+                assert403ForServiceMissingS2sPermission(mockMvc, happyPathRequestBuilder, AUTHORISED_CREATE_SERVICE);
+                assert403ForServiceMissingS2sPermission(mockMvc, happyPathRequestBuilder, AUTHORISED_UPDATE_SERVICE);
+                assert403ForServiceMissingS2sPermission(mockMvc, happyPathRequestBuilder, AUTHORISED_DELETE_SERVICE);
+            }
+
+            @Test
+            @Override
             @DisplayName(DISPLAY_AUTH_SERVICE_UNAVAILABLE)
             public void should401IfAuthServiceUnavailable() throws Exception {
-                assert401IfIdamUnavailable(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+                assert401IfIdamUnavailable(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
             }
 
             @Test
             @Override
             @DisplayName(DISPLAY_S2S_AUTH_SERVICE_UNAVAILABLE)
             public void should401IfS2sAuthServiceUnavailable() throws Exception {
-                assert401IfS2sAuthServiceUnavailable(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+                assert401IfS2sAuthServiceUnavailable(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
             }
 
         }
@@ -1261,6 +1321,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             @DisplayName(DISPLAY_ALL_AUTH_OK)
             public void should2xxSuccessfulForHappyPath() throws Exception {
                 assert2xxSuccessfulForHappyPath(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+                assert2xxSuccessfulForHappyPath(mockMvc, happyPathRequestBuilder, AUTHORISED_UPDATE_SERVICE);
             }
 
             @Test
@@ -1303,6 +1364,15 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             @DisplayName(DISPLAY_S2S_AUTH_UNAUTHORISED)
             public void should403ForUnauthorisedServiceAuthToken() throws Exception {
                 assert403ForUnauthorisedServiceAuthToken(mockMvc, happyPathRequestBuilder);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_PERMISSION_MISSING)
+            public void should403ForServiceMissingS2sPermission() throws Exception {
+                assert403ForServiceMissingS2sPermission(mockMvc, happyPathRequestBuilder, AUTHORISED_CREATE_SERVICE);
+                assert403ForServiceMissingS2sPermission(mockMvc, happyPathRequestBuilder, AUTHORISED_READ_SERVICE);
+                assert403ForServiceMissingS2sPermission(mockMvc, happyPathRequestBuilder, AUTHORISED_DELETE_SERVICE);
             }
 
             @Test

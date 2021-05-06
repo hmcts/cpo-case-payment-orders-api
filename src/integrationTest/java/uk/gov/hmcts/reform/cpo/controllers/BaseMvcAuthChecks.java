@@ -26,6 +26,9 @@ interface BaseMvcAuthChecks {
     String DISPLAY_S2S_AUTH_MALFORMED = "Should return 401:unauthorised if malformed service authentication token";
     String DISPLAY_S2S_AUTH_UNAUTHORISED = "Should return 403:forbidden if unauthorised service authentication token";
 
+    String DISPLAY_S2S_PERMISSION_MISSING
+        = "Should return 403:forbidden if service is missing correct S2S permission";
+
     String DISPLAY_S2S_AUTH_SERVICE_UNAVAILABLE
         = "Should return 401:unauthorised if S2S authentication service is unavailable";
 
@@ -42,6 +45,8 @@ interface BaseMvcAuthChecks {
     void should401ForMalformedServiceAuthToken() throws Exception;
 
     void should403ForUnauthorisedServiceAuthToken() throws Exception;
+
+    void should403ForServiceMissingS2sPermission() throws Exception;
 
     void should401IfAuthServiceUnavailable() throws Exception;
 
@@ -68,8 +73,8 @@ interface BaseMvcAuthChecks {
      * AC2: Mandatory parameters missing from the request (IDAM token Missing)
      */
     default void assert401ForMissingAuthToken(MockMvc mockMvc,
-                                               MockHttpServletRequestBuilder happyPathRequestBuilder,
-                                               String serviceName) throws Exception {
+                                              MockHttpServletRequestBuilder happyPathRequestBuilder,
+                                              String serviceName) throws Exception {
 
         // GIVEN
         HttpHeaders headers = createHttpHeaders(serviceName);
@@ -86,8 +91,8 @@ interface BaseMvcAuthChecks {
      * AC3: Mandatory parameters missing from the request (IDAM token invalid - MALFORMED)
      */
     default void assert401ForMalformedAuthToken(MockMvc mockMvc,
-                                                 MockHttpServletRequestBuilder happyPathRequestBuilder,
-                                                 String serviceName) throws Exception {
+                                                MockHttpServletRequestBuilder happyPathRequestBuilder,
+                                                String serviceName) throws Exception {
 
         // GIVEN
         HttpHeaders headers = createHttpHeaders(serviceName);
@@ -123,8 +128,8 @@ interface BaseMvcAuthChecks {
      * AC4: Mandatory parameters missing from the request (S2S token Missing)
      */
     default void assert401ForMissingServiceAuthToken(MockMvc mockMvc,
-                                                      MockHttpServletRequestBuilder happyPathRequestBuilder,
-                                                      String serviceName) throws Exception {
+                                                     MockHttpServletRequestBuilder happyPathRequestBuilder,
+                                                     String serviceName) throws Exception {
 
         // GIVEN
         HttpHeaders headers = createHttpHeaders(serviceName);
@@ -141,8 +146,8 @@ interface BaseMvcAuthChecks {
      * AC5: Mandatory parameters missing from the request (S2S token invalid - MALFORMED)
      */
     default void assert401ForMalformedServiceAuthToken(MockMvc mockMvc,
-                                                        MockHttpServletRequestBuilder happyPathRequestBuilder,
-                                                        String serviceName) throws Exception {
+                                                       MockHttpServletRequestBuilder happyPathRequestBuilder,
+                                                       String serviceName) throws Exception {
 
         // GIVEN
         HttpHeaders headers = createHttpHeaders(serviceName);
@@ -160,11 +165,29 @@ interface BaseMvcAuthChecks {
      * AC5: Mandatory parameters missing from the request (S2S token invalid - UNAUTHORISED)
      */
     default void assert403ForUnauthorisedServiceAuthToken(MockMvc mockMvc,
-                                                           MockHttpServletRequestBuilder happyPathRequestBuilder
+                                                          MockHttpServletRequestBuilder happyPathRequestBuilder
     ) throws Exception {
 
         // GIVEN
         HttpHeaders headers = createHttpHeaders(UNAUTHORISED_SERVICE); // <-- UNAUTHORISED S2S AUTH
+
+        // WHEN
+        mockMvc.perform(happyPathRequestBuilder.headers(headers))
+            // THEN
+            .andExpect(status().isForbidden());
+    }
+
+    /*
+     * CPO-33: “Implement tests for invalid S2S and Idam token”
+     * AC5: Mandatory parameters missing from the request (S2S token invalid - MISSING-PERMISSION)
+     */
+    default void assert403ForServiceMissingS2sPermission(MockMvc mockMvc,
+                                                         MockHttpServletRequestBuilder happyPathRequestBuilder,
+                                                         String serviceNameWithoutPermission
+    ) throws Exception {
+
+        // GIVEN
+        HttpHeaders headers = createHttpHeaders(serviceNameWithoutPermission); // <-- MISSING-PERMISSION
 
         // WHEN
         mockMvc.perform(happyPathRequestBuilder.headers(headers))
