@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -97,4 +99,21 @@ class JwtGrantedAuthoritiesConverterTest {
         Collection<GrantedAuthority> authorities = converter.convert(jwt);
         assertEquals(1, authorities.size(), "should return one authority");
     }
+
+
+    @Test
+    @DisplayName("Should throw AuthenticationServiceException when IdamRepository error")
+    void shouldThrowAuthenticationServiceExceptionWhenIdamRepositoryError() {
+
+        // GIVEN
+        when(jwt.containsClaim(TOKEN_NAME)).thenReturn(true);
+        when(jwt.getClaim(TOKEN_NAME)).thenReturn(ACCESS_TOKEN);
+        when(jwt.getTokenValue()).thenReturn(ACCESS_TOKEN);
+        when(idamRepository.getUserInfo(BEARER + ACCESS_TOKEN)).thenThrow(new RuntimeException());
+
+        // WHEN / THEN
+        assertThatThrownBy(() -> converter.convert(jwt))
+            .isInstanceOf(AuthenticationServiceException.class);
+    }
+
 }
