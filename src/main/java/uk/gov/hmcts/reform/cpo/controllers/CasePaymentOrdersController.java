@@ -190,7 +190,7 @@ public class CasePaymentOrdersController {
         return casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter);
     }
 
-    @DeleteMapping(path = CASE_PAYMENT_ORDERS_PATH)
+    @DeleteMapping(path = CASE_PAYMENT_ORDERS_PATH, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "Delete specified case payment orders")
     @ApiResponses({
