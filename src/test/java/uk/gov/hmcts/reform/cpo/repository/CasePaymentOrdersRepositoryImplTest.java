@@ -12,7 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -51,8 +50,12 @@ class CasePaymentOrdersRepositoryImplTest {
     private static final List<Long> CASE_IDS = List.of(RandomUtils.nextLong(), RandomUtils.nextLong());
 
     @Test
-    void testDeleteByUuids() throws Exception {
+    void testDeleteByUuids() {
         when(casePaymentOrdersJpaRepository.deleteByIdIsIn(anyList())).thenReturn(UUIDS.size());
+        when(casePaymentOrdersJpaRepository.existsById(UUIDS.get(0)))
+                .thenReturn(true);
+        when(casePaymentOrdersJpaRepository.existsById(UUIDS.get(1)))
+                .thenReturn(true);
 
         casePaymentOrdersRepository.deleteByUuids(UUIDS);
 
@@ -72,19 +75,23 @@ class CasePaymentOrdersRepositoryImplTest {
 
     @Test
     void testExceptionThrownIfUnknownUuidCannotBeDeleted() {
-        List<UUID> uuids = List.of(UUID.randomUUID());
-        when(casePaymentOrdersJpaRepository.deleteByIdIsIn(anyList())).thenReturn(0);
+        List<UUID> uuids = List.of(UUID.randomUUID(), UUID.randomUUID());
 
-        assertThrows(CasePaymentOrderCouldNotBeFoundException.class, () -> {
-            casePaymentOrdersRepository.deleteByUuids(uuids);
-        });
+        CasePaymentOrderCouldNotBeFoundException casePaymentOrderCouldNotBeFoundException =
+                assertThrows(CasePaymentOrderCouldNotBeFoundException.class,
+                    () -> casePaymentOrdersRepository.deleteByUuids(uuids));
+
+        assertTrue(uuids.stream().map(UUID::toString)
+                .allMatch(casePaymentOrderCouldNotBeFoundException.getMessage()::contains));
+
+        verify(casePaymentOrdersJpaRepository, never()).deleteByIdIsIn(anyList());
     }
 
     @Test
-    void testDeleteByCaseIds() throws Exception {
+    void testDeleteByCaseIds() {
         when(casePaymentOrdersJpaRepository.deleteByCaseIdIsIn(anyList())).thenReturn(CASE_IDS.size());
-        when(casePaymentOrdersJpaRepository.findAllByCaseId(anyLong()))
-                .thenReturn(Collections.singletonList(new CasePaymentOrderEntity()));
+        when(casePaymentOrdersJpaRepository.existsByCaseId(anyLong()))
+                .thenReturn(true);
 
         casePaymentOrdersRepository.deleteByCaseIds(CASE_IDS);
 
@@ -104,19 +111,24 @@ class CasePaymentOrdersRepositoryImplTest {
 
     @Test
     void testExceptionThrownIfUnknownCaseIdCannotBeDeleted() {
-        List<Long> caseIds = List.of(123L);
-        when(casePaymentOrdersJpaRepository.findAllByCaseId(anyLong())).thenReturn(Collections.emptyList());
+        List<Long> caseIds = List.of(123L, 456L);
 
-        assertThrows(CasePaymentOrderCouldNotBeFoundException.class,
-            () -> casePaymentOrdersRepository.deleteByCaseIds(caseIds));
+        CasePaymentOrderCouldNotBeFoundException casePaymentOrderCouldNotBeFoundException =
+                assertThrows(CasePaymentOrderCouldNotBeFoundException.class,
+                    () -> casePaymentOrdersRepository.deleteByCaseIds(caseIds));
+
+        assertTrue(caseIds.stream()
+                .map(Object::toString)
+                .allMatch(casePaymentOrderCouldNotBeFoundException.getMessage()::contains));
+
         verify(casePaymentOrdersJpaRepository, never()).deleteByCaseIdIsIn(anyList());
     }
 
     @Test
     void testDeleteByCaseIdsMixOfExistingAndNonExistentCaseIds() {
         // Simulate 3 records existing with case id
-        when(casePaymentOrdersJpaRepository.findAllByCaseId(anyLong()))
-                .thenReturn(Collections.singletonList(new CasePaymentOrderEntity()));
+        when(casePaymentOrdersJpaRepository.existsByCaseId(anyLong()))
+                .thenReturn(true);
         when(casePaymentOrdersJpaRepository.deleteByCaseIdIsIn(anyList())).thenReturn(3);
 
         List<Long> caseIdToDelete = List.of(RandomUtils.nextLong());

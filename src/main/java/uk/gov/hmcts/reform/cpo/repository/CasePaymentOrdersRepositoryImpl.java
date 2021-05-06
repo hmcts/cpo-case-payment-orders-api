@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,10 +28,8 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
 
     @Override
     public void deleteByUuids(List<UUID> uuids) {
-        int deleteByIds = casePaymentOrdersJpaRepository.deleteByIdIsIn(uuids);
-        if (deleteByIds != uuids.size()) {
-            throw new CasePaymentOrderCouldNotBeFoundException(ValidationError.CPO_NOT_FOUND_BY_ID);
-        }
+        validateAllEntriesExistByUuid(uuids);
+        casePaymentOrdersJpaRepository.deleteByIdIsIn(uuids);
     }
 
     @Override
@@ -40,12 +39,35 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
 
     @Override
     public void deleteByCaseIds(List<Long> caseIds) {
+        validateAllEntriesExistByCaseIds(caseIds);
+        casePaymentOrdersJpaRepository.deleteByCaseIdIsIn(caseIds);
+    }
+
+    private void validateAllEntriesExistByCaseIds(List<Long> caseIds) {
+        List<String> nonExistentCaseIds = new ArrayList<>();
         for (Long cid : caseIds) {
-            if (casePaymentOrdersJpaRepository.findAllByCaseId(cid).isEmpty()) {
-                throw new CasePaymentOrderCouldNotBeFoundException(ValidationError.CPO_NOT_FOUND_BY_CASE_ID);
+            if (!casePaymentOrdersJpaRepository.existsByCaseId(cid)) {
+                nonExistentCaseIds.add(String.valueOf(cid));
             }
         }
-        casePaymentOrdersJpaRepository.deleteByCaseIdIsIn(caseIds);
+        throwExceptionIfCposNotFound(nonExistentCaseIds);
+    }
+
+    private void validateAllEntriesExistByUuid(List<UUID> uuids) {
+        List<String> nonExistentUuids = new ArrayList<>();
+        for (UUID uuid : uuids) {
+            if (!casePaymentOrdersJpaRepository.existsById(uuid)) {
+                nonExistentUuids.add(uuid.toString());
+            }
+        }
+        throwExceptionIfCposNotFound(nonExistentUuids);
+    }
+
+    private void throwExceptionIfCposNotFound(List<String> nonExistentCpoIdentitifers) {
+        if (!nonExistentCpoIdentitifers.isEmpty()) {
+            throw new CasePaymentOrderCouldNotBeFoundException(
+                    ValidationError.CPOS_NOT_FOUND + String.join(",", nonExistentCpoIdentitifers));
+        }
     }
 
     @Override
@@ -60,12 +82,14 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
 
     @Override
     public Page<CasePaymentOrderEntity> findByIdIn(List<UUID> ids, Pageable pageable) {
+        validateAllEntriesExistByUuid(ids);
         return casePaymentOrdersJpaRepository.findByIdIn(ids, pageable);
     }
 
     @Override
-    public Page<CasePaymentOrderEntity> findByCaseIdIn(List<Long> casesId, Pageable pageable) {
-        return casePaymentOrdersJpaRepository.findByCaseIdIn(casesId, pageable);
+    public Page<CasePaymentOrderEntity> findByCaseIdIn(List<Long> caseIds, Pageable pageable) {
+        validateAllEntriesExistByCaseIds(caseIds);
+        return casePaymentOrdersJpaRepository.findByCaseIdIn(caseIds, pageable);
     }
 
     @Override

@@ -28,8 +28,6 @@ import uk.gov.hmcts.reform.cpo.auditlog.AuditRepository;
 import uk.gov.hmcts.reform.cpo.config.AuditConfiguration;
 
 import javax.inject.Inject;
-import java.time.LocalDateTime;
-import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
@@ -72,7 +70,6 @@ public class BaseTest {
     public static final String ORDER_REFERENCE_INVALID = "2021-918425346";
     public static final String ACTION = "action";
     public static final String RESPONSIBLE_PARTY = "responsibleParty";
-    public static final LocalDateTime EFFECTIVE_FROM = LocalDateTime.of(2021, Month.MARCH, 24, 11, 48, 32);
     public static final boolean HISTORY_EXISTS_DEFAULT = false;
     public static final boolean HISTORY_EXISTS_UPDATED = true;
 

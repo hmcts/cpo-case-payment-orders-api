@@ -7,14 +7,12 @@
     "does not contain the search criteria parameters",
     "contains a 204",
     "contains an case_ids that doesn't exist in the Case Payment Orders database"
-
-
   ],
 
   "request" : {
     "_extends_": "Common_Request",
     "queryParams": {
-      "case_ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]},${[scenarioContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][case_id]},${[scenarioContext][customValues][GenerateCaseId]}"
+      "case_ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]},${[scenarioContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][case_id]},1617017531060561"
     }
   },
 
@@ -22,7 +20,7 @@
     "_extends_" : "Common_404_Response",
     "body" : {
       "exception" : "uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException",
-      "message" : "Case Payment Order specified by Case IDs does not exist",
+      "message" : "The following Case Payment Orders do not exist : 1617017531060561",
       "path" : "/case-payment-orders",
       "details" : null
     }

@@ -19,7 +19,7 @@
     "_extends_" : "Common_404_Response",
     "body" : {
       "exception" : "uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException",
-      "message" : "Case Payment Order does not exist.",
+      "message" : "The following Case Payment Orders do not exist : 1617017531060561,1617017629907038",
       "path" : "/case-payment-orders",
       "details" : null
     }

@@ -37,7 +37,6 @@ public class CasePaymentOrderEntityGenerator {
                 .caseId(useSameCaseId ? caseId : Long.parseLong(uidService.generateUID()))
                 .createdBy("Created by " + Arrays.toString(RandomUtils.nextBytes(2)))
                 .orderReference("2021-" + RandomUtils.nextLong(10000000000L, 99999999999L))
-                .effectiveFrom(LocalDateTime.now())
                 .createdTimestamp(LocalDateTime.now())
                 .responsibleParty("ResponsibleParty" + Arrays.toString(RandomUtils.nextBytes(2)))
                 .historyExists(false)

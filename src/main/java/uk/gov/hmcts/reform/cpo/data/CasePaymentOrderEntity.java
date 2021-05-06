@@ -33,9 +33,6 @@ public class CasePaymentOrderEntity {
     @CreationTimestamp
     private LocalDateTime createdTimestamp;
 
-    @Column(nullable = false)
-    private LocalDateTime effectiveFrom;
-
     @Column(length = 16, nullable = false)
     private Long caseId;
 

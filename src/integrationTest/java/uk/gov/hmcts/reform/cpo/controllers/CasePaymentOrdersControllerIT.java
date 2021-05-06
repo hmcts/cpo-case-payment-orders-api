@@ -7,11 +7,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.cpo.BaseTest;
 import uk.gov.hmcts.reform.cpo.auditlog.AuditOperationType;
@@ -44,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -86,7 +90,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         casePaymentOrdersAuditJpaRepository.deleteAllInBatch();
     }
 
-
     @Nested
     @DisplayName("POST /case-payment-orders")
     class CreateCasePaymentOrder {
@@ -104,18 +107,17 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             caseId = uidService.generateUID();
 
-            createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(EFFECTIVE_FROM, caseId,
+            createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(caseId,
                                                                               ACTION, RESPONSIBLE_PARTY,
                                                                               ORDER_REFERENCE_VALID
             );
 
-            createCasePaymentOrderRequestNull = new CreateCasePaymentOrderRequest(null, null,
+            createCasePaymentOrderRequestNull = new CreateCasePaymentOrderRequest(null,
                                                                                   null, null,
                                                                                   null
             );
 
-            createCasePaymentOrderRequestInvalid = new CreateCasePaymentOrderRequest(EFFECTIVE_FROM,
-                                                                                     CASE_ID_INVALID,
+            createCasePaymentOrderRequestInvalid = new CreateCasePaymentOrderRequest(CASE_ID_INVALID,
                                                                                      ACTION, RESPONSIBLE_PARTY,
                                                                                      ORDER_REFERENCE_INVALID
             );
@@ -139,7 +141,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                     .andExpect(jsonPath("$.action", is(ACTION)))
                     .andExpect(jsonPath("$.responsible_party", is(RESPONSIBLE_PARTY)))
                     .andExpect(jsonPath("$.order_reference", is(ORDER_REFERENCE_VALID)))
-                    .andExpect(jsonPath("$.effective_from", is(EFFECTIVE_FROM.format(formatter))))
                     .andExpect(jsonPath("$.created_by", is(IDAM_MOCK_USER_ID)))
                     .andExpect(jsonPath("$.created_timestamp").exists())
                     .andExpect(jsonPath("$.history_exists", is(HISTORY_EXISTS_DEFAULT)))
@@ -167,11 +168,10 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath(ERROR_PATH_MESSAGE, is(ValidationError.ARGUMENT_NOT_VALID)))
-                .andExpect(jsonPath(ERROR_PATH_DETAILS, hasSize(5)))
+                .andExpect(jsonPath(ERROR_PATH_DETAILS, hasSize(4)))
                 .andExpect(jsonPath(ERROR_PATH_DETAILS, hasItem(ValidationError.ACTION_REQUIRED)))
                 .andExpect(jsonPath(ERROR_PATH_DETAILS, hasItem(ValidationError.ORDER_REFERENCE_REQUIRED)))
                 .andExpect(jsonPath(ERROR_PATH_DETAILS, hasItem(ValidationError.CASE_ID_REQUIRED)))
-                .andExpect(jsonPath(ERROR_PATH_DETAILS, hasItem(ValidationError.EFFECTIVE_FROM_REQUIRED)))
                 .andExpect(jsonPath(ERROR_PATH_DETAILS, hasItem(ValidationError.RESPONSIBLE_PARTY_REQUIRED)))
 
                 .andExpect(hasGeneratedLogAudit(AuditOperationType.CREATE_CASE_PAYMENT_ORDER,
@@ -209,8 +209,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                 casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
 
             // make a request with matching Case-ID and OrderReference
-            createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(EFFECTIVE_FROM,
-                                                                              savedEntity.getCaseId().toString(),
+            createCasePaymentOrderRequest = new CreateCasePaymentOrderRequest(savedEntity.getCaseId().toString(),
                                                                               ACTION,
                                                                               RESPONSIBLE_PARTY,
                                                                               savedEntity.getOrderReference());
@@ -235,7 +234,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             assertTrue(savedEntity.isPresent());
             assertEquals(id, savedEntity.get().getId());
-            assertEquals(request.getEffectiveFrom(), savedEntity.get().getEffectiveFrom());
             assertEquals(request.getCaseId(), savedEntity.get().getCaseId().toString());
             assertEquals(request.getAction(), savedEntity.get().getAction());
             assertEquals(request.getResponsibleParty(), savedEntity.get().getResponsibleParty());
@@ -255,7 +253,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(RevisionType.ADD, latestRevision.getRevisionType());
             // verify content
             assertEquals(id, latestRevision.getEntity().getId());
-            assertEquals(request.getEffectiveFrom(), latestRevision.getEntity().getEffectiveFrom());
             assertEquals(request.getCaseId(), latestRevision.getEntity().getCaseId().toString());
             assertEquals(request.getAction(), latestRevision.getEntity().getAction());
             assertEquals(request.getResponsibleParty(), latestRevision.getEntity().getResponsibleParty());
@@ -266,7 +263,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertFalse(latestRevision.getEntity().isHistoryExists());
         }
     }
-
 
     @Nested
     @DisplayName("DELETE /case-payment-orders?ids=")
@@ -324,32 +320,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         @DisplayName("Fail if one case payment from list cannot be removed as specified ID does not exist")
         @Test
         void shouldFailWithNotFoundWhenDeleteNonExistentId() throws Exception {
-
-            List<CasePaymentOrderEntity> savedEntities =
-                    casePaymentOrderEntityGenerator.generateAndSaveEntities(3);
-            List<UUID> savedEntitiesUuids = savedEntities.stream()
-                    .map(CasePaymentOrderEntity::getId)
-                    .collect(Collectors.toList());
-            assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
-
-            List<UUID> entitiesToDelete = new ArrayList<>(savedEntitiesUuids);
-
-            entitiesToDelete.add(UUID.randomUUID());
-
-            String[] savedEntitiesUuidsString = entitiesToDelete.stream().map(UUID::toString).toArray(String[]::new);
-
-            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
-                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
-                                .queryParam(IDS, savedEntitiesUuidsString))
-                    .andExpect(status().isNotFound())
-                    .andExpect(jsonPath(ERROR_PATH_MESSAGE, is(ValidationError.CPO_NOT_FOUND_BY_ID)))
-
-                    .andExpect(hasGeneratedLogAudit(AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
-                                                    AUTHORISED_CRUD_SERVICE,
-                                                    Arrays.asList(savedEntitiesUuidsString),
-                                                    null));
-
-            assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
+            assert404ResponseWhenSpecifiedIdentifierNotFound(HttpMethod.DELETE, IDS);
         }
 
         @DisplayName("Should delete entity and all its corresponding audit revisions")
@@ -505,40 +476,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertTrue(casePaymentOrdersAuditJpaRepository.findAllById(savedEntitiesUuids).isEmpty());
         }
 
-
-        @DisplayName("Fail if one case payment from list cannot be removed as specified Case Id does not exist")
-        @Test
-        void shouldFailWithNotFoundWhenDeleteNonExistentCaseId() throws Exception {
-
-            List<CasePaymentOrderEntity> savedEntities =
-                    casePaymentOrderEntityGenerator.generateAndSaveEntities(3);
-            List<UUID> savedEntitiesUuids = savedEntities.stream()
-                    .map(CasePaymentOrderEntity::getId)
-                    .collect(Collectors.toList());
-            assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
-
-            List<String> savedEntitiesCaseIds = savedEntities.stream()
-                    .map(CasePaymentOrderEntity::getCaseId)
-                    .map(caseId -> Long.toString(caseId))
-                    .collect(Collectors.toList());
-            savedEntitiesCaseIds.add(uidService.generateUID());
-
-            mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
-                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
-                                .queryParam(CASE_IDS, savedEntitiesCaseIds.toArray(String[]::new)))
-                    .andExpect(status().isNotFound())
-                    .andExpect(jsonPath(ERROR_PATH_MESSAGE,
-                            is(ValidationError.CPO_NOT_FOUND_BY_CASE_ID)))
-
-                    .andExpect(hasGeneratedLogAudit(AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
-                                                    AUTHORISED_CRUD_SERVICE,
-                                                    null,
-                                                    savedEntitiesCaseIds));
-
-
-            assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
-        }
-
         @DisplayName("Should delete entity and all its corresponding audit revisions")
         @Test
         void testCaseIdPresentMultipleTimesForCreateAndUpdate() throws Exception {
@@ -599,8 +536,13 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                                     null,
                                                     invalidLuhn));
         }
-    }
 
+        @DisplayName("Should fail with 404 Not Found if any of the specified CaseIds cannot be found in database")
+        @Test
+        void shouldThrow404NotFoundWhenCaseIdSpecifiedNotFound() throws Exception {
+            assert404ResponseWhenSpecifiedIdentifierNotFound(HttpMethod.DELETE, CASE_IDS);
+        }
+    }
 
     @Nested
     @DisplayName("GET /case-payment-orders?ids=")
@@ -682,6 +624,12 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                                 AUTHORISED_READ_SERVICE,
                                                 invalidUuid,
                                                 null));
+        }
+
+        @DisplayName("Should fail with 404 Not Found if any of the specified ids cannot be found in database")
+        @Test
+        void shouldThrow404NotFoundWhenUuidSpecifiedNotFound() throws Exception {
+            assert404ResponseWhenSpecifiedIdentifierNotFound(HttpMethod.GET, IDS);
         }
 
         @DisplayName("Should fail with 400 Bad Request when CaseIds and UUIDs are specified")
@@ -863,8 +811,13 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                                 null,
                                                 invalidLuhn));
         }
-    }
 
+        @DisplayName("Should fail with 404 Not Found if any of the specified CaseIds cannot be found in database")
+        @Test
+        void shouldThrow404NotFoundWhenCaseIdSpecifiedNotFound() throws Exception {
+            assert404ResponseWhenSpecifiedIdentifierNotFound(HttpMethod.GET, CASE_IDS);
+        }
+    }
 
     @Nested
     @DisplayName("PUT /case-payment-orders")
@@ -882,7 +835,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                 casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
             UpdateCasePaymentOrderRequest request = new UpdateCasePaymentOrderRequest(
                 originalEntity.getId().toString(),
-                EFFECTIVE_FROM,
                 uidService.generateUID(),
                 ACTION,
                 RESPONSIBLE_PARTY,
@@ -914,7 +866,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                 casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
             UpdateCasePaymentOrderRequest request = new UpdateCasePaymentOrderRequest(
                 null,
-                EFFECTIVE_FROM,
                 uidService.generateUID(),
                 ACTION,
                 RESPONSIBLE_PARTY,
@@ -934,37 +885,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             verifyUpdateLogAuditValues(request, result);
         }
 
-        @DisplayName("should fail with 400 bad request when Effective From is null")
-        @Test
-        void shouldFailWith400BadRequestWhenEffectiveFromIsNull() throws Exception {
-
-            // CPO-6 / AC2: Must return error if one or more of the mandatory parameters have not been provided
-
-            // GIVEN
-            CasePaymentOrderEntity originalEntity =
-                casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
-            UpdateCasePaymentOrderRequest request = new UpdateCasePaymentOrderRequest(
-                originalEntity.getId().toString(),
-                null,
-                uidService.generateUID(),
-                ACTION,
-                RESPONSIBLE_PARTY,
-                ORDER_REFERENCE_VALID
-            );
-
-            // WHEN
-            ResultActions result =  mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
-                                                        .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
-                                                        .contentType(MediaType.APPLICATION_JSON)
-                                                        .content(objectMapper.writeValueAsString(request)));
-
-            // THEN
-            assertBadRequestResponse(result, ValidationError.EFFECTIVE_FROM_REQUIRED);
-            // check latest audit does not show update (i.e. modified)
-            assertNotSame(RevisionType.MOD, getLatestAuditRevision(request.getUUID()).getRevisionType());
-            verifyUpdateLogAuditValues(request, result);
-        }
-
         @DisplayName("should fail with 400 bad request when Case ID is null")
         @Test
         void shouldFailWith400BadRequestWhenCaseIdIsNull() throws Exception {
@@ -976,7 +896,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                 casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
             UpdateCasePaymentOrderRequest request = new UpdateCasePaymentOrderRequest(
                 originalEntity.getId().toString(),
-                EFFECTIVE_FROM,
                 null,
                 ACTION,
                 RESPONSIBLE_PARTY,
@@ -1007,7 +926,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                 casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
             UpdateCasePaymentOrderRequest request = new UpdateCasePaymentOrderRequest(
                 originalEntity.getId().toString(),
-                EFFECTIVE_FROM,
                 uidService.generateUID(),
                 null,
                 null,
@@ -1043,7 +961,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             // GIVEN
             UpdateCasePaymentOrderRequest request = new UpdateCasePaymentOrderRequest(
                 CPO_ID_INVALID,
-                EFFECTIVE_FROM,
                 uidService.generateUID(),
                 ACTION,
                 RESPONSIBLE_PARTY,
@@ -1072,7 +989,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                 casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
             UpdateCasePaymentOrderRequest request = new UpdateCasePaymentOrderRequest(
                 originalEntity.getId().toString(),
-                EFFECTIVE_FROM,
                 CASE_ID_INVALID,
                 ACTION,
                 RESPONSIBLE_PARTY,
@@ -1103,7 +1019,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                 casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
             UpdateCasePaymentOrderRequest request = new UpdateCasePaymentOrderRequest(
                 originalEntity.getId().toString(),
-                EFFECTIVE_FROM,
                 uidService.generateUID(),
                 ACTION,
                 RESPONSIBLE_PARTY,
@@ -1134,7 +1049,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                 casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
             UpdateCasePaymentOrderRequest request = new UpdateCasePaymentOrderRequest(
                 originalEntity.getId().toString(),
-                EFFECTIVE_FROM,
                 uidService.generateUID(),
                 "",
                 "",
@@ -1175,7 +1089,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                 casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
             UpdateCasePaymentOrderRequest request = new UpdateCasePaymentOrderRequest(
                 originalEntity.getId().toString(),
-                EFFECTIVE_FROM,
                 otherEntity.getCaseId().toString(), // i.e. try to make them match
                 ACTION,
                 RESPONSIBLE_PARTY,
@@ -1204,7 +1117,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             // GIVEN
             UpdateCasePaymentOrderRequest request = new UpdateCasePaymentOrderRequest(
                 CPO_ID_VALID_1,
-                EFFECTIVE_FROM,
                 uidService.generateUID(),
                 ACTION,
                 RESPONSIBLE_PARTY,
@@ -1249,7 +1161,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                           ResultActions result) throws Exception {
             result
                 .andExpect(jsonPath("$.id").value(request.getId()))
-                .andExpect(jsonPath("$.effective_from").value(request.getEffectiveFrom().format(formatter)))
                 .andExpect(jsonPath("$.case_id").value(request.getCaseId()))
                 .andExpect(jsonPath("$.order_reference").value(request.getOrderReference()))
                 .andExpect(jsonPath("$.action").value(request.getAction()))
@@ -1265,7 +1176,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             assertTrue(updatedEntity.isPresent());
             assertEquals(request.getId(), updatedEntity.get().getId().toString());
-            assertEquals(request.getEffectiveFrom(), updatedEntity.get().getEffectiveFrom());
             assertEquals(request.getCaseId(), updatedEntity.get().getCaseId().toString());
             assertEquals(request.getAction(), updatedEntity.get().getAction());
             assertEquals(request.getResponsibleParty(), updatedEntity.get().getResponsibleParty());
@@ -1284,7 +1194,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(RevisionType.MOD, latestRevision.getRevisionType());
             // verify content
             assertEquals(request.getId(), latestRevision.getEntity().getId().toString());
-            assertEquals(request.getEffectiveFrom(), latestRevision.getEntity().getEffectiveFrom());
             assertEquals(request.getCaseId(), latestRevision.getEntity().getCaseId().toString());
             assertEquals(request.getAction(), latestRevision.getEntity().getAction());
             assertEquals(request.getResponsibleParty(), latestRevision.getEntity().getResponsibleParty());
@@ -1305,7 +1214,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         }
     }
 
-
     private CasePaymentOrderAuditRevision getLatestAuditRevision(UUID id) {
 
         List<CasePaymentOrderAuditRevision> auditRevisions = auditUtils.getAuditRevisions(id);
@@ -1316,4 +1224,93 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         return auditRevisions.get(auditRevisions.size() - 1);
     }
 
+    private void assert404ResponseWhenSpecifiedIdentifierNotFound(HttpMethod method, String parameterName)
+            throws Exception {
+        // GIVEN
+        List<CasePaymentOrderEntity> savedEntities =
+                casePaymentOrderEntityGenerator.generateAndSaveEntities(3);
+        List<UUID> savedEntitiesUuids = savedEntities.stream()
+                .map(CasePaymentOrderEntity::getId)
+                .collect(Collectors.toList());
+        assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
+
+        MockHttpServletRequestBuilder mockHttpServletRequestBuilder = null;
+        AuditOperationType auditOperationType = null;
+
+        switch (method) {
+            case GET:
+                mockHttpServletRequestBuilder = get(CASE_PAYMENT_ORDERS_PATH);
+                auditOperationType = AuditOperationType.GET_CASE_PAYMENT_ORDER;
+                break;
+            case DELETE:
+                mockHttpServletRequestBuilder = delete(CASE_PAYMENT_ORDERS_PATH);
+                auditOperationType = AuditOperationType.DELETE_CASE_PAYMENT_ORDER;
+                break;
+            default:
+                fail("Invalid http method parameter supplied");
+        }
+
+        String queryParamName = null;
+        String[] queryParamValue = null;
+        ResultMatcher hasGeneratedLogAuditRequestMatcher = null;
+        String expectedErrorMessage = null;
+
+        switch (parameterName) {
+            case IDS:
+                List<UUID> nonExistentUuids = new ArrayList<>();
+                nonExistentUuids.add(UUID.randomUUID());
+                nonExistentUuids.add(UUID.randomUUID());
+                savedEntitiesUuids.addAll(nonExistentUuids);
+                String[] savedEntitiesUuidsString =
+                        savedEntitiesUuids.stream().map(UUID::toString).toArray(String[]::new);
+                queryParamName = IDS;
+                queryParamValue = savedEntitiesUuidsString;
+                hasGeneratedLogAuditRequestMatcher = hasGeneratedLogAudit(auditOperationType,
+                        AUTHORISED_CRUD_SERVICE,
+                        Arrays.asList(savedEntitiesUuidsString),
+                        null);
+                expectedErrorMessage = ValidationError.CPOS_NOT_FOUND
+                        + nonExistentUuids.get(0).toString()
+                        + ","
+                        + nonExistentUuids.get(1).toString();
+                break;
+            case CASE_IDS:
+                List<String> savedEntitiesCaseIds = savedEntities.stream()
+                        .map(CasePaymentOrderEntity::getCaseId)
+                        .map(caseId -> Long.toString(caseId))
+                        .collect(Collectors.toList());
+
+                List<String> nonExistentCpoIdentifiers = new ArrayList<>();
+                nonExistentCpoIdentifiers.add(uidService.generateUID());
+                nonExistentCpoIdentifiers.add(uidService.generateUID());
+                savedEntitiesCaseIds.addAll(nonExistentCpoIdentifiers);
+                queryParamName = CASE_IDS;
+                queryParamValue = savedEntitiesCaseIds.toArray(String[]::new);
+                hasGeneratedLogAuditRequestMatcher = hasGeneratedLogAudit(auditOperationType,
+                        AUTHORISED_CRUD_SERVICE,
+                        null,
+                        savedEntitiesCaseIds);
+                expectedErrorMessage = ValidationError.CPOS_NOT_FOUND
+                        + nonExistentCpoIdentifiers.get(0)
+                        + ","
+                        + nonExistentCpoIdentifiers.get(1);
+                break;
+            default:
+                fail("Invalid query parameter name supplied");
+
+        }
+
+        mockMvc.perform(
+                mockHttpServletRequestBuilder
+                        .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                        .queryParam(queryParamName, queryParamValue))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath(ERROR_PATH_MESSAGE,
+                        is(expectedErrorMessage)))
+                .andExpect(hasGeneratedLogAuditRequestMatcher);
+
+        if (method.equals(HttpMethod.DELETE)) {
+            assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
+        }
+    }
 }
