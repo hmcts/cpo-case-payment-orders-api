@@ -128,8 +128,7 @@ public class CasePaymentOrdersController {
             message = "One or more of the following reasons:"
                 + "\n1) " + ValidationError.CPO_FILTER_ERROR
                 + "\n2) " + ValidationError.CASE_ID_INVALID
-                + "\n3) " + ValidationError.ID_INVALID
-                + "\n4) " + ValidationError.CPOS_NOT_FOUND,
+                + "\n3) " + ValidationError.ID_INVALID,
             response = String.class,
             examples = @Example({
                 @ExampleProperty(
@@ -150,7 +149,11 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 403,
             message = AuthError.UNAUTHORISED_S2S_SERVICE
-        )
+        ),
+        @ApiResponse(
+            code = 404,
+            message = ValidationError.CPOS_NOT_FOUND
+        ),
     })
     @ApiImplicitParams({
         @ApiImplicitParam(name = "page", value = "page number, indexes from (0,1) to page-size.", paramType = "query"),
@@ -200,8 +203,8 @@ public class CasePaymentOrdersController {
             message = "One or more of the following reasons:"
                 + "\n1) " + ValidationError.ID_INVALID
                 + "\n2) " + ValidationError.CASE_ID_INVALID
-                + "\n3) " + ValidationError.CPOS_NOT_FOUND
-                + "\n4) " + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS,
+                + "\n3) " + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS,
+            response = String.class,
             examples = @Example(value = {
                 @ExampleProperty(
                     value = "{\n"
@@ -222,6 +225,10 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 403,
             message = AuthError.UNAUTHORISED_S2S_SERVICE
+        ),
+        @ApiResponse(
+                code = 404,
+                message = ValidationError.CPOS_NOT_FOUND
         )
     })
     @LogAudit(
