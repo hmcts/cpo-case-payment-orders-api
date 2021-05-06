@@ -15,17 +15,16 @@ import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 
 import javax.persistence.EntityManagerFactory;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderAuditUtils.SELECT_DELETED_ENTITIES;
-import static uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderAuditUtils.SELECT_ENTITIES_ONLY;
-import static uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderAuditUtils.SELECT_REVISION_INFO_ONLY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderAuditUtils.SELECT_DELETED_ENTITIES;
+import static uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderAuditUtils.SELECT_ENTITIES_ONLY;
+import static uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderAuditUtils.SELECT_REVISION_INFO_ONLY;
 
 class CasePaymentOrdersAuditTest extends BaseTest {
 
@@ -53,7 +52,6 @@ class CasePaymentOrdersAuditTest extends BaseTest {
                 .action(ACTION_VALUE)
                 .caseId(new Random().nextLong())
                 .createdBy("gsullivan")
-                .effectiveFrom(LocalDateTime.now())
                 .responsibleParty("mrresponsible")
                 .build()
         );

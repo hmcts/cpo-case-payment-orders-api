@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 
 import javax.validation.constraints.NotEmpty;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -22,13 +21,11 @@ public class UpdateCasePaymentOrderRequest extends BaseCasePaymentOrderRequest {
     private final String id;
 
     public UpdateCasePaymentOrderRequest(String id,
-                                         LocalDateTime effectiveFrom,
                                          String caseId,
                                          String action,
                                          String responsibleParty,
                                          String orderReference) {
-        super(effectiveFrom,
-              caseId,
+        super(caseId,
               action,
               responsibleParty,
               orderReference);

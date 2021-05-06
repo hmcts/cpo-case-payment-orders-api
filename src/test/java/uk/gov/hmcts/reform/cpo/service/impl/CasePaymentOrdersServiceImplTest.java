@@ -327,7 +327,6 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
             casePaymentOrderEntity.setCaseId(Long.parseLong("1609243447569251"));
             casePaymentOrderEntity.setCreatedBy("action1");
             casePaymentOrderEntity.setOrderReference("action1");
-            casePaymentOrderEntity.setEffectiveFrom(LocalDateTime.now());
             casePaymentOrderEntity.setCreatedTimestamp(LocalDateTime.now());
             casePaymentOrderEntity.setResponsibleParty("setResponsibleParty");
             casePaymentOrders.add(casePaymentOrderEntity);
@@ -337,7 +336,6 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
             casePaymentOrderEntity1.setCaseId(Long.parseLong("1609243447569252"));
             casePaymentOrderEntity1.setCreatedBy("action1");
             casePaymentOrderEntity1.setOrderReference("Baction2");
-            casePaymentOrderEntity1.setEffectiveFrom(LocalDateTime.now());
             casePaymentOrderEntity1.setCreatedTimestamp(LocalDateTime.now());
             casePaymentOrderEntity1.setResponsibleParty("setResponsibleParty");
             casePaymentOrders.add(casePaymentOrderEntity1);
@@ -347,7 +345,6 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
             casePaymentOrderEntity2.setCaseId(Long.parseLong("1609243447569253"));
             casePaymentOrderEntity2.setCreatedBy("action1");
             casePaymentOrderEntity2.setOrderReference("Caction3");
-            casePaymentOrderEntity2.setEffectiveFrom(LocalDateTime.now());
             casePaymentOrderEntity2.setCreatedTimestamp(LocalDateTime.now());
             casePaymentOrderEntity2.setResponsibleParty("setResponsibleParty");
             casePaymentOrders.add(casePaymentOrderEntity2);
