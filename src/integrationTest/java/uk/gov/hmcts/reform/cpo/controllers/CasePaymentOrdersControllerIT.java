@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.cpo.utils.UIDService;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -1256,7 +1257,10 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
         switch (parameterName) {
             case IDS:
-                savedEntitiesUuids.add(UUID.randomUUID());
+                List<UUID> nonExistentUuids = new ArrayList<>();
+                nonExistentUuids.add(UUID.randomUUID());
+                nonExistentUuids.add(UUID.randomUUID());
+                savedEntitiesUuids.addAll(nonExistentUuids);
                 String[] savedEntitiesUuidsString =
                         savedEntitiesUuids.stream().map(UUID::toString).toArray(String[]::new);
                 queryParamName = IDS;
@@ -1265,21 +1269,31 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                         AUTHORISED_CRUD_SERVICE,
                         Arrays.asList(savedEntitiesUuidsString),
                         null);
-                expectedErrorMessage = ValidationError.CPO_NOT_FOUND_BY_ID;
+                expectedErrorMessage = ValidationError.CPOS_NOT_FOUND
+                        + nonExistentUuids.get(0).toString()
+                        + ","
+                        + nonExistentUuids.get(1).toString();
                 break;
             case CASE_IDS:
                 List<String> savedEntitiesCaseIds = savedEntities.stream()
                         .map(CasePaymentOrderEntity::getCaseId)
                         .map(caseId -> Long.toString(caseId))
                         .collect(Collectors.toList());
-                savedEntitiesCaseIds.add(uidService.generateUID());
+
+                List<String> nonExistentCpoIdentifiers = new ArrayList<>();
+                nonExistentCpoIdentifiers.add(uidService.generateUID());
+                nonExistentCpoIdentifiers.add(uidService.generateUID());
+                savedEntitiesCaseIds.addAll(nonExistentCpoIdentifiers);
                 queryParamName = CASE_IDS;
                 queryParamValue = savedEntitiesCaseIds.toArray(String[]::new);
                 hasGeneratedLogAuditRequestMatcher = hasGeneratedLogAudit(auditOperationType,
                         AUTHORISED_CRUD_SERVICE,
                         null,
                         savedEntitiesCaseIds);
-                expectedErrorMessage = ValidationError.CPO_NOT_FOUND_BY_CASE_ID;
+                expectedErrorMessage = ValidationError.CPOS_NOT_FOUND
+                        + nonExistentCpoIdentifiers.get(0)
+                        + ","
+                        + nonExistentCpoIdentifiers.get(1);
                 break;
             default:
                 fail("Invalid query parameter name supplied");

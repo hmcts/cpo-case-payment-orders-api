@@ -16,7 +16,7 @@ public interface CasePaymentOrdersJpaRepository extends JpaRepository<CasePaymen
 
     int deleteByCaseIdIsIn(Collection<Long> caseIds);
 
-    List<CasePaymentOrderEntity> findAllByCaseId(Long caseId);
+    boolean existsByCaseId(Long caseId);
 
     Page<CasePaymentOrderEntity> findByIdIn(List<UUID> ids, Pageable pageable);
 

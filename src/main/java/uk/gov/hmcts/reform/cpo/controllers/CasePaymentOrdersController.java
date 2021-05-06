@@ -126,7 +126,8 @@ public class CasePaymentOrdersController {
             message = "One or more of the following reasons:"
                 + "\n1) " + ValidationError.CPO_FILTER_ERROR
                 + "\n2) " + ValidationError.CASE_ID_INVALID
-                + "\n3) " + ValidationError.ID_INVALID,
+                + "\n3) " + ValidationError.ID_INVALID
+                + "\n4) " + ValidationError.CPOS_NOT_FOUND,
             response = String.class,
             examples = @Example({
                 @ExampleProperty(
@@ -196,9 +197,8 @@ public class CasePaymentOrdersController {
             message = "One or more of the following reasons:"
                 + "\n1) " + ValidationError.ID_INVALID
                 + "\n2) " + ValidationError.CASE_ID_INVALID
-                + "\n3) " + ValidationError.CPO_NOT_FOUND_BY_ID
-                + "\n4) " + ValidationError.CPO_NOT_FOUND_BY_CASE_ID
-                + "\n5) " + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS,
+                + "\n3) " + ValidationError.CPOS_NOT_FOUND
+                + "\n4) " + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS,
             examples = @Example(value = {
                 @ExampleProperty(
                     value = "{\n"
