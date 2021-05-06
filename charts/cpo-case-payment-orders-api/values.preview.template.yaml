@@ -13,5 +13,7 @@ java:
     CPO_CASE_PAYMENT_ORDERS_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
     CPO_CASE_PAYMENT_ORDERS_DB_OPTIONS: "?stringtype=unspecified"
     CPO_CASE_PAYMENT_ORDERS_DB_PORT: 5432
+    S2S_AUTHORIZATIONS_XUI_ID: xui_webapp
+    S2S_AUTHORIZATIONS_XUI_PERMISSION: CRUD
   postgresql:
     enabled: true

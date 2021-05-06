@@ -1,0 +1,11 @@
+{
+  "_guid_": "CPO_403_Response",
+  "_extends_": "Common_403_Response",
+
+  "headers": {
+    "_extends_": "Common_400_Response_Headers",
+    "WWW-Authenticate": "Bearer error=\"insufficient_scope\", error_description=\"The request requires higher privileges than provided by the access token.\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+  },
+
+  "body": null
+}

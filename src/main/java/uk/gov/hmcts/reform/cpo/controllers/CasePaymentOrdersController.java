@@ -12,6 +12,7 @@ import io.swagger.annotations.ExampleProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -109,6 +110,7 @@ public class CasePaymentOrdersController {
         cpoId = "#result.id",
         caseId = "#requestPayload.caseId"
     )
+    @PreAuthorize("@securityUtils.hasCreatePermission()")
     public CasePaymentOrder createCasePaymentOrderRequest(@Valid @RequestBody CreateCasePaymentOrderRequest
                                                               requestPayload) {
         return casePaymentOrdersService.createCasePaymentOrder(requestPayload);
@@ -126,8 +128,7 @@ public class CasePaymentOrdersController {
             message = "One or more of the following reasons:"
                 + "\n1) " + ValidationError.CPO_FILTER_ERROR
                 + "\n2) " + ValidationError.CASE_ID_INVALID
-                + "\n3) " + ValidationError.ID_INVALID
-                + "\n4) " + ValidationError.CPOS_NOT_FOUND,
+                + "\n3) " + ValidationError.ID_INVALID,
             response = String.class,
             examples = @Example({
                 @ExampleProperty(
@@ -148,7 +149,11 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 403,
             message = AuthError.UNAUTHORISED_S2S_SERVICE
-        )
+        ),
+        @ApiResponse(
+            code = 404,
+            message = ValidationError.CPOS_NOT_FOUND
+        ),
     })
     @ApiImplicitParams({
         @ApiImplicitParam(name = "page", value = "page number, indexes from (0,1) to page-size.", paramType = "query"),
@@ -159,6 +164,7 @@ public class CasePaymentOrdersController {
         cpoIds = "T(uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController).buildOptionalIds(#ids)",
         caseIds  = "T(uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController).buildOptionalIds(#caseIds)"
     )
+    @PreAuthorize("@securityUtils.hasReadPermission()")
     public Page<CasePaymentOrder> getCasePaymentOrders(@ApiParam("list of case payment orders ids")
                                                        @ValidCpoId
                                                        @RequestParam(name = IDS, required = false)
@@ -184,7 +190,7 @@ public class CasePaymentOrdersController {
         return casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter);
     }
 
-    @DeleteMapping(path = CASE_PAYMENT_ORDERS_PATH)
+    @DeleteMapping(path = CASE_PAYMENT_ORDERS_PATH, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "Delete specified case payment orders")
     @ApiResponses({
@@ -197,8 +203,8 @@ public class CasePaymentOrdersController {
             message = "One or more of the following reasons:"
                 + "\n1) " + ValidationError.ID_INVALID
                 + "\n2) " + ValidationError.CASE_ID_INVALID
-                + "\n3) " + ValidationError.CPOS_NOT_FOUND
-                + "\n4) " + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS,
+                + "\n3) " + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS,
+            response = String.class,
             examples = @Example(value = {
                 @ExampleProperty(
                     value = "{\n"
@@ -219,6 +225,10 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 403,
             message = AuthError.UNAUTHORISED_S2S_SERVICE
+        ),
+        @ApiResponse(
+                code = 404,
+                message = ValidationError.CPOS_NOT_FOUND
         )
     })
     @LogAudit(
@@ -226,6 +236,7 @@ public class CasePaymentOrdersController {
         cpoIds = "T(uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController).buildOptionalIds(#ids)",
         caseIds  = "T(uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController).buildOptionalIds(#caseIds)"
     )
+    @PreAuthorize("@securityUtils.hasDeletePermission()")
     public void deleteCasePaymentOrdersById(@ApiParam("list of IDs")
                                             @ValidCpoId
                                             @RequestParam(name = IDS, required = false) Optional<List<String>> ids,
@@ -297,6 +308,7 @@ public class CasePaymentOrdersController {
         cpoId = "#requestPayload.id",
         caseId = "#requestPayload.caseId"
     )
+    @PreAuthorize("@securityUtils.hasUpdatePermission()")
     public CasePaymentOrder updateCasePaymentOrderRequest(@Valid @RequestBody UpdateCasePaymentOrderRequest
                                                               requestPayload) {
         return casePaymentOrdersService.updateCasePaymentOrder(requestPayload);

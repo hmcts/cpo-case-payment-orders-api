@@ -1,0 +1,9 @@
+{
+  "_guid_": "Base_Case_Payment_Order",
+
+  "effective_from": "2021-02-10T03:02:30Z",
+  "case_id": "5277391326466289",
+  "action": "Pay up",
+  "responsible_party": "John Doe",
+  "order_reference": "2021-91842534611"
+}

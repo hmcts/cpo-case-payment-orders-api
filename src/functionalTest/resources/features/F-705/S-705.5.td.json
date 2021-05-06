@@ -1,0 +1,24 @@
+{
+  "_guid_": "S-705.5",
+  "_extends_": "updateCasePaymentOrderBase",
+
+  "title": "Must refuse access of the UpdateCasePaymentOrder API for a CRUD whitelisted service",
+
+  "s2sClientId": "payment_app",
+
+  "specs": [
+    "a new Case-Payment-Order microservice has been established",
+    "a CRUD whitelist doesn't exist for the invoking service",
+    "contains all the mandatory parameters"
+  ],
+
+  "request": {
+    "body" : {
+      "_extends_": "Base_CPO_Update_Payload_data"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "CPO_403_Response"
+  }
+}

@@ -17,11 +17,10 @@ def secrets = [
     secret('ccd-caseworker-autotest-email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
     secret('ccd-caseworker-autotest-password', 'CCD_CASEWORKER_AUTOTEST_PASSWORD'),
     secret('ccd-befta-caseworker-1-pwd', 'CCD_BEFTA_CASEWORKER_1_PWD')
-
-
   ],
   's2s-${env}': [
-    secret('microservicekey-xui-webapp', 'BEFTA_S2S_CLIENT_SECRET')
+    secret('microservicekey-xui-webapp', 'BEFTA_S2S_CLIENT_SECRET'),
+    secret('microservicekey-payment-app', 'BEFTA_S2S_CLIENT_SECRET_OF_PAYMENT_APP')
   ]
 ]
 
@@ -42,7 +41,6 @@ env.OAUTH2_CLIENT_ID = "xuiwebapp"
 env.OAUTH2_REDIRECT_URI = "https://manage-case.aat.platform.hmcts.net/oauth2/callback"
 env.OAUTH2_ACCESS_TOKEN_TYPE = "OIDC"
 env.OAUTH2_SCOPE_VARIABLES = "profile openid roles manage-user create-user"
-
 
 // S2S auth
 env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
