@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.Response;
+import org.springframework.http.HttpStatus;
 
 /*
  * Customises the static stubbed response before sending it back to the client
@@ -13,10 +14,19 @@ public abstract class AbstractDynamicResponseTransformer extends ResponseTransfo
 
     @Override
     public Response transform(Request request, Response response, FileSource files, Parameters parameters) {
-        return Response.Builder.like(response)
-            .but()
-            .body(dynamicResponse(request, response, parameters))
-            .build();
+        try {
+            return Response.Builder.like(response)
+                .but()
+                .body(dynamicResponse(request, response, parameters))
+                .build();
+
+        } catch (SecurityException ex) {
+            return Response.Builder.like(response)
+                .but()
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .statusMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase())
+                .build();
+        }
     }
 
     @Override

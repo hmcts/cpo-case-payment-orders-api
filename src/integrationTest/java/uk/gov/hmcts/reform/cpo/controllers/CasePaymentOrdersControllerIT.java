@@ -193,6 +193,13 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             @Test
             @Override
+            @DisplayName(DISPLAY_S2S_AUTH_EXPIRED)
+            public void should401ForExpiredServiceAuthToken() throws Exception {
+                assert401ForExpiredServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
             @DisplayName(DISPLAY_S2S_AUTH_UNAUTHORISED)
             public void should403ForUnauthorisedServiceAuthToken() throws Exception {
                 assert403ForUnauthorisedServiceAuthToken(mockMvc, happyPathRequestBuilder);
@@ -430,6 +437,13 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             @Test
             @Override
+            @DisplayName(DISPLAY_S2S_AUTH_EXPIRED)
+            public void should401ForExpiredServiceAuthToken() throws Exception {
+                assert401ForExpiredServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
             @DisplayName(DISPLAY_S2S_AUTH_UNAUTHORISED)
             public void should403ForUnauthorisedServiceAuthToken() throws Exception {
                 assert403ForUnauthorisedServiceAuthToken(mockMvc, happyPathRequestBuilder);
@@ -643,6 +657,13 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             @DisplayName(DISPLAY_S2S_AUTH_MALFORMED)
             public void should401ForMalformedServiceAuthToken() throws Exception {
                 assert401ForMalformedServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_EXPIRED)
+            public void should401ForExpiredServiceAuthToken() throws Exception {
+                assert401ForExpiredServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
             }
 
             @Test
@@ -895,6 +916,13 @@ class CasePaymentOrdersControllerIT extends BaseTest {
 
             @Test
             @Override
+            @DisplayName(DISPLAY_S2S_AUTH_EXPIRED)
+            public void should401ForExpiredServiceAuthToken() throws Exception {
+                assert401ForExpiredServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
             @DisplayName(DISPLAY_S2S_AUTH_UNAUTHORISED)
             public void should403ForUnauthorisedServiceAuthToken() throws Exception {
                 assert403ForUnauthorisedServiceAuthToken(mockMvc, happyPathRequestBuilder);
@@ -1120,6 +1148,13 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             @DisplayName(DISPLAY_S2S_AUTH_UNAUTHORISED)
             public void should403ForUnauthorisedServiceAuthToken() throws Exception {
                 assert403ForUnauthorisedServiceAuthToken(mockMvc, happyPathRequestBuilder);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_EXPIRED)
+            public void should401ForExpiredServiceAuthToken() throws Exception {
+                assert401ForExpiredServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
             }
 
             @Test
@@ -1357,6 +1392,13 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             @DisplayName(DISPLAY_S2S_AUTH_MALFORMED)
             public void should401ForMalformedServiceAuthToken() throws Exception {
                 assert401ForMalformedServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
+            }
+
+            @Test
+            @Override
+            @DisplayName(DISPLAY_S2S_AUTH_EXPIRED)
+            public void should401ForExpiredServiceAuthToken() throws Exception {
+                assert401ForExpiredServiceAuthToken(mockMvc, happyPathRequestBuilder, AUTHORISED_CRUD_SERVICE);
             }
 
             @Test

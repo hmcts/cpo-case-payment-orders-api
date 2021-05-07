@@ -89,16 +89,18 @@ public class BaseTest {
     protected AuditRepository auditRepository;
 
     public static HttpHeaders createHttpHeaders(String serviceName) throws JOSEException {
-        return createHttpHeaders(serviceName, AUTH_TOKEN_TTL);
+        return createHttpHeaders(AUTH_TOKEN_TTL, serviceName, AUTH_TOKEN_TTL);
     }
 
-    public static HttpHeaders createHttpHeaders(String serviceName, long authTtlMillis) throws JOSEException {
+    public static HttpHeaders createHttpHeaders(long authTtlMillis,
+                                                String serviceName,
+                                                long s2sAuthTtlMillis) throws JOSEException {
         HttpHeaders headers = new HttpHeaders();
         // :: IDAM OAuth2 token
         String authToken = BEARER + generateAuthToken(authTtlMillis);
         headers.add(AUTHORIZATION, authToken);
         // :: S2S authentication token
-        String s2SToken = generateS2SToken(serviceName);
+        String s2SToken = generateS2SToken(serviceName, s2sAuthTtlMillis);
         headers.add(SERVICE_AUTHORIZATION, s2SToken);
         // :: LogAudit Request-ID header
         headers.add(AuditConfiguration.REQUEST_ID, EXAMPLE_REQUEST_ID);
@@ -201,10 +203,10 @@ public class BaseTest {
         return signedJWT.serialize();
     }
 
-    private static String generateS2SToken(String serviceName) {
+    private static String generateS2SToken(String serviceName, long ttlMillis) {
         return Jwts.builder()
             .setSubject(serviceName)
-            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + ttlMillis))
             .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
             .compact();
     }
