@@ -1,0 +1,7 @@
+{
+	"_guid_": "CPO_Request_Headers_Authorization_Invalid",
+
+	"Authorization": "INVALID",
+	"ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]",
+	"Content-Type": "application/json"
+}

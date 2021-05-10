@@ -1,0 +1,27 @@
+{
+  "_guid_" : "S-704.8",
+  "_extends_" : "deleteCasePaymentOrderBase",
+
+  "title": "Mandatory parameters missing from the request (IDAM token invalid)",
+
+  "specs": [
+    "a new Case-Payment-Order microservice has been established",
+    "contains a set of ids from the case payment order just created above",
+    "contain the invalid IDAM token parameter",
+    "contains relevant error message"
+  ],
+
+  "request" : {
+    "headers": {
+      "_extends_": "CPO_Request_Headers_Authorization_Invalid"
+    },
+    "queryParams": {
+      "ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]},${[scenarioContext][childContexts][Prerequisite_Create_CPO_2][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_401_Response",
+    "body" : null
+  }
+}

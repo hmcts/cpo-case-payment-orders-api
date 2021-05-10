@@ -1,0 +1,7 @@
+{
+	"_guid_": "CPO_Request_Headers_ServiceAuthorization_Missing",
+
+	"Authorization": "[[DEFAULT_AUTO_VALUE]]",
+	"ServiceAuthorization": "",
+	"Content-Type": "application/json"
+}

@@ -1,0 +1,26 @@
+{
+  "_guid_" : "S-701.5",
+  "_extends_" : "createCasePaymentOrderBase",
+
+  "title": "Mandatory parameters missing from the request (IDAM token missing)",
+
+  "specs": [
+    "a new Case-Payment-Order microservice has been established",
+    "contain NO IDAM token",
+    "contains relevant error message"
+  ],
+
+  "request" : {
+    "headers": {
+      "_extends_": "CPO_Request_Headers_Authorization_Missing"
+    },
+    "body": {
+      "_extends_" : "Base_CPO_Data_Payload_data"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_401_Response",
+    "body" : null
+  }
+}

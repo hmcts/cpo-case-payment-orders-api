@@ -1,0 +1,28 @@
+{
+  "_guid_" : "S-702.8",
+  "_extends_" : "updateCasePaymentOrderBase",
+
+  "title": "Mandatory parameters missing from the request (S2S token missing)",
+
+  "specs": [
+    "a new Case-Payment-Order microservice has been established",
+    "contain NO S2S token",
+    "contains relevant error message"
+  ],
+
+  "request" : {
+    "headers": {
+      "_extends_": "CPO_Request_Headers_ServiceAuthorization_Missing"
+    },
+    "body": {
+      "_extends_" : "Base_CPO_Data_Payload_data",
+      "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
+      "responsible_party" : "party2"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_401_Response",
+    "body" : null
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "_guid_" : "S-702.7",
+  "_extends_" : "updateCasePaymentOrderBase",
+
+  "title": "Mandatory parameters missing from the request (IDAM token invalid)",
+
+  "specs": [
+    "a new Case-Payment-Order microservice has been established",
+    "contain the invalid IDAM token parameter",
+    "contains relevant error message"
+  ],
+
+  "request" : {
+    "headers": {
+      "_extends_": "CPO_Request_Headers_Authorization_Invalid"
+    },
+    "body": {
+      "_extends_" : "Base_CPO_Data_Payload_data",
+      "id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}",
+      "responsible_party" : "party2"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_401_Response",
+    "body" : null
+  }
+}
