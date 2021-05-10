@@ -16,6 +16,9 @@ services:
       IDAM_API_URL: "${IDAM_STUB_SERVICE_NAME:-http://idam-api:5000}"
       IDAM_OIDC_URL: "${IDAM_STUB_SERVICE_NAME:-http://idam-api:5000}"
       S2S_URL: http://service-auth-provider-api:8080
+      # override default 'xui_webapp' permissions with values that support the FTA tests
+      S2S_AUTHORIZATIONS_XUI_ID: xui_webapp
+      S2S_AUTHORIZATIONS_XUI_PERMISSION: CRUD
     ports:
       - 4457:4457
     depends_on:

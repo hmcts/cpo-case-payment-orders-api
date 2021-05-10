@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
 import org.springframework.boot.context.properties.bind.validation.BindValidationException;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import java.util.Optional;
@@ -13,9 +14,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ServiceAuthorizationConfigIT {
-    private static final String XUI_ID = "S2S.AUTHORIZATIONS.XUI.ID";
-    private static final String XUI_PERMISSION = "S2S.AUTHORIZATIONS.XUI.PERMISSION";
+@ActiveProfiles("itest")
+class ServiceAuthorizationConfigIT {
+
+    // NB: s2s service config from `application-itest.yaml`
+    private static final String S2S_ID = "test_crud_service";
+    private static final String S2S_ID_PROPERTY = "S2S.AUTHORIZATIONS.TEST_CRUD_SERVICE.ID";
+    private static final String S2S_PERMISSION_PROPERTY = "S2S.AUTHORIZATIONS.TEST_CRUD_SERVICE.PERMISSION";
 
     private ApplicationContextRunner applicationContextRunner;
 
@@ -119,6 +124,7 @@ public class ServiceAuthorizationConfigIT {
 
         return new ApplicationContextRunner()
                 .withUserConfiguration(ServiceAuthorizationConfig.class, ConfigurationPropertiesAutoConfiguration.class)
-                .withPropertyValues(XUI_ID + ":" + "xui_webapp", XUI_PERMISSION + ":" + permissionValues);
+                .withPropertyValues(S2S_ID_PROPERTY + ":" + S2S_ID,
+                                    S2S_PERMISSION_PROPERTY + ":" + permissionValues);
     }
 }
