@@ -5,8 +5,7 @@
   "title": "Mandatory parameters missing from the request (IDAM token missing)",
 
   "specs": [
-    "a new Case-Payment-Order microservice has been established",
-    "contain NO IDAM token",
+    "does not contain an IDAM token",
     "contains relevant error message"
   ],
 
@@ -20,7 +19,6 @@
   },
 
   "expectedResponse" : {
-    "_extends_" : "Common_401_Response",
-    "body" : null
+    "_extends_" : "CPO_401_Response"
   }
 }

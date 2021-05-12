@@ -5,9 +5,8 @@
   "title": "Mandatory parameters missing from the request (S2S token invalid)",
 
   "specs": [
-    "a new Case-Payment-Order microservice has been established",
     "contains a set of ids from the case payment orders previously created",
-    "contain the invalid S2S token parameter",
+    "contains an invalid S2S token",
     "contains relevant error message"
   ],
 
@@ -21,7 +20,6 @@
   },
 
   "expectedResponse" : {
-    "_extends_" : "Common_401_Response",
-    "body" : null
+    "_extends_" : "CPO_401_Response"
   }
 }

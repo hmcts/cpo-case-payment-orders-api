@@ -118,11 +118,10 @@ Feature: UPDATE Case Payment Order Endpoint
 # CPO-33 / AC-2
   @S-702.6
   Scenario: Mandatory parameters missing from the request (IDAM token missing)
-      And [a new Case-Payment-Order microservice has been established] in the context,
 
     When a request is prepared with appropriate values,
       And the request [intends to update a previously created payment order]
-      And the request [contain NO IDAM token],
+      And the request [does not contain an IDAM token],
       And it is submitted to call the [updateCasePaymentOrder] operation of [Case Payment Orders Microservice],
 
     Then a negative response is received,
@@ -133,11 +132,10 @@ Feature: UPDATE Case Payment Order Endpoint
 # CPO-33 / AC-3
   @S-702.7
   Scenario: Mandatory parameters missing from the request (IDAM token invalid)
-      And [a new Case-Payment-Order microservice has been established] in the context,
 
     When a request is prepared with appropriate values,
       And the request [intends to update a previously created payment order]
-      And the request [contain the invalid IDAM token parameter],
+      And the request [contains an invalid IDAM token],
       And it is submitted to call the [updateCasePaymentOrder] operation of [Case Payment Orders Microservice],
 
     Then a negative response is received,
@@ -148,11 +146,10 @@ Feature: UPDATE Case Payment Order Endpoint
 # CPO-33 / AC-4
   @S-702.8
   Scenario: Mandatory parameters missing from the request (S2S token missing)
-      And [a new Case-Payment-Order microservice has been established] in the context,
 
     When a request is prepared with appropriate values,
       And the request [intends to update a previously created payment order]
-      And the request [contain NO S2S token],
+      And the request [does not contain an S2S token],
       And it is submitted to call the [updateCasePaymentOrder] operation of [Case Payment Orders Microservice],
 
     Then a negative response is received,
@@ -163,11 +160,10 @@ Feature: UPDATE Case Payment Order Endpoint
 # CPO-33 / AC-5
   @S-702.9
   Scenario: Mandatory parameters missing from the request (S2S token invalid)
-      And [a new Case-Payment-Order microservice has been established] in the context,
 
     When a request is prepared with appropriate values,
       And the request [intends to update a previously created payment order]
-      And the request [contain the invalid S2S token parameter],
+      And the request [contains an invalid S2S token],
       And it is submitted to call the [updateCasePaymentOrder] operation of [Case Payment Orders Microservice],
 
     Then a negative response is received,

@@ -1,67 +1,108 @@
 package uk.gov.hmcts.reform.cpo.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.stubbing.StubMapping;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import uk.gov.hmcts.reform.cpo.BaseTest;
 import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
+import uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderEntityGenerator;
 
+import java.util.List;
+import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.cpo.BaseTest.AUTH_TOKEN_TTL;
-import static uk.gov.hmcts.reform.cpo.BaseTest.UNAUTHORISED_SERVICE;
-import static uk.gov.hmcts.reform.cpo.BaseTest.createHttpHeaders;
 
-interface BaseMvcAuthChecks {
+class BaseMvcAuthChecks extends BaseTest {
 
-    String DISPLAY_ALL_AUTH_OK = "Should return 2xx:Successful for happy path with valid authentication";
+    @Autowired
+    private MockMvc mockMvc;
 
-    String DISPLAY_AUTH_MISSING = "Should return 401:Unauthorised if no authentication token";
-    String DISPLAY_AUTH_MALFORMED = "Should return 401:Unauthorised if malformed token";
-    String DISPLAY_AUTH_EXPIRED = "Should return 401:Unauthorised if authentication token has expired";
+    @Autowired
+    private CasePaymentOrderEntityGenerator entityGenerator;
 
-    String DISPLAY_AUTH_SERVICE_UNAVAILABLE
-        = "Should return 401:Unauthorised if authentication service is unavailable";
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    String DISPLAY_S2S_AUTH_MISSING = "Should return 401:Unauthorised if no service authentication token";
-    String DISPLAY_S2S_AUTH_MALFORMED = "Should return 401:Unauthorised if malformed service authentication token";
-    String DISPLAY_S2S_AUTH_EXPIRED = "Should return 401:Unauthorised if service authentication token has expired";
+    static final String DISPLAY_ALL_AUTH_OK
+        = "#{index} - {0} - Should return 2xx:Successful for happy path with valid authentication";
 
-    String DISPLAY_S2S_AUTH_UNAUTHORISED = "Should return 403:Forbidden if unauthorised service authentication token";
-    String DISPLAY_S2S_PERMISSION_MISSING = "Should return 403:Forbidden if service is missing correct S2S permission";
+    static final String DISPLAY_AUTH_MISSING
+        = "#{index} - {0} - Should return 401:Unauthorised if no authentication token";
+    static final String DISPLAY_AUTH_MALFORMED
+        = "#{index} - {0} - Should return 401:Unauthorised if malformed token";
+    static final String DISPLAY_AUTH_EXPIRED
+        = "#{index} - {0} - Should return 401:Unauthorised if authentication token has expired";
 
-    String DISPLAY_S2S_AUTH_SERVICE_UNAVAILABLE
-        = "Should return 401:Unauthorised if S2S authentication service is unavailable";
+    static final String DISPLAY_AUTH_SERVICE_UNAVAILABLE
+        = "#{index} - {0} - Should return 401:Unauthorised if authentication service is unavailable";
 
-    void should2xxSuccessfulForHappyPath() throws Exception;
+    static final String DISPLAY_S2S_AUTH_MISSING
+        = "#{index} - {0} - Should return 401:Unauthorised if no service authentication token";
+    static final String DISPLAY_S2S_AUTH_MALFORMED
+        = "#{index} - {0} - Should return 401:Unauthorised if malformed service authentication token";
+    static final String DISPLAY_S2S_AUTH_EXPIRED
+        = "#{index} - {0} - Should return 401:Unauthorised if service authentication token has expired";
 
-    void should401ForMissingAuthToken() throws Exception;
+    static final String DISPLAY_S2S_AUTH_UNAUTHORISED
+        = "#{index} - {0} - Should return 403:Forbidden if unauthorised service authentication token";
+    static final String DISPLAY_S2S_PERMISSION_MISSING
+        = "#{index} - {0} - Should return 403:Forbidden if service is missing correct S2S permission";
 
-    void should401ForMalformedAuthToken() throws Exception;
+    static final String DISPLAY_S2S_AUTH_SERVICE_UNAVAILABLE
+        = "#{index} - {0} - Should return 401:Unauthorised if S2S authentication service is unavailable";
 
-    void should401ForExpiredAuthToken() throws Exception;
+    @SuppressWarnings("unused")
+    interface AuthChecks {
+        void should2xxSuccessfulForHappyPath(String displayName, EndpointUtil endpointUtil) throws Exception;
 
-    void should401ForMissingServiceAuthToken() throws Exception;
+        void should401ForMissingAuthToken(String displayName, EndpointUtil endpointUtil) throws Exception;
 
-    void should401ForMalformedServiceAuthToken() throws Exception;
+        void should401ForMalformedAuthToken(String displayName, EndpointUtil endpointUtil) throws Exception;
 
-    void should401ForExpiredServiceAuthToken() throws Exception;
+        void should401ForExpiredAuthToken(String displayName, EndpointUtil endpointUtil) throws Exception;
 
-    void should403ForUnauthorisedServiceAuthToken() throws Exception;
+        void should401ForMissingServiceAuthToken(String displayName, EndpointUtil endpointUtil) throws Exception;
 
-    void should403ForServiceMissingS2sPermission() throws Exception;
+        void should401ForMalformedServiceAuthToken(String displayName, EndpointUtil endpointUtil) throws Exception;
 
-    void should401IfAuthServiceUnavailable() throws Exception;
+        void should401ForExpiredServiceAuthToken(String displayName, EndpointUtil endpointUtil) throws Exception;
 
-    void should401IfS2sAuthServiceUnavailable() throws Exception;
+        void should403ForUnauthorisedServiceAuthToken(String displayName, EndpointUtil endpointUtil) throws Exception;
+
+        void should403ForServiceMissingS2sPermission(String displayName, EndpointUtil endpointUtil) throws Exception;
+
+        void should401IfAuthServiceUnavailable(String displayName, EndpointUtil endpointUtil) throws Exception;
+
+        void should401IfS2sAuthServiceUnavailable(String displayName, EndpointUtil endpointUtil) throws Exception;
+    }
 
     /*
      * CPO-33: “Implement tests for invalid S2S and Idam token”
      * AC1: Happy Path with valid Mandatory parameters (IDAM/S2S tokens)
      */
-    default void assert2xxSuccessfulForHappyPath(MockMvc mockMvc,
-                                                 MockHttpServletRequestBuilder happyPathRequestBuilder,
+    void assert2xxSuccessfulForHappyPath(EndpointUtil endpointUtil) throws Exception {
+
+        assert2xxSuccessfulForHappyPath(endpointUtil, endpointUtil.getHappyPathServiceName());
+        assert2xxSuccessfulForHappyPath(endpointUtil, AUTHORISED_CRUD_SERVICE);
+    }
+
+    private void assert2xxSuccessfulForHappyPath(EndpointUtil endpointUtil,
                                                  String serviceName) throws Exception {
+
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
+
         // GIVEN
         HttpHeaders headers = createHttpHeaders(serviceName); // <-- VALID AUTH & S2S AUTH
 
@@ -75,9 +116,11 @@ interface BaseMvcAuthChecks {
      * CPO-33: “Implement tests for invalid S2S and Idam token”
      * AC2: Mandatory parameters missing from the request (IDAM token Missing)
      */
-    default void assert401ForMissingAuthToken(MockMvc mockMvc,
-                                              MockHttpServletRequestBuilder happyPathRequestBuilder,
-                                              String serviceName) throws Exception {
+    void assert401ForMissingAuthToken(EndpointUtil endpointUtil) throws Exception {
+
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
+        String serviceName = endpointUtil.getHappyPathServiceName();
 
         // GIVEN
         HttpHeaders headers = createHttpHeaders(serviceName);
@@ -86,16 +129,18 @@ interface BaseMvcAuthChecks {
         // WHEN
         mockMvc.perform(happyPathRequestBuilder.headers(headers))
             // THEN
-            .andExpect(status().isUnauthorized());
+            .andExpect(isUnauthorizedOAuth2Error());
     }
 
     /*
      * CPO-33: “Implement tests for invalid S2S and Idam token”
      * AC3: Mandatory parameters missing from the request (IDAM token invalid - MALFORMED)
      */
-    default void assert401ForMalformedAuthToken(MockMvc mockMvc,
-                                                MockHttpServletRequestBuilder happyPathRequestBuilder,
-                                                String serviceName) throws Exception {
+    void assert401ForMalformedAuthToken(EndpointUtil endpointUtil) throws Exception {
+
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
+        String serviceName = endpointUtil.getHappyPathServiceName();
 
         // GIVEN
         HttpHeaders headers = createHttpHeaders(serviceName);
@@ -105,16 +150,18 @@ interface BaseMvcAuthChecks {
         // WHEN
         mockMvc.perform(happyPathRequestBuilder.headers(headers))
             // THEN
-            .andExpect(status().isUnauthorized());
+            .andExpect(isUnauthorizedOAuth2Error());
     }
 
     /*
      * CPO-33: “Implement tests for invalid S2S and Idam token”
      * AC3: Mandatory parameters missing from the request (IDAM token invalid - EXPIRED)
      */
-    default void assert401ForExpiredAuthToken(MockMvc mockMvc,
-                                              MockHttpServletRequestBuilder happyPathRequestBuilder,
-                                              String serviceName) throws Exception {
+    void assert401ForExpiredAuthToken(EndpointUtil endpointUtil) throws Exception {
+
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
+        String serviceName = endpointUtil.getHappyPathServiceName();
 
         // GIVEN
         long authTtlMillis = -1;
@@ -125,16 +172,18 @@ interface BaseMvcAuthChecks {
         // WHEN
         mockMvc.perform(happyPathRequestBuilder.headers(headers))
             // THEN
-            .andExpect(status().isUnauthorized());
+            .andExpect(isUnauthorizedOAuth2Error());
     }
 
     /*
      * CPO-33: “Implement tests for invalid S2S and Idam token”
      * AC4: Mandatory parameters missing from the request (S2S token Missing)
      */
-    default void assert401ForMissingServiceAuthToken(MockMvc mockMvc,
-                                                     MockHttpServletRequestBuilder happyPathRequestBuilder,
-                                                     String serviceName) throws Exception {
+    void assert401ForMissingServiceAuthToken(EndpointUtil endpointUtil) throws Exception {
+
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
+        String serviceName = endpointUtil.getHappyPathServiceName();
 
         // GIVEN
         HttpHeaders headers = createHttpHeaders(serviceName);
@@ -150,9 +199,11 @@ interface BaseMvcAuthChecks {
      * CPO-33: “Implement tests for invalid S2S and Idam token”
      * AC5: Mandatory parameters missing from the request (S2S token invalid - MALFORMED)
      */
-    default void assert401ForMalformedServiceAuthToken(MockMvc mockMvc,
-                                                       MockHttpServletRequestBuilder happyPathRequestBuilder,
-                                                       String serviceName) throws Exception {
+    void assert401ForMalformedServiceAuthToken(EndpointUtil endpointUtil) throws Exception {
+
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
+        String serviceName = endpointUtil.getHappyPathServiceName();
 
         // GIVEN
         HttpHeaders headers = createHttpHeaders(serviceName);
@@ -169,9 +220,11 @@ interface BaseMvcAuthChecks {
      * CPO-33: “Implement tests for invalid S2S and Idam token”
      * AC5: Mandatory parameters missing from the request (S2S token invalid - EXPIRED)
      */
-    default void assert401ForExpiredServiceAuthToken(MockMvc mockMvc,
-                                                     MockHttpServletRequestBuilder happyPathRequestBuilder,
-                                                     String serviceName) throws Exception {
+    void assert401ForExpiredServiceAuthToken(EndpointUtil endpointUtil) throws Exception {
+
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
+        String serviceName = endpointUtil.getHappyPathServiceName();
 
         // GIVEN
         long s2sAuthTtlMillis = -1;
@@ -189,9 +242,10 @@ interface BaseMvcAuthChecks {
      * CPO-33: “Implement tests for invalid S2S and Idam token”
      * AC5: Mandatory parameters missing from the request (S2S token invalid - UNAUTHORISED)
      */
-    default void assert403ForUnauthorisedServiceAuthToken(MockMvc mockMvc,
-                                                          MockHttpServletRequestBuilder happyPathRequestBuilder
-    ) throws Exception {
+    void assert403ForUnauthorisedServiceAuthToken(EndpointUtil endpointUtil) throws Exception {
+
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
 
         // GIVEN
         HttpHeaders headers = createHttpHeaders(UNAUTHORISED_SERVICE); // <-- UNAUTHORISED S2S AUTH
@@ -206,10 +260,28 @@ interface BaseMvcAuthChecks {
      * CPO-33: “Implement tests for invalid S2S and Idam token”
      * AC5: Mandatory parameters missing from the request (S2S token invalid - MISSING-PERMISSION)
      */
-    default void assert403ForServiceMissingS2sPermission(MockMvc mockMvc,
-                                                         MockHttpServletRequestBuilder happyPathRequestBuilder,
-                                                         String serviceNameWithoutPermission
-    ) throws Exception {
+    void assert403ForServiceMissingS2sPermission(EndpointUtil endpointUtil) throws Exception {
+
+        String happyPathServiceName = endpointUtil.getHappyPathServiceName();
+
+        List<String> serviceNames = List.of(AUTHORISED_CREATE_SERVICE,
+                                            AUTHORISED_READ_SERVICE,
+                                            AUTHORISED_UPDATE_SERVICE,
+                                            AUTHORISED_DELETE_SERVICE);
+
+        for (String serviceName : serviceNames) {
+            if (!happyPathServiceName.equals(serviceName)) { // NB: skip happy path
+                assert403ForServiceMissingS2sPermission(endpointUtil, serviceName);
+            }
+        }
+
+    }
+
+    void assert403ForServiceMissingS2sPermission(EndpointUtil endpointUtil,
+                                                         String serviceNameWithoutPermission) throws Exception {
+
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
 
         // GIVEN
         HttpHeaders headers = createHttpHeaders(serviceNameWithoutPermission); // <-- MISSING-PERMISSION
@@ -224,9 +296,12 @@ interface BaseMvcAuthChecks {
      * CPO-33: “Implement tests for invalid S2S and Idam token”
      * AC6: IDAM Service Unavailable
      */
-    default void assert401IfIdamUnavailable(MockMvc mockMvc,
-                                            MockHttpServletRequestBuilder happyPathRequestBuilder,
-                                            String serviceName) throws Exception {
+    void assert401IfIdamUnavailable(EndpointUtil endpointUtil) throws Exception {
+
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
+        String serviceName = endpointUtil.getHappyPathServiceName();
+
         StubMapping badIdamStub = null;
 
         try {
@@ -240,7 +315,7 @@ interface BaseMvcAuthChecks {
             // WHEN
             mockMvc.perform(happyPathRequestBuilder.headers(headers))
                 // THEN
-                .andExpect(status().isUnauthorized());
+                .andExpect(isUnauthorizedOAuth2Error());
 
         } finally {
             if (badIdamStub != null) {
@@ -253,9 +328,12 @@ interface BaseMvcAuthChecks {
      * CPO-33: “Implement tests for invalid S2S and Idam token”
      * AC7: S2S Service Unavailable
      */
-    default void assert401IfS2sAuthServiceUnavailable(MockMvc mockMvc,
-                                                      MockHttpServletRequestBuilder happyPathRequestBuilder,
-                                                      String serviceName) throws Exception {
+    void assert401IfS2sAuthServiceUnavailable(EndpointUtil endpointUtil) throws Exception {
+
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
+        String serviceName = endpointUtil.getHappyPathServiceName();
+
         StubMapping badS2sStub = null;
 
         try {
@@ -278,4 +356,22 @@ interface BaseMvcAuthChecks {
         }
     }
 
+    interface EndpointUtil {
+
+        MockHttpServletRequestBuilder getHappyPathRequestBuilder(CasePaymentOrderEntityGenerator entityGenerator,
+                                                                 ObjectMapper objectMapper)
+            throws JsonProcessingException;
+
+        String getHappyPathServiceName();
+
+    }
+
+    private ResultMatcher isUnauthorizedOAuth2Error() {
+        return result -> assertAll(
+            () -> assertEquals(HttpStatus.UNAUTHORIZED.value(), result.getResponse().getStatus()),
+            () -> assertTrue(result.getResponse().containsHeader(HttpHeaders.WWW_AUTHENTICATE)),
+            () -> assertTrue(Objects.requireNonNull(result.getResponse().getHeader(HttpHeaders.WWW_AUTHENTICATE))
+                                 .startsWith(OAuth2AccessToken.TokenType.BEARER.getValue()))
+        );
+    }
 }

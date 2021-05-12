@@ -177,12 +177,11 @@ Feature: GET Case Payment Order Endpoint
 # CPO-33 / AC-2
   @S-703.11
   Scenario: Mandatory parameters missing from the request (IDAM token missing)
-      And [a new Case-Payment-Order microservice has been established] in the context,
       And a successful call [to create a case payment order CP1] as in [Prerequisite_Create_CPO],
 
     When a request is prepared with appropriate values,
       And the request [contains a set of ids from the case payment orders previously created]
-      And the request [contain NO IDAM token],
+      And the request [does not contain an IDAM token],
       And it is submitted to call the [getCasePaymentOrder] operation of [Case Payment Orders Microservice],
 
     Then a negative response is received,
@@ -193,12 +192,11 @@ Feature: GET Case Payment Order Endpoint
 # CPO-33 / AC-3
   @S-703.12
   Scenario: Mandatory parameters missing from the request (IDAM token invalid)
-      And [a new Case-Payment-Order microservice has been established] in the context,
       And a successful call [to create a case payment order CP1] as in [Prerequisite_Create_CPO],
 
     When a request is prepared with appropriate values,
       And the request [contains a set of ids from the case payment orders previously created]
-      And the request [contain the invalid IDAM token parameter],
+      And the request [contains an invalid IDAM token],
       And it is submitted to call the [getCasePaymentOrder] operation of [Case Payment Orders Microservice],
 
     Then a negative response is received,
@@ -209,12 +207,11 @@ Feature: GET Case Payment Order Endpoint
 # CPO-33 / AC-4
   @S-703.13
   Scenario: Mandatory parameters missing from the request (S2S token missing)
-      And [a new Case-Payment-Order microservice has been established] in the context,
       And a successful call [to create a case payment order CP1] as in [Prerequisite_Create_CPO],
 
     When a request is prepared with appropriate values,
       And the request [contains a set of ids from the case payment orders previously created]
-      And the request [contain NO S2S token],
+      And the request [does not contain an S2S token],
       And it is submitted to call the [getCasePaymentOrder] operation of [Case Payment Orders Microservice],
 
     Then a negative response is received,
@@ -225,12 +222,11 @@ Feature: GET Case Payment Order Endpoint
 # CPO-33 / AC-5
   @S-703.14
   Scenario: Mandatory parameters missing from the request (S2S token invalid)
-      And [a new Case-Payment-Order microservice has been established] in the context,
       And a successful call [to create a case payment order CP1] as in [Prerequisite_Create_CPO],
 
     When a request is prepared with appropriate values,
       And the request [contains a set of ids from the case payment orders previously created]
-      And the request [contain the invalid S2S token parameter],
+      And the request [contains an invalid S2S token],
       And it is submitted to call the [getCasePaymentOrder] operation of [Case Payment Orders Microservice],
 
     Then a negative response is received,
