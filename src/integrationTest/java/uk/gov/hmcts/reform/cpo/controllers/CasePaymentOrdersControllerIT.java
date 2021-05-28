@@ -90,6 +90,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         casePaymentOrdersAuditJpaRepository.deleteAllInBatch();
     }
 
+
     @Nested
     @DisplayName("POST /case-payment-orders")
     class CreateCasePaymentOrder {
@@ -264,6 +265,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         }
     }
 
+
     @Nested
     @DisplayName("DELETE /case-payment-orders?ids=")
     class DeleteCasePaymentOrdersByIds {
@@ -387,6 +389,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                                     caseId));
         }
     }
+
 
     @Nested
     @DisplayName("DELETE /case-payment-orders?case_ids=")
@@ -544,6 +547,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         }
     }
 
+
     @Nested
     @DisplayName("GET /case-payment-orders?ids=")
     class GetCasePaymentOrdersByIds {
@@ -673,6 +677,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                                 null));
         }
     }
+
 
     @Nested
     @DisplayName("GET /case-payment-orders?case_ids=")
@@ -818,6 +823,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assert404ResponseWhenSpecifiedIdentifierNotFound(HttpMethod.GET, CASE_IDS);
         }
     }
+
 
     @Nested
     @DisplayName("PUT /case-payment-orders")
@@ -1313,4 +1319,5 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
         }
     }
+
 }

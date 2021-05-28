@@ -1,23 +1,22 @@
 package uk.gov.hmcts.reform.cpo;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.crypto.RSASSASigner;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.TextCodec;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextImpl;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -26,35 +25,43 @@ import uk.gov.hmcts.reform.cpo.auditlog.AuditEntry;
 import uk.gov.hmcts.reform.cpo.auditlog.AuditOperationType;
 import uk.gov.hmcts.reform.cpo.auditlog.AuditRepository;
 import uk.gov.hmcts.reform.cpo.config.AuditConfiguration;
+import uk.gov.hmcts.reform.cpo.utils.KeyGenUtil;
 
 import javax.inject.Inject;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ACCESS_TOKEN;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.util.AssertionErrors.assertNotNull;
+import static uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter.TOKEN_NAME;
+import static uk.gov.hmcts.reform.cpo.security.SecurityUtils.BEARER;
 import static uk.gov.hmcts.reform.cpo.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
 @SpringBootTest(classes = {
     Application.class,
     TestIdamConfiguration.class
 })
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc() // NB: don't disable filters as they are needed to test authentication is enabled on endpoints
 @AutoConfigureWireMock(port = 0, stubs = "classpath:/wiremock-stubs")
 @ActiveProfiles("itest")
 @SuppressWarnings({"squid:S2187"})
 public class BaseTest {
 
-    public static final String AUTHORISED_CRUD_SERVICE = "TEST_CRUD_SERVICE";
-    public static final String AUTHORISED_READ_SERVICE = "TEST_READ_SERVICE";
+    public static final String AUTHORISED_CRUD_SERVICE = "test_crud_service";
 
-    protected final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    public static final String AUTHORISED_CREATE_SERVICE = "test_create_service";
+    public static final String AUTHORISED_READ_SERVICE = "test_read_service";
+    public static final String AUTHORISED_UPDATE_SERVICE = "test_update_service";
+    public static final String AUTHORISED_DELETE_SERVICE = "test_delete_service";
+
+    public static final String UNAUTHORISED_SERVICE = "test_unauthorised_service";
+
+    public static final long AUTH_TOKEN_TTL = 14400000;
 
     public static final String ERROR_PATH_DETAILS = "$.details";
     public static final String ERROR_PATH_ERROR = "$.error";
@@ -77,29 +84,25 @@ public class BaseTest {
 
     private static final String EXAMPLE_REQUEST_ID = "TEST REQUEST ID";
 
-    @Value("${wiremock.server.port}")
-    protected Integer wiremockPort;
-
     @SpyBean
     @Inject
     protected AuditRepository auditRepository;
 
-    @SuppressWarnings("squid:S5979")
-    @Mock
-    protected Authentication authentication;
-
-    @BeforeEach
-    void init() {
-        Jwt jwt = generateDummyAuthToken();
-        when(authentication.getPrincipal()).thenReturn(jwt);
-        SecurityContextHolder.setContext(new SecurityContextImpl(authentication));
+    public static HttpHeaders createHttpHeaders(String serviceName) throws JOSEException {
+        return createHttpHeaders(AUTH_TOKEN_TTL, serviceName, AUTH_TOKEN_TTL);
     }
 
-    protected HttpHeaders createHttpHeaders(String serviceName) {
+    public static HttpHeaders createHttpHeaders(long authTtlMillis,
+                                                String serviceName,
+                                                long s2sAuthTtlMillis) throws JOSEException {
         HttpHeaders headers = new HttpHeaders();
-        headers.add(AUTHORIZATION, "Bearer EncodedAuthToken");
-        String s2SToken = generateDummyS2SToken(serviceName);
+        // :: IDAM OAuth2 token
+        String authToken = BEARER + generateAuthToken(authTtlMillis);
+        headers.add(AUTHORIZATION, authToken);
+        // :: S2S authentication token
+        String s2SToken = generateS2SToken(serviceName, s2sAuthTtlMillis);
         headers.add(SERVICE_AUTHORIZATION, s2SToken);
+        // :: LogAudit Request-ID header
         headers.add(AuditConfiguration.REQUEST_ID, EXAMPLE_REQUEST_ID);
         return headers;
     }
@@ -182,17 +185,28 @@ public class BaseTest {
         }
     }
 
-    private Jwt generateDummyAuthToken() {
-        return Jwt.withTokenValue("a dummy auth token")
-            .claim("aClaim", "aClaim")
-            .header("aHeader", "aHeader")
-            .build();
+    private static String generateAuthToken(long ttlMillis) throws JOSEException  {
+
+        JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder()
+            .subject("CPO_Stub")
+            .issueTime(new Date())
+            .claim(TOKEN_NAME, ACCESS_TOKEN)
+            .expirationTime(new Date(System.currentTimeMillis() + ttlMillis));
+
+        SignedJWT signedJWT = new SignedJWT(
+            new JWSHeader.Builder(JWSAlgorithm.RS256)
+                .keyID(KeyGenUtil.getRsaJWK().getKeyID()).build(),
+            builder.build()
+        );
+        signedJWT.sign(new RSASSASigner(KeyGenUtil.getRsaJWK()));
+
+        return signedJWT.serialize();
     }
 
-    private static String generateDummyS2SToken(String serviceName) {
+    private static String generateS2SToken(String serviceName, long ttlMillis) {
         return Jwts.builder()
             .setSubject(serviceName)
-            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + ttlMillis))
             .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
             .compact();
     }

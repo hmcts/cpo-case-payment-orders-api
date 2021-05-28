@@ -107,6 +107,13 @@ class SecurityUtilsTest implements BaseTest {
     }
 
     @Test
+    void testHasCreateAccessReturnsFalseWhenRequestAttributesAreNull() {
+        setS2SToken(null);
+        RequestContextHolder.resetRequestAttributes();
+        assertFalse(securityUtils.hasCreatePermission());
+    }
+
+    @Test
     void testHasCreateAccessReturnsTrueWhenCalledByAppWithCreatePermissions() {
         assertParametersSuppliedToServiceAuthorizatrionConfig(CREATE);
     }

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -15,7 +14,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
@@ -43,9 +41,9 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -233,7 +231,7 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
                 .pageable(getPageRequest())
                 .build();
 
-            when(casePaymentOrdersRepository.findByIdIn(anyList(), ArgumentMatchers.<Pageable>any())).thenReturn(
+            when(casePaymentOrdersRepository.findByIdIn(anyList(), any())).thenReturn(
                 getEntityPages());
 
             final Page<CasePaymentOrder> pages = casePaymentOrdersService.getCasePaymentOrders(
@@ -250,7 +248,7 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
                 .pageable(getPageRequest())
                 .build();
 
-            when(casePaymentOrdersRepository.findByCaseIdIn(anyList(), ArgumentMatchers.<Pageable>any())).thenReturn(
+            when(casePaymentOrdersRepository.findByCaseIdIn(anyList(), any())).thenReturn(
                 getEntityPages());
 
             final Page<CasePaymentOrder> pages = casePaymentOrdersService.getCasePaymentOrders(
@@ -315,7 +313,7 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
 
         private Page<CasePaymentOrderEntity> getEntityPages() {
             final PageRequest pageRequest = getPageRequest();
-            return new PageImpl<CasePaymentOrderEntity>(createListOfCasePaymentOrderEntity(), pageRequest, 3);
+            return new PageImpl<>(createListOfCasePaymentOrderEntity(), pageRequest, 3);
         }
 
 
@@ -335,7 +333,7 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
             casePaymentOrderEntity1.setAction("action");
             casePaymentOrderEntity1.setCaseId(Long.parseLong("1609243447569252"));
             casePaymentOrderEntity1.setCreatedBy("action1");
-            casePaymentOrderEntity1.setOrderReference("Baction2");
+            casePaymentOrderEntity1.setOrderReference("B action2");
             casePaymentOrderEntity1.setCreatedTimestamp(LocalDateTime.now());
             casePaymentOrderEntity1.setResponsibleParty("setResponsibleParty");
             casePaymentOrders.add(casePaymentOrderEntity1);
@@ -344,7 +342,7 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
             casePaymentOrderEntity2.setAction("action");
             casePaymentOrderEntity2.setCaseId(Long.parseLong("1609243447569253"));
             casePaymentOrderEntity2.setCreatedBy("action1");
-            casePaymentOrderEntity2.setOrderReference("Caction3");
+            casePaymentOrderEntity2.setOrderReference("C action3");
             casePaymentOrderEntity2.setCreatedTimestamp(LocalDateTime.now());
             casePaymentOrderEntity2.setResponsibleParty("setResponsibleParty");
             casePaymentOrders.add(casePaymentOrderEntity2);
@@ -430,8 +428,9 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
             // THEN
             verify(casePaymentOrdersRepository, times(1)).saveAndFlush(captor.capture());
 
-            assertTrue("", previousCreateDateTime.isBefore(captor.getValue().getCreatedTimestamp()));
-            assertEquals(captor.getValue().isHistoryExists(), HISTORY_EXISTS_UPDATED);
+            assertTrue("Created timestamp should be updated",
+                       previousCreateDateTime.isBefore(captor.getValue().getCreatedTimestamp()));
+            assertEquals(HISTORY_EXISTS_UPDATED, captor.getValue().isHistoryExists());
         }
 
         @Test

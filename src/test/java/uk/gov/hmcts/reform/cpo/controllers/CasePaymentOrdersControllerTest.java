@@ -648,7 +648,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
     }
 
     @Nested
-    @DisplayName("Get /case-payment-orders")
+    @DisplayName("GET /case-payment-orders")
     class GetCasePaymentOrder extends BaseMvcTest {
 
         private final List<String> casesIds = List.of("1609243447569251", "1609243447569252", "1609243447569253");
@@ -768,6 +768,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
     class BuildIdListsForLogAudit {
 
         @Test
+        @DisplayName("should return empty list when empty is passed")
         void buildIdLists_shouldReturnEmptyListWhenEmptyPassed() {
             // WHEN
             List<String> ids = CasePaymentOrdersController.buildOptionalIds(Optional.empty());
@@ -779,6 +780,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         }
 
         @Test
+        @DisplayName("should return empty list when an empty list is passed")
         void buildIdLists_shouldReturnEmptyListWhenEmptyListPassed() {
             // GIVEN
             List<String> input = Collections.emptyList();
@@ -793,7 +795,8 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         }
 
         @Test
-        void buildIdLists_shouldReturnEmptyListWhenPopulatedListIsPassed() {
+        @DisplayName("should return complete list when an populated list is passed")
+        void buildIdLists_shouldReturnListWhenPopulatedListIsPassed() {
             // GIVEN
             List<String> input = List.of("1", "2", "3");
 

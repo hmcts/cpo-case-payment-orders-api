@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -23,9 +24,9 @@ import static uk.gov.hmcts.reform.cpo.security.Permission.UPDATE;
 @Slf4j
 public class SecurityUtils {
 
-    public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+    public static final String SERVICE_AUTHORIZATION = ServiceAuthFilter.AUTHORISATION;
 
-    public static final String BEARER = "Bearer ";
+    public static final String BEARER = JwtGrantedAuthoritiesConverter.BEARER;
 
     private final IdamRepository idamRepository;
     private final ServiceAuthorizationConfig serviceAuthorizationConfig;

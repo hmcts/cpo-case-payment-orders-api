@@ -1,0 +1,25 @@
+{
+  "_guid_" : "S-703.14",
+  "_extends_" : "getCasePaymentOrderBase",
+
+  "title": "Mandatory parameters missing from the request (S2S token invalid)",
+
+  "specs": [
+    "contains a set of ids from the case payment orders previously created",
+    "contains an invalid S2S token",
+    "contains relevant error message"
+  ],
+
+  "request" : {
+    "headers": {
+      "_extends_": "CPO_Request_Headers_ServiceAuthorization_Invalid"
+    },
+    "queryParams": {
+      "ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}}"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "CPO_401_Response"
+  }
+}

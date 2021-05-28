@@ -1,0 +1,24 @@
+{
+  "_guid_" : "S-701.8",
+  "_extends_" : "createCasePaymentOrderBase",
+
+  "title": "Mandatory parameters missing from the request (S2S token Missing)",
+
+  "specs": [
+    "contains an invalid S2S token",
+    "contains relevant error message"
+  ],
+
+  "request" : {
+    "headers": {
+      "_extends_": "CPO_Request_Headers_ServiceAuthorization_Invalid"
+    },
+    "body": {
+      "_extends_" : "Base_CPO_Data_Payload_data"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "CPO_401_Response"
+  }
+}

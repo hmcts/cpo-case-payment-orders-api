@@ -1,0 +1,25 @@
+{
+  "_guid_" : "S-703.11",
+  "_extends_" : "getCasePaymentOrderBase",
+
+  "title": "Mandatory parameters missing from the request (IDAM token missing)",
+
+  "specs": [
+    "contains a set of ids from the case payment orders previously created",
+    "does not contain an IDAM token",
+    "contains relevant error message"
+  ],
+
+  "request" : {
+    "headers": {
+      "_extends_": "CPO_Request_Headers_Authorization_Missing"
+    },
+    "queryParams": {
+      "ids": "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][id]}}"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "CPO_401_Response"
+  }
+}
