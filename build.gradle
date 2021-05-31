@@ -304,7 +304,7 @@ dependencies {
   // in groovy:2.5.* when running functional/befta tests
   testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.3'
 
-  testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '2.2.2.RELEASE'
+  testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '3.0.3'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
