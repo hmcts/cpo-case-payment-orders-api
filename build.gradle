@@ -284,7 +284,7 @@ dependencies {
   implementation "org.apache.tomcat.embed:tomcat-embed-el:${versions.tomcatEmbedded}"
   implementation "org.apache.tomcat.embed:tomcat-embed-websocket:${versions.tomcatEmbedded}"
 
-  compile group: 'org.flywaydb', name: 'flyway-core', version: '7.7.0'
+  compile group: 'org.flywaydb', name: 'flyway-core', version: '7.11.2'
 
   compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
   compile group: 'commons-validator', name: 'commons-validator', version: '1.7'
