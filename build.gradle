@@ -203,8 +203,11 @@ def versions = [
   springBoot      : springBoot.class.package.implementationVersion,
   springCloud     : '2020.0.1',
   springfoxSwagger: '3.0.0',
-  testcontainers  : '1.15.2'
+  testcontainers  : '1.15.2',
+  tomcatEmbedded  : '9.0.50'
 ]
+
+ext['spring-framework.version'] = '5.3.7'
 
 // before committing a change, make sure task still works
 dependencyUpdates {
@@ -282,6 +285,10 @@ dependencies {
   implementation group: 'org.hibernate', name: 'hibernate-envers', version: '5.4.30.Final'
 
   implementation group: 'net.minidev', name: 'json-smart', version: '2.4.7'
+
+  implementation "org.apache.tomcat.embed:tomcat-embed-core:${versions.tomcatEmbedded}"
+  implementation "org.apache.tomcat.embed:tomcat-embed-el:${versions.tomcatEmbedded}"
+  implementation "org.apache.tomcat.embed:tomcat-embed-websocket:${versions.tomcatEmbedded}"
 
   compile group: 'org.flywaydb', name: 'flyway-core', version: '7.7.0'
 

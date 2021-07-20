@@ -7,10 +7,5 @@
     <cpe>cpe:/a:pivotal_software:spring_security</cpe>
     <cve>CVE-2018-1258</cve>
   </suppress>
-  <suppress>
-    <cve>CVE-2021-22118</cve>
-    <cve>CVE-2021-30639</cve>
-    <cve>CVE-2021-33037</cve>
-  </suppress>
 
 </suppressions>
