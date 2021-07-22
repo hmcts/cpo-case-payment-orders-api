@@ -33,6 +33,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -1307,12 +1308,12 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         }
 
         mockMvc.perform(
-                mockHttpServletRequestBuilder
+            Objects.requireNonNull(mockHttpServletRequestBuilder)
                         .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
                         .queryParam(queryParamName, queryParamValue))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath(ERROR_PATH_MESSAGE,
-                        is(expectedErrorMessage)))
+                        is(Objects.requireNonNull(expectedErrorMessage))))
                 .andExpect(hasGeneratedLogAuditRequestMatcher);
 
         if (method.equals(HttpMethod.DELETE)) {

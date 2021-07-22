@@ -328,7 +328,7 @@ dependencies {
 
   testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.0.0'
 
-  testCompile 'com.github.hmcts:fortify-client:1.2.0:all'
+  testCompile 'com.github.hmcts:fortify-client:1.2.1:all'
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath
