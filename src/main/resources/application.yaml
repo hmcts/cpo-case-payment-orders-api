@@ -107,3 +107,9 @@ s2s:
     xui:
       id: "xui_webapp"
       permission: "R"
+
+case:
+  payment:
+    orders:
+      api:
+        enabled: ${CASE_PAYMENT_ORDERS_ENABLED:true}
