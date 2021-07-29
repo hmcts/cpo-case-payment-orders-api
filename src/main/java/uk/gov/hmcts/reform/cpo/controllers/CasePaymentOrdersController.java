@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -47,6 +48,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @Validated
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+@ConditionalOnProperty(value = "case.payment.orders.api.enabled", havingValue = "true")
 public class CasePaymentOrdersController {
 
     @SuppressWarnings({"squid:S1075"})
