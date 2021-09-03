@@ -35,7 +35,7 @@ public class BaseCasePaymentOrderRequest {
     @NotNull(message = ValidationError.ORDER_REFERENCE_REQUIRED)
     @Pattern(regexp = Validator.ORDER_REFERENCE_RG, message = ValidationError.ORDER_REFERENCE_INVALID)
     @ApiModelProperty(value = "Description of the Payments system order reference", required = true,
-        example = "2021-11223344556")
+        example = "2021-1122334455667")
     private String orderReference;
 
 }

@@ -12,7 +12,7 @@
       "effective_from" : "2021-01-01T00:00:00Z",
       "case_id" : "${[scenarioContext][customValues][GenerateCaseId]}",
       "action" : "payday",
-      "order_reference" : "2021-12345678901"
+      "order_reference" : "2021-1234567890123"
     }
   },
 

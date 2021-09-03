@@ -45,7 +45,7 @@ public interface BaseTest {
     String CPO_ID_INVALID_1 = "160924";
     String CPO_ID_INVALID_2 = "160924 ";
 
-    String ORDER_REFERENCE_VALID = "2021-11223344556";
+    String ORDER_REFERENCE_VALID = "2021-1122334455667";
     String ORDER_REFERENCE_INVALID = "2021-918425346";
     String ACTION = "action";
     String RESPONSIBLE_PARTY = "responsibleParty";

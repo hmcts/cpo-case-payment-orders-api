@@ -140,6 +140,37 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
                 .andExpect(jsonPath("$.created_timestamp", is(CREATED_TIMESTAMP.format(formatter))));
         }
 
+        @DisplayName("should Fail With 400 BadRequest When Order Reference is invalid length - less than 18 chars")
+        @Test
+        void shouldFailWithBadRequestWhenOrderReferenceIsInvalidLessThan18Chars() throws Exception {
+            CreateCasePaymentOrderRequest cpoInvalidOrderRequest = new CreateCasePaymentOrderRequest(
+                    CASE_ID_VALID_1,
+                    ACTION,
+                    RESPONSIBLE_PARTY,
+                    "2021-1122");
+
+            this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(cpoInvalidOrderRequest)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string(containsString("Order Reference has invalid format.")));
+        }
+
+        @DisplayName("should Fail With 400 BadRequest When Order Reference is invalid length - more than 18 chars")
+        @Test
+        void shouldFailWithBadRequestWhenOrderReferenceIsInvalidMoreThan18Chars() throws Exception {
+            CreateCasePaymentOrderRequest cpoInvalidOrderRequest = new CreateCasePaymentOrderRequest(
+                    CASE_ID_VALID_1,
+                    ACTION,
+                    RESPONSIBLE_PARTY,
+                    "2021-11223344556677");
+
+            this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(cpoInvalidOrderRequest)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string(containsString("Order Reference has invalid format.")));
+        }
     }
 
 
