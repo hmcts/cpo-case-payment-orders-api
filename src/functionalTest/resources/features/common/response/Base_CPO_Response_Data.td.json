@@ -5,7 +5,7 @@
   "case_id" : "${[scenarioContext][customValues][GetGeneratedCaseId]}",
   "action" : "payday",
   "responsible_party" : "party1",
-  "order_reference" : "2021-12345678901",
+  "order_reference" : "2021-1234567890123",
   "created_by" : "[[ANYTHING_PRESENT]]",
   "history_exists" : "[[ANYTHING_PRESENT]]"
 }

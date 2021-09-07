@@ -4,7 +4,7 @@
   "case_id" : "${[scenarioContext][childContexts][Prerequisite_Create_CPO][testData][actualResponse][body][case_id]}",
   "action" : "updated payday",
   "responsible_party" : "updated party",
-  "order_reference" : "2021-11122233344",
+  "order_reference" : "2021-1112223334455",
   "history_exists": "[[ANYTHING_PRESENT]]"
 }
 

@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,7 +126,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
 
         }
 
-
         @DisplayName("happy path test with mockMvc")
         @Test
         void shouldSuccessfullyCreateCasePaymentOrder() throws Exception {
@@ -138,6 +139,23 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.id", is(casePaymentOrder.getId().toString())))
                 .andExpect(jsonPath("$.created_timestamp", is(CREATED_TIMESTAMP.format(formatter))));
+        }
+
+        @DisplayName("should Fail With 400 BadRequest When Order Reference is invalid")
+        @ParameterizedTest
+        @ValueSource(strings =  {"2021-1122", "2021-11223344556677"})
+        void shouldFailWithBadRequestWhenOrderReferenceIsInvalid(String orderReference) throws Exception {
+            CreateCasePaymentOrderRequest cpoInvalidOrderRequest = new CreateCasePaymentOrderRequest(
+                    CASE_ID_VALID_1,
+                    ACTION,
+                    RESPONSIBLE_PARTY,
+                    orderReference);
+
+            this.mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(cpoInvalidOrderRequest)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string(containsString("Order Reference has invalid format.")));
         }
 
     }
