@@ -93,3 +93,12 @@ resource "azurerm_key_vault_secret" "POSTGRES-DATABASE" {
   value        = module.cpo-case-payments-db.postgresql_database
   key_vault_id = module.key-vault.key_vault_id
 }
+
+terraform {
+  required_providers {
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = "1.6.0"
+    }
+  }
+}
