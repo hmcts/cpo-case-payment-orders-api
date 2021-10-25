@@ -73,7 +73,7 @@ public class BaseTest {
     public static final String CPO_ID_VALID_1 = "df54651b-3227-4067-9f23-6ffb32e2c6bd";
     public static final String CPO_ID_INVALID = "INVALID_NON_NUMERIC";
 
-    public static final String ORDER_REFERENCE_VALID = "2021-11223344556";
+    public static final String ORDER_REFERENCE_VALID = "2021-1122334455667";
     public static final String ORDER_REFERENCE_INVALID = "2021-918425346";
     public static final String ACTION = "action";
     public static final String RESPONSIBLE_PARTY = "responsibleParty";

@@ -10,7 +10,7 @@ import static org.apache.commons.validator.routines.checkdigit.LuhnCheckDigit.LU
 public interface Validator<T> {
 
     String CASE_ID_RG = "\\d{16}";
-    String ORDER_REFERENCE_RG = "^2[0-9]{3}-[0-9]{11}$";
+    String ORDER_REFERENCE_RG = "^2[0-9]{3}-[0-9]{13}$";
 
     default void buildErrors(final ConstraintValidatorContext context, final String message, List<String> errors) {
         final var errorsCommaSeparated = String.join(",", errors);
