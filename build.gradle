@@ -207,7 +207,7 @@ def versions = [
   springCloud     : '2020.0.1',
   springfoxSwagger: '3.0.0',
   testcontainers  : '1.15.2',
-  tomcatEmbedded  : '9.0.50'
+  tomcatEmbedded  : '9.0.54'
 ]
 
 ext['spring-framework.version'] = '5.3.7'
@@ -303,7 +303,7 @@ dependencies {
 
   // CVE-2021-29425
   compile group: 'commons-io', name: 'commons-io', version: '2.8.0'
-  
+
 
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   compileOnly group: 'org.mapstruct', name: 'mapstruct', version: versions.mapstruct
