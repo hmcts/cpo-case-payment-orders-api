@@ -210,7 +210,7 @@ def versions = [
   tomcatEmbedded  : '9.0.54'
 ]
 
-ext['spring-framework.version'] = '5.3.7'
+ext['spring-framework.version'] = '5.3.12'
 
 // before committing a change, make sure task still works
 dependencyUpdates {

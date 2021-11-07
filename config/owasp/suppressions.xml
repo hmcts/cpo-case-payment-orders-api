@@ -12,17 +12,12 @@
     <cve>CVE-2020-23171</cve>
 	</suppress>
 
-  <suppress until="2030-01-01">
+  <suppress until="2021-11-25">
     <notes><![CDATA[
      Suppressing as it's a false positive (see: https://pivotal.io/security/cve-2018-1258)
    ]]></notes>
     <cpe>cpe:/a:pivotal_software:spring_security</cpe>
     <cve>CVE-2018-1258</cve>
-  </suppress>
-
-  <suppress until="2021-11-25">
-    <notes>Temp suppression to unblock pipeline.</notes>
-    <cve>CVE-2021-22096</cve>
   </suppress>
 
 </suppressions>
