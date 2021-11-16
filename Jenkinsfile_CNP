@@ -5,6 +5,7 @@ import uk.gov.hmcts.contino.GradleBuilder
 def type = "java"
 def product = "cpo"
 def component = "case-payment-orders-api"
+def branchesToSync = ['demo', 'ithc', 'perftest']
 
 GradleBuilder builder = new GradleBuilder(this, product)
 
@@ -62,8 +63,8 @@ withPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
   }
 
+  syncBranchesWithMaster(branchesToSync)
   loadVaultSecrets(secrets)
-
   enableAksStagingDeployment()
   disableLegacyDeployment()
 
