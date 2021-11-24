@@ -12,7 +12,7 @@
     <cve>CVE-2020-23171</cve>
 	</suppress>
 
-  <suppress until="2021-11-25">
+  <suppress until="2021-12-25">
     <notes><![CDATA[
      Suppressing as it's a false positive (see: https://pivotal.io/security/cve-2018-1258)
    ]]></notes>
