@@ -12,9 +12,8 @@ def product = "cpo"
 def component = "case-payment-orders-api"
 
 withNightlyPipeline(type, product, component) {
-  // Temporarily disable fortify scan stage until 'entitlementPreferenceType is not available' issue is fixed
-  //enableFortifyScan('ccd-aat')
-  //after('fortify-scan') {
-  //  steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-  //}
+  enableFortifyScan('ccd-aat')
+  after('fortify-scan') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+  }
 }
