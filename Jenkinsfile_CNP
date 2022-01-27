@@ -35,16 +35,19 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 
-// IDAM client auth
-env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
+
 // :: configure `xuiwebapp` as the default value for `idamClientId`
 env.OAUTH2_CLIENT_ID = "xuiwebapp"
 env.OAUTH2_REDIRECT_URI = "https://manage-case.aat.platform.hmcts.net/oauth2/callback"
 env.OAUTH2_ACCESS_TOKEN_TYPE = "OIDC"
 env.OAUTH2_SCOPE_VARIABLES = "profile openid roles manage-user create-user"
 
-// S2S auth
-env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+// IDAM client and S2S auth
+env.IDAM_API_URL_BASE = "https://idam-api.aat.platform.hmcts.net"
+env.S2S_URL_BASE = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+
+env.CCD_API_GATEWAY_OAUTH2_CLIENT_ID = "ccd_gateway"
+
 // :: configure `xui_webapp` as the default value for `s2sClientId`
 env.BEFTA_S2S_CLIENT_ID = "xui_webapp"
 env.BEFTA_S2S_CLIENT_ID_OF_PAYMENT_APP = "payment_app"
