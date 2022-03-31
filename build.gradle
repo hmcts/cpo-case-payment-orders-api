@@ -11,7 +11,6 @@ plugins {
   id 'uk.gov.hmcts.java' version '0.12.6'
 }
 
-// CWE-862
 ext['spring-security.version'] = '5.6.1'
 
 group = 'uk.gov.hmcts.reform'
