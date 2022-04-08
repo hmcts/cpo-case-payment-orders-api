@@ -11,7 +11,6 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-
 import uk.gov.hmcts.reform.cpo.BaseTest;
 import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
 import uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderEntityGenerator;
@@ -104,10 +103,8 @@ class BaseMvcAuthChecks extends BaseTest {
     private void assert2xxSuccessfulForHappyPath(EndpointUtil endpointUtil,
                                                  String serviceName) throws Exception {
 
-        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(
-            entityGenerator,
-            objectMapper
-        );
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
 
         // GIVEN
         HttpHeaders headers = createHttpHeaders(serviceName); // <-- VALID AUTH & S2S AUTH
@@ -124,10 +121,8 @@ class BaseMvcAuthChecks extends BaseTest {
      */
     void assert401ForMissingAuthToken(EndpointUtil endpointUtil) throws Exception {
 
-        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(
-            entityGenerator,
-            objectMapper
-        );
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
         String serviceName = endpointUtil.getHappyPathServiceName();
 
         // GIVEN
@@ -146,10 +141,8 @@ class BaseMvcAuthChecks extends BaseTest {
      */
     void assert401ForMalformedAuthToken(EndpointUtil endpointUtil) throws Exception {
 
-        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(
-            entityGenerator,
-            objectMapper
-        );
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
         String serviceName = endpointUtil.getHappyPathServiceName();
 
         // GIVEN
@@ -169,19 +162,15 @@ class BaseMvcAuthChecks extends BaseTest {
      */
     void assert401ForExpiredAuthToken(EndpointUtil endpointUtil) throws Exception {
 
-        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(
-            entityGenerator,
-            objectMapper
-        );
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
         String serviceName = endpointUtil.getHappyPathServiceName();
 
         // GIVEN
         long authTtlMillis = -1;
-        HttpHeaders headers = createHttpHeaders(
-            authTtlMillis, // <-- EXPIRED AUTH
-            serviceName,
-            AUTH_TOKEN_TTL
-        );
+        HttpHeaders headers = createHttpHeaders(authTtlMillis, // <-- EXPIRED AUTH
+                                                serviceName,
+                                                AUTH_TOKEN_TTL);
 
         // WHEN
         mockMvc.perform(happyPathRequestBuilder.headers(headers))
@@ -195,10 +184,8 @@ class BaseMvcAuthChecks extends BaseTest {
      */
     void assert401ForMissingServiceAuthToken(EndpointUtil endpointUtil) throws Exception {
 
-        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(
-            entityGenerator,
-            objectMapper
-        );
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
         String serviceName = endpointUtil.getHappyPathServiceName();
 
         // GIVEN
@@ -217,10 +204,8 @@ class BaseMvcAuthChecks extends BaseTest {
      */
     void assert401ForMalformedServiceAuthToken(EndpointUtil endpointUtil) throws Exception {
 
-        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(
-            entityGenerator,
-            objectMapper
-        );
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
         String serviceName = endpointUtil.getHappyPathServiceName();
 
         // GIVEN
@@ -240,19 +225,15 @@ class BaseMvcAuthChecks extends BaseTest {
      */
     void assert401ForExpiredServiceAuthToken(EndpointUtil endpointUtil) throws Exception {
 
-        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(
-            entityGenerator,
-            objectMapper
-        );
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
         String serviceName = endpointUtil.getHappyPathServiceName();
 
         // GIVEN
         long s2sAuthTtlMillis = -1;
-        HttpHeaders headers = createHttpHeaders(
-            AUTH_TOKEN_TTL,
-            serviceName,
-            s2sAuthTtlMillis
-        ); // <-- EXPIRED S2S AUTH
+        HttpHeaders headers = createHttpHeaders(AUTH_TOKEN_TTL,
+                                                serviceName,
+                                                s2sAuthTtlMillis); // <-- EXPIRED S2S AUTH
 
         // WHEN
         mockMvc.perform(happyPathRequestBuilder.headers(headers))
@@ -266,10 +247,8 @@ class BaseMvcAuthChecks extends BaseTest {
      */
     void assert403ForUnauthorisedServiceAuthToken(EndpointUtil endpointUtil) throws Exception {
 
-        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(
-            entityGenerator,
-            objectMapper
-        );
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
 
         // GIVEN
         HttpHeaders headers = createHttpHeaders(UNAUTHORISED_SERVICE); // <-- UNAUTHORISED S2S AUTH
@@ -288,12 +267,10 @@ class BaseMvcAuthChecks extends BaseTest {
 
         String happyPathServiceName = endpointUtil.getHappyPathServiceName();
 
-        List<String> serviceNames = List.of(
-            AUTHORISED_CREATE_SERVICE,
-            AUTHORISED_READ_SERVICE,
-            AUTHORISED_UPDATE_SERVICE,
-            AUTHORISED_DELETE_SERVICE
-        );
+        List<String> serviceNames = List.of(AUTHORISED_CREATE_SERVICE,
+                                            AUTHORISED_READ_SERVICE,
+                                            AUTHORISED_UPDATE_SERVICE,
+                                            AUTHORISED_DELETE_SERVICE);
 
         for (String serviceName : serviceNames) {
             if (!happyPathServiceName.equals(serviceName)) { // NB: skip happy path
@@ -304,12 +281,10 @@ class BaseMvcAuthChecks extends BaseTest {
     }
 
     void assert403ForServiceMissingS2sPermission(EndpointUtil endpointUtil,
-                                                 String serviceNameWithoutPermission) throws Exception {
+                                                         String serviceNameWithoutPermission) throws Exception {
 
-        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(
-            entityGenerator,
-            objectMapper
-        );
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
 
         // GIVEN
         HttpHeaders headers = createHttpHeaders(serviceNameWithoutPermission); // <-- MISSING-PERMISSION
@@ -326,10 +301,8 @@ class BaseMvcAuthChecks extends BaseTest {
      */
     void assert401IfIdamUnavailable(EndpointUtil endpointUtil) throws Exception {
 
-        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(
-            entityGenerator,
-            objectMapper
-        );
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
         String serviceName = endpointUtil.getHappyPathServiceName();
 
         StubMapping badIdamStub = null;
@@ -361,10 +334,8 @@ class BaseMvcAuthChecks extends BaseTest {
      */
     void assert401IfS2sAuthServiceUnavailable(EndpointUtil endpointUtil) throws Exception {
 
-        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(
-            entityGenerator,
-            objectMapper
-        );
+        MockHttpServletRequestBuilder happyPathRequestBuilder = endpointUtil.getHappyPathRequestBuilder(entityGenerator,
+                                                                                                        objectMapper);
         String serviceName = endpointUtil.getHappyPathServiceName();
 
         StubMapping badS2sStub = null;
