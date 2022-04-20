@@ -1,5 +1,5 @@
 ARG PLATFORM=""
-FROM adoptopenjdk:11-jre-hotspot as builder
+FROM adoptopenjdk${PLATFORM}:11-jre-hotspot as builder
 
 ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} application.jar
