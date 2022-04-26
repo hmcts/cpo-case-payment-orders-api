@@ -20,12 +20,13 @@
     <cve>CVE-2018-1258</cve>
   </suppress>
 
-	<suppress until="2022-05-25">
-    		<notes><![CDATA[
-   			file name: spring-security-core-5.4.7.jar
-   		]]></notes>
-    		<packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-core@.*$</packageUrl>
-    		<vulnerabilityName>CWE-862: Missing Authorization</vulnerabilityName>
+  <suppress until="2022-05-25">
+    <notes><![CDATA[
+   file name: jackson-databind-2.11.4.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+    <cve>CVE-2020-36518</cve>
+    <vulnerabilityName>CVE-2020-36518: Vulnerability that allows StackOverflow exception and denial of service via a large depth of nested objects</vulnerabilityName>
   </suppress>
 
   <!-- Suppress until fixed -->
@@ -48,5 +49,4 @@
     <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-core@.*$</packageUrl>
     <cve>CVE-2022-22968</cve>
   </suppress>
-
 </suppressions>
