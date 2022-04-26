@@ -20,7 +20,7 @@
     <cve>CVE-2018-1258</cve>
   </suppress>
 
-  <suppress until="2022-04-25">
+  <suppress until="2022-05-25">
     <notes><![CDATA[
    file name: jackson-databind-2.11.4.jar
    ]]></notes>
