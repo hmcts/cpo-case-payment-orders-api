@@ -354,7 +354,7 @@ dependencies {
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath
 
-  runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.19'
+  runtime group: 'org.postgresql', name: 'postgresql', version: '42.3.5'
 }
 
 mainClassName = 'uk.gov.hmcts.reform.cpo.Application'
