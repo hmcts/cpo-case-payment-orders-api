@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
 
-  <suppress until="2022-05-25">
+  <suppress until="2022-06-25">
     <notes>
 			Declared as False positive on library com.nimbusds:lang-tag #3594
 			https://github.com/jeremylong/DependencyCheck/issues/3594
@@ -12,7 +12,7 @@
     <cve>CVE-2020-23171</cve>
 	</suppress>
 
-  <suppress until="2022-05-25">
+  <suppress until="2022-06-25">
     <notes><![CDATA[
      Suppressing as it's a false positive (see: https://pivotal.io/security/cve-2018-1258)
    ]]></notes>
@@ -20,7 +20,7 @@
     <cve>CVE-2018-1258</cve>
   </suppress>
 
-  <suppress until="2022-05-25">
+  <suppress until="2022-06-25">
     <notes><![CDATA[
    file name: jackson-databind-2.11.4.jar
    ]]></notes>
@@ -37,5 +37,11 @@
     <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-beans@.*$</packageUrl>
     <vulnerabilityName>CVE-2022-22965</vulnerabilityName>
   </suppress>
+  <suppress until="2022-06-25">
+    <notes><![CDATA[
+   file name: spring-core-5.3.18.jar
+   ]]></notes>
+    <cve>CVE-2016-1000027</cve>
+  </suppress>s
 
 </suppressions>
