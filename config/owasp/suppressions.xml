@@ -42,6 +42,6 @@
    file name: spring-core-5.3.18.jar
    ]]></notes>
     <cve>CVE-2016-1000027</cve>
-  </suppress>s
+  </suppress>
 
 </suppressions>
