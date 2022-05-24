@@ -37,12 +37,7 @@
     <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-beans@.*$</packageUrl>
     <vulnerabilityName>CVE-2022-22965</vulnerabilityName>
   </suppress>
-  <suppress until="2022-06-25">
-    <notes><![CDATA[
-   file name: spring-core-5.3.18.jar
-   ]]></notes>
-    <cve>CVE-2016-1000027</cve>
-  </suppress>
+
   <suppress until="2022-06-25">
     <notes><![CDATA[
    file name: tomcat-embed-core-9.0.58.jar
@@ -72,6 +67,11 @@
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-core@.*$</packageUrl>
     <cve>CVE-2022-22971</cve>
+  </suppress>
+
+  <suppress until="2022-06-25">
+    <notes>False-positive. See CCD-3253</notes>
+    <cve>CVE-2016-1000027</cve>
   </suppress>
 
 </suppressions>
