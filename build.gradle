@@ -209,7 +209,7 @@ def versions = [
   springCloud     : '2020.0.1',
   springfoxSwagger: '3.0.0',
   testcontainers  : '1.15.2',
-  tomcatEmbedded  : '9.0.58'
+  tomcatEmbedded  : '9.0.63'
 ]
 
 ext['spring-framework.version'] = '5.3.20'
