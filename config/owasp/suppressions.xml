@@ -5,8 +5,8 @@
   <suppress>
     <notes>
 			CVE-2020-23171 refer https://tools.hmcts.net/jira/browse/CCD-1873
-      CVE-2018-1258
-      CVE-2016-1000027 https://tools.hmcts.net/jira/browse/CCD-3253
+      CVE-2018-1258 refer https://tools.hmcts.net/jira/browse/CCD-3413
+      CVE-2016-1000027 refer https://tools.hmcts.net/jira/browse/CCD-3253
     </notes>
     <cve>CVE-2020-23171</cve>
     <cve>CVE-2018-1258</cve>
