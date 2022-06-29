@@ -14,6 +14,7 @@
   </suppress>
   <!--End of false positives section -->
 
+  <!--Please add all the temporary suppression under the below section -->
   <suppress>
     <notes><![CDATA[
       file name: tomcat-embed-core-9.0.58.jar
@@ -22,5 +23,6 @@
     </notes>
     <cve>CVE-2022-29885</cve>
   </suppress>
+  <!--End of temporary suppression section -->
 
 </suppressions>
