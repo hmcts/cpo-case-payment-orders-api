@@ -7,10 +7,12 @@
 			CVE-2020-23171 refer https://tools.hmcts.net/jira/browse/CCD-1873
       CVE-2018-1258 refer https://tools.hmcts.net/jira/browse/CCD-3413
       CVE-2016-1000027 refer https://tools.hmcts.net/jira/browse/CCD-3253
+      CVE-2022-33915 refer https://tools.hmcts.net/jira/browse/CCD-3450
     </notes>
     <cve>CVE-2020-23171</cve>
     <cve>CVE-2018-1258</cve>
     <cve>CVE-2016-1000027</cve>
+    <cve>CVE-2022-33915</cve>
   </suppress>
   <!--End of false positives section -->
 
@@ -19,11 +21,9 @@
     <notes>
       CVE-2022-29885 refer https://tools.hmcts.net/jira/browse/CCD-3270
       CVE-2022-34305 refer https://tools.hmcts.net/jira/browse/CCD-3433
-      CVE-2022-33915 refer https://tools.hmcts.net/jira/browse/CCD-3450
     </notes>
     <cve>CVE-2022-29885</cve>
     <cve>CVE-2022-34305</cve>
-    <cve>CVE-2022-33915</cve>
   </suppress>
   <!--End of temporary suppression section -->
 
