@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.cpo.wiremock.extension;
 
+import static uk.gov.hmcts.reform.cpo.utils.KeyGenUtil.getRsaJWK;
+
 import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.Response;
 import com.nimbusds.jose.JOSEException;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.hmcts.reform.cpo.utils.KeyGenUtil;
 
 /*
  * Replaces response body with the OAuth JWK Set, i.e. the public keys used to sign the mock OAAuth token
@@ -20,7 +21,7 @@ public class DynamicOAuthJwkSetResponseTransformer extends AbstractDynamicRespon
 
         try {
             return "{"
-                + "   \"keys\": [" +  KeyGenUtil.getRsaJWK().toJSONObject() + "]"
+                + "   \"keys\": [" +  getRsaJWK().toPublicJWK().toJSONString() + "]"
                 + "}";
 
         } catch (JOSEException ex) {

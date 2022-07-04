@@ -11,8 +11,8 @@ plugins {
   id 'uk.gov.hmcts.java' version '0.12.6'
 }
 
-// CVE-2021-22119
-ext['spring-security.version'] = '5.4.7'
+// CWE-862
+ext['spring-security.version'] = '5.6.1'
 
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
@@ -209,10 +209,10 @@ def versions = [
   springCloud     : '2020.0.1',
   springfoxSwagger: '3.0.0',
   testcontainers  : '1.15.2',
-  tomcatEmbedded  : '9.0.58'
+  tomcatEmbedded  : '9.0.63'
 ]
 
-ext['spring-framework.version'] = '5.3.18'
+ext['spring-framework.version'] = '5.3.20'
 ext['log4j2.version'] = '2.17.1'
 
 // before committing a change, make sure task still works
@@ -263,6 +263,9 @@ ext.libraries = [
 ]
 
 dependencies {
+  compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-jaxb-annotations', version: '2.13.2'
+  compile "com.fasterxml.jackson.core:jackson-databind:2.13.2.2"
+  compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -300,6 +303,11 @@ dependencies {
   implementation "org.apache.tomcat.embed:tomcat-embed-core:${versions.tomcatEmbedded}"
   implementation "org.apache.tomcat.embed:tomcat-embed-el:${versions.tomcatEmbedded}"
   implementation "org.apache.tomcat.embed:tomcat-embed-websocket:${versions.tomcatEmbedded}"
+
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.21'
+
+  implementation 'com.fasterxml.jackson.core:jackson-core:2.13.2'
+  implementation 'com.fasterxml.jackson.core:jackson-annotations:2.13.2'
 
   compile group: 'org.flywaydb', name: 'flyway-core', version: '7.7.0'
 
@@ -346,7 +354,7 @@ dependencies {
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath
 
-  runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.19'
+  runtime group: 'org.postgresql', name: 'postgresql', version: '42.3.5'
 }
 
 mainClassName = 'uk.gov.hmcts.reform.cpo.Application'
