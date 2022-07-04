@@ -8,9 +8,9 @@ java:
         - AppInsightsInstrumentationKey
   environment:
     CPO_CASE_PAYMENT_ORDERS_DB_HOST: "{{ .Release.Name }}-postgresql"
-    CPO_CASE_PAYMENT_ORDERS_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
-    CPO_CASE_PAYMENT_ORDERS_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
-    CPO_CASE_PAYMENT_ORDERS_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
+    CPO_CASE_PAYMENT_ORDERS_DB_NAME: "{{ .Values.postgresql.auth.database}}"
+    CPO_CASE_PAYMENT_ORDERS_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
+    CPO_CASE_PAYMENT_ORDERS_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
     CPO_CASE_PAYMENT_ORDERS_DB_OPTIONS: "?stringtype=unspecified"
     CPO_CASE_PAYMENT_ORDERS_DB_PORT: 5432
     # override default 'xui_webapp' permissions with values that support the FTA tests
