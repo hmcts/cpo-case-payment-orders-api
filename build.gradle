@@ -274,8 +274,8 @@ dependencies {
 
   implementation "org.springframework.security:spring-security-web"
   implementation "org.springframework.security:spring-security-config"
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.5.14"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.5.14"
 
   implementation group: 'io.springfox', name: 'springfox-boot-starter', version: versions.springfoxSwagger
 
