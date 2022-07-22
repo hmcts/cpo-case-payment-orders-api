@@ -8,11 +8,11 @@ plugins {
   id 'com.github.ben-manes.versions' version '0.38.0'
   id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.23'
   id 'org.sonarqube' version '3.1.1'
-  id 'uk.gov.hmcts.java' version '0.12.6'
+  id 'uk.gov.hmcts.java' version '0.12.27'
 }
 
 // CWE-862
-ext['spring-security.version'] = '5.6.1'
+ext['spring-security.version'] = '5.6.6'
 
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
@@ -274,8 +274,8 @@ dependencies {
 
   implementation "org.springframework.security:spring-security-web"
   implementation "org.springframework.security:spring-security-config"
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.5.14"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.5.14"
 
   implementation group: 'io.springfox', name: 'springfox-boot-starter', version: versions.springfoxSwagger
 
