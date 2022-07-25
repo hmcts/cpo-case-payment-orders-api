@@ -34,7 +34,7 @@ public class UIDService {
      * @param numberString number string to process
      * @param noCheckDigit Whether check digit is present or not. True if no check Digit
      *                     is appended.
-     * @return
+     * @return checkDigit int
      */
     private int checkSum(String numberString, boolean noCheckDigit) {
         int sum = 0;
