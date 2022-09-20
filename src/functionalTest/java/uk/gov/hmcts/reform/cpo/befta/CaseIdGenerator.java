@@ -25,7 +25,7 @@ public class CaseIdGenerator {
 
     /**
      * This is the timestamp to 10th of the second representing first 10 digits of the UID for a case.
-     * @return
+     * @return timestamp String
      */
     private String getCurrentTime() {
         long date = new Date().getTime();
