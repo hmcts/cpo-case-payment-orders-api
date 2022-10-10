@@ -206,7 +206,8 @@ def versions = [
   springCloud     : '2021.0.3',
   springfoxSwagger: '3.0.0',
   testcontainers  : '1.15.2',
-  tomcatEmbedded  : '9.0.65'
+  tomcatEmbedded  : '9.0.65',
+  jackson         : '2.14.0-rc1',
 ]
 
 ext['spring-framework.version'] = '5.3.20'
@@ -261,9 +262,9 @@ ext.libraries = [
 ]
 
 dependencies {
-  compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-jaxb-annotations', version: '2.13.2'
-  compile "com.fasterxml.jackson.core:jackson-databind:2.13.2.2"
-  compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
+  compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-jaxb-annotations', version: versions.jackson
+  compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
+  compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -304,8 +305,8 @@ dependencies {
 
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.21'
 
-  implementation 'com.fasterxml.jackson.core:jackson-core:2.13.2'
-  implementation 'com.fasterxml.jackson.core:jackson-annotations:2.13.2'
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
 
   compile group: 'org.flywaydb', name: 'flyway-core', version: '7.7.0'
 
