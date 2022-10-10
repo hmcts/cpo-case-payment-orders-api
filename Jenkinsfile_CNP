@@ -1,6 +1,7 @@
 #!groovy
 @Library("Infrastructure")
 import uk.gov.hmcts.contino.GradleBuilder
+import uk.gov.hmcts.contino.GithubAPI
 
 def type = "java"
 def product = "cpo"
@@ -61,6 +62,13 @@ env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionSt
 
 
 withPipeline(type, product, component) {
+  onPR {
+    def githubApi = new GithubAPI(this)
+    if (!githubApi.getLabelsbyPattern(env.BRANCH_NAME, "keep-helm")) {
+      enableCleanupOfHelmReleaseOnSuccess()
+    }
+  }
+
   after('test') {
     builder.gradle('integration')
 
