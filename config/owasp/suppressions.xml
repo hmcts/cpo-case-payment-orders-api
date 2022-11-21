@@ -3,7 +3,7 @@
 
   <!--Please add all the false positives under the below section-->
   <suppress>
-    <notes>
+    <notes>False Positives
       CVE-2018-1258 refer https://tools.hmcts.net/jira/browse/CCD-3413
       CVE-2016-1000027 refer https://tools.hmcts.net/jira/browse/CCD-3253
       CVE-2022-22978 refer https://tools.hmcts.net/jira/browse/CCD-3513
