@@ -1,15 +1,19 @@
 name: Add a Dummy commit to trigger dev build
 
+#on:
+#  schedule:
+#    - cron: "30 13 * * *"
 on:
-  schedule:
-    - cron: "30 13 * * *"
+  push:
+    branches:
+      - CCD-3916_Github_Actions
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
         with:
           ref: develop
 
