@@ -14,7 +14,7 @@ services:
       CPO_S2S_AUTHORISED_SERVICES: xui_webapp,payment_app
       IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
-      S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      S2S_URL: http://rpe-service-auth-provider-aat.aat.platform.hmcts.net
     ports:
       - 4457:4457
     depends_on:
