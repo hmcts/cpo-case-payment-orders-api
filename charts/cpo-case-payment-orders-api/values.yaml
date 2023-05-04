@@ -1,7 +1,7 @@
 java:
   applicationPort: 4457
   image: 'hmctspublic.azurecr.io/cpo/case-payment-orders-api:latest'
-  ingressHost: cpo-case-payment-orders-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+  ingressHost: cpo-case-payment-orders-api-{{ .Values.global.environment }}.{{ .Values.global.environment }}.platform.hmcts.net
   aadIdentityName: cpo
 #  Uncomment once the vault containing the app insights key has been set up
   keyVaults:
@@ -23,9 +23,9 @@ java:
   environment:
     IDAM_OIDC_URL: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net
     IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
-    OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443/openam/oauth2/hmcts
+    OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.platform.hmcts.net:8443/openam/oauth2/hmcts
     CPO_S2S_AUTHORISED_SERVICES: xui_webapp,payment_app,fprl-cos-api,service_request_cpo_update_service
-    S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.{{ .Values.global.environment }}.platform.hmcts.net
     CPO_CASE_PAYMENT_ORDERS_DB_OPTIONS: "?stringtype=unspecified&gssEncMode=disable"
     S2S_AUTHORIZATIONS_XUI_ID: xui_webapp
     S2S_AUTHORIZATIONS_XUI_PERMISSION: R
