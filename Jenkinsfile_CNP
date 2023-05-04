@@ -48,7 +48,7 @@ env.OAUTH2_SCOPE_VARIABLES = "profile openid roles manage-user create-user"
 
 // IDAM client and S2S auth
 env.IDAM_API_URL_BASE = "https://idam-api.aat.platform.hmcts.net"
-env.S2S_URL_BASE = "http://rpe-service-auth-provider-aat.aat.platform.hmcts.net"
+env.S2S_URL_BASE = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
 
 env.CCD_API_GATEWAY_OAUTH2_CLIENT_ID = "ccd_gateway"
 
