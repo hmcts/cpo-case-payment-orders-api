@@ -1,5 +1,5 @@
 ARG PLATFORM=""
-FROM adoptopenjdk${PLATFORM}:11-jre-hotspot as builder
+FROM adoptopenjdk${PLATFORM}:11.0.11_9-jre-hotspot as builder
 
 ARG JAR_FILE=build/libs/cpo-case-payment-orders-api.jar
 COPY ${JAR_FILE} application.jar
