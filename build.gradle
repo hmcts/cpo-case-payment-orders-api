@@ -199,7 +199,7 @@ def versions = [
   junit           : '5.9.3',
   junitPlatform   : '1.9.3',
   lombok          : '1.18.26',
-  mapstruct       : '1.4.2.Final',
+  mapstruct       : '1.5.5.Final',
   reformLogging   : '5.1.9',
   springBoot      : springBoot.class.package.implementationVersion,
   springCloud     : '2021.0.7',
