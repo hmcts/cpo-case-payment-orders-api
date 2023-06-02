@@ -1,5 +1,5 @@
 ARG PLATFORM=""
-FROM adoptopenjdk${PLATFORM}:jdk-17.0.7+7 as builder
+FROM eclipse-temurin${PLATFORM}:17 as builder
 
 ARG JAR_FILE=build/libs/cpo-case-payment-orders-api.jar
 COPY ${JAR_FILE} application.jar
