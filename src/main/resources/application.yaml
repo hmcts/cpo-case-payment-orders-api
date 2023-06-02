@@ -1,6 +1,12 @@
 server:
   port: 4457
 
+logging:
+  level:
+    org:
+      springframework:
+        web: INFO
+
 audit:
   log:
     enabled: true

@@ -27,7 +27,7 @@ import uk.gov.hmcts.reform.cpo.auditlog.AuditRepository;
 import uk.gov.hmcts.reform.cpo.config.AuditConfiguration;
 import uk.gov.hmcts.reform.cpo.utils.KeyGenUtil;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

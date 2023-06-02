@@ -7,7 +7,7 @@ import lombok.Getter;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.UUID;
 
 @Getter

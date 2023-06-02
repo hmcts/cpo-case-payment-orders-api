@@ -7,8 +7,8 @@ import org.hibernate.service.spi.ServiceRegistryImplementor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
-import javax.persistence.EntityManagerFactory;
+import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManagerFactory;
 
 import static org.hibernate.event.spi.EventType.POST_DELETE;
 

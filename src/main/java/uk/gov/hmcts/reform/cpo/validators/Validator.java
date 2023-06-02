@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.cpo.validators;
 
 
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
 import java.util.UUID;
 

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrderAuditRevision;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;

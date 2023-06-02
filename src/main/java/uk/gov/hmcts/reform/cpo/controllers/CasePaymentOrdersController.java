@@ -36,7 +36,7 @@ import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -70,7 +70,7 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 201,
             message = "Case Payment Order Created"
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
@@ -93,19 +93,19 @@ public class CasePaymentOrdersController {
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
             })
-        ),
+            ),
         @ApiResponse(
             code = 401,
             message = AuthError.AUTHENTICATION_TOKEN_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 403,
             message = AuthError.UNAUTHORISED_S2S_SERVICE
-        ),
+            ),
         @ApiResponse(
             code = 409,
             message = ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE
-        )
+            )
     })
     @LogAudit(
         operationType = AuditOperationType.CREATE_CASE_PAYMENT_ORDER,
@@ -124,7 +124,7 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 200,
             message = ""
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
@@ -143,19 +143,19 @@ public class CasePaymentOrdersController {
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
             })
-        ),
+            ),
         @ApiResponse(
             code = 401,
             message = AuthError.AUTHENTICATION_TOKEN_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 403,
             message = AuthError.UNAUTHORISED_S2S_SERVICE
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = ValidationError.CPOS_NOT_FOUND
-        ),
+            ),
     })
     @ApiImplicitParams({
         @ApiImplicitParam(name = "page", value = "page number, indexes from (0,1) to page-size.", paramType = "query"),
@@ -199,7 +199,7 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 204,
             message = "Case Payment Orders Deleted"
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
@@ -217,21 +217,21 @@ public class CasePaymentOrdersController {
                         + "   \"details\": [ \"" + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS + "\" ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE
-                )
+                    )
             })
-        ),
+            ),
         @ApiResponse(
             code = 401,
             message = AuthError.AUTHENTICATION_TOKEN_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 403,
             message = AuthError.UNAUTHORISED_S2S_SERVICE
-        ),
+            ),
         @ApiResponse(
                 code = 404,
                 message = ValidationError.CPOS_NOT_FOUND
-        )
+            )
     })
     @LogAudit(
         operationType = AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
@@ -262,7 +262,7 @@ public class CasePaymentOrdersController {
         @ApiResponse(
             code = 202,
             message = "Case Payment Order Updated"
-        ),
+            ),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
@@ -287,23 +287,23 @@ public class CasePaymentOrdersController {
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
             })
-        ),
+            ),
         @ApiResponse(
             code = 401,
             message = AuthError.AUTHENTICATION_TOKEN_INVALID
-        ),
+            ),
         @ApiResponse(
             code = 403,
             message = AuthError.UNAUTHORISED_S2S_SERVICE
-        ),
+            ),
         @ApiResponse(
             code = 404,
             message = ValidationError.CPO_NOT_FOUND
-        ),
+            ),
         @ApiResponse(
             code = 409,
             message = ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE
-        )
+            )
     })
     @LogAudit(
         operationType = AuditOperationType.UPDATE_CASE_PAYMENT_ORDER,
