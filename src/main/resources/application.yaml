@@ -17,6 +17,8 @@ audit:
 management:
   endpoint:
     health:
+      probes:
+        enabled: true
       show-details: "always"
       cache:
         time-to-live: 1000ms
@@ -25,9 +27,7 @@ management:
       base-path: /
       exposure:
         include: health, info, prometheus
-  health:
-    probes:
-      enabled: true
+
 spring:
   #CCD-3509 CVE-2021-22044 spring.mvc.pathmatch.matching-strategy = ant_path_matcher
   #required to fix null pointers in integration tests, conflict in Springfox after Springboot 2.6.10 upgrade
@@ -67,6 +67,7 @@ spring:
     password: ${CPO_CASE_PAYMENT_ORDERS_DB_PASSWORD:cpo}
     type: com.zaxxer.hikari.HikariDataSource
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     database: postgresql
     show-sql: false
     hibernate:
@@ -83,7 +84,7 @@ spring:
 
   flyway:
     out-of-order: true
-    ignore-missing-migrations: true
+    ignoreM-migration-patterns: true
   security:
     oauth2:
       client:
