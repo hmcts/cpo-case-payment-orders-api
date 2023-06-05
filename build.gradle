@@ -17,8 +17,11 @@ ext['spring-security.version'] = '6.1.0'
 
 group = 'uk.gov.hmcts.reform'
 
-sourceCompatibility = 17
-targetCompatibility = 17
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(17)
+  }
+}
 
 sourceSets {
   functionalTest {
