@@ -27,6 +27,7 @@ import springfox.documentation.service.ParameterType;
 import springfox.documentation.service.RequestParameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
+import uk.gov.hmcts.reform.idam.client.OAuth2Configuration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +36,16 @@ import java.util.List;
 
 @Configuration
 public class SwaggerConfiguration {
+
+    @Bean
+    public OAuth2Configuration oAuth2Configuration(){
+        return new OAuth2Configuration(
+            "{baseUrl}/{action}/oauth2/code/{registrationId}",
+            "client-id",
+            "client-secret",
+            "read:user"
+        );
+    }
 
     @Bean
     public Docket api() {
