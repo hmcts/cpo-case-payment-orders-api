@@ -190,9 +190,9 @@ jacocoTestReport {
   }
 }
 
-project.tasks['sonar'].dependsOn jacocoTestReport
+project.tasks['sonarqube'].dependsOn jacocoTestReport
 
-sonar {
+sonarqube {
   properties {
     property "sonar.projectName", "Reform :: cpo-case-payment-orders-api"
     property "sonar.projectKey", "uk.gov.hmcts.reform:cpo-case-payment-orders-api"
