@@ -74,6 +74,8 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
+        id:
+          db_structure_naming_strategy: legacy
         jdbc:
           time_zone: UTC
       org:

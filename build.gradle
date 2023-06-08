@@ -130,7 +130,7 @@ task smoke(type: Test) {
   doLast {
     generateCucumberReports.enabled = true
     javaexec {
-      main = "uk.gov.hmcts.reform.cpo.befta.CasePaymentOrdersBeftaMain"
+      mainClass = "uk.gov.hmcts.reform.cpo.befta.CasePaymentOrdersBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
       args = [
                '--strict',
@@ -211,7 +211,6 @@ def versions = [
   logback         : '1.4.7',
   springBoot      : springBoot.class.package.implementationVersion,
   springCloud     : '2022.0.3',
-  springfoxSwagger: '3.0.0',
   testcontainers  : '1.18.3',
   tomcatEmbedded  : '10.1.9',
 ]
@@ -284,7 +283,9 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client', version: '3.1.0'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '3.1.0'
 
-  implementation group: 'io.springfox', name: 'springfox-boot-starter', version: versions.springfoxSwagger
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-common', version: '2.1.0'
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.1.0'
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-api', version: '2.1.0'
 
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
   // implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.reformLogging
@@ -292,7 +293,7 @@ dependencies {
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: versions.appInsights
 
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.1.0'
-  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
+  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.1'
 
   implementation "com.github.ben-manes.caffeine:caffeine:3.1.6"
 

@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.cpo.payload;
 
-import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 @Getter
-@ApiModel("Create Case Payment Order Request")
+@Schema(name = "Create Case Payment Order Request")
 public class CreateCasePaymentOrderRequest extends BaseCasePaymentOrderRequest {
 
     public CreateCasePaymentOrderRequest(String caseId,

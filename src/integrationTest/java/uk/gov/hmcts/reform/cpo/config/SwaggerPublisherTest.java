@@ -3,12 +3,9 @@ package uk.gov.hmcts.reform.cpo.config;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.cpo.BaseTest;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.OAuth2Configuration;
 
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -21,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Built-in feature which saves service's swagger specs in temporary directory.
  * Each travis run on master should automatically save and upload (if updated) documentation.
  */
-@ContextConfiguration(classes = {SwaggerConfiguration.class, IdamClient.class})
+@ContextConfiguration(classes = {OpenApiConfiguration.class})
 class SwaggerPublisherTest extends BaseTest {
 
     @Autowired
@@ -30,7 +27,7 @@ class SwaggerPublisherTest extends BaseTest {
     @DisplayName("Generate swagger documentation")
     @Test
     void generateDocs() throws Exception {
-        byte[] specs = mvc.perform(get("/v2/api-docs"))
+        byte[] specs = mvc.perform(get("/v3/api-docs"))
             .andExpect(status().isOk())
             .andReturn()
             .getResponse()

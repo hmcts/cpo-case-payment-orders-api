@@ -1,5 +1,13 @@
 package uk.gov.hmcts.reform.cpo.config;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.ExternalDocumentation;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.actuate.autoconfigure.web.server.ManagementPortType;
@@ -17,79 +25,72 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.builders.RequestParameterBuilder;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.Contact;
-import springfox.documentation.service.ParameterType;
-import springfox.documentation.service.RequestParameter;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import uk.gov.hmcts.reform.idam.client.OAuth2Configuration;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 @Configuration
-public class SwaggerConfiguration {
+public class OpenApiConfiguration {
 
     @Bean
-    public OAuth2Configuration oAuth2Configuration(){
-        return new OAuth2Configuration(
-            "{baseUrl}/{action}/oauth2/code/{registrationId}",
-            "client-id",
-            "client-secret",
-            "read:user"
-        );
+    public GroupedOpenApi grouped() {
+        return GroupedOpenApi.builder()
+            .group("Case Payment Orders API")
+            .addOpenApiMethodFilter(method -> method.isAnnotationPresent(RestController.class))
+            .build();
     }
 
     @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-            .useDefaultResponseMessages(false)
-            .select()
-            .apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))
-            .paths(PathSelectors.any())
-            .build().useDefaultResponseMessages(false)
-            .apiInfo(apiInfo())
-            .globalRequestParameters(Arrays.asList(
-                headerServiceAuthorization(),
-                headerAuthorization()
-            ));
+    public OpenAPI api() {
+        return new OpenAPI()
+            .info(apiInfo())
+            .externalDocs(externalDocs())
+            .components(components())
+            ;
     }
 
-    private ApiInfo apiInfo() {
-        return new ApiInfoBuilder()
+    private Info apiInfo() {
+        return new Info()
             .title("Case Payment Orders API")
             .description("Case payment orders")
-            .version("1.0.0")
-            .contact(new Contact("CDM",
-                                 "https://tools.hmcts.net/confluence/display/RCCD/Reform%3A+Core+Case+Data+Home",
-                                 "corecasedatateam@hmcts.net"))
-            .termsOfServiceUrl("")
-            .build();
+            .version("v1.0.0")
+            .license(new License()
+                         .name("MIT")
+                         .url("https://opensource.org/licenses/MIT")
+            )
+            .contact(new Contact()
+                         .name("CDM")
+                         .url("https://tools.hmcts.net/confluence/display/RCCD/Reform%3A+Core+Case+Data+Home")
+                         .email("corecasedatateam@hmcts.net")
+            );
     }
 
-    private RequestParameter headerServiceAuthorization() {
-        return new RequestParameterBuilder()
+    private ExternalDocumentation externalDocs() {
+        return new ExternalDocumentation()
+            .description("README")
+            .url("https://github.com/hmcts/rpe-pdf-service");
+    }
+
+    private Components components() {
+        return new Components()
+            .addSecuritySchemes("headerServiceAuthorization", headerServiceAuthorization())
+            .addSecuritySchemes("headerAuthorization", headerAuthorization())
+            ;
+    }
+
+    private SecurityScheme headerServiceAuthorization() {
+        return new SecurityScheme()
             .name("ServiceAuthorization")
             .description("Valid Service-to-Service JWT token for a whitelisted micro-service")
-            .in(ParameterType.HEADER)
-            .required(true)
-            .build();
+            .in(SecurityScheme.In.HEADER);
     }
 
-    private RequestParameter headerAuthorization() {
-        return new RequestParameterBuilder()
+    private SecurityScheme headerAuthorization() {
+        return new SecurityScheme()
             .name("Authorization")
             .description("Keyword `Bearer` followed by a valid IDAM user token")
-            .in(ParameterType.HEADER)
-            .required(true)
-            .build();
+            .in(SecurityScheme.In.HEADER);
     }
 
     //CCD-3509 CVE-2021-22044 required to fix null pointers in integration tests,
