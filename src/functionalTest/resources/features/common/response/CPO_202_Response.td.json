@@ -3,7 +3,8 @@
   "_extends_": "Common_202_Response",
 
   "headers": {
-    "Content-Length": "[[ANYTHING_PRESENT]]",
+    "Transfer-Encoding": "[[ANY_NULLABLE]]",
+    "Content-Length": "[[ANY_NULLABLE]]",
     "Cache-Control": "[[ANY_NULLABLE]]",
     "Expires": "[[ANY_NULLABLE]]",
     "Pragma": "[[ANY_NULLABLE]]",
