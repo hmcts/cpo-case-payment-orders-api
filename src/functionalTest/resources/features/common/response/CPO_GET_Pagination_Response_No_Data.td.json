@@ -9,11 +9,7 @@
   "total_elements" : 0,
   "number_of_elements" : 0,
   "size" : 0,
-  "sort" : {
-    "sorted" : false,
-    "unsorted" : true,
-    "empty" : true
-  },
+  "sort" : [],
   "number" : 0,
   "first" : true,
   "empty" : true
