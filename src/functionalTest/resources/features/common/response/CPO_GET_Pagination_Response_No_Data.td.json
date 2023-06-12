@@ -9,16 +9,7 @@
   "total_elements" : 0,
   "number_of_elements" : 0,
   "size" : 0,
-  "sort" : [
-    {
-      "direction" : "ASC",
-      "property" : "caseId"
-    },
-    {
-      "direction" : "ASC",
-      "property" : "orderReference"
-    }
-  ],
+  "sort" : "[[ANY_NULLABLE]]",
   "number" : 0,
   "first" : true,
   "empty" : true
