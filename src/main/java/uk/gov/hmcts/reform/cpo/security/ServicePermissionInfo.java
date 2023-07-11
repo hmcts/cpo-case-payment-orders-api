@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.cpo.security;
 import lombok.Data;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.Pattern;
 
 @Data
 class ServicePermissionInfo {

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.auditlog.aop.AuditContext;
 import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.Clock;
 import java.time.LocalDateTime;
 

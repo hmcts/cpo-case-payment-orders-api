@@ -4,8 +4,8 @@ import uk.gov.hmcts.reform.cpo.validators.CaseIdValidator;
 import uk.gov.hmcts.reform.cpo.validators.CaseIdsValidator;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 

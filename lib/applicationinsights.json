@@ -1,0 +1,6 @@
+{
+  "connectionString": "${file:/mnt/secrets/draft-store/app-insights-connection-string}",
+  "role": {
+    "name": "CPO Case Payment Orders API"
+  }
+}

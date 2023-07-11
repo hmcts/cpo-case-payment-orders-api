@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 

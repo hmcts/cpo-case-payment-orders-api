@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import static uk.gov.hmcts.reform.cpo.security.Permission.CREATE;
 import static uk.gov.hmcts.reform.cpo.security.Permission.DELETE;
