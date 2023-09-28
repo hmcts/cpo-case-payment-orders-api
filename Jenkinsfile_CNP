@@ -63,10 +63,7 @@ env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionSt
 
 withPipeline(type, product, component) {
   onPR {
-    def githubApi = new GithubAPI(this)
-    if (!githubApi.getLabelsbyPattern(env.BRANCH_NAME, "keep-helm")) {
-      enableCleanupOfHelmReleaseOnSuccess()
-    }
+    enableSlackNotifications('#ccd-pr-builds')
   }
 
   afterAlways('test') {
