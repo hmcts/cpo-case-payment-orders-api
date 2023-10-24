@@ -9,7 +9,7 @@ This micro-service provides a set of APIs to manage case payment orders.
 ## Getting Started
 
 ### Prerequisites
-- [JDK 11](https://java.com)
+- [JDK 17](https://java.com)
 
 ### Building the application
 

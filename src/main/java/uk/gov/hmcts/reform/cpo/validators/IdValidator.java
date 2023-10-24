@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.cpo.validators;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.util.ArrayList;
 import java.util.List;
 

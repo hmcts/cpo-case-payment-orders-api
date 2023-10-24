@@ -1244,12 +1244,12 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = null;
         AuditOperationType auditOperationType = null;
 
-        switch (method) {
-            case GET:
+        switch (method.name()) {
+            case "GET":
                 mockHttpServletRequestBuilder = get(CASE_PAYMENT_ORDERS_PATH);
                 auditOperationType = AuditOperationType.GET_CASE_PAYMENT_ORDER;
                 break;
-            case DELETE:
+            case "DELETE":
                 mockHttpServletRequestBuilder = delete(CASE_PAYMENT_ORDERS_PATH);
                 auditOperationType = AuditOperationType.DELETE_CASE_PAYMENT_ORDER;
                 break;

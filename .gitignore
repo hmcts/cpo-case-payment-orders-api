@@ -32,3 +32,5 @@ definition_files/
 /bin/integrationTest
 /bin/main
 /bin/test
+lib/applicationinsights-agent-*.jar
+lib/applicationinsights.log

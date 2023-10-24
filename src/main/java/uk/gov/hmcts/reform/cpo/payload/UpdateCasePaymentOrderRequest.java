@@ -1,22 +1,21 @@
 package uk.gov.hmcts.reform.cpo.payload;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.UUID;
 
 @Getter
-@ApiModel("Update Case Payment Order Request")
+@Schema(name = "Update Case Payment Order Request")
 public class UpdateCasePaymentOrderRequest extends BaseCasePaymentOrderRequest {
 
     @NotEmpty(message = ValidationError.ID_REQUIRED)
     @ValidCpoId
-    @ApiModelProperty(value = "Case Payment Order ID to update", required = true,
+    @Schema(name = "Case Payment Order ID to update", required = true,
         example = "77d30e7f-ead9-4529-a499-6bf8b0f2d08e")
     private final String id;
 
