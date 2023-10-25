@@ -6,7 +6,7 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "cpo"
 def component = "case-payment-orders-api"
-def branchesToSync = ['demo', 'ithc', 'perftest']
+def branchesToSync = ['ithc', 'perftest']
 
 GradleBuilder builder = new GradleBuilder(this, product)
 
