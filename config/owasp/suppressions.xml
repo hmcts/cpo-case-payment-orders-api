@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
   <suppress>
     <notes>Temporary Suppression
-        CVE-2022-1471 refer https://tools.hmcts.net/jira/browse/CCD-4454
         CVE-2023-35116 refer https://tools.hmcts.net/jira/browse/CCD-4771    
         CVE-2023-34035 refer [Ticket]
         CVE-2023-34034 refer [Ticket]
@@ -9,9 +8,8 @@
         CVE-2023-42795 refer [Ticket]
         CVE-2023-45648 refer [Ticket]
         CVE-2023-44487 refer [Ticket]
-    
-        CVE-2023-45960 refer [Ticket]</notes>
-    <cve>CVE-2022-1471</cve>
+        CVE-2023-45960 refer [Ticket]
+    </notes>
     <cve>CVE-2023-35116</cve>
     <cve>CVE-2023-34035</cve>
     <cve>CVE-2023-34034</cve>
