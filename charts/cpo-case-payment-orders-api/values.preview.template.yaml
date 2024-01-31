@@ -2,10 +2,6 @@ java:
   # Don't modify below here
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
-  keyVaults:
-    cpo:
-      secrets:
-        - app-insights-connection-string
   environment:
     CPO_CASE_PAYMENT_ORDERS_DB_HOST: "{{ .Release.Name }}-postgresql"
     CPO_CASE_PAYMENT_ORDERS_DB_NAME: "{{ .Values.postgresql.auth.database}}"

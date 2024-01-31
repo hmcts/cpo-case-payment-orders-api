@@ -1,7 +1,7 @@
 {
   "connectionString": "${file:/mnt/secrets/cpo/app-insights-connection-string}",
   "role": {
-    "name": "CPO Case Payment Orders API"
+    "name": "cpo-case-payment-orders-api"
   },
   "preview": {
     "sampling": {
