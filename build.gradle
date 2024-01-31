@@ -207,7 +207,7 @@ def versions = [
   mapstruct       : '1.5.5.Final',
   lombokMapBinding: '0.2.0',
   reformLogging   : '6.0.1',
-  appInsights     : '2.6.1',
+  appInsights     : '2.4.1',
   logback         : '1.4.7',
   springBoot      : springBoot.class.package.implementationVersion,
   springCloud     : '2022.0.3',
@@ -288,7 +288,6 @@ dependencies {
   implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-api', version: '2.1.0'
 
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
-  // implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.reformLogging
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: versions.appInsights
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: versions.appInsights
 

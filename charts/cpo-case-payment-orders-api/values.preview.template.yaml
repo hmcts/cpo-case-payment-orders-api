@@ -5,7 +5,7 @@ java:
   keyVaults:
     cpo:
       secrets:
-        - AppInsightsInstrumentationKey
+        - app-insights-connection-string
   environment:
     CPO_CASE_PAYMENT_ORDERS_DB_HOST: "{{ .Release.Name }}-postgresql"
     CPO_CASE_PAYMENT_ORDERS_DB_NAME: "{{ .Values.postgresql.auth.database}}"
