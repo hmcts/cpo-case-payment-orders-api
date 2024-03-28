@@ -212,7 +212,7 @@ def versions = [
   springBoot      : springBoot.class.package.implementationVersion,
   springCloud     : '2022.0.3',
   testcontainers  : '1.18.3',
-  tomcatEmbedded  : '10.1.9',
+  tomcatEmbedded  : '10.1.13',
 ]
 
 ext['spring-security.version'] = '6.1.2'
