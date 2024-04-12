@@ -132,7 +132,7 @@ module "postgresql_v15" {
   pgsql_sku        = var.pgsql_sku
   pgsql_storage_mb = var.pgsql_storage_mb
 
-  force_user_permissions_trigger = "1"
+  force_user_permissions_trigger = "2"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER-V15" {
