@@ -49,61 +49,6 @@ moved {
   to   = module.application_insights.azurerm_application_insights.this
 }
 
-module "cpo-case-payments-db" {
-  source                = "git@github.com:hmcts/cnp-module-postgres?ref=master"
-  product               = var.product
-  component             = var.component
-  name                  = "${local.app_full_name}-postgres-db"
-  location              = var.location
-  env                   = var.env
-  subscription          = var.subscription
-  postgresql_user       = var.postgresql_user
-  postgresql_version    = var.postgresql_version
-  database_name         = var.database_name
-  sku_name              = var.sku_name
-  sku_tier              = var.sku_tier
-  sku_capacity          = var.sku_capacity
-  ssl_enforcement       = var.ssl_enforcement
-  storage_mb            = var.storage_mb
-  backup_retention_days = var.backup_retention_days
-  georedundant_backup   = var.georedundant_backup
-  common_tags           = var.common_tags
-}
-
-////////////////////////////////
-// Populate Vault with DB info
-////////////////////////////////
-
-resource "azurerm_key_vault_secret" "POSTGRES-USER" {
-  name         = "${var.component}-POSTGRES-USER"
-  value        = module.cpo-case-payments-db.user_name
-  key_vault_id = module.key-vault.key_vault_id
-}
-
-resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
-  name         = "${var.component}-POSTGRES-PASS"
-  value        = module.cpo-case-payments-db.postgresql_password
-  key_vault_id = module.key-vault.key_vault_id
-}
-
-resource "azurerm_key_vault_secret" "POSTGRES-HOST" {
-  name         = "${var.component}-POSTGRES-HOST"
-  value        = module.cpo-case-payments-db.host_name
-  key_vault_id = module.key-vault.key_vault_id
-}
-
-resource "azurerm_key_vault_secret" "POSTGRES-PORT" {
-  name         = "${var.component}-POSTGRES-PORT"
-  value        = module.cpo-case-payments-db.postgresql_listen_port
-  key_vault_id = module.key-vault.key_vault_id
-}
-
-resource "azurerm_key_vault_secret" "POSTGRES-DATABASE" {
-  name         = "${var.component}-POSTGRES-DATABASE"
-  value        = module.cpo-case-payments-db.postgresql_database
-  key_vault_id = module.key-vault.key_vault_id
-}
-
 module "postgresql_v15" {
   source = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=master"
   providers = {
@@ -135,6 +80,10 @@ module "postgresql_v15" {
   force_user_permissions_trigger = "2"
 }
 
+////////////////////////////////////
+// Populate KeyVault with DB info //
+////////////////////////////////////
+
 resource "azurerm_key_vault_secret" "POSTGRES-USER-V15" {
   name         = "${var.component}-POSTGRES-USER-V15"
   value        = module.postgresql_v15.username
@@ -153,3 +102,14 @@ resource "azurerm_key_vault_secret" "POSTGRES-HOST-V15" {
   key_vault_id = module.key-vault.key_vault_id
 }
 
+resource "azurerm_key_vault_secret" "POSTGRES-PORT" {
+  name         = "${var.component}-POSTGRES-PORT"
+  value        = "5432"
+  key_vault_id = module.key-vault.key_vault_id
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES-DATABASE" {
+  name         = "${var.component}-POSTGRES-DATABASE"
+  value        = var.database_name
+  key_vault_id = module.key-vault.key_vault_id
+}
