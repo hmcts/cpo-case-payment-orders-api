@@ -78,6 +78,8 @@ module "postgresql_v15" {
   pgsql_storage_mb = var.pgsql_storage_mb
 
   force_user_permissions_trigger = "2"
+
+  public_access = false
 }
 
 ////////////////////////////////////
