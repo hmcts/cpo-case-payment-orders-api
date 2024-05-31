@@ -1,7 +1,3 @@
-provider "azurerm" {
-  features {}
-}
-
 locals {
   app_full_name = "${var.product}-${var.component}"
 }
