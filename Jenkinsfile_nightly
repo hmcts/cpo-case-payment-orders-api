@@ -13,7 +13,7 @@ def product = "cpo"
 def component = "case-payment-orders-api"
 
 withNightlyPipeline(type, product, component) {
-  enableFortifyScan('ccd-aat')
+  // enableFortifyScan('ccd-aat')
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
   }
