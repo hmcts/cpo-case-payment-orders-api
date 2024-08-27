@@ -310,8 +310,8 @@ dependencies {
   implementation group: 'net.minidev', name: 'json-smart', version: '2.4.11'
 
   // CVE-2021-42550
-  implementation group: 'ch.qos.logback', name: 'logback-classic', version: versions.logback
-  implementation group: 'ch.qos.logback', name: 'logback-core', version: versions.logback
+  implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.6'
+  implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.6'
 
   implementation "org.apache.tomcat.embed:tomcat-embed-core:${versions.tomcatEmbedded}"
   implementation "org.apache.tomcat.embed:tomcat-embed-el:${versions.tomcatEmbedded}"
