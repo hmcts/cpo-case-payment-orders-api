@@ -363,7 +363,7 @@ dependencies {
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath
 
-  runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
+  runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.6.1'
 
   implementation group: 'org.dom4j', name: 'dom4j', version: '2.1.4'
   implementation group: 'xerces', name: 'xercesImpl', version: '2.12.2'
