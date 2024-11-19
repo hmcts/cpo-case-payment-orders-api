@@ -27,7 +27,7 @@ services:
       - ccd-network
 
   cpo-db:
-    image: postgres:11.11
+    image: postgres:15
     restart: always
     environment:
       - POSTGRES_DB=${DB_NAME}
