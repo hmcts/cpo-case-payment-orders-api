@@ -201,7 +201,7 @@ sonarqube {
 def versions = [
   junit           : '5.9.3',
   junitPlatform   : '1.9.3',
-  lombok          : '1.18.34',
+  lombok          : '1.18.36',
   mapstruct       : '1.5.5.Final',
   lombokMapBinding: '0.2.0',
   reformLogging   : '6.0.1',
@@ -327,7 +327,7 @@ dependencies {
   implementation group: 'commons-io', name: 'commons-io', version: '2.12.0'
 
 
-  compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   compileOnly group: 'org.mapstruct', name: 'mapstruct', version: versions.mapstruct
   compileOnly group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: versions.lombokMapBinding
 
