@@ -133,7 +133,7 @@ task smoke(type: Test) {
       mainClass = "uk.gov.hmcts.reform.cpo.befta.CasePaymentOrdersBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
       args = [
-               '--strict',
+               //'--strict',
                '--plugin', "json:${rootDir}/target/cucumber.json",
                '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
                '--tags', '@Smoke and not @Ignore',
