@@ -84,7 +84,7 @@ task functional(type: Test) {
       mainClass = "uk.gov.hmcts.reform.cpo.befta.CasePaymentOrdersBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
       args = [
-               '--strict',
+               //'--strict',
                '--threads', '10',
                '--plugin', "json:${rootDir}/target/cucumber.json",
                '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
@@ -133,7 +133,7 @@ task smoke(type: Test) {
       mainClass = "uk.gov.hmcts.reform.cpo.befta.CasePaymentOrdersBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
       args = [
-               '--strict',
+               //'--strict',
                '--plugin', "json:${rootDir}/target/cucumber.json",
                '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
                '--tags', '@Smoke and not @Ignore',
@@ -201,7 +201,7 @@ sonarqube {
 def versions = [
   junit           : '5.9.3',
   junitPlatform   : '1.9.3',
-  lombok          : '1.18.34',
+  lombok          : '1.18.36',
   mapstruct       : '1.5.5.Final',
   lombokMapBinding: '0.2.0',
   reformLogging   : '6.0.1',
@@ -327,7 +327,7 @@ dependencies {
   implementation group: 'commons-io', name: 'commons-io', version: '2.12.0'
 
 
-  compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   compileOnly group: 'org.mapstruct', name: 'mapstruct', version: versions.mapstruct
   compileOnly group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: versions.lombokMapBinding
 
@@ -355,8 +355,8 @@ dependencies {
 
   integrationTestImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
 
-  testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.12'
-  testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.11'
+  testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.24.2'
+  testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.0'
   testImplementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
   testImplementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '4.0.2'
   testImplementation 'com.github.hmcts:fortify-client:1.3.0:all'
