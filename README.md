@@ -9,7 +9,7 @@ This micro-service provides a set of APIs to manage case payment orders.
 ## Getting Started
 
 ### Prerequisites
-- [JDK 17](https://java.com)
+- [JDK 21](https://java.com)
 
 ### Building the application
 
@@ -145,4 +145,3 @@ or to run all checks, all tests and generate a code coverage report execute the 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
-
