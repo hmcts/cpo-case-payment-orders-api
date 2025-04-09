@@ -18,7 +18,8 @@
       "openapi": "[[ANYTHING_PRESENT]]",
       "servers": "[[ANYTHING_PRESENT]]",
       "components": "[[ANYTHING_PRESENT]]",
-      "externalDocs": "[[ANYTHING_PRESENT]]"
+      "externalDocs": "[[ANYTHING_PRESENT]]",
+      "info": "[[ANYTHING_PRESENT]]"
     },
     "info": {
       "description": "Case payment orders",
