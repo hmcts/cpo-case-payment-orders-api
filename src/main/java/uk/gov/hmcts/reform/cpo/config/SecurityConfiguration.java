@@ -37,6 +37,15 @@ public class SecurityConfiguration {
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
 
     private static final String[] AUTH_ALLOWED_LIST = {
+        "/**/swagger-ui.html",
+        "/**/webjars/**",
+        "/**/swagger-resources",
+        "/**/swagger-resources/**",
+        "/**/v2/api-docs",
+        "/**/configuration/ui",
+        "/**/configuration/security",
+        "/**/swagger-ui/**",
+        "/**/v3/api-docs/**",
         "/swagger-resources/**",
         "/swagger-ui/**",
         "/webjars/**",
@@ -48,6 +57,13 @@ public class SecurityConfiguration {
         "/favicon.ico",
         "/"
     };
+
+    public static final String[] SWAGGER_AUTH_WHITELIST = new String[]
+        {"/**/swagger-ui.html", "/**/webjars/**", "/**/swagger-resources",
+            "/**/swagger-resources/**", "/**/v2/api-docs",
+            "/**/configuration/ui", "/**/configuration/security",
+            "/**/swagger-ui/**", "/**/v3/api-docs/**"};
+// this one ignores under spring security
 
     @Autowired
     public SecurityConfiguration(final ServiceAuthFilter serviceAuthFilter,
