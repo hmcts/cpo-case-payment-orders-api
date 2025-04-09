@@ -2,29 +2,29 @@
   "_guid_": "S-125.2",
   "title": "Must return a positive appropriate response when Swagger JSON URL is accessed",
   "_extends_": "F-125_Test_Swagger_JSON_Base_Data",
-
   "specs": [
     "to observe the swagger json content"
   ],
-
-  "request" :{
-    "pathVariables" : {
+  "request": {
+    "pathVariables": {
       "cpo-case-payment-orders-api-version": "cpo-case-payment-orders-api.json"
     }
   },
-
   "expectedResponse": {
-    "responseCode" : 200,
-    "responseMessage" : "OK",
-    "body" : {
+    "responseCode": 200,
+    "responseMessage": "OK",
+    "body": {
       "paths": "[[ANYTHING_PRESENT]]",
-      "info": {
-        "description": "Case payment orders",
-        "title": "Case Payment Orders API",
-        "contact":"[[ANYTHING_PRESENT]]",
-        "license": "[[ANYTHING_PRESENT]]",
-        "version": "[[ANYTHING_PRESENT]]"
-      }
+      "openapi": "[[ANYTHING_PRESENT]]",
+      "servers": "[[ANYTHING_PRESENT]]",
+      "components": "[[ANYTHING_PRESENT]]"
+    },
+    "info": {
+      "description": "Case payment orders",
+      "title": "Case Payment Orders API",
+      "contact": "[[ANYTHING_PRESENT]]",
+      "license": "[[ANYTHING_PRESENT]]",
+      "version": "[[ANYTHING_PRESENT]]"
     }
   }
 }
