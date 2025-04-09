@@ -25,7 +25,7 @@
       "swagger": "2.0",
       "info": {
         "description": "Api Documentation",
-        "title": "Api Documentation",
+        "title": "Case Payment Orders API",
         "contact":"[[ANYTHING_PRESENT]]",
         "license": "[[ANYTHING_PRESENT]]",
         "version": "[[ANYTHING_PRESENT]]",
