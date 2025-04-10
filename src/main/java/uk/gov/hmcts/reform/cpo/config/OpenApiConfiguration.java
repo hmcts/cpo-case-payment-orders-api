@@ -35,15 +35,6 @@ public class OpenApiConfiguration {
 
     @Bean
     public GroupedOpenApi grouped() {
-        //return GroupedOpenApi.builder()
-        //    .group("Case Payment Orders API")
-        //    .addOpenApiMethodFilter(method -> method.isAnnotationPresent(RestController.class))
-        //    .build();
-
-        //return GroupedOpenApi.builder()
-        //    .group("OpenApiController")
-        //    .packagesToScan("uk.gov.hmcts.reform.cpo.controllers")
-        //    .build();
 
         //try this one
         return GroupedOpenApi.builder()
@@ -52,8 +43,6 @@ public class OpenApiConfiguration {
             .packagesToScan("uk.gov.hmcts.reform.cpo.controllers")
             .build();
 
-        //return GroupedOpenApi.builder().
-        // group("cpo-case-payment-orders-api").pathsToMatch("/**").build();
     }
 
     @Bean
