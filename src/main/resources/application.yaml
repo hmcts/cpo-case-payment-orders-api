@@ -126,3 +126,9 @@ case:
     orders:
       api:
         enabled: ${CASE_PAYMENT_ORDERS_ENABLED:true}
+
+springdoc:
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:true}
+  packagesToScan: uk.gov.hmcts.reform.cpo.controllers
+  pathsToMatch: /**

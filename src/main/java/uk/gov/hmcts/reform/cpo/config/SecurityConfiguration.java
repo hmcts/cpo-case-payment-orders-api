@@ -37,6 +37,14 @@ public class SecurityConfiguration {
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
 
     private static final String[] AUTH_ALLOWED_LIST = {
+        "/**/webjars/**",
+        "/**/swagger-resources",
+        "/**/swagger-resources/**",
+        "/**/v2/api-docs",
+        "/**/configuration/ui",
+        "/**/configuration/security",
+        "/**/swagger-ui/**",
+        "/**/v3/api-docs/**",
         "/swagger-resources/**",
         "/swagger-ui/**",
         "/webjars/**",
