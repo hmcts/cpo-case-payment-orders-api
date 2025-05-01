@@ -39,7 +39,6 @@ public class SecurityConfiguration {
     private static final String[] AUTH_ALLOWED_LIST = {
         "/**/webjars/**",
         "/**/swagger-resources",
-        "/**/swagger-resources/**",
         "/**/v3/api-docs/**", //necessary
         "/swagger-resources/**",
         "/swagger-ui/**",
