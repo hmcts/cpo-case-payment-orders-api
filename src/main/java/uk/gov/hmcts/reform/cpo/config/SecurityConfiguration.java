@@ -42,7 +42,6 @@ public class SecurityConfiguration {
         "/**/swagger-resources/**",
         "/**/v2/api-docs",
         "/**/configuration/ui",
-        "/**/configuration/security",
         "/**/v3/api-docs/**", //necessary
         "/swagger-resources/**",
         "/swagger-ui/**",
