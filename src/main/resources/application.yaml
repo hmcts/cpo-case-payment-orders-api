@@ -126,5 +126,3 @@ case:
     orders:
       api:
         enabled: ${CASE_PAYMENT_ORDERS_ENABLED:true}
-
-
