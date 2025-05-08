@@ -48,7 +48,7 @@ public class CasePaymentOrdersTestAutomationAdapter extends DefaultTestAutomatio
         } else if (key.toString().startsWith("approximately ")) {
             try {
                 String actualSizeFromHeaderStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
-                "testData.actualResponse.headers.Content-Length");
+                    "testData.actualResponse.headers.Content-Length");
                 String expectedSizeStr = key.toString().replace("approximately ", "");
 
                 int actualSize =  Integer.parseInt(actualSizeFromHeaderStr);
@@ -64,7 +64,7 @@ public class CasePaymentOrdersTestAutomationAdapter extends DefaultTestAutomatio
         } else if (key.toString().startsWith("contains ")) {
             try {
                 String actualValueStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
-                "testData.actualResponse.body.__plainTextValue__");
+                    "testData.actualResponse.body.__plainTextValue__");
                 String expectedValueStr = key.toString().replace("contains ", "");
 
                 if (actualValueStr.contains(expectedValueStr)) {
