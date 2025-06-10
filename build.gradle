@@ -266,7 +266,12 @@ ext.libraries = [
   ]
 ]
 
+configurations.all {
+  exclude group: "org.apache.commons", module:"commons-beanutils"
+}
+
 dependencies {
+  implementation 'commons-beanutils:commons-beanutils:1.11.0'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation('org.springframework.boot:spring-boot-starter-actuator'){
     version {
