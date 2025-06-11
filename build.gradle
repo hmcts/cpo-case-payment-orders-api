@@ -316,7 +316,7 @@ dependencies {
   implementation "org.apache.tomcat.embed:tomcat-embed-el:${versions.tomcatEmbedded}"
   implementation "org.apache.tomcat.embed:tomcat-embed-websocket:${versions.tomcatEmbedded}"
 
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.3'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.48'
 
   implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.19.1'
 
