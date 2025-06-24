@@ -2,20 +2,20 @@ plugins {
   id 'application'
   id 'idea'
   id 'jacoco'
-  id 'io.spring.dependency-management' version '1.1.0'
-  id 'org.springframework.boot' version '3.1.0'
-  id 'org.owasp.dependencycheck' version '8.2.1'
-  id 'com.github.ben-manes.versions' version '0.46.0'
+  id 'io.spring.dependency-management' version '1.1.7'
+  id 'org.springframework.boot' version '3.3.12'
+  id 'org.owasp.dependencycheck' version '12.1.1'
+  id 'com.github.ben-manes.versions' version '0.52.0'
   id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
-  id 'org.sonarqube' version '4.4.0.3356'
-  id 'uk.gov.hmcts.java' version '0.12.43'
+  id 'org.sonarqube' version '6.2.0.5505'
+  id 'uk.gov.hmcts.java' version '0.12.63'
 }
 
 group = 'uk.gov.hmcts.reform'
 
 java {
   toolchain {
-    languageVersion = JavaLanguageVersion.of(17)
+    languageVersion = JavaLanguageVersion.of(21)
   }
 }
 
@@ -84,7 +84,7 @@ task functional(type: Test) {
       mainClass = "uk.gov.hmcts.reform.cpo.befta.CasePaymentOrdersBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
       args = [
-               '--strict',
+               //'--strict',
                '--threads', '10',
                '--plugin', "json:${rootDir}/target/cucumber.json",
                '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
@@ -133,7 +133,7 @@ task smoke(type: Test) {
       mainClass = "uk.gov.hmcts.reform.cpo.befta.CasePaymentOrdersBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
       args = [
-               '--strict',
+               //'--strict',
                '--plugin', "json:${rootDir}/target/cucumber.json",
                '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
                '--tags', '@Smoke and not @Ignore',
@@ -168,8 +168,6 @@ task fortifyScan(type: JavaExec)  {
   mainClass = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
   classpath += sourceSets.test.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
-  // The line below prevents the build from failing if the Fortify scan detects issues
-  ignoreExitValue = true
 }
 
 task customCleanBeftaReports(type:Delete) {
@@ -201,25 +199,24 @@ sonarqube {
 }
 
 def versions = [
-  junit           : '5.9.3',
-  junitPlatform   : '1.9.3',
-  lombok          : '1.18.28',
+  junit           : '5.10.5',
+  junitPlatform   : '1.10.5',
+  lombok          : '1.18.38',
   mapstruct       : '1.5.5.Final',
   lombokMapBinding: '0.2.0',
   reformLogging   : '6.0.1',
   appInsights     : '2.4.1',
-  logback         : '1.4.7',
   springBoot      : springBoot.class.package.implementationVersion,
-  springCloud     : '2022.0.3',
-  testcontainers  : '1.18.3',
-  tomcatEmbedded  : '10.1.9',
+  springCloud     : '2023.0.5',
+  testcontainers  : '1.20.2',
+  tomcatEmbedded  : '10.1.40',
 ]
 
-ext['spring-security.version'] = '6.1.0'
-ext['spring-framework.version'] = '6.0.9'
+ext['spring-security.version'] = '6.3.9'
+ext['spring-framework.version'] = '6.1.20'
 ext['log4j2.version'] = '2.17.1'
 ext['snakeyaml.version'] = '2.0'
-ext['jackson.version'] = '2.15.3'
+ext['jackson.version'] = '2.16.0'
 
 // before committing a change, make sure task still works
 dependencyUpdates {
@@ -240,7 +237,7 @@ dependencyCheck {
 
 dependencyManagement {
   dependencies {
-    dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.70'
+    dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15to18', version: '1.77'
     // CVE-2018-10237 - Unbounded memory allocation
     dependencySet(group: 'com.google.guava', version: '30.1.1-jre') {
       entry 'guava'
@@ -254,7 +251,8 @@ dependencyManagement {
 repositories {
   mavenLocal()
   maven {
-    url "https://jitpack.io"
+    name = "AzureArtifacts"
+    url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
   }
   mavenCentral()
 }
@@ -280,8 +278,8 @@ dependencies {
 
   implementation group: 'org.springframework.security', name: 'spring-security-web'
   implementation group: 'org.springframework.security', name: 'spring-security-config'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client', version: '3.1.0'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '3.1.0'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
 
   implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-common', version: '2.1.0'
   implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.1.0'
@@ -303,8 +301,8 @@ dependencies {
   implementation group: 'net.minidev', name: 'json-smart', version: '2.4.11'
 
   // CVE-2021-42550
-  implementation group: 'ch.qos.logback', name: 'logback-classic', version: versions.logback
-  implementation group: 'ch.qos.logback', name: 'logback-core', version: versions.logback
+  implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.6'
+  implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.6'
 
   implementation "org.apache.tomcat.embed:tomcat-embed-core:${versions.tomcatEmbedded}"
   implementation "org.apache.tomcat.embed:tomcat-embed-el:${versions.tomcatEmbedded}"
@@ -321,7 +319,7 @@ dependencies {
   implementation group: 'commons-io', name: 'commons-io', version: '2.12.0'
 
 
-  compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   compileOnly group: 'org.mapstruct', name: 'mapstruct', version: versions.mapstruct
   compileOnly group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: versions.lombokMapBinding
 
@@ -349,26 +347,26 @@ dependencies {
 
   integrationTestImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
 
-  testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.12'
-  testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.11'
+  testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.24.2'
+  testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.0'
   testImplementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
   testImplementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '4.0.2'
-  testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.3.0'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.9:all'
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath
 
-  runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
+  runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.7.6'
 
   implementation group: 'org.dom4j', name: 'dom4j', version: '2.1.4'
   implementation group: 'xerces', name: 'xercesImpl', version: '2.12.2'
 }
 
-mainClassName = 'uk.gov.hmcts.reform.cpo.Application'
+application {
+  mainClass = 'uk.gov.hmcts.reform.cpo.Application'
+}
 
 bootJar {
-  getArchiveFileName().set(provider {
-    'cpo-case-payment-orders-api.jar'
-  })
+  archiveFileName = 'cpo-case-payment-orders-api.jar'
 
   manifest {
     attributes('Implementation-Version': project.version.toString())
