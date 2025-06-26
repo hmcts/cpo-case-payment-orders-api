@@ -290,7 +290,7 @@ dependencies {
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: versions.appInsights
 
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.1.0'
-  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.1'
+  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.4'
 
   implementation "com.github.ben-manes.caffeine:caffeine:3.1.6"
 
