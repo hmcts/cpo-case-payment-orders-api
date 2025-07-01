@@ -338,7 +338,7 @@ dependencies {
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
 
-  testImplementation group: 'org.apache.groovy', name: 'groovy', version: '4.0.12'
+  testImplementation group: 'org.apache.groovy', name: 'groovy', version: '4.0.27'
 
   testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '4.0.3'
 
