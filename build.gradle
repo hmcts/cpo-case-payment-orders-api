@@ -338,7 +338,7 @@ dependencies {
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
 
-  testImplementation group: 'org.apache.groovy', name: 'groovy', version: '4.0.12'
+  testImplementation group: 'org.apache.groovy', name: 'groovy', version: '4.0.27'
 
   testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '4.0.3'
 
@@ -350,12 +350,12 @@ dependencies {
   testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.24.2'
   testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.4'
   testImplementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
-  testImplementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '4.0.2'
+  testImplementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '4.0.5'
   testImplementation 'com.github.hmcts:fortify-client:1.4.9:all'
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath
 
-  runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.7.6'
+  runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.7.7'
 
   implementation group: 'org.dom4j', name: 'dom4j', version: '2.1.4'
   implementation group: 'xerces', name: 'xercesImpl', version: '2.12.2'
