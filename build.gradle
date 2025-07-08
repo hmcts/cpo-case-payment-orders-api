@@ -294,7 +294,7 @@ dependencies {
 
   implementation "com.github.ben-manes.caffeine:caffeine:3.1.6"
 
-  implementation group: 'com.auth0', name:'java-jwt', version:'4.4.0'
+  implementation group: 'com.auth0', name:'java-jwt', version:'4.5.0'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
   implementation group: 'org.hibernate', name: 'hibernate-envers', version: '6.2.4.Final'
 
