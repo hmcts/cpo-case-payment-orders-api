@@ -347,7 +347,7 @@ dependencies {
 
   integrationTestImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
 
-  testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.24.2'
+  testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.27.7-prerelease-CME-537'
   testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.4'
   testImplementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
   testImplementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '4.0.5'
