@@ -1,5 +1,5 @@
 #=================================
-@F-700 @Smoke
+@F-000 @Smoke
 Feature: Healthcheck Operation
 #=================================
 
@@ -7,7 +7,7 @@ Feature: Healthcheck Operation
     Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-700 @Smoke
+  @S-000 @Smoke
   Scenario: must return a successful response from the Case Payment Orders Healthcheck Operation
 
      When a request is prepared with appropriate values,
