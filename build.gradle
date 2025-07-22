@@ -90,7 +90,9 @@ task functional(type: Test) {
                '--plugin', "json:${rootDir}/target/cucumber.json",
                '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
                '--tags', 'not @Ignore',
-               '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
+               '--glue', 'uk.gov.hmcts.befta.player',
+               '--glue', 'uk.gov.hmcts.reform.cpo.befta',
+               'src/functionalTest/resources/features'
              ]
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
       jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED', '--add-opens=java.base/sun.security.util=ALL-UNNAMED' ]
@@ -120,9 +122,8 @@ task integration(type: Test) {
   failFast = true
 }
 
-task smoke(type: Test) {
-  description = "Runs smoke tests"
-  group = "Verification"
+task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
+
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
 
@@ -138,7 +139,9 @@ task smoke(type: Test) {
                '--plugin', "json:${rootDir}/target/cucumber.json",
                '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
                '--tags', '@Smoke and not @Ignore',
-               '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
+               '--glue', 'uk.gov.hmcts.befta.player',
+               '--glue', 'uk.gov.hmcts.reform.cpo.befta',
+               'src/functionalTest/resources/features'
              ]
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
       jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED', '--add-opens=java.base/sun.security.util=ALL-UNNAMED' ]
@@ -197,6 +200,12 @@ sonarqube {
     property "sonar.projectKey", "uk.gov.hmcts.reform:cpo-case-payment-orders-api"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.outputLocation.get().asFile.path}"
   }
+}
+
+configurations {
+  testAnnotationProcessor.extendsFrom(annotationProcessor)
+  integrationTestAnnotationProcessor.extendsFrom(annotationProcessor)
+  functionalTestAnnotationProcessor.extendsFrom(annotationProcessor)
 }
 
 def versions = [
@@ -298,31 +307,28 @@ dependencies {
   compileOnly group: 'org.mapstruct', name: 'mapstruct', version: versions.mapstruct
   compileOnly group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: versions.lombokMapBinding
   runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.7.7'
-
-
   annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: versions.mapstruct
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: versions.lombokMapBinding
-  testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-  integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+
 
   testImplementation libraries.junit5
   testImplementation group: 'org.apache.groovy', name: 'groovy', version: '4.0.27'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
   testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner'
+  testImplementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre' // Needed for BEFTA
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
-
+  
   integrationTestImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
 
-  functionalTestImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.27.7-prerelease-CME-537'
+  functionalTestImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.25.4'
   functionalTestImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.4'
   functionalTestImplementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '4.0.5'
   functionalTestImplementation 'com.github.hmcts:fortify-client:1.4.9:all'
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath
-
 }
 
 application {
