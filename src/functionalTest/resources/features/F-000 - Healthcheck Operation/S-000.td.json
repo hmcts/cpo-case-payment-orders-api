@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-700.1",
+  "_guid_": "S-000",
   "title": "must return a successful response when hitting Case Payment Orders Healthcheck Operation",
 
   "productName": "Case Payment Orders API",
