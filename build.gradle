@@ -291,7 +291,7 @@ dependencies {
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.6'
   implementation group: 'org.dom4j', name: 'dom4j', version: '2.2.0'
   implementation group: 'org.hibernate', name: 'hibernate-envers', version: '7.0.6.Final'
-  implementation group: 'org.flywaydb', name: 'flyway-core', version: '11.10.3'
+  implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   implementation group: 'xerces', name: 'xercesImpl', version: '2.12.2'
 
@@ -305,9 +305,6 @@ dependencies {
   annotationProcessor group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: versions.lombokMapBinding
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-
-  // NB: use a JSR305 implementation to import javax.annotation.meta.When enum
-  //compileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
 
   testImplementation libraries.junit5
   testImplementation group: 'org.apache.groovy', name: 'groovy', version: '4.0.27'

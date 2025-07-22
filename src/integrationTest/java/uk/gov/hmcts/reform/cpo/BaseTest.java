@@ -31,7 +31,7 @@ import com.nimbusds.jwt.SignedJWT;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.TextCodec;
+import io.jsonwebtoken.security.Keys;
 import jakarta.inject.Inject;
 import uk.gov.hmcts.reform.TestIdamConfiguration;
 import uk.gov.hmcts.reform.cpo.auditlog.AuditEntry;
@@ -208,7 +208,7 @@ public class BaseTest {
         return Jwts.builder()
             .setSubject(serviceName)
             .setExpiration(new Date(System.currentTimeMillis() + ttlMillis))
-            .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
+            .signWith(SignatureAlgorithm.HS256, Keys.secretKeyFor(SignatureAlgorithm.HS256))
             .compact();
     }
 
