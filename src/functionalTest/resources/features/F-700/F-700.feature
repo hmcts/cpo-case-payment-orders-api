@@ -3,9 +3,6 @@
 Feature: Healthcheck Operation
 #=================================
 
-  Background:
-    Given an appropriate test context as detailed in the test data source
-
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   @S-700.1 @Smoke
   Scenario: must return a successful response from the Case Payment Orders Healthcheck Operation
