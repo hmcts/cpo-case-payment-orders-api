@@ -120,11 +120,14 @@ task integration(type: Test) {
   failFast = true
 }
 
-task smoke(type: Test) {
-  description = "Runs smoke tests"
-  group = "Verification"
+task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
+
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
+  include "uk/gov/hmcts/reform/cpo/befta/**"
+  useJUnitPlatform {
+    includeTags 'smoke'
+  }
 
   generateCucumberReports.enabled = false
 
@@ -137,7 +140,7 @@ task smoke(type: Test) {
                //'--strict',
                '--plugin', "json:${rootDir}/target/cucumber.json",
                '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
-               '--tags', '@Smoke and not @Ignore',
+               '--tags', '@Smoke',
                '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
              ]
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
