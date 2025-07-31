@@ -39,6 +39,21 @@ sourceSets {
   }
 }
 
+configurations {
+    providedRuntime
+    annotationProcessor
+    mockitoAgent
+
+    testAnnotationProcessor.extendsFrom(annotationProcessor)
+    integrationTestImplementation.extendsFrom(testImplementation)
+    integrationTestRuntimeOnly.extendsFrom(testRuntimeOnly)
+    integrationTestAnnotationProcessor.extendsFrom(testAnnotationProcessor)
+    functionalTestImplementation.extendsFrom(testImplementation)
+    functionalTestRuntimeOnly.extendsFrom(testRuntimeOnly)
+    functionalTestAnnotationProcessor.extendsFrom(testAnnotationProcessor)
+
+}
+
 idea {
   module {
     // config to allow Intelij to mark test source and resource files correctly to help linting tools
@@ -68,6 +83,7 @@ tasks.withType(Test) {
 test {
   failFast = true
   jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED', '--add-opens=java.base/sun.security.util=ALL-UNNAMED' ]
+  jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
 }
 
 task functional(type: Test) {
@@ -90,10 +106,12 @@ task functional(type: Test) {
                '--plugin', "json:${rootDir}/target/cucumber.json",
                '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
                '--tags', 'not @Ignore',
-               '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
+               '--glue', 'uk.gov.hmcts.befta.player',
+               '--glue', 'uk.gov.hmcts.reform.cpo.befta',
+               'src/functionalTest/resources/features'
              ]
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
-      jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED', '--add-opens=java.base/sun.security.util=ALL-UNNAMED' ]
+      jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
     }
   }
 
@@ -143,10 +161,12 @@ task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verificatio
                '--plugin', "json:${rootDir}/target/cucumber.json",
                '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
                '--tags', '@Smoke',
-               '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
+               '--glue', 'uk.gov.hmcts.befta.player',
+               '--glue', 'uk.gov.hmcts.reform.cpo.befta',
+               'src/functionalTest/resources/features'
              ]
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
-      jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED', '--add-opens=java.base/sun.security.util=ALL-UNNAMED' ]
+      jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
     }
   }
 
@@ -206,6 +226,7 @@ sonarqube {
 }
 
 def versions = [
+  cucumber        : '7.27.0',
   junit           : '5.13.4',
   junitPlatform   : '1.13.4',
   lombok          : '1.18.38',
@@ -220,7 +241,7 @@ def versions = [
 ext['spring-security.version'] = '6.5.1'
 ext['spring-framework.version'] = '6.2.8'
 ext['log4j2.version'] = '2.23.1'
-ext['snakeyaml.version'] = '2.1'
+ext['snakeyaml.version'] = '2.4'
 ext['jackson.version'] = '2.16.1'
 
 // before committing a change, make sure task still works
@@ -304,13 +325,10 @@ dependencies {
   compileOnly group: 'org.mapstruct', name: 'mapstruct', version: versions.mapstruct
   compileOnly group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: versions.lombokMapBinding
   runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.7.7'
-
-
   annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: versions.mapstruct
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: versions.lombokMapBinding
-  testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-  integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+
 
   testImplementation libraries.junit5
   testImplementation group: 'org.apache.groovy', name: 'groovy', version: '4.0.27'
@@ -318,7 +336,7 @@ dependencies {
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
-
+  
   integrationTestImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
 
   functionalTestImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.25.4'
@@ -328,6 +346,9 @@ dependencies {
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath
 
+  functionalTestImplementation group: 'io.cucumber', name: 'cucumber-java', version: versions.cucumber
+  functionalTestImplementation group: 'io.cucumber', name: 'cucumber-junit', version: versions.cucumber
+  functionalTestImplementation group: 'io.cucumber', name: 'cucumber-junit-platform-engine', version: versions.cucumber
 }
 
 application {
