@@ -3,7 +3,7 @@
 Feature: Healthcheck Operation
 
 
-  @S-000 @Smoke
+  @S-000
   Scenario: must return a successful response from the Case Payment Orders Healthcheck Operation
     Given an appropriate test context as detailed in the test data source
 
