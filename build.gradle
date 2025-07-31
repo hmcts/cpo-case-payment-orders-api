@@ -220,7 +220,7 @@ def versions = [
 ext['spring-security.version'] = '6.5.1'
 ext['spring-framework.version'] = '6.2.8'
 ext['log4j2.version'] = '2.23.1'
-ext['snakeyaml.version'] = '2.4'
+ext['snakeyaml.version'] = '2.1'
 ext['jackson.version'] = '2.16.1'
 
 // before committing a change, make sure task still works
@@ -314,7 +314,6 @@ dependencies {
 
   testImplementation libraries.junit5
   testImplementation group: 'org.apache.groovy', name: 'groovy', version: '4.0.27'
-  testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
   testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
