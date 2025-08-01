@@ -1,9 +1,9 @@
 
-@F-000
-Feature: F-000: Healthcheck Operation
+@F-000 @Smoke
+Feature: Healthcheck Operation
 
 
-  @S-000
+  @S-000 @Smoke
   Scenario: must return a successful response from the Case Payment Orders Healthcheck Operation
     Given an appropriate test context as detailed in the test data source
 

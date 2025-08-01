@@ -39,21 +39,6 @@ sourceSets {
   }
 }
 
-configurations {
-    providedRuntime
-    annotationProcessor
-    mockitoAgent
-
-    testAnnotationProcessor.extendsFrom(annotationProcessor)
-    integrationTestImplementation.extendsFrom(testImplementation)
-    integrationTestRuntimeOnly.extendsFrom(testRuntimeOnly)
-    integrationTestAnnotationProcessor.extendsFrom(testAnnotationProcessor)
-    functionalTestImplementation.extendsFrom(testImplementation)
-    functionalTestRuntimeOnly.extendsFrom(testRuntimeOnly)
-    functionalTestAnnotationProcessor.extendsFrom(testAnnotationProcessor)
-
-}
-
 idea {
   module {
     // config to allow Intelij to mark test source and resource files correctly to help linting tools
@@ -83,7 +68,6 @@ tasks.withType(Test) {
 test {
   failFast = true
   jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED', '--add-opens=java.base/sun.security.util=ALL-UNNAMED' ]
-  // jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
 }
 
 task functional(type: Test) {
@@ -111,7 +95,7 @@ task functional(type: Test) {
                'src/functionalTest/resources/features'
              ]
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
-      jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
+      jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED', '--add-opens=java.base/sun.security.util=ALL-UNNAMED' ]
     }
   }
 
@@ -142,17 +126,11 @@ task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verificatio
 
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
-  
-  new File("$buildDir/test-results/test").mkdirs()
-  copy {
-    from "src/functionalTest/resources/DummyTest.xml"
-    into "$buildDir/test-results/test"
-  }
 
   generateCucumberReports.enabled = false
 
   doLast {
-    generateCucumberReports.enabled = false
+    generateCucumberReports.enabled = true
     javaexec {
       mainClass = "uk.gov.hmcts.reform.cpo.befta.CasePaymentOrdersBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
@@ -166,22 +144,21 @@ task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verificatio
                'src/functionalTest/resources/features'
              ]
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
-      jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
+      jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED', '--add-opens=java.base/sun.security.util=ALL-UNNAMED' ]
     }
   }
 
-  // Disabled for now as smoke test F-000 was moved to functional test
-  // finalizedBy {
-  //   generateCucumberReports {
-  //     doLast{
-  //       delete "${rootDir}/BEFTA Report for Smoke Tests/"
-  //       new File("${rootDir}/BEFTA Report for Smoke Tests").mkdirs()
-  //       file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Smoke Tests"))
+  finalizedBy {
+    generateCucumberReports {
+      doLast{
+        delete "${rootDir}/BEFTA Report for Smoke Tests/"
+        new File("${rootDir}/BEFTA Report for Smoke Tests").mkdirs()
+        file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Smoke Tests"))
 
-  //       logger.quiet("Smoke test report moved to ---> file://${rootDir}/BEFTA%20Report%20for%20Smoke%20Tests/overview-features.html")
-  //     }
-  //   }
-  // }
+        logger.quiet("Smoke test report moved to ---> file://${rootDir}/BEFTA%20Report%20for%20Smoke%20Tests/overview-features.html")
+      }
+    }
+  }
 
   outputs.upToDateWhen { false }
 }
@@ -223,6 +200,12 @@ sonarqube {
     property "sonar.projectKey", "uk.gov.hmcts.reform:cpo-case-payment-orders-api"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.outputLocation.get().asFile.path}"
   }
+}
+
+configurations {
+  testAnnotationProcessor.extendsFrom(annotationProcessor)
+  integrationTestAnnotationProcessor.extendsFrom(annotationProcessor)
+  functionalTestAnnotationProcessor.extendsFrom(annotationProcessor)
 }
 
 def versions = [
@@ -343,13 +326,10 @@ dependencies {
   functionalTestImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.25.4'
   functionalTestImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.4'
   functionalTestImplementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '4.0.5'
+  functionalTestImplementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre'
   functionalTestImplementation 'com.github.hmcts:fortify-client:1.4.9:all'
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath
-
-  functionalTestImplementation group: 'io.cucumber', name: 'cucumber-java', version: versions.cucumber
-  functionalTestImplementation group: 'io.cucumber', name: 'cucumber-junit', version: versions.cucumber
-  functionalTestImplementation group: 'io.cucumber', name: 'cucumber-junit-platform-engine', version: versions.cucumber
 }
 
 application {
