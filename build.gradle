@@ -138,7 +138,7 @@ task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verificatio
                //'--strict',
                '--plugin', "json:${rootDir}/target/cucumber.json",
                '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
-               '--tags', '@Smoke',
+               '--tags', '@Smoke and not @Ignore',
                '--glue', 'uk.gov.hmcts.befta.player',
                '--glue', 'uk.gov.hmcts.reform.cpo.befta',
                'src/functionalTest/resources/features'
@@ -209,7 +209,6 @@ configurations {
 }
 
 def versions = [
-  cucumber        : '7.27.0',
   junit           : '5.13.4',
   junitPlatform   : '1.13.4',
   lombok          : '1.18.38',
@@ -326,7 +325,7 @@ dependencies {
   functionalTestImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.25.4'
   functionalTestImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.4'
   functionalTestImplementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '4.0.5'
-  functionalTestImplementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre'
+  functionalTestImplementation group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'
   functionalTestImplementation 'com.github.hmcts:fortify-client:1.4.9:all'
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath
