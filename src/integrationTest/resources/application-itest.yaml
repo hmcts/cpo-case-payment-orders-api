@@ -17,7 +17,7 @@ spring:
     type: none
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-    url: jdbc:tc:postgresql:11:///databasename
+    url: jdbc:tc:postgresql:15:///databasename
 
 azure:
   application-insights:
