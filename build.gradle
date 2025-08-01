@@ -83,7 +83,7 @@ tasks.withType(Test) {
 test {
   failFast = true
   jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED', '--add-opens=java.base/sun.security.util=ALL-UNNAMED' ]
-  jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
+  // jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
 }
 
 task functional(type: Test) {
@@ -332,6 +332,7 @@ dependencies {
 
   testImplementation libraries.junit5
   testImplementation group: 'org.apache.groovy', name: 'groovy', version: '4.0.27'
+  testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
   testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
