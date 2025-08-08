@@ -298,7 +298,7 @@ dependencies {
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
   implementation group: 'org.hibernate', name: 'hibernate-envers', version: '6.2.4.Final'
 
-  implementation group: 'net.minidev', name: 'json-smart', version: '2.4.11'
+  implementation group: 'net.minidev', name: 'json-smart', version: '2.6.0'
 
   // CVE-2021-42550
   implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.18'
