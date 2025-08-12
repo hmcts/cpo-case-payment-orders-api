@@ -357,7 +357,7 @@ dependencies {
 
   runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.7.7'
 
-  implementation group: 'org.dom4j', name: 'dom4j', version: '2.1.4'
+  implementation group: 'org.dom4j', name: 'dom4j', version: '2.2.0'
   implementation group: 'xerces', name: 'xercesImpl', version: '2.12.2'
 }
 
