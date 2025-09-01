@@ -207,7 +207,7 @@ def versions = [
   reformLogging   : '6.1.9',
   appInsights     : '2.4.1',
   springBoot      : springBoot.class.package.implementationVersion,
-  springCloud     : '2023.0.5',
+  springCloud     : '2023.0.6',
   testcontainers  : '1.21.3',
   tomcatEmbedded  : '10.1.44',
 ]
@@ -340,7 +340,7 @@ dependencies {
 
   testImplementation group: 'org.apache.groovy', name: 'groovy', version: '4.0.28'
 
-  testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '4.0.3'
+  testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '4.3.0'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
