@@ -205,7 +205,7 @@ def versions = [
   mapstruct       : '1.6.3',
   lombokMapBinding: '0.2.0',
   reformLogging   : '6.1.9',
-  appInsights     : '2.4.1',
+  appInsights     : '2.6.4',
   springBoot      : springBoot.class.package.implementationVersion,
   springCloud     : '2023.0.6',
   testcontainers  : '1.21.3',
