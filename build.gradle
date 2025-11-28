@@ -313,7 +313,7 @@ dependencies {
 
 
   testImplementation libraries.junit5
-  testImplementation group: 'org.apache.groovy', name: 'groovy', version: '5.0.2'
+  testImplementation group: 'org.apache.groovy', name: 'groovy', version: '4.0.29'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
   testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner'
   testImplementation group: 'com.google.guava', name: 'guava', version: '33.5.0-jre' // Needed for BEFTA
