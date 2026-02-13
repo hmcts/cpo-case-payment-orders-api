@@ -200,8 +200,8 @@ sonarqube {
 }
 
 def versions = [
-  junit           : '5.10.5',
-  junitPlatform   : '1.10.5',
+  junit           : '5.14.2',
+  junitPlatform   : '1.14.2',
   lombok          : '1.18.42',
   mapstruct       : '1.6.3',
   lombokMapBinding: '0.2.0',
