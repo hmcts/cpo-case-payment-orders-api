@@ -209,7 +209,7 @@ def versions = [
   appInsights     : '2.6.4',
   springBoot      : springBoot.class.package.implementationVersion,
   springCloud     : '2023.0.6',
-  testcontainers  : '1.21.3',
+  testcontainers  : '1.21.4',
   tomcatEmbedded  : '10.1.44',
 ]
 
