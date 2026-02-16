@@ -66,6 +66,7 @@ tasks.withType(Test) {
 }
 
 test {
+  generateCucumberReports.enabled = true
   failFast = true
   jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED', '--add-opens=java.base/sun.security.util=ALL-UNNAMED' ]
 }
@@ -217,7 +218,7 @@ def versions = [
   reformLogging   : '6.1.9',
   appInsights     : '2.6.4',
   springCloud     : '2025.0.0',
-  testcontainers  : '1.21.3',
+  testcontainers  : '1.21.4',
 ]
 
 ext['spring-security.version'] = '6.5.7'
@@ -306,14 +307,14 @@ dependencies {
 
   compileOnly group: 'org.mapstruct', name: 'mapstruct', version: versions.mapstruct
   compileOnly group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: versions.lombokMapBinding
-  runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.7.8'
+  runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.7.10'
   annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: versions.mapstruct
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: versions.lombokMapBinding
 
 
   testImplementation libraries.junit5
-  testImplementation group: 'org.apache.groovy', name: 'groovy', version: '4.0.29'
+  testImplementation group: 'org.apache.groovy', name: 'groovy', version: '4.0.30'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
   testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner'
   testImplementation group: 'com.google.guava', name: 'guava', version: '33.5.0-jre' // Needed for BEFTA
