@@ -1,46 +1,47 @@
 package uk.gov.hmcts.reform.cpo;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import static org.assertj.core.api.Assertions.assertThat;
+import org.mockito.ArgumentCaptor;
+import static org.mockito.Mockito.verify;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
+import org.springframework.http.HttpHeaders;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import org.springframework.http.HttpStatus;
+import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ACCESS_TOKEN;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import static org.springframework.test.util.AssertionErrors.assertEquals;
+import static org.springframework.test.util.AssertionErrors.assertNotNull;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultMatcher;
+
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.TextCodec;
-import org.apache.commons.lang3.StringUtils;
-import org.mockito.ArgumentCaptor;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultMatcher;
+import io.jsonwebtoken.security.Keys;
+import jakarta.inject.Inject;
 import uk.gov.hmcts.reform.TestIdamConfiguration;
 import uk.gov.hmcts.reform.cpo.auditlog.AuditEntry;
 import uk.gov.hmcts.reform.cpo.auditlog.AuditOperationType;
 import uk.gov.hmcts.reform.cpo.auditlog.AuditRepository;
 import uk.gov.hmcts.reform.cpo.config.AuditConfiguration;
-import uk.gov.hmcts.reform.cpo.utils.KeyGenUtil;
-
-import jakarta.inject.Inject;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ACCESS_TOKEN;
-import static org.springframework.test.util.AssertionErrors.assertEquals;
-import static org.springframework.test.util.AssertionErrors.assertNotNull;
 import static uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter.TOKEN_NAME;
 import static uk.gov.hmcts.reform.cpo.security.SecurityUtils.BEARER;
 import static uk.gov.hmcts.reform.cpo.security.SecurityUtils.SERVICE_AUTHORIZATION;
+import uk.gov.hmcts.reform.cpo.utils.KeyGenUtil;
 
 @SpringBootTest(classes = {
     Application.class,
@@ -84,7 +85,7 @@ public class BaseTest {
 
     private static final String EXAMPLE_REQUEST_ID = "TEST REQUEST ID";
 
-    @SpyBean
+    @MockitoSpyBean
     @Inject
     protected AuditRepository auditRepository;
 
@@ -207,7 +208,7 @@ public class BaseTest {
         return Jwts.builder()
             .setSubject(serviceName)
             .setExpiration(new Date(System.currentTimeMillis() + ttlMillis))
-            .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
+            .signWith(SignatureAlgorithm.HS256, Keys.secretKeyFor(SignatureAlgorithm.HS256))
             .compact();
     }
 
