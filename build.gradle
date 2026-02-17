@@ -210,8 +210,8 @@ configurations {
 }
 
 def versions = [
-  junit           : '5.13.4',
-  junitPlatform   : '1.13.4',
+  junit           : '5.14.3',
+  junitPlatform   : '1.14.3',
   lombok          : '1.18.42',
   mapstruct       : '1.6.3',
   lombokMapBinding: '0.2.0',
