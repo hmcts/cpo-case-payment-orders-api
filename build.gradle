@@ -328,6 +328,7 @@ dependencies {
   functionalTestImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.4'
   functionalTestImplementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '4.0.6'
   functionalTestImplementation 'com.github.hmcts:fortify-client:1.4.10:all'
+  testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.10', classifier: 'all'
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath
 }
