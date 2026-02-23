@@ -300,7 +300,7 @@ dependencies {
   implementation group: 'commons-validator', name: 'commons-validator', version: '1.10.1'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.13.0'
   implementation group: 'org.dom4j', name: 'dom4j', version: '2.2.0'
-  implementation group: 'org.hibernate', name: 'hibernate-envers', version: '7.2.4.Final'
+  implementation group: 'org.hibernate', name: 'hibernate-envers', version: '7.2.5.Final'
   implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   implementation group: 'xerces', name: 'xercesImpl', version: '2.12.2'
