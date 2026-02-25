@@ -324,7 +324,7 @@ dependencies {
   
   integrationTestImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
 
-  functionalTestImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.25.4'
+  functionalTestImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '97merge'
   functionalTestImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.4'
   functionalTestImplementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '4.0.6'
   functionalTestImplementation 'com.github.hmcts:fortify-client:1.4.10:all'
