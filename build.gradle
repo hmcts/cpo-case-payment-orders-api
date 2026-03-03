@@ -225,7 +225,7 @@ ext['spring-security.version'] = '6.5.7'
 ext['spring-framework.version'] = '6.2.14'
 ext['log4j2.version'] = '2.23.1'
 ext['snakeyaml.version'] = '2.4'
-ext['jackson.version'] = '2.16.1'
+ext['jackson.version'] = '2.19.4'
 
 // before committing a change, make sure task still works
 dependencyUpdates {
