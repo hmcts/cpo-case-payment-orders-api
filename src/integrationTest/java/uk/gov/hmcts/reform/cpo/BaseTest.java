@@ -90,8 +90,8 @@ public class BaseTest {
     @Inject
     protected AuditRepository auditRepository;
 
-    @Value("${wiremock.server.port:5000}")
-    private int wireMockPort;
+    @Value("${oidc.issuer}")
+    private String oidcIssuer;
 
     public HttpHeaders createHttpHeaders(String serviceName) throws JOSEException {
         return createHttpHeaders(AUTH_TOKEN_TTL, serviceName, AUTH_TOKEN_TTL);
@@ -217,7 +217,7 @@ public class BaseTest {
     }
 
     private String testOidcIssuer() {
-        return "http://localhost:" + wireMockPort + "/o";
+        return oidcIssuer;
     }
 
     private static String generateS2SToken(String serviceName, long ttlMillis) {
