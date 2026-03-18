@@ -376,7 +376,9 @@ dependencies {
   implementation group: 'xerces', name: 'xercesImpl', version: '2.12.2'
 }
 
-mainClassName = 'uk.gov.hmcts.reform.cpo.Application'
+application {
+  mainClass = 'uk.gov.hmcts.reform.cpo.Application'
+}
 
 bootJar {
   getArchiveFileName().set(provider {
