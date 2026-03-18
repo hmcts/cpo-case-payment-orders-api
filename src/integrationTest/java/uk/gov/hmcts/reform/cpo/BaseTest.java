@@ -95,9 +95,16 @@ public class BaseTest {
     public static HttpHeaders createHttpHeaders(long authTtlMillis,
                                                 String serviceName,
                                                 long s2sAuthTtlMillis) throws JOSEException {
+        return createHttpHeaders(authTtlMillis, serviceName, s2sAuthTtlMillis, testOidcIssuer());
+    }
+
+    public static HttpHeaders createHttpHeaders(long authTtlMillis,
+                                                String serviceName,
+                                                long s2sAuthTtlMillis,
+                                                String authIssuer) throws JOSEException {
         HttpHeaders headers = new HttpHeaders();
         // :: IDAM OAuth2 token
-        String authToken = BEARER + generateAuthToken(authTtlMillis);
+        String authToken = BEARER + generateAuthToken(authTtlMillis, authIssuer);
         headers.add(AUTHORIZATION, authToken);
         // :: S2S authentication token
         String s2SToken = generateS2SToken(serviceName, s2sAuthTtlMillis);
@@ -185,10 +192,11 @@ public class BaseTest {
         }
     }
 
-    private static String generateAuthToken(long ttlMillis) throws JOSEException  {
+    private static String generateAuthToken(long ttlMillis, String issuer) throws JOSEException  {
 
         JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder()
             .subject("CPO_Stub")
+            .issuer(issuer)
             .issueTime(new Date())
             .claim(TOKEN_NAME, ACCESS_TOKEN)
             .expirationTime(new Date(System.currentTimeMillis() + ttlMillis));
@@ -201,6 +209,10 @@ public class BaseTest {
         signedJWT.sign(new RSASSASigner(KeyGenUtil.getRsaJWK()));
 
         return signedJWT.serialize();
+    }
+
+    private static String testOidcIssuer() {
+        return "http://localhost:" + System.getProperty("wiremock.server.port", "5000") + "/o";
     }
 
     private static String generateS2SToken(String serviceName, long ttlMillis) {

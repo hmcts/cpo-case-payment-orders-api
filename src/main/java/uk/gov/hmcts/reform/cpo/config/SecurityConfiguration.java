@@ -62,7 +62,7 @@ public class SecurityConfiguration {
         NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromOidcIssuerLocation(issuerUri);
         OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
         OAuth2TokenValidator<Jwt> withIssuer = new JwtIssuerValidator(issuerOverride);
-        OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withTimestamp);
+        OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withTimestamp, withIssuer);
         jwtDecoder.setJwtValidator(validator);
         return jwtDecoder;
     }

@@ -9,7 +9,7 @@ This micro-service provides a set of APIs to manage case payment orders.
 ## Getting Started
 
 ### Prerequisites
-- [JDK 17](https://java.com)
+- [JDK 21](https://java.com)
 
 ### Building the application
 
@@ -45,6 +45,15 @@ by executing the following command:
 
 This will start the API container exposing the application's port
 (set to `4457` in this template app).
+
+JWT/OIDC configuration is split across two settings:
+
+- `IDAM_OIDC_URL` is used for OIDC discovery and JWKS lookup. The app derives `spring.security.oauth2.client.provider.oidc.issuer-uri` as `${IDAM_OIDC_URL}/o`.
+- `OIDC_ISSUER` is the issuer claim the active `JwtDecoder` enforces on incoming bearer tokens.
+
+Those values can differ in HMCTS environments. Discovery may use the public IDAM base URL, while issuer validation must match the issuer claim emitted in the token. Do not infer `OIDC_ISSUER` from discovery config alone. Set it only after decoding a real IDAM access token and copying the exact `iss` claim. Helm already supplies an environment value in [charts/cpo-case-payment-orders-api/values.yaml](./charts/cpo-case-payment-orders-api/values.yaml), but it still needs to be treated as a value to verify against a real token.
+
+`Jenkinsfile_CNP` configures `IDAM_API_URL_BASE` and `S2S_URL_BASE` for BEFTA usage, but it does not override `IDAM_OIDC_URL` or `OIDC_ISSUER`; deployment-time issuer settings come from Helm/environment values.
 
 In order to test if the application is up, you can call its health endpoint:
 
@@ -102,6 +111,8 @@ To run all integration tests execute the following command:
 ./gradlew integration
 ```
 
+The integration profile (`src/integrationTest/resources/application-itest.yaml`) keeps issuer discovery and enforced issuer aligned to the WireMock OIDC issuer so JWT issuer validation remains active during the suite.
+
 ### Functional tests
 The tests are written using befta-fw library. To find out more about BEFTA Framework, see the
  [BEFTA-FW repository and its README](https://github.com/hmcts/befta-fw).
@@ -145,4 +156,3 @@ or to run all checks, all tests and generate a code coverage report execute the 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
-
