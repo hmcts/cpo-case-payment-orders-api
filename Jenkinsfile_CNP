@@ -60,6 +60,8 @@ env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.preview.platform.hmcts.net".toLowerCase()
 
+// Prevent Docker hub rate limit errors by ensuring that testcontainers uses images from hmctspublic ACR
+env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
 
 withPipeline(type, product, component) {
   onPR {
@@ -71,9 +73,31 @@ withPipeline(type, product, component) {
 
     // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
-
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
-  }
+
+    copyIgnore('./build/reports/tests/test', './Unit Tests/')
+    copyIgnore('./build/reports/tests/integration', './Integration Tests/')
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Unit Tests/**/*'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Integration Tests/**/*'
+
+    publishHTML target: [
+          allowMissing         : true,
+          alwaysLinkToLastBuild: true,
+          keepAll              : true,
+          reportDir            : 'Unit Tests',
+          reportFiles          : "index.html",
+          reportName           : "Unit Test Report"
+      ]
+
+    publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "Integration Tests",
+            reportFiles          : "index.html",
+            reportName           : "Integration Test Report"
+        ]
+    }
 
   syncBranchesWithMaster(branchesToSync)
   loadVaultSecrets(secrets)
@@ -82,17 +106,68 @@ withPipeline(type, product, component) {
 
   afterAlways('smoketest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
+    publishHTML target: [
+      allowMissing         : true,
+      alwaysLinkToLastBuild: true,
+      keepAll              : true,
+      reportDir            : 'BEFTA Report for Smoke Tests',
+      reportFiles          : "overview-features.html",
+      reportName           : "Smoke Test Report"
+    ]
   }
 
   afterAlways('smoketest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
+    publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : 'BEFTA Report for Smoke Tests',
+            reportFiles          : "overview-features.html",
+            reportName           : "Smoke Test Report"
+    ]
   }
 
   afterAlways('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
+    publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : 'BEFTA Report for Functional Tests',
+            reportFiles          : "overview-features.html",
+            reportName           : "Functional Test Report"
+    ]
   }
 
   afterAlways('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
+    publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : 'BEFTA Report for Functional Tests',
+            reportFiles          : "overview-features.html",
+            reportName           : "Functional Test Report"
+    ]
   }
+
+  afterAlways('pact-provider-verification') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
+        publishHTML target: [
+             allowMissing         : true,
+             alwaysLinkToLastBuild: true,
+             keepAll              : true,
+            reportDir            : "build/reports/tests/runProviderPactVerification",
+            reportFiles          : "index.html",
+            reportName           : "Contract Tests Report"
+        ]
+    }
+}
+
+/**
+ * Forces a recursive copy by always returning 0 regardless of errors
+ */
+def copyIgnore(filePath, destinationDir) {
+  steps.sh("cp -R '${filePath}' '${destinationDir}' || :")
 }

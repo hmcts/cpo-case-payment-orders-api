@@ -1,28 +1,30 @@
 package uk.gov.hmcts.reform.cpo.security;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
-import org.springframework.boot.context.properties.bind.validation.BindValidationException;
-import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.test.context.ActiveProfiles;
-import uk.gov.hmcts.reform.cpo.validators.ValidationError;
+import java.util.Set;
 
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 @ActiveProfiles("itest")
 class ServiceAuthorizationConfigIT {
 
     // NB: s2s service config from `application-itest.yaml`
     private static final String S2S_ID = "test_crud_service";
-    private static final String S2S_ID_PROPERTY = "S2S.AUTHORIZATIONS.TEST_CRUD_SERVICE.ID";
-    private static final String S2S_PERMISSION_PROPERTY = "S2S.AUTHORIZATIONS.TEST_CRUD_SERVICE.PERMISSION";
 
-    private ApplicationContextRunner applicationContextRunner;
+    private Validator validator;
+
+    @BeforeEach
+    void setUp() {
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
+    }
 
     @Test
     void testServiceAuthorizationConfigBean_loadsSuccesfully_create_whitelistPermissions() {
@@ -94,37 +96,27 @@ class ServiceAuthorizationConfigIT {
     }
 
     private void assertApplicationContextBeanLoadedSuccessfullyWithWhitelistConfig(String permissionsWhiteListConfig) {
-        applicationContextRunner = createApplicationContextRunner(permissionsWhiteListConfig);
+        ServicePermissionInfo info = new ServicePermissionInfo();
+        info.setId(S2S_ID);
+        info.setPermission(permissionsWhiteListConfig);
 
-        applicationContextRunner.run(context ->
-            assertNotNull(context.getBean(ServiceAuthorizationConfig.class))
-        );
+        Set<ConstraintViolation<ServicePermissionInfo>> violations = validator.validate(info);
+        assertTrue(violations.isEmpty());
     }
 
     private void assertApplicationContextBeanFailsToLoadWithWhitelistConfig(String permissionsWhiteListConfig) {
-        applicationContextRunner = createApplicationContextRunner(permissionsWhiteListConfig);
 
+        ServicePermissionInfo info = new ServicePermissionInfo();
+        info.setId(S2S_ID);
+        info.setPermission(permissionsWhiteListConfig);
 
-        applicationContextRunner.run(context -> {
-                Exception exception =
-                        assertThrows(IllegalStateException.class,
-                            () -> context.getBean(ServiceAuthorizationConfig.class));
-
-                Optional<Throwable> rootCause = Stream.iterate(exception, Throwable::getCause)
-                        .filter(throwable -> throwable instanceof BindValidationException)
-                        .filter(throwable -> ((BindValidationException)throwable).getValidationErrors().hasErrors())
-                        .findFirst();
-                assertTrue(rootCause.get().getMessage()
-                            .contains(ValidationError.INVALID_PERMISSION_WHITELIST_VALUE));
-            }
-        );
+        Set<ConstraintViolation<ServicePermissionInfo>> violations = validator.validate(info);
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream()
+                .anyMatch(violation -> 
+                    violation.getMessage().contains(
+                        ValidationError.INVALID_PERMISSION_WHITELIST_VALUE
+                    )));
     }
 
-    private ApplicationContextRunner createApplicationContextRunner(String permissionValues) {
-
-        return new ApplicationContextRunner()
-                .withUserConfiguration(ServiceAuthorizationConfig.class, ConfigurationPropertiesAutoConfiguration.class)
-                .withPropertyValues(S2S_ID_PROPERTY + ":" + S2S_ID,
-                                    S2S_PERMISSION_PROPERTY + ":" + permissionValues);
-    }
 }

@@ -1,5 +1,5 @@
 # renovate: datasource=github-releases depName=microsoft/ApplicationInsights-Java
-ARG APP_INSIGHTS_AGENT_VERSION=3.4.13
+ARG APP_INSIGHTS_AGENT_VERSION=3.7.7
 
 ARG PLATFORM=""
 FROM eclipse-temurin${PLATFORM}:21 as builder
@@ -27,4 +27,4 @@ COPY --from=builder ${DIR_LAYER_SPRING_BOOT_LOADER} /opt/app/
 COPY --from=builder ${DIR_LAYER_SNAPSHOT_DEPENDENCIES} /opt/app/
 
 EXPOSE 4457
-ENTRYPOINT ["/usr/bin/java", "org.springframework.boot.loader.JarLauncher"]
+ENTRYPOINT ["/usr/bin/java", "org.springframework.boot.loader.launch.JarLauncher"]

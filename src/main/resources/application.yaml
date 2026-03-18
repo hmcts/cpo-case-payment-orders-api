@@ -27,6 +27,9 @@ management:
       base-path: /
       exposure:
         include: health, info, prometheus
+  health:
+    ssl:
+      enabled: false
 
 spring:
   #CCD-3509 CVE-2021-22044 spring.mvc.pathmatch.matching-strategy = ant_path_matcher
