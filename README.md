@@ -55,6 +55,8 @@ Those values can differ in HMCTS environments. Discovery may use the public IDAM
 
 `Jenkinsfile_CNP` configures `IDAM_API_URL_BASE` and `S2S_URL_BASE` for BEFTA usage, but it does not override `IDAM_OIDC_URL` or `OIDC_ISSUER`; deployment-time issuer settings come from Helm/environment values.
 
+Smoke and functional runs enforce JWT issuer verification in CI, while local runs keep it disabled by default unless `VERIFY_OIDC_ISSUER=true` is set.
+
 In order to test if the application is up, you can call its health endpoint:
 
 ```bash

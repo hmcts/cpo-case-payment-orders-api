@@ -119,6 +119,19 @@ task functional(type: Test) {
   outputs.upToDateWhen { false }
 }
 
+task verifyFunctionalTestJwtIssuer(type: JavaExec) {
+  description = 'Verifies the functional/smoke test token issuer matches OIDC_ISSUER'
+  group = 'Verification'
+  dependsOn functionalTestClasses
+
+  onlyIf {
+    System.getenv('VERIFY_OIDC_ISSUER')?.toBoolean()
+  }
+
+  mainClass = 'uk.gov.hmcts.reform.cpo.befta.JwtIssuerVerificationApp'
+  classpath += sourceSets.functionalTest.runtimeClasspath
+}
+
 task integration(type: Test) {
   description = "Runs integration tests"
   group = "Verification"
@@ -128,6 +141,7 @@ task integration(type: Test) {
 }
 
 task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
+  dependsOn verifyFunctionalTestJwtIssuer
 
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
@@ -167,6 +181,8 @@ task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verificatio
 
   outputs.upToDateWhen { false }
 }
+
+functional.dependsOn verifyFunctionalTestJwtIssuer
 
 cucumberReports {
   outputDir = file("${rootDir}/target/cucumber")

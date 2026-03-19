@@ -54,6 +54,28 @@ At the time of this patch, Helm contains an `OIDC_ISSUER` value but this repo do
 
 Decode a real IDAM bearer token from the target environment and compare its `iss` claim with the deployment `OIDC_ISSUER` value before treating that environment configuration as verified.
 
+## Local verification
+
+For local running, `OIDC_ISSUER` must match the `iss` claim in the real access token your local setup is using.
+Do not assume it is the same as the integration-test issuer.
+
+The functional/smoke issuer verifier is:
+
+- mandatory in CI/pipeline when `VERIFY_OIDC_ISSUER=true` is set
+- disabled by default for local runs
+- opt-in locally by setting `VERIFY_OIDC_ISSUER=true`
+
+Examples:
+
+- integration-test profile uses `http://localhost:${wiremock.server.port}/o`
+- a local docker/session may produce tokens with a different issuer such as `http://localhost:5556`
+
+If local verification fails with a message like:
+
+`OIDC_ISSUER mismatch: expected http://localhost:5000/o but token iss was http://localhost:5556`
+
+then set `OIDC_ISSUER` to the actual token issuer and rerun the verification.
+
 ## Operational note
 
 If OIDC discovery succeeds but `OIDC_ISSUER` does not match the token `iss` claim, authentication fails with `401 Unauthorized`.
