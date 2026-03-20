@@ -38,7 +38,7 @@ Do not derive `OIDC_ISSUER` by guesswork. Decode a real bearer token from the ta
 - Local CPO docker stack: `cpo-docker/compose/cpo.yml`
 - Integration test profile: `src/integrationTest/resources/application-itest.yaml`
 
-`Jenkinsfile_CNP` sets `IDAM_API_URL_BASE` and `S2S_URL_BASE` for BEFTA-style tests, but it does not define `IDAM_OIDC_URL` or `OIDC_ISSUER`. Runtime issuer settings therefore come from Helm values or explicit environment overrides.
+`Jenkinsfile_CNP` sets `IDAM_API_URL_BASE` and `S2S_URL_BASE` for BEFTA-style tests and also exports `OIDC_ISSUER` for the build-integrated issuer verifier. Runtime issuer settings still come from Helm values or explicit environment overrides.
 
 At the time of this patch, Helm contains an `OIDC_ISSUER` value but this repo does not contain a captured real token proving that value. Treat that environment value as pending verification until a real token is decoded.
 

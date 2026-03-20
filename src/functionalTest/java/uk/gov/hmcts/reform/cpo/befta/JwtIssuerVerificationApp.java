@@ -20,6 +20,10 @@ public final class JwtIssuerVerificationApp {
     }
 
     public static void main(String[] args) throws Exception {
+        verifyIssuerAlignment();
+    }
+
+    static void verifyIssuerAlignment() throws Exception {
         String expectedIssuer = requireEnv("OIDC_ISSUER");
         String accessToken = fetchAccessToken();
         String actualIssuer = decodeIssuer(accessToken);
@@ -31,6 +35,18 @@ public final class JwtIssuerVerificationApp {
         }
 
         System.out.println("Verified OIDC_ISSUER matches functional test token iss: " + actualIssuer);
+    }
+
+    static void verifyIssuerAlignmentIfEnabled() {
+        if (!Boolean.parseBoolean(System.getenv("VERIFY_OIDC_ISSUER"))) {
+            return;
+        }
+        try {
+            verifyIssuerAlignment();
+        } catch (Exception e) {
+            throw new IllegalStateException("Functional test JWT issuer verification failed before authenticated setup",
+                e);
+        }
     }
 
     private static String fetchAccessToken() throws Exception {
