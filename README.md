@@ -57,8 +57,8 @@ Those values can differ in HMCTS environments. Discovery may use the public IDAM
 
 Smoke and functional runs enforce JWT issuer verification in CI, while local runs keep it disabled by default unless `VERIFY_OIDC_ISSUER=true` is set.
 
-### Codex Skill
-Repo-local workflow docs are indexed in `AGENTS.md`.
+### Codex Workflow Docs
+Repo-local workflow docs are indexed in [AGENTS.md](./AGENTS.md).
 
 In order to test if the application is up, you can call its health endpoint:
 

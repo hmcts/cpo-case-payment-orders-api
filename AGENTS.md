@@ -1,7 +1,13 @@
-# Agent Instructions
+# AGENTS
 
-## Available skills
+This repo uses manual, repo-local Codex skills.
 
-- `docs/skills/security/SKILL.md`
-  Use for JWT, IDAM, Spring Security, and related regression-test work in this repo.
-  Prompt cue: `Use docs/skills/security/SKILL.md`
+Available skills:
+- Security skill: `docs/skills/security/SKILL.md`
+- JWT issuer skill: `docs/skills/security-jwt-issuer/SKILL.md`
+
+For Spring Security, auth filters, broader security regressions, or IDAM-related work, tell Codex:
+`Use docs/skills/security/SKILL.md`
+
+For JWT issuer validation, `OIDC_ISSUER`, decoder validation, or issuer-verifier pipeline work, tell Codex:
+`Use docs/skills/security-jwt-issuer/SKILL.md`
