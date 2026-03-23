@@ -1,6 +1,6 @@
 ---
 name: repo-security
-description: Use for security work in cpo-case-payment-orders-api involving Spring Security, auth filters, S2S or user-auth regressions, and broader environment/config verification outside the dedicated JWT issuer workflow.
+description: Use for security work in cpo-case-payment-orders-api involving JWT, IDAM, Spring Security, auth filters, auth configuration, CI or deployment auth wiring, S2S or user-auth regressions, and broader environment/config verification outside the dedicated JWT issuer workflow.
 ---
 
 # Repo Security
@@ -9,8 +9,9 @@ description: Use for security work in cpo-case-payment-orders-api involving Spri
 
 - changing `SecurityConfiguration` or auth filters
 - adding focused security regression tests
-- verifying Spring Security, IDAM, or S2S-related settings across app, local docker, Helm, or pipeline wiring
+- verifying JWT, Spring Security, IDAM, or S2S-related settings across app, local docker, Helm, or pipeline wiring
 - checking why auth tests now return `401` instead of `403`
+- reviewing auth configuration or CI/deployment auth wiring outside issuer-specific handling
 - working on broader security behavior beyond just JWT issuer validation
 
 For JWT issuer-specific work, prefer `docs/skills/security-jwt-issuer/SKILL.md`.
