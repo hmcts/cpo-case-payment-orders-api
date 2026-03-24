@@ -43,9 +43,9 @@ TOKEN='eyJ...'
 PAYLOAD=$(printf '%s' "$TOKEN" | cut -d '.' -f2)
 python3 - <<'PY' "$PAYLOAD"
 import base64, json, sys
-s = sys.argv[1]
-s += '=' * (-len(s) % 4)
-print(json.loads(base64.urlsafe_b64decode(s))["iss"])
+payload = sys.argv[1]
+payload += '=' * (-len(payload) % 4)
+print(json.loads(base64.urlsafe_b64decode(payload))["iss"])
 PY
 ```
 
