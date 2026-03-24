@@ -30,6 +30,29 @@ Use `IDAM_OIDC_URL` for metadata discovery and JWKS retrieval.
 Use `OIDC_ISSUER` for the exact `iss` claim expected in bearer tokens.
 Do not derive `OIDC_ISSUER` by guesswork. Decode a real bearer token from the target environment and copy the `iss` claim exactly.
 
+## How to derive `OIDC_ISSUER`
+
+- Do not guess the issuer from the public discovery URL alone.
+- Decode only the JWT payload from a real access token for the target environment and inspect the `iss` claim.
+- Do not store or document full bearer tokens. Record only the derived issuer value.
+
+Example:
+
+```bash
+TOKEN='eyJ...'
+PAYLOAD=$(printf '%s' "$TOKEN" | cut -d '.' -f2)
+python3 - <<'PY' "$PAYLOAD"
+import base64, json, sys
+s = sys.argv[1]
+s += '=' * (-len(s) % 4)
+print(json.loads(base64.urlsafe_b64decode(s))["iss"])
+PY
+```
+
+- JWTs are `header.payload.signature`.
+- The second segment is base64url-encoded JSON.
+- This decodes the payload only. It does not verify the signature.
+
 ## Verified config sources
 
 - Application defaults: `src/main/resources/application.yaml`
