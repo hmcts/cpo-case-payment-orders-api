@@ -207,6 +207,8 @@ configurations {
   testAnnotationProcessor.extendsFrom(annotationProcessor)
   integrationTestAnnotationProcessor.extendsFrom(annotationProcessor)
   functionalTestAnnotationProcessor.extendsFrom(annotationProcessor)
+  integrationTestImplementation.extendsFrom(testImplementation)
+  integrationTestRuntimeOnly.extendsFrom(testRuntimeOnly)
 }
 
 def versions = [
@@ -217,7 +219,7 @@ def versions = [
   lombokMapBinding: '0.2.0',
   reformLogging   : '6.1.9',
   appInsights     : '2.6.4',
-  springCloud     : '2025.0.0',
+  springCloud     : '2025.1.1',
   testcontainers  : '1.21.4',
 ]
 
@@ -320,7 +322,7 @@ dependencies {
   testImplementation group: 'com.google.guava', name: 'guava', version: '33.5.0-jre' // Needed for BEFTA
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
-  integrationTestImplementation sourceSets.test.runtimeClasspath
+  integrationTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock'
   
   integrationTestImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
 
