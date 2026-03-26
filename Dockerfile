@@ -8,7 +8,7 @@ ARG JAR_FILE=build/libs/cpo-case-payment-orders-api.jar
 COPY ${JAR_FILE} application.jar
 RUN java -Djarmode=layertools -jar application.jar extract
 
-FROM hmctspublic.azurecr.io/base/java${PLATFORM}:21-distroless
+FROM hmctsprod.azurecr.io/base/java${PLATFORM}:21-distroless
 USER hmcts
 
 COPY lib/applicationinsights.json /opt/app/
