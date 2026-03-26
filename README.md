@@ -53,6 +53,8 @@ JWT/OIDC configuration is split across two settings:
 
 Those values can differ in HMCTS environments. Discovery may use the public IDAM base URL, while issuer validation must match the issuer claim emitted in the token. Do not infer `OIDC_ISSUER` from discovery config alone. Set it only after decoding a real IDAM access token and copying the exact `iss` claim. Helm supplies an environment value in [charts/cpo-case-payment-orders-api/values.yaml](./charts/cpo-case-payment-orders-api/values.yaml), but each target environment should still be verified against a real token.
 
+Local runtime configs also need an explicit `OIDC_ISSUER`. `docker-compose.yml` and `cpo-docker/compose/cpo.yml` now set it so the running container does not fall back to the stale application default.
+
 `Jenkinsfile_CNP` configures `IDAM_API_URL_BASE` and `S2S_URL_BASE` for BEFTA usage and now also exports `OIDC_ISSUER` for the build-integrated JWT issuer verifier. Deployment-time issuer settings still come from Helm/environment values.
 
 Smoke and functional runs enforce JWT issuer verification in CI, while local runs keep it disabled by default unless `VERIFY_OIDC_ISSUER=true` is set.

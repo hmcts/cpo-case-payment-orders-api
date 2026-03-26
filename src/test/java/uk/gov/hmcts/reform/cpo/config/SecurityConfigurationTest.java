@@ -15,10 +15,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SecurityConfigurationTest {
 
     private static final String VALID_ISSUER = "http://fr-am:8080/openam/oauth2/hmcts";
+    private static final String INVALID_ISSUER = "http://unexpected-issuer";
 
     @Test
     void shouldAcceptJwtFromConfiguredIssuer() {
         assertFalse(validator().validate(buildJwt(VALID_ISSUER, Instant.now().plusSeconds(300))).hasErrors());
+    }
+
+    @Test
+    void shouldRejectJwtFromUnexpectedIssuer() {
+        assertTrue(validator().validate(buildJwt(INVALID_ISSUER, Instant.now().plusSeconds(300))).hasErrors());
     }
 
     @Test

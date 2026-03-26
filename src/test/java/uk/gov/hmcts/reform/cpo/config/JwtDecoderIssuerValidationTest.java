@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class JwtDecoderIssuerValidationTest {
@@ -32,6 +33,11 @@ class JwtDecoderIssuerValidationTest {
     private static final KeyPair RSA_KEY_PAIR = generateKeyPair();
 
     @Test
+    void shouldAcceptJwtFromConfiguredIssuer() throws JOSEException {
+        assertDoesNotThrow(() -> decoder().decode(buildSignedToken(VALID_ISSUER, Instant.now().plusSeconds(300))));
+    }
+
+    @Test
     void shouldRejectJwtFromUnexpectedIssuer() throws JOSEException {
         JwtValidationException exception = assertThrows(
             JwtValidationException.class,
@@ -39,6 +45,16 @@ class JwtDecoderIssuerValidationTest {
         );
 
         assertThat(exception.getMessage()).contains("iss");
+    }
+
+    @Test
+    void shouldRejectExpiredJwtEvenWhenIssuerMatches() throws JOSEException {
+        JwtValidationException exception = assertThrows(
+            JwtValidationException.class,
+            () -> decoder().decode(buildSignedToken(VALID_ISSUER, Instant.now().minusSeconds(60)))
+        );
+
+        assertThat(exception.getMessage()).contains("Jwt expired");
     }
 
     private OAuth2TokenValidator<Jwt> validator() {

@@ -132,6 +132,35 @@ task verifyFunctionalTestJwtIssuer(type: JavaExec) {
   classpath += sourceSets.functionalTest.runtimeClasspath
 }
 
+task verifyOidcIssuerPolicy {
+  description = 'Fails if oidc.issuer is derived from discovery configuration'
+  group = 'Verification'
+
+  doLast {
+    def policyFiles = [
+      'src/main/resources/application.yaml',
+      'src/integrationTest/resources/application-itest.yaml'
+    ]
+
+    def violations = policyFiles.findAll { path ->
+      def configFile = file(path)
+      configFile.exists() && configFile.readLines().any { line ->
+        def normalized = line.replaceAll(/\s+/, '')
+        normalized.startsWith('issuer:${OIDC_ISSUER:${IDAM_OIDC_URL')
+          || normalized.startsWith('issuer:${OIDC_ISSUER:${idam.api.url')
+      }
+    }
+
+    if (!violations.isEmpty()) {
+      throw new GradleException(
+        "OIDC issuer policy violation. Do not derive oidc.issuer from discovery config in: ${violations.join(', ')}"
+      )
+    }
+  }
+}
+
+check.dependsOn verifyOidcIssuerPolicy
+
 task integration(type: Test) {
   description = "Runs integration tests"
   group = "Verification"
