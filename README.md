@@ -46,6 +46,22 @@ by executing the following command:
 This will start the API container exposing the application's port
 (set to `4457` in this template app).
 
+JWT/OIDC configuration is split across two settings:
+
+- `IDAM_OIDC_URL` is used for OIDC discovery and JWKS lookup. The app derives `spring.security.oauth2.client.provider.oidc.issuer-uri` as `${IDAM_OIDC_URL}/o`.
+- `OIDC_ISSUER` is the issuer claim the active `JwtDecoder` enforces on incoming bearer tokens.
+
+Those values can differ in HMCTS environments. Discovery may use the public IDAM base URL, while issuer validation must match the issuer claim emitted in the token. Do not infer `OIDC_ISSUER` from discovery config alone. Set it only after decoding a real IDAM access token and copying the exact `iss` claim. Helm supplies an environment value in [charts/cpo-case-payment-orders-api/values.yaml](./charts/cpo-case-payment-orders-api/values.yaml), but each target environment should still be verified against a real token.
+
+Local runtime configs also need an explicit `OIDC_ISSUER`. `docker-compose.yml` and `cpo-docker/compose/cpo.yml` now set it so the running container does not fall back to the stale application default.
+
+`Jenkinsfile_CNP` configures `IDAM_API_URL_BASE` and `S2S_URL_BASE` for BEFTA usage and now also exports `OIDC_ISSUER` for the build-integrated JWT issuer verifier. Deployment-time issuer settings still come from Helm/environment values.
+
+Smoke and functional runs enforce JWT issuer verification in CI, while local runs keep it disabled by default unless `VERIFY_OIDC_ISSUER=true` is set.
+
+### Codex Workflow Docs
+Repo-local workflow docs are indexed in [AGENTS.md](./AGENTS.md).
+
 In order to test if the application is up, you can call its health endpoint:
 
 ```bash
@@ -102,6 +118,8 @@ To run all integration tests execute the following command:
 ./gradlew integration
 ```
 
+The integration profile (`src/integrationTest/resources/application-itest.yaml`) keeps issuer discovery and enforced issuer aligned to the WireMock OIDC issuer so JWT issuer validation remains active during the suite.
+
 ### Functional tests
 The tests are written using befta-fw library. To find out more about BEFTA Framework, see the
  [BEFTA-FW repository and its README](https://github.com/hmcts/befta-fw).
@@ -111,6 +129,8 @@ These tests can be run using:
 export TEST_URL=http://localhost:4457
 ./gradlew functional
 ```
+
+When `VERIFY_OIDC_ISSUER=true`, functional and smoke runs perform a JWT issuer pre-check using a real test token. This requires `OIDC_ISSUER` and the usual IDAM test credentials to be present.
 
 > Note: These are the tests run against an environment.
 > Please see [cpo-docker/README.md](./cpo-docker/README.md) for local environment testing.
