@@ -2,8 +2,8 @@
 
 ## Summary
 
-Issuer validation is active in `cpo-case-payment-orders-api`.
-The decoder now rejects tokens whose `iss` claim does not match `oidc.issuer`, even if signature validation and timestamps succeed.
+- Issuer validation is active in `cpo-case-payment-orders-api`.
+- The decoder now rejects tokens whose `iss` claim does not match `oidc.issuer`, even if signature validation and timestamps succeed.
 
 ## Current behavior
 
