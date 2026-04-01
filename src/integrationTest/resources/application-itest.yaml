@@ -19,6 +19,9 @@ spring:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
     url: jdbc:tc:postgresql:15:///databasename
 
+oidc:
+  issuer: http://localhost:${wiremock.server.port:5000}/o
+
 azure:
   application-insights:
     web:
