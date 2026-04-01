@@ -2,8 +2,11 @@
 
 ## Summary
 
-- Issuer validation is active in `cpo-case-payment-orders-api`.
-- The decoder now rejects tokens whose `iss` claim does not match `oidc.issuer`, even if signature validation and timestamps succeed.
+- JWT issuer validation is enabled in the active `JwtDecoder`.
+- OIDC discovery and issuer enforcement are configured separately on purpose.
+- The decoder rejects tokens whose `iss` claim does not match `oidc.issuer`, even if signature validation and timestamps succeed.
+- The enforced issuer must come from a real access token `iss` claim, not from discovery metadata or deployment naming.
+- See [HMCTS Guidance](#hmcts-guidance) for the central policy reference.
 
 ## Current behavior
 
@@ -23,13 +26,13 @@ This keeps key discovery separate from the trust boundary for issuer claims.
 
 ## Configuration contract
 
-- `IDAM_OIDC_URL` feeds `spring.security.oauth2.client.provider.oidc.issuer-uri` as `${IDAM_OIDC_URL}/o`
-- `OIDC_ISSUER` feeds `oidc.issuer`
+| Setting | Used for | Must match or point to | Notes |
+| --- | --- | --- | --- |
+| `IDAM_OIDC_URL` | OIDC metadata discovery and JWKS retrieval | the target IDAM base URL | feeds `spring.security.oauth2.client.provider.oidc.issuer-uri` as `${IDAM_OIDC_URL}/o` |
+| `OIDC_ISSUER` | enforced JWT issuer validation | the exact `iss` claim in real bearer tokens | do not infer it from discovery metadata, deployment naming, or guesswork |
 
-Use `IDAM_OIDC_URL` for metadata discovery and JWKS retrieval.
-Use `OIDC_ISSUER` for the exact `iss` claim expected in bearer tokens.
-Do not derive `OIDC_ISSUER` by guesswork. Decode a real bearer token from the target environment and copy the `iss` claim exactly.
 Do not rely on the fallback in `application.yaml` for any real runtime. Compose, Helm, and CI should all provide `OIDC_ISSUER` explicitly.
+See [HMCTS Guidance](#hmcts-guidance) for the policy reference when deciding or reviewing service-level issuer configuration.
 
 ## How to derive `OIDC_ISSUER`
 
@@ -58,11 +61,13 @@ PY
 
 - Application defaults: `src/main/resources/application.yaml`
 - Helm deployment values: `charts/cpo-case-payment-orders-api/values.yaml`
+- Preview Helm template: `charts/cpo-case-payment-orders-api/values.preview.template.yaml`
 - Local Docker runtime: `docker-compose.yml`
 - Local CPO docker stack: `cpo-docker/compose/cpo.yml`
 - Integration test profile: `src/integrationTest/resources/application-itest.yaml`
+- Build verification tasks: `build.gradle`
 
-`Jenkinsfile_CNP` sets `IDAM_API_URL_BASE` and `S2S_URL_BASE` for BEFTA-style tests and also exports `OIDC_ISSUER` for the build-integrated issuer verifier. Runtime issuer settings still come from Helm values or explicit environment overrides.
+`Jenkinsfile_CNP` sets `IDAM_API_URL_BASE` and `S2S_URL_BASE` for BEFTA-style tests and also exports `OIDC_ISSUER` for the build-integrated issuer verifier. `Jenkinsfile_nightly` exports the same issuer-verifier environment for nightly runs. Runtime issuer settings still come from Helm values or explicit environment overrides.
 
 At the time of this patch, Helm contains an `OIDC_ISSUER` value but this repo does not contain a captured real token proving that value. Treat that environment value as pending verification until a real token is decoded.
 
@@ -89,6 +94,8 @@ The functional/smoke issuer verifier is:
 - disabled by default for local runs
 - opt-in locally by setting `VERIFY_OIDC_ISSUER=true`
 
+The build also enforces a separate static policy check with `verifyOidcIssuerPolicy`, which fails if `oidc.issuer` is derived from discovery configuration.
+
 Examples:
 
 - integration-test profile uses `http://localhost:${wiremock.server.port}/o`
@@ -114,7 +121,7 @@ Before merging JWT issuer-validation changes, confirm all of the following:
 - `issuer-uri` is used for discovery and JWKS lookup only.
 - `oidc.issuer` / `OIDC_ISSUER` is used as the enforced token `iss` value only.
 - `OIDC_ISSUER` is explicitly configured and not guessed from the discovery URL.
-- App config, Helm values, preview values, and CI/Jenkins values are aligned for the target environment.
+- The `OIDC_ISSUER` value for the target environment is aligned across the runtime config and any CI/verifier configuration used for that same environment.
 - If `OIDC_ISSUER` changed, it was verified against a real token for the target environment.
 - There is a test that accepts a token with the expected issuer.
 - There is a test that rejects a token with an unexpected issuer.
@@ -123,7 +130,7 @@ Before merging JWT issuer-validation changes, confirm all of the following:
 - At least one failure assertion clearly proves issuer rejection, for example by checking for `iss`.
 - CI or build verification checks that a real token issuer matches `OIDC_ISSUER`, or the repo documents why that does not apply.
 - Comments and docs do not describe the old insecure behavior.
-- Any repo-specific difference from peer services is intentional and documented.
+- Any repo-specific exception to the standard issuer-validation pattern is intentional and documented.
 
 Do not merge if any of the following are true:
 
@@ -142,3 +149,8 @@ Do not merge if any of the following are true:
 - Requiring explicit `OIDC_ISSUER` with no static fallback in main runtime config is the preferred pattern, but it is not yet mandatory across all services.
 - Local or test-only fallbacks are acceptable only when they are static, intentional, and clearly scoped to non-production use.
 - The build enforces this policy with `verifyOidcIssuerPolicy`, which fails if `oidc.issuer` is derived from discovery config.
+
+## HMCTS Guidance
+
+- [JWT iss Claim Validation guidance](https://tools.hmcts.net/confluence/spaces/SISM/pages/1958056812/JWT+iss+Claim+Validation+for+OIDC+and+OAuth+2+Tokens#JWTissClaimValidationforOIDCandOAuth2Tokens-Configurationrecommendation)
+- Use that guidance as the reference point for service-level issuer decisions and configuration recommendations.
