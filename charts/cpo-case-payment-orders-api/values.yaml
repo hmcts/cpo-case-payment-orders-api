@@ -9,6 +9,8 @@ java:
       secrets:
         - name: app-insights-connection-string
           alias: app-insights-connection-string
+        - name: case_payment_orders_api_s2s_secret
+          alias: CASE_PAYMENT_ORDERS_API_S2S_SECRET
         - name: case-payment-orders-api-POSTGRES-USER-V15
           alias: CPO_CASE_PAYMENT_ORDERS_DB_USERNAME
         - name: case-payment-orders-api-POSTGRES-PASS-V15
@@ -26,6 +28,7 @@ java:
     OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443/openam/oauth2/hmcts
     CPO_S2S_AUTHORISED_SERVICES: xui_webapp,payment_app,fprl-cos-api,service_request_cpo_update_service
     S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    CCD_DATA_STORE_URL: http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     CPO_CASE_PAYMENT_ORDERS_DB_OPTIONS: "?stringtype=unspecified&gssEncMode=disable"
     S2S_AUTHORIZATIONS_XUI_ID: xui_webapp
     S2S_AUTHORIZATIONS_XUI_PERMISSION: R
@@ -35,3 +38,4 @@ java:
     S2S_AUTHORIZATIONS_FPRL_PERMISSION: C
     S2S_AUTHORIZATIONS_PAYCPOCLIENT_ID: service_request_cpo_update_service
     S2S_AUTHORIZATIONS_PAYCPOCLIENT_PERMISSION: C
+    CPO_S2S_MICROSERVICE: "cpo_case_payment_orders_api"
