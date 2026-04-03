@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.security.AuthError;
+import uk.gov.hmcts.reform.cpo.service.CaseAccessService;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
@@ -56,10 +57,12 @@ public class CasePaymentOrdersController {
     public static final String IDS = "ids";
 
     private final CasePaymentOrdersService casePaymentOrdersService;
+    private final CaseAccessService caseAccessService;
 
 
-    public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersService) {
+    public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersService, CaseAccessService caseAccessService) {
         this.casePaymentOrdersService = casePaymentOrdersService;
+        this.caseAccessService = caseAccessService;
     }
 
     @PostMapping(path = CASE_PAYMENT_ORDERS_PATH, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
@@ -111,6 +114,7 @@ public class CasePaymentOrdersController {
     @PreAuthorize("@securityUtils.hasCreatePermission()")
     public CasePaymentOrder createCasePaymentOrderRequest(@Valid @RequestBody CreateCasePaymentOrderRequest
                                                               requestPayload) {
+        caseAccessService.assertUserHasAccessToCase(requestPayload.getCaseId());
         return casePaymentOrdersService.createCasePaymentOrder(requestPayload);
     }
 
@@ -169,7 +173,6 @@ public class CasePaymentOrdersController {
                                                        @Parameter(hidden = true) Pageable pageable
 
     ) {
-
         final var casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
             .cpoIds(ids.orElse(Collections.emptyList()))
             .caseIds(caseIds.orElse(Collections.emptyList()))
@@ -180,6 +183,10 @@ public class CasePaymentOrdersController {
             return Page.empty();
         }
         casePaymentOrderQueryFilter.validateCasePaymentOrdersFiltering();
+
+        ids.ifPresent(caseAccessService::assertUserHasAccessToPaymentOrderIds);
+        caseIds.ifPresent(caseAccessService::assertUserHasAccessToCases);
+
         return casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter);
     }
 
@@ -239,6 +246,10 @@ public class CasePaymentOrdersController {
             .caseIds(caseIds.orElse(emptyList()))
             .build();
 
+        casePaymentOrderQueryFilter.validateCasePaymentOrdersFiltering();
+        ids.ifPresent(caseAccessService::assertUserHasAccessToPaymentOrderIds);
+        caseIds.ifPresent(caseAccessService::assertUserHasAccessToCases);
+
         casePaymentOrdersService.deleteCasePaymentOrders(casePaymentOrderQueryFilter);
     }
 
@@ -297,6 +308,7 @@ public class CasePaymentOrdersController {
     @PreAuthorize("@securityUtils.hasUpdatePermission()")
     public CasePaymentOrder updateCasePaymentOrderRequest(@Valid @RequestBody UpdateCasePaymentOrderRequest
                                                               requestPayload) {
+        caseAccessService.assertUserHasAccessToCase(requestPayload.getCaseId());
         return casePaymentOrdersService.updateCasePaymentOrder(requestPayload);
     }
 
