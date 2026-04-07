@@ -4,11 +4,7 @@ import org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointP
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.actuate.autoconfigure.web.server.ManagementPortType;
 import org.springframework.boot.actuate.endpoint.ExposableEndpoint;
-import org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver;
-import org.springframework.boot.actuate.endpoint.web.EndpointMapping;
-import org.springframework.boot.actuate.endpoint.web.EndpointMediaTypes;
-import org.springframework.boot.actuate.endpoint.web.ExposableWebEndpoint;
-import org.springframework.boot.actuate.endpoint.web.WebEndpointsSupplier;
+import org.springframework.boot.actuate.endpoint.web.*;
 import org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping;
 import org.springframework.cloud.contract.wiremock.WireMockConfigurationCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +14,7 @@ import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.cpo.wiremock.extension.ConnectionClosedTransformer;
 import uk.gov.hmcts.reform.cpo.wiremock.extension.DynamicOAuthJwkSetResponseTransformer;
 import uk.gov.hmcts.reform.cpo.wiremock.extension.DynamicS2sDetailsResponseTransformer;
+import uk.gov.hmcts.reform.cpo.wiremock.extension.DynamicS2sLeaseResponseTransformer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,8 +29,9 @@ public class WireMockTestConfiguration {
             options.extensions(
                 new ConnectionClosedTransformer(),
                 new DynamicS2sDetailsResponseTransformer(),
-                new DynamicOAuthJwkSetResponseTransformer()
-            );
+                new DynamicOAuthJwkSetResponseTransformer(),
+                new DynamicS2sLeaseResponseTransformer()
+                );
         };
     }
 
