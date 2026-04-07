@@ -76,9 +76,3 @@ variable "pgsql_storage_mb" {
   type        = number
   default     = 65536
 }
-
-variable "case_payment_orders_api_s2s_secret" {
-  description = "S2S secret for cpo-case-payment-orders-api"
-  type        = string
-  sensitive   = true
-}
