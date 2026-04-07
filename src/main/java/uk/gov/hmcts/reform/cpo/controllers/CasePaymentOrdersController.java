@@ -247,7 +247,6 @@ public class CasePaymentOrdersController {
             .caseIds(caseIds.orElse(emptyList()))
             .build();
 
-        casePaymentOrderQueryFilter.validateCasePaymentOrdersFiltering();
         ids.ifPresent(caseAccessService::assertUserHasAccessToPaymentOrderIds);
         caseIds.ifPresent(caseAccessService::assertUserHasAccessToCases);
 

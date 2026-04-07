@@ -11,9 +11,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.mockito.Mockito.*;
-
-//import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 class CaseAccessServiceImplTest {
 
@@ -60,7 +61,7 @@ class CaseAccessServiceImplTest {
         SecurityUtils securityUtils = mock(SecurityUtils.class);
         CaseAccessClient caseAccessClient = mock(CaseAccessClient.class);
 
-        CaseAccessServiceImpl service = new CaseAccessServiceImpl(repository, securityUtils, caseAccessClient);
+        final CaseAccessServiceImpl service = new CaseAccessServiceImpl(repository, securityUtils, caseAccessClient);
 
         UUID foundPaymentOrderId = UUID.randomUUID();
         UUID missingPaymentOrderId = UUID.randomUUID();
