@@ -90,7 +90,7 @@ data "azurerm_key_vault_secret" "cpo_s2s_secret" {
 }
 
 resource "azurerm_key_vault_secret" "case_payment_orders_api_s2s_secret" {
-  name         = "case_payment_orders_api_s2s_secret"
+  name         = "case-payment-orders-api-s2s-secret"
   value        = data.azurerm_key_vault_secret.cpo_s2s_secret.value
   key_vault_id = module.key-vault.key_vault_id
 }

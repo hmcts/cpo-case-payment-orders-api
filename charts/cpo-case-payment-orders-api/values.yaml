@@ -9,7 +9,7 @@ java:
       secrets:
         - name: app-insights-connection-string
           alias: app-insights-connection-string
-        - name: case_payment_orders_api_s2s_secret
+        - name: case-payment-orders-api-s2s-secret
           alias: CASE_PAYMENT_ORDERS_API_S2S_SECRET
         - name: case-payment-orders-api-POSTGRES-USER-V15
           alias: CPO_CASE_PAYMENT_ORDERS_DB_USERNAME
