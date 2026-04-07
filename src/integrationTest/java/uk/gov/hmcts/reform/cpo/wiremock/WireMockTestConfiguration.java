@@ -4,7 +4,11 @@ import org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointP
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.actuate.autoconfigure.web.server.ManagementPortType;
 import org.springframework.boot.actuate.endpoint.ExposableEndpoint;
-import org.springframework.boot.actuate.endpoint.web.*;
+import org.springframework.boot.actuate.endpoint.web.EndpointMapping;
+import org.springframework.boot.actuate.endpoint.web.EndpointMediaTypes;
+import org.springframework.boot.actuate.endpoint.web.ExposableWebEndpoint;
+import org.springframework.boot.actuate.endpoint.web.WebEndpointsSupplier;
+import org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver;
 import org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping;
 import org.springframework.cloud.contract.wiremock.WireMockConfigurationCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +35,7 @@ public class WireMockTestConfiguration {
                 new DynamicS2sDetailsResponseTransformer(),
                 new DynamicOAuthJwkSetResponseTransformer(),
                 new DynamicS2sLeaseResponseTransformer()
-                );
+            );
         };
     }
 
@@ -39,8 +43,10 @@ public class WireMockTestConfiguration {
     //conflict in Springfox after Springboot 2.6.10
     @Bean
     public WebMvcEndpointHandlerMapping webEndpointServletHandlerMapping(WebEndpointsSupplier webEndpointsSupplier,
-         EndpointMediaTypes endpointMediaTypes, CorsEndpointProperties corsProperties,
-         WebEndpointProperties webEndpointProperties, Environment environment) {
+                                                                         EndpointMediaTypes endpointMediaTypes,
+                                                                         CorsEndpointProperties corsProperties,
+                                                                         WebEndpointProperties webEndpointProperties,
+                                                                         Environment environment) {
 
         Collection<ExposableWebEndpoint> webEndpoints = webEndpointsSupplier.getEndpoints();
         List<ExposableEndpoint<?>> allEndpoints = new ArrayList<>(webEndpoints);
