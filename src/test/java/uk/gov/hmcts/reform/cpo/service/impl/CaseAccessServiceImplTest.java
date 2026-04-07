@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.cpo.service.impl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
-import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
 import uk.gov.hmcts.reform.cpo.service.CaseAccessClient;
@@ -12,11 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 
 //import static org.mockito.Mockito.*;
 
@@ -59,21 +54,33 @@ class CaseAccessServiceImplTest {
 
 
     @Test
-    @DisplayName("should throw when payment order id cannot be found")
-    void shouldThrowWhenPaymentOrderIdCannotBeFound() {
+    @DisplayName("should ignore missing payment order ids and only check access for found payment orders")
+    void shouldIgnoreMissingPaymentOrderIdsAndOnlyCheckAccessForFoundPaymentOrders() {
         CasePaymentOrdersRepository repository = mock(CasePaymentOrdersRepository.class);
         SecurityUtils securityUtils = mock(SecurityUtils.class);
         CaseAccessClient caseAccessClient = mock(CaseAccessClient.class);
 
         CaseAccessServiceImpl service = new CaseAccessServiceImpl(repository, securityUtils, caseAccessClient);
 
-        UUID paymentOrderId = UUID.randomUUID();
+        UUID foundPaymentOrderId = UUID.randomUUID();
+        UUID missingPaymentOrderId = UUID.randomUUID();
 
-        when(repository.findById(paymentOrderId)).thenReturn(Optional.empty());
+        CasePaymentOrderEntity entity = new CasePaymentOrderEntity();
+        entity.setCaseId(1234567890123456L);
 
-        assertThatThrownBy(() -> service.assertUserHasAccessToPaymentOrderIds(List.of(paymentOrderId.toString())))
-            .isInstanceOf(CasePaymentOrderCouldNotBeFoundException.class);
+        when(repository.findById(foundPaymentOrderId)).thenReturn(Optional.of(entity));
+        when(repository.findById(missingPaymentOrderId)).thenReturn(Optional.empty());
+        when(securityUtils.getUserToken()).thenReturn("Bearer user-token");
+
+        service.assertUserHasAccessToPaymentOrderIds(List.of(
+            foundPaymentOrderId.toString(),
+            missingPaymentOrderId.toString()
+        ));
+
+        verify(caseAccessClient).assertCanAccessCase("Bearer user-token", "1234567890123456");
+        verifyNoMoreInteractions(caseAccessClient);
     }
+
 
     @Test
     @DisplayName("should use current user token when checking access to a case")

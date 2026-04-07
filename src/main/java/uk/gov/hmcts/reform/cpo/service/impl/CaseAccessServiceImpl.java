@@ -1,14 +1,13 @@
 package uk.gov.hmcts.reform.cpo.service.impl;
 
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
 import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
 import uk.gov.hmcts.reform.cpo.service.CaseAccessClient;
 import uk.gov.hmcts.reform.cpo.service.CaseAccessService;
-import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -42,17 +41,12 @@ public class CaseAccessServiceImpl implements CaseAccessService {
     public void assertUserHasAccessToPaymentOrderIds(List<String> paymentOrderIds) {
         List<String> caseIds = paymentOrderIds.stream()
             .map(UUID::fromString)
-            .map(this::getCaseIdForPaymentOrderId)
+            .map(casePaymentOrdersRepository::findById)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(casePaymentOrderEntity -> casePaymentOrderEntity.getCaseId().toString())
             .toList();
 
         assertUserHasAccessToCases(caseIds);
     }
-
-    private String getCaseIdForPaymentOrderId(UUID paymentOrderId) {
-        return casePaymentOrdersRepository.findById(paymentOrderId)
-            .orElseThrow(() -> new CasePaymentOrderCouldNotBeFoundException(ValidationError.CPO_NOT_FOUND))
-            .getCaseId()
-            .toString();
-    }
-
 }
