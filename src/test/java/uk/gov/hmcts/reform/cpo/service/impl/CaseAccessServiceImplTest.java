@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.cpo.service.impl;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersRepository;
@@ -14,7 +13,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+
+//import static org.mockito.Mockito.*;
 
 class CaseAccessServiceImplTest {
 
@@ -25,14 +29,14 @@ class CaseAccessServiceImplTest {
         SecurityUtils securityUtils = mock(SecurityUtils.class);
         CaseAccessClient caseAccessClient = mock(CaseAccessClient.class);
 
-        CaseAccessServiceImpl service = new CaseAccessServiceImpl(
+        final CaseAccessServiceImpl service = new CaseAccessServiceImpl(
             casePaymentOrdersRepository,
             securityUtils,
             caseAccessClient
         );
 
-        UUID paymentOrderId1 = UUID.randomUUID();
-        UUID paymentOrderId2 = UUID.randomUUID();
+        final UUID paymentOrderId1 = UUID.randomUUID();
+        final UUID paymentOrderId2 = UUID.randomUUID();
 
         CasePaymentOrderEntity entity1 = new CasePaymentOrderEntity();
         entity1.setCaseId(1234567890123456L);
@@ -57,7 +61,7 @@ class CaseAccessServiceImplTest {
     @Test
     @DisplayName("should throw when payment order id cannot be found")
     void shouldThrowWhenPaymentOrderIdCannotBeFound() {
-        CasePaymentOrdersRepository repository = Mockito.mock(CasePaymentOrdersRepository.class);
+        CasePaymentOrdersRepository repository = mock(CasePaymentOrdersRepository.class);
         SecurityUtils securityUtils = mock(SecurityUtils.class);
         CaseAccessClient caseAccessClient = mock(CaseAccessClient.class);
 

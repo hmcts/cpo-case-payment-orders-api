@@ -60,7 +60,8 @@ public class CasePaymentOrdersController {
     private final CaseAccessService caseAccessService;
 
 
-    public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersService, CaseAccessService caseAccessService) {
+    public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersService,
+                                       CaseAccessService caseAccessService) {
         this.casePaymentOrdersService = casePaymentOrdersService;
         this.caseAccessService = caseAccessService;
     }

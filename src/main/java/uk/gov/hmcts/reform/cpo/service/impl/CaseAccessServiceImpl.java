@@ -25,6 +25,7 @@ public class CaseAccessServiceImpl implements CaseAccessService {
         this.securityUtils = securityUtils;
         this.caseAccessClient = caseAccessClient;
     }
+
     @Override
     public void assertUserHasAccessToCase(String caseId) {
         caseAccessClient.assertCanAccessCase(securityUtils.getUserToken(), caseId);

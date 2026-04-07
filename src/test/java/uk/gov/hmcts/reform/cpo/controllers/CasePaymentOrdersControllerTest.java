@@ -202,7 +202,8 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         void directCallHappyPath() {
 
             // GIVEN
-            CasePaymentOrdersController controller = new CasePaymentOrdersController(casePaymentOrdersService, caseAccessService);
+            CasePaymentOrdersController controller = new CasePaymentOrdersController(casePaymentOrdersService,
+                                                                                     caseAccessService);
 
             // WHEN
             CasePaymentOrder response = controller.updateCasePaymentOrderRequest(updateCasePaymentOrderRequest);

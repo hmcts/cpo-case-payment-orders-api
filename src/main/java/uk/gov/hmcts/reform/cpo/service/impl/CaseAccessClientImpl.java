@@ -30,7 +30,7 @@ public class CaseAccessClientImpl implements CaseAccessClient {
 
     @Override
     public void assertCanAccessCase(String userToken, String caseId) {
-        try{
+        try {
             restClient.get()
                 .uri(ccdDataStoreUrl + "/cases/{caseId}", caseId)
                 .header("Authorization", userToken)
