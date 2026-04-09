@@ -79,6 +79,11 @@ module "postgresql_v15" {
   public_access = false
 }
 
+data "azurerm_key_vault" "cpo_key_vault" {
+  name                = "${var.raw_product}-${var.env}"
+  resource_group_name = "${var.raw_product}-shared-${var.env}"
+}
+
 data "azurerm_key_vault" "s2s_vault" {
   name                = "s2s-${local.local_env}"
   resource_group_name = "rpe-service-auth-provider-${local.local_env}"
@@ -92,7 +97,7 @@ data "azurerm_key_vault_secret" "cpo_s2s_secret" {
 resource "azurerm_key_vault_secret" "case_payment_orders_api_s2s_secret" {
   name         = "case-payment-orders-api-s2s-secret"
   value        = data.azurerm_key_vault_secret.cpo_s2s_secret.value
-  key_vault_id = module.key-vault.key_vault_id
+  key_vault_id = data.azurerm_key_vault.cpo_key_vault.id
 }
 ////////////////////////////////////
 // Populate KeyVault with DB info //
