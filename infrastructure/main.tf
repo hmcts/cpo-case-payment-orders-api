@@ -80,8 +80,8 @@ module "postgresql_v15" {
 }
 
 data "azurerm_key_vault" "cpo_key_vault" {
-  name                = "${var.raw_product}-${var.env}"
-  resource_group_name = "${var.raw_product}-shared-${var.env}"
+  name                = "${var.product}-${var.env}"
+  resource_group_name = "${var.product}-shared-${var.env}"
 }
 
 data "azurerm_key_vault" "s2s_vault" {
