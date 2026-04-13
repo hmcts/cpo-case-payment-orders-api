@@ -1,5 +1,6 @@
 locals {
   app_full_name = "${var.product}-${var.component}"
+  local_env     = var.env == "preview" ? "aat" : var.env
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -78,6 +79,26 @@ module "postgresql_v15" {
   public_access = false
 }
 
+data "azurerm_key_vault" "cpo_key_vault" {
+  name                = "${var.product}-${var.env}"
+  resource_group_name = "${var.product}-shared-${var.env}"
+}
+
+data "azurerm_key_vault" "s2s_vault" {
+  name                = "s2s-${local.local_env}"
+  resource_group_name = "rpe-service-auth-provider-${local.local_env}"
+}
+
+data "azurerm_key_vault_secret" "cpo_s2s_secret" {
+  name         = "microservicekey-cpo-case-payment-orders-api"
+  key_vault_id = data.azurerm_key_vault.s2s_vault.id
+}
+
+resource "azurerm_key_vault_secret" "case_payment_orders_api_s2s_secret" {
+  name         = "case-payment-orders-api-s2s-secret"
+  value        = data.azurerm_key_vault_secret.cpo_s2s_secret.value
+  key_vault_id = data.azurerm_key_vault.cpo_key_vault.id
+}
 ////////////////////////////////////
 // Populate KeyVault with DB info //
 ////////////////////////////////////
