@@ -77,6 +77,10 @@ task functional(type: Test) {
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
 
+  environment "CCD_DATA_STORE_URL",
+    System.getenv("CCD_DATA_STORE_URL")
+      ?: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+
   generateCucumberReports.enabled = false
 
   doLast {
@@ -127,6 +131,10 @@ task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verificatio
 
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
+
+  environment "CCD_DATA_STORE_URL",
+    System.getenv("CCD_DATA_STORE_URL")
+      ?: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
 
   generateCucumberReports.enabled = false
 
@@ -321,7 +329,7 @@ dependencies {
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
-  
+
   integrationTestImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
 
   functionalTestImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.25.4'
