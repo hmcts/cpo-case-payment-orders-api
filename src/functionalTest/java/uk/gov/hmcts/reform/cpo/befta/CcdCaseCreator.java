@@ -109,6 +109,8 @@ public class CcdCaseCreator {
                      + "/event-triggers/" + CREATE_EVENT + "/token")
             .header("Authorization", "Bearer " + idamToken)
             .header("ServiceAuthorization", serviceToken)
+            .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+            .header("Accept", MediaType.APPLICATION_JSON_VALUE)
             .retrieve()
             .body(String.class);
 
