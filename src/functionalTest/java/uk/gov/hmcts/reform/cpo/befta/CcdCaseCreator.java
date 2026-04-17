@@ -26,7 +26,7 @@ public class CcdCaseCreator {
             String idamToken = getIdamToken();
             String userId = getUserId(idamToken);
             String serviceToken = getServiceToken();
-            String eventToken = getEventToken(idamToken, serviceToken, userId);
+            final String eventToken = getEventToken(idamToken, serviceToken, userId);
 
             var requestNode = objectMapper.createObjectNode();
             var eventNode = requestNode.putObject("event");
