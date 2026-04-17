@@ -77,10 +77,6 @@ task functional(type: Test) {
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
 
-  environment "CCD_DATA_STORE_URL",
-    System.getenv("CCD_DATA_STORE_URL")
-      ?: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-
   generateCucumberReports.enabled = false
 
   doLast {
@@ -99,6 +95,9 @@ task functional(type: Test) {
                '--glue', 'uk.gov.hmcts.reform.cpo.befta',
                'src/functionalTest/resources/features'
              ]
+      environment "CCD_DATA_STORE_URL",
+        System.getenv("CCD_DATA_STORE_URL")
+          ?: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
       jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED', '--add-opens=java.base/sun.security.util=ALL-UNNAMED' ]
     }
@@ -132,10 +131,6 @@ task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verificatio
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
 
-  environment "CCD_DATA_STORE_URL",
-    System.getenv("CCD_DATA_STORE_URL")
-      ?: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-
   generateCucumberReports.enabled = false
 
   doLast {
@@ -152,6 +147,9 @@ task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verificatio
                '--glue', 'uk.gov.hmcts.reform.cpo.befta',
                'src/functionalTest/resources/features'
              ]
+      environment "CCD_DATA_STORE_URL",
+        System.getenv("CCD_DATA_STORE_URL")
+          ?: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
       jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED', '--add-opens=java.base/sun.security.util=ALL-UNNAMED' ]
     }
