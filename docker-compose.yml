@@ -3,7 +3,7 @@ version: '2.4'
 
 services:
   case-payment-orders-api:
-    image: "hmctspublic.azurecr.io/cpo/case-payment-orders-api:latest"
+    image: "hmctsprod.azurecr.io/cpo/case-payment-orders-api:latest"
     container_name: case-payment-orders-api
     environment:
       CPO_CASE_PAYMENT_ORDERS_DB_HOST: cpo-db
