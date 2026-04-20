@@ -31,11 +31,36 @@ public class CaseAccessClientImpl implements CaseAccessClient {
     @Override
     public void assertCanAccessCase(String userToken, String caseId) {
         log.info("Checking CCD access for caseId={} via ccdDataStoreUrl={}", caseId, ccdDataStoreUrl);
+        String serviceToken = authTokenGenerator.generate();
+
+        String rawServiceToken = serviceToken.startsWith("Bearer ")
+            ? serviceToken.substring("Bearer ".length())
+            : serviceToken;
+
+        String serviceSub = null;
+        try {
+            serviceSub = com.auth0.jwt.JWT.decode(rawServiceToken).getSubject();
+        } catch (Exception e) {
+            log.warn("Unable to decode generated service token subject", e);
+        }
+
+        String userSub = null;
+        try {
+            String rawUserToken = userToken.startsWith("Bearer ")
+                ? userToken.substring("Bearer ".length())
+                : userToken;
+            userSub = com.auth0.jwt.JWT.decode(rawUserToken).getSubject();
+        } catch (Exception e) {
+            log.warn("Unable to decode user token subject", e);
+        }
+
+        log.info("Checking CCD access for caseId={} via ccdDataStoreUrl={} userSub={} serviceSub={}",
+                 caseId, ccdDataStoreUrl, userSub, serviceSub);
         try {
             restClient.get()
                 .uri(ccdDataStoreUrl + "/cases/{caseId}", caseId)
                 .header("Authorization", userToken)
-                .header(SERVICE_AUTHORIZATION, authTokenGenerator.generate())
+                .header(SERVICE_AUTHORIZATION, serviceToken)
                 .retrieve()
                 .toBodilessEntity();
         } catch (HttpClientErrorException.Forbidden | HttpClientErrorException.NotFound ex) {
