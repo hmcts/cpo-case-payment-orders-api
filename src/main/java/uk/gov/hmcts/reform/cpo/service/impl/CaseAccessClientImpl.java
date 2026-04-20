@@ -30,7 +30,6 @@ public class CaseAccessClientImpl implements CaseAccessClient {
 
     @Override
     public void assertCanAccessCase(String userToken, String caseId) {
-        log.info("Checking CCD access for caseId={} via ccdDataStoreUrl={}", caseId, ccdDataStoreUrl);
         String serviceToken = authTokenGenerator.generate();
 
         String rawServiceToken = serviceToken.startsWith("Bearer ")
@@ -54,8 +53,21 @@ public class CaseAccessClientImpl implements CaseAccessClient {
             log.warn("Unable to decode user token subject", e);
         }
 
-        log.info("Checking CCD access for caseId={} via ccdDataStoreUrl={} userSub={} serviceSub={}",
-                 caseId, ccdDataStoreUrl, userSub, serviceSub);
+        String host = null;
+        String resolvedAddress = null;
+        try {
+            host = java.net.URI.create(ccdDataStoreUrl).getHost();
+            if (host != null) {
+                resolvedAddress = java.net.InetAddress.getByName(host).getHostAddress();
+            }
+        } catch (Exception e) {
+            log.warn("Unable to resolve CCD host from url={}", ccdDataStoreUrl, e);
+        }
+
+        log.info("Checking CCD access for caseId={} via ccdDataStoreUrl={} host={} resolvedAddress={} "
+                     + "userSub={} serviceSub={}",
+                 caseId, ccdDataStoreUrl, host, resolvedAddress, userSub, serviceSub);
+
         try {
             restClient.get()
                 .uri(ccdDataStoreUrl + "/cases/{caseId}", caseId)
@@ -64,9 +76,10 @@ public class CaseAccessClientImpl implements CaseAccessClient {
                 .retrieve()
                 .toBodilessEntity();
         } catch (HttpClientErrorException.Forbidden | HttpClientErrorException.NotFound ex) {
-            log.warn("CCD access check failed for caseId={} status={} body={}",
+            log.warn("CCD access check failed for caseId={} status={} headers={} body={}",
                      caseId,
                      ex.getStatusCode(),
+                     ex.getResponseHeaders(),
                      ex.getResponseBodyAsString());
             log.warn("Access denied when checking case access for case {}", caseId, ex);
             throw new AccessDeniedException("User does not have access to case: " + caseId);
@@ -74,6 +87,6 @@ public class CaseAccessClientImpl implements CaseAccessClient {
             log.error("Error while checking access to case {}", caseId, ex);
             throw ex;
         }
-
     }
+
 }
