@@ -30,6 +30,7 @@ public class CaseAccessClientImpl implements CaseAccessClient {
 
     @Override
     public void assertCanAccessCase(String userToken, String caseId) {
+        log.info("Checking CCD access for caseId={} via ccdDataStoreUrl={}", caseId, ccdDataStoreUrl);
         try {
             restClient.get()
                 .uri(ccdDataStoreUrl + "/cases/{caseId}", caseId)
@@ -38,6 +39,10 @@ public class CaseAccessClientImpl implements CaseAccessClient {
                 .retrieve()
                 .toBodilessEntity();
         } catch (HttpClientErrorException.Forbidden | HttpClientErrorException.NotFound ex) {
+            log.warn("CCD access check failed for caseId={} status={} body={}",
+                     caseId,
+                     ex.getStatusCode(),
+                     ex.getResponseBodyAsString());
             log.warn("Access denied when checking case access for case {}", caseId, ex);
             throw new AccessDeniedException("User does not have access to case: " + caseId);
         } catch (RestClientException ex) {

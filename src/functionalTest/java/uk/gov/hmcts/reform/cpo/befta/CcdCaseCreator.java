@@ -10,8 +10,10 @@ import uk.gov.hmcts.befta.exception.FunctionalTestException;
 
 public class CcdCaseCreator {
 
-    private static final String JURISDICTION = "BEFTA_JURISDICTION_1";
-    private static final String CASE_TYPE = "BEFTA_CASETYPE_1_1";
+//    private static final String JURISDICTION = "BEFTA_JURISDICTION_1";
+    private static final String JURISDICTION = "PROBATE";
+//    private static final String CASE_TYPE = "BEFTA_CASETYPE_1_1";
+    private static final String CASE_TYPE = "GrantOfRepresentation";
     private static final String CREATE_EVENT = "CREATE";
 
     private final RestClient restClient;
