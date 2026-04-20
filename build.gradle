@@ -225,7 +225,7 @@ ext['spring-security.version'] = '6.5.7'
 ext['spring-framework.version'] = '6.2.14'
 ext['log4j2.version'] = '2.23.1'
 ext['snakeyaml.version'] = '2.4'
-ext['jackson.version'] = '2.16.1'
+ext['jackson.version'] = '2.19.4'
 
 // before committing a change, make sure task still works
 dependencyUpdates {
@@ -301,7 +301,8 @@ dependencies {
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.13.0'
   implementation group: 'org.dom4j', name: 'dom4j', version: '2.2.0'
   implementation group: 'org.hibernate', name: 'hibernate-envers', version: '7.3.1.Final'
-  implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
+  implementation group: 'org.flywaydb', name: 'flyway-core', version: '12.0.3'
+  implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '12.0.3'
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   implementation group: 'xerces', name: 'xercesImpl', version: '2.12.2'
 
