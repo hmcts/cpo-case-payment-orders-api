@@ -73,6 +73,7 @@ public class CaseAccessClientImpl implements CaseAccessClient {
                 .uri(ccdDataStoreUrl + "/cases/{caseId}", caseId)
                 .header("Authorization", userToken)
                 .header(SERVICE_AUTHORIZATION, serviceToken)
+                .header("experimental", "true")
                 .retrieve()
                 .toBodilessEntity();
         } catch (HttpClientErrorException.Forbidden | HttpClientErrorException.NotFound ex) {
