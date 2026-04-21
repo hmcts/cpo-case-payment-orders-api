@@ -67,9 +67,24 @@ public class CaseAccessClientImpl implements CaseAccessClient {
         log.info("Checking CCD access for caseId={} via ccdDataStoreUrl={} host={} resolvedAddress={} "
                      + "userSub={} serviceSub={}",
                  caseId, ccdDataStoreUrl, host, resolvedAddress, userSub, serviceSub);
+        String requestUrl = ccdDataStoreUrl + "/cases/" + caseId;
 
-        log.info("Tokens for case access check caseId={}: serviceToken={} userToken={}",
-                 caseId, serviceToken, userToken);
+        log.info("""
+            Outbound CCD request
+            GET {} HTTP/1.1
+            {}
+            host: {}
+            resolvedAddress: {}
+            userSub: {}
+            serviceSub: {}
+            """,
+                 requestUrl,
+                 formatHeadersForLog(userToken, serviceToken),
+                 host,
+                 resolvedAddress,
+                 userSub,
+                 serviceSub
+        );
 
         try {
             restClient.get()
@@ -80,17 +95,44 @@ public class CaseAccessClientImpl implements CaseAccessClient {
                 .retrieve()
                 .toBodilessEntity();
         } catch (HttpClientErrorException.Forbidden | HttpClientErrorException.NotFound ex) {
-            log.warn("CCD access check failed for caseId={} status={} headers={} body={}",
-                     caseId,
+            //log.warn("CCD access check failed for caseId={} status={} headers={} body={}",
+            //caseId,
+            //ex.getStatusCode(),
+            //ex.getResponseHeaders(),
+            //ex.getResponseBodyAsString());
+            log.warn("""
+            Outbound CCD response
+            HTTP/1.1 {}
+            {}
+            {}
+                """,
                      ex.getStatusCode(),
                      ex.getResponseHeaders(),
-                     ex.getResponseBodyAsString());
+                     ex.getResponseBodyAsString()
+            );
             log.warn("Access denied when checking case access for case {}", caseId, ex);
             throw new AccessDeniedException("User does not have access to case: " + caseId);
         } catch (RestClientException ex) {
             log.error("Error while checking access to case {}", caseId, ex);
             throw ex;
         }
+    }
+
+    private String maskToken(String token) {
+        if (token == null) {
+            return "null";
+        }
+        int visible = Math.min(25, token.length());
+        return token.substring(0, visible) + "...";
+    }
+
+    private String formatHeadersForLog(String userToken, String serviceToken) {
+        return """
+        Authorization: %s
+        ServiceAuthorization: %s
+        experimental: true
+        accept: application/json
+        """.formatted(maskToken(userToken), maskToken(serviceToken));
     }
 
 }
