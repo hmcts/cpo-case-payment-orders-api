@@ -68,6 +68,8 @@ public class CaseAccessClientImpl implements CaseAccessClient {
                      + "userSub={} serviceSub={}",
                  caseId, ccdDataStoreUrl, host, resolvedAddress, userSub, serviceSub);
 
+        log.info("Tokens for case access check caseId={}: serviceToken={} userToken={}", caseId, serviceToken, userToken);
+
         try {
             restClient.get()
                 .uri(ccdDataStoreUrl + "/cases/{caseId}", caseId)
