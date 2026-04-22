@@ -1,38 +1,32 @@
 package uk.gov.hmcts.reform.cpo.service.impl;
 
-import org.junit.jupiter.api.DisplayName;
+import feign.FeignException;
+import feign.Request;
+import feign.Request.HttpMethod;
+import feign.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.cpo.clients.CcdDataServiceApi;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withForbiddenRequest;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withNoContent;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withResourceNotFound;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 
 class CaseAccessClientImplTest {
 
     private static final String USER_TOKEN = "Bearer user-token";
     private static final String SERVICE_TOKEN = "Bearer service-token";
     private static final String CASE_ID = "1234567890123456";
-    private static final String CCD_URL = "http://ccd-data-store";
 
     private AuthTokenGenerator authTokenGenerator;
-    private MockRestServiceServer server;
+    private CcdDataServiceApi ccdDataServiceApi;
     private CaseAccessClientImpl client;
 
     @BeforeEach
@@ -40,52 +34,53 @@ class CaseAccessClientImplTest {
         authTokenGenerator = mock(AuthTokenGenerator.class);
         given(authTokenGenerator.generate()).willReturn(SERVICE_TOKEN);
 
-        RestClient.Builder restClientBuilder = RestClient.builder();
-        server = MockRestServiceServer.bindTo(restClientBuilder).build();
-        client = new CaseAccessClientImpl(restClientBuilder, authTokenGenerator, CCD_URL);
+        ccdDataServiceApi = mock(CcdDataServiceApi.class);
+        client = new CaseAccessClientImpl(authTokenGenerator, ccdDataServiceApi);
     }
 
     @Test
-    @DisplayName("should call CCD with user and service authorization headers")
     void shouldCallCcdWithUserAndServiceAuthorizationHeaders() {
-        server.expect(requestTo(CCD_URL + "/cases/" + CASE_ID))
-            .andExpect(method(HttpMethod.GET))
-            .andExpect(header("Authorization", USER_TOKEN))
-            .andExpect(header("ServiceAuthorization", SERVICE_TOKEN))
-            .andRespond(withNoContent());
-
         client.assertCanAccessCase(USER_TOKEN, CASE_ID);
+
         verify(authTokenGenerator).generate();
-        server.verify();
+        verify(ccdDataServiceApi).getCase(USER_TOKEN, SERVICE_TOKEN, CASE_ID);
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = {403, 404})
-    @DisplayName("should deny access when CCD rejects the case access check")
-    void shouldDenyAccessWhenCcdRejectsTheCaseAccessCheck(int httpStatus) {
-        server.expect(requestTo(CCD_URL + "/cases/" + CASE_ID))
-            .andRespond(httpStatus == 403 ? withForbiddenRequest() : withResourceNotFound());
+    @Test
+    void shouldDenyAccessWhenCcdReturns403() {
+        doThrow(feignException(403)).when(ccdDataServiceApi).getCase(USER_TOKEN, SERVICE_TOKEN, CASE_ID);
 
         assertThatThrownBy(() -> client.assertCanAccessCase(USER_TOKEN, CASE_ID))
             .isInstanceOf(AccessDeniedException.class)
             .hasMessage("User does not have access to case: " + CASE_ID);
-
-        verify(authTokenGenerator).generate();
-        server.verify();
     }
 
     @Test
-    @DisplayName("should rethrow CCD client errors that are not authorization failures")
-    void shouldRethrowCcdClientErrorsThatAreNotAuthorizationFailures() {
-
-        server.expect(requestTo(CCD_URL + "/cases/" + CASE_ID))
-            .andRespond(withServerError());
+    void shouldDenyAccessWhenCcdReturns404() {
+        doThrow(feignException(404)).when(ccdDataServiceApi).getCase(USER_TOKEN, SERVICE_TOKEN, CASE_ID);
 
         assertThatThrownBy(() -> client.assertCanAccessCase(USER_TOKEN, CASE_ID))
-            .isInstanceOf(RestClientResponseException.class);
+            .isInstanceOf(AccessDeniedException.class)
+            .hasMessage("User does not have access to case: " + CASE_ID);
+    }
 
+    @Test
+    void shouldRethrowUnexpectedFeignErrors() {
+        doThrow(feignException(500)).when(ccdDataServiceApi).getCase(USER_TOKEN, SERVICE_TOKEN, CASE_ID);
 
+        assertThatThrownBy(() -> client.assertCanAccessCase(USER_TOKEN, CASE_ID))
+            .isInstanceOf(FeignException.class);
+    }
 
-        server.verify();
+    private static FeignException feignException(int status) {
+        Request request = Request.create(HttpMethod.GET, "/cases/" + CASE_ID, Map.of(), null, null, null);
+        Response response = Response.builder()
+            .status(status)
+            .reason("error")
+            .request(request)
+            .headers(Map.of())
+            .body("error", StandardCharsets.UTF_8)
+            .build();
+        return FeignException.errorStatus("getCase", response);
     }
 }
