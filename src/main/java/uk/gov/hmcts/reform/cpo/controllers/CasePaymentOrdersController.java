@@ -118,6 +118,7 @@ public class CasePaymentOrdersController {
     public CasePaymentOrder createCasePaymentOrderRequest(@Valid @RequestBody CreateCasePaymentOrderRequest
                                                               requestPayload) {
         caseAccessService.assertUserHasAccessToCase(requestPayload.getCaseId());
+        log.info("DUPLICATE ISSUE - POST mapping id {} ", requestPayload.getCaseId());
         return casePaymentOrdersService.createCasePaymentOrder(requestPayload);
     }
 
@@ -314,6 +315,7 @@ public class CasePaymentOrdersController {
     public CasePaymentOrder updateCasePaymentOrderRequest(@Valid @RequestBody UpdateCasePaymentOrderRequest
                                                               requestPayload) {
         caseAccessService.assertUserHasAccessToCase(requestPayload.getCaseId());
+        log.info("DUPLICATE ISSUE - PUT mapping id {} ", requestPayload.getCaseId());
         return casePaymentOrdersService.updateCasePaymentOrder(requestPayload);
     }
 
