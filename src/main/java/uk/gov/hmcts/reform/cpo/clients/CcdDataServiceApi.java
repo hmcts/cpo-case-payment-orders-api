@@ -11,7 +11,7 @@ import static uk.gov.hmcts.reform.cpo.security.SecurityUtils.SERVICE_AUTHORIZATI
 
 @FeignClient(
     name = "ccd-client",
-    url = "${ccd.data-store.url}"
+    url = "${ccd.data-store.url:http://localhost}"
 )
 public interface CcdDataServiceApi {
     String EXPERIMENTAL = "experimental=true";

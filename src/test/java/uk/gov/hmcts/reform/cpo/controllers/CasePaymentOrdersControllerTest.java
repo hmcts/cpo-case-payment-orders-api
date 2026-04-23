@@ -81,7 +81,8 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
     @WebMvcTest(controllers = CasePaymentOrdersController.class,
         includeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes = MapperConfig.class),
         excludeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes =
-            {SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class, AuditConfiguration.class}))
+            {SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class, AuditConfiguration.class}),
+        properties = "ccd.data-store.url=http://localhost")
     @AutoConfigureMockMvc(addFilters = false)
     @ImportAutoConfiguration(TestIdamConfiguration.class)
     static class BaseMvcTest {

@@ -113,7 +113,7 @@ idam:
 
 ccd:
   data-store:
-    url: ${CCD_DATA_STORE_URL}
+    url: ${CCD_DATA_STORE_URL:http://localhost}
 
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
