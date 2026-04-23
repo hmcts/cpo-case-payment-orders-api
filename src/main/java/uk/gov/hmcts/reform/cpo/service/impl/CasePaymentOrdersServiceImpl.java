@@ -163,6 +163,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
             if (exception.getCause() instanceof ConstraintViolationException
                 && isDuplicateCaseIdOrderRefPairing(exception)) {
 
+                log.info("DUPLICATE ISSUE - exception thrown {} --> " , exception.getMessage());
                 throw new CaseIdOrderReferenceUniqueConstraintException(ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE);
             } else {
                 throw exception;
