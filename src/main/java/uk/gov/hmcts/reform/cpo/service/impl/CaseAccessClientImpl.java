@@ -24,7 +24,9 @@ public class CaseAccessClientImpl implements CaseAccessClient {
     @Override
     public void assertCanAccessCase(String userToken, String caseId) {
         try {
+            log.info("Checking access to case {} for user", caseId);
             ccdDataServiceApi.getCase(userToken, authTokenGenerator.generate(), caseId);
+            log.info("Successfully checked access to case {} for user", caseId);
         } catch (FeignException ex) {
             if (ex.status() == 403 || ex.status() == 404) {
                 log.warn("Access denied when checking case access for case {}", caseId, ex);

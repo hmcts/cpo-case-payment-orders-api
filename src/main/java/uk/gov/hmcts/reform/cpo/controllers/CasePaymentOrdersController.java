@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,6 +46,7 @@ import static java.util.Collections.emptyList;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
+@Slf4j
 @RestController
 @Validated
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -174,6 +176,7 @@ public class CasePaymentOrdersController {
                                                        @Parameter(hidden = true) Pageable pageable
 
     ) {
+        log.info("In GET with ids: {} and caseIds: {}", ids, caseIds);
         final var casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
             .cpoIds(ids.orElse(Collections.emptyList()))
             .caseIds(caseIds.orElse(Collections.emptyList()))
@@ -184,9 +187,11 @@ public class CasePaymentOrdersController {
             return Page.empty();
         }
         casePaymentOrderQueryFilter.validateCasePaymentOrdersFiltering();
-
+        log.info("Getting case payment orders with ids: !!!");
         ids.ifPresent(caseAccessService::assertUserHasAccessToPaymentOrderIds);
+        log.info("Getting case payment orders with caseIds: !!!");
         caseIds.ifPresent(caseAccessService::assertUserHasAccessToCases);
+        log.info("have got past new code");
 
         return casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter);
     }
