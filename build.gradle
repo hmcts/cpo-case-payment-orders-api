@@ -95,6 +95,9 @@ task functional(type: Test) {
                '--glue', 'uk.gov.hmcts.reform.cpo.befta',
                'src/functionalTest/resources/features'
              ]
+      environment "CCD_DATA_STORE_URL",
+        System.getenv("CCD_DATA_STORE_URL")
+          ?: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
       jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED', '--add-opens=java.base/sun.security.util=ALL-UNNAMED' ]
     }
@@ -144,6 +147,9 @@ task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verificatio
                '--glue', 'uk.gov.hmcts.reform.cpo.befta',
                'src/functionalTest/resources/features'
              ]
+      environment "CCD_DATA_STORE_URL",
+        System.getenv("CCD_DATA_STORE_URL")
+          ?: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
       jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED', '--add-opens=java.base/sun.security.util=ALL-UNNAMED' ]
     }
@@ -321,7 +327,7 @@ dependencies {
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
-  
+
   integrationTestImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
 
   functionalTestImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.25.4'

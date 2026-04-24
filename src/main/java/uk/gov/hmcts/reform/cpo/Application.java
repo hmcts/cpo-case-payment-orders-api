@@ -4,12 +4,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
+import uk.gov.hmcts.reform.cpo.clients.CcdDataServiceApi;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 import java.time.Clock;
 
 @SpringBootApplication
-@EnableFeignClients(basePackageClasses = IdamApi.class)
+@EnableFeignClients(basePackageClasses = {IdamApi.class, CcdDataServiceApi.class})
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 public class Application {
 

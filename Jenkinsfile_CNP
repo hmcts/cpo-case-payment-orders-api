@@ -1,7 +1,6 @@
 #!groovy
 @Library("Infrastructure")
 import uk.gov.hmcts.contino.GradleBuilder
-import uk.gov.hmcts.contino.GithubAPI
 
 def type = "java"
 def product = "cpo"
