@@ -92,13 +92,7 @@ public class SecurityUtils {
         }
 
         String serviceName = getServiceNameFromS2SToken(serviceAuthorizationHeaderValue);
-        boolean hasPermission = serviceAuthorizationConfig.hasPermissions(serviceName, permission);
 
-        log.info("Permission check for service '{}' and permission '{}': {}",
-            serviceName,
-            permission,
-            hasPermission ? "granted" : "denied");
-
-        return hasPermission;
+        return serviceAuthorizationConfig.hasPermissions(serviceName, permission);
     }
 }

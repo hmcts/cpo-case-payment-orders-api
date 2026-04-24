@@ -52,8 +52,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     @Override
     public CasePaymentOrder createCasePaymentOrder(CreateCasePaymentOrderRequest createCasePaymentOrderRequest) {
         String createdBy = getUserId();
-        log.info("DUPLICATE ISSUE - createCasePaymentOrder order with id {} ",
-            createCasePaymentOrderRequest.getCaseId(), createCasePaymentOrderRequest.getCaseId());
+
         CasePaymentOrderEntity requestEntity = mapper.toEntity(createCasePaymentOrderRequest, createdBy);
         requestEntity.setHistoryExists(false);
 
@@ -67,8 +66,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
     @Override
     public CasePaymentOrder updateCasePaymentOrder(UpdateCasePaymentOrderRequest updateCasePaymentOrderRequest) {
         String createdBy = getUserId();
-        log.info("DUPLICATE ISSUE - updateCasePaymentOrder order with id {} ",
-            updateCasePaymentOrderRequest.getCaseId(), updateCasePaymentOrderRequest.getCaseId());
+
         var casePaymentOrderEntity = verifyCpoExists(updateCasePaymentOrderRequest.getUUID());
 
         mapper.mergeIntoEntity(casePaymentOrderEntity, updateCasePaymentOrderRequest, createdBy);
@@ -154,8 +152,6 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
 
     private CasePaymentOrderEntity saveEntity(CasePaymentOrderEntity entity) {
         try {
-            log.info("DUPLICATE ISSUE - Saving case payment order with id {}, case id {}",
-                entity.getId(), entity.getCaseId());
             // save and flush to force unique constraint to apply now
             return casePaymentOrdersRepository.saveAndFlush(entity);
 
@@ -163,7 +159,6 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
             if (exception.getCause() instanceof ConstraintViolationException
                 && isDuplicateCaseIdOrderRefPairing(exception)) {
 
-                log.info("DUPLICATE ISSUE - exception thrown {} --> ", exception.getMessage());
                 throw new CaseIdOrderReferenceUniqueConstraintException(ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE);
             } else {
                 throw exception;

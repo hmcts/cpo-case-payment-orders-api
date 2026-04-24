@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.cpo.repository;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-import org.slf4j.MDC;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
 import uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
@@ -16,7 +14,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-@Slf4j
 public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersRepository {
     private final CasePaymentOrdersJpaRepository casePaymentOrdersJpaRepository;
 
@@ -102,36 +99,7 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
 
     @Override
     public CasePaymentOrderEntity saveAndFlush(CasePaymentOrderEntity casePaymentOrderEntity) {
-        String traceId = firstPresentMdcValue("traceId", "X-B3-TraceId", "correlationId", "x-correlation-id");
-        String spanId = firstPresentMdcValue("spanId", "X-B3-SpanId");
-        String requestId = firstPresentMdcValue("requestId", "x-request-id");
-
-        log.info(
-            "event=CPO_SAVE operation=saveAndFlush entity=CasePaymentOrderEntity "
-                + "traceId={} spanId={} requestId={} id={} caseId={} orderReference={} action={} createdBy={} "
-                + "historyExists={} createdTimestamp={}",
-            traceId,
-            spanId,
-            requestId,
-            casePaymentOrderEntity.getId(),
-            casePaymentOrderEntity.getCaseId(),
-            casePaymentOrderEntity.getOrderReference(),
-            casePaymentOrderEntity.getAction(),
-            casePaymentOrderEntity.getCreatedBy(),
-            casePaymentOrderEntity.isHistoryExists(),
-            casePaymentOrderEntity.getCreatedTimestamp()
-        );
         return casePaymentOrdersJpaRepository.saveAndFlush(casePaymentOrderEntity);
-    }
-
-    private String firstPresentMdcValue(String... keys) {
-        for (String key : keys) {
-            String value = MDC.get(key);
-            if (value != null && !value.isBlank()) {
-                return value;
-            }
-        }
-        return "n/a";
     }
 
 }

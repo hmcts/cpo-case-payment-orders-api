@@ -591,7 +591,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             assertTrue(captor.getValue().getCaseIds().isEmpty());
         }
 
-
         @DisplayName("should delete case payment order specified by id")
         @Test
         void shouldDeleteCasePaymentOrderById() throws Exception {

@@ -9,21 +9,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.extern.slf4j.Slf4j;
+import jakarta.validation.Valid;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.cpo.auditlog.AuditOperationType;
 import uk.gov.hmcts.reform.cpo.auditlog.LogAudit;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
@@ -37,7 +30,6 @@ import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 
-import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +38,6 @@ import static java.util.Collections.emptyList;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
-@Slf4j
 @RestController
 @Validated
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -117,7 +108,6 @@ public class CasePaymentOrdersController {
     @PreAuthorize("@securityUtils.hasCreatePermission()")
     public CasePaymentOrder createCasePaymentOrderRequest(@Valid @RequestBody CreateCasePaymentOrderRequest
                                                               requestPayload) {
-        log.info("DUPLICATE ISSUE - POST mapping id {} ", requestPayload.getCaseId());
         caseAccessService.assertUserHasAccessToCase(requestPayload.getCaseId());
         return casePaymentOrdersService.createCasePaymentOrder(requestPayload);
     }
@@ -177,7 +167,7 @@ public class CasePaymentOrdersController {
                                                        @Parameter(hidden = true) Pageable pageable
 
     ) {
-        log.info("In GET with ids: {} and caseIds: {}", ids, caseIds);
+
         final var casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
             .cpoIds(ids.orElse(Collections.emptyList()))
             .caseIds(caseIds.orElse(Collections.emptyList()))
@@ -188,11 +178,8 @@ public class CasePaymentOrdersController {
             return Page.empty();
         }
         casePaymentOrderQueryFilter.validateCasePaymentOrdersFiltering();
-        log.info("Getting case payment orders with ids: !!!");
         ids.ifPresent(caseAccessService::assertUserHasAccessToPaymentOrderIds);
-        log.info("Getting case payment orders with caseIds: !!!");
         caseIds.ifPresent(caseAccessService::assertUserHasAccessToExistingCases);
-        log.info("have got past new code");
 
         return casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter);
     }
@@ -247,7 +234,6 @@ public class CasePaymentOrdersController {
                                             @ValidCaseId
                                             @RequestParam(name = CASE_IDS, required = false)
                                                 Optional<List<String>> caseIds) {
-        log.info("Delete endpoint called with ids={} and caseIds={}", ids, caseIds);
 
         final var casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
             .cpoIds(ids.orElse(emptyList()))
@@ -315,7 +301,6 @@ public class CasePaymentOrdersController {
     @PreAuthorize("@securityUtils.hasUpdatePermission()")
     public CasePaymentOrder updateCasePaymentOrderRequest(@Valid @RequestBody UpdateCasePaymentOrderRequest
                                                               requestPayload) {
-        log.info("DUPLICATE ISSUE - PUT mapping id {} ", requestPayload.getCaseId());
         caseAccessService.assertUserHasAccessToCase(requestPayload.getCaseId());
         return casePaymentOrdersService.updateCasePaymentOrder(requestPayload);
     }
