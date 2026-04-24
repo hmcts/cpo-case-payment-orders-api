@@ -657,7 +657,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             controller.deleteCasePaymentOrdersById(Optional.of(Collections.emptyList()),
                                                    Optional.of(List.of(CASE_ID_VALID_1)));
 
-            verify(caseAccessService).assertUserHasAccessToCases(List.of(CASE_ID_VALID_1));
+            verify(caseAccessService).assertUserHasAccessToExistingCases(List.of(CASE_ID_VALID_1));
         }
 
         @DisplayName("should delete case payment order specified by case id")

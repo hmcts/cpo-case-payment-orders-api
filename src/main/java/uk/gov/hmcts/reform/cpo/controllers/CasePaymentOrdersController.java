@@ -255,7 +255,7 @@ public class CasePaymentOrdersController {
             .build();
 
         ids.ifPresent(caseAccessService::assertUserHasAccessToPaymentOrderIds);
-        caseIds.ifPresent(caseAccessService::assertUserHasAccessToCases);
+        caseIds.ifPresent(caseAccessService::assertUserHasAccessToExistingCases);
 
         casePaymentOrdersService.deleteCasePaymentOrders(casePaymentOrderQueryFilter);
     }
