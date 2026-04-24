@@ -38,6 +38,18 @@ public class CaseAccessServiceImpl implements CaseAccessService {
     }
 
     @Override
+    public void assertUserHasAccessToExistingCases(List<String> caseIds) {
+        List<String> existingCaseIds = caseIds.stream()
+            .distinct()
+            .map(Long::parseLong)
+            .filter(casePaymentOrdersRepository::existsByCaseId)
+            .map(String::valueOf)
+            .toList();
+
+        assertUserHasAccessToCases(existingCaseIds);
+    }
+
+    @Override
     public void assertUserHasAccessToPaymentOrderIds(List<String> paymentOrderIds) {
         List<String> caseIds = paymentOrderIds.stream()
             .map(UUID::fromString)

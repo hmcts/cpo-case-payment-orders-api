@@ -191,7 +191,7 @@ public class CasePaymentOrdersController {
         log.info("Getting case payment orders with ids: !!!");
         ids.ifPresent(caseAccessService::assertUserHasAccessToPaymentOrderIds);
         log.info("Getting case payment orders with caseIds: !!!");
-        caseIds.ifPresent(caseAccessService::assertUserHasAccessToCases);
+        caseIds.ifPresent(caseAccessService::assertUserHasAccessToExistingCases);
         log.info("have got past new code");
 
         return casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter);

@@ -7,6 +7,8 @@ public interface CaseAccessService {
 
     void assertUserHasAccessToCases(List<String> caseIds);
 
+    void assertUserHasAccessToExistingCases(List<String> caseIds);
+
     void assertUserHasAccessToPaymentOrderIds(List<String> paymentOrderIds);
 
 }
