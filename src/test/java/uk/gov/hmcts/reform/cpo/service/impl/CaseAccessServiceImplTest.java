@@ -19,6 +19,29 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 class CaseAccessServiceImplTest {
 
     @Test
+    @DisplayName("should only check access for existing distinct case ids")
+    void shouldOnlyCheckAccessForExistingDistinctCaseIds() {
+        CasePaymentOrdersRepository repository = mock(CasePaymentOrdersRepository.class);
+        SecurityUtils securityUtils = mock(SecurityUtils.class);
+        CaseAccessClient caseAccessClient = mock(CaseAccessClient.class);
+
+        final CaseAccessServiceImpl service = new CaseAccessServiceImpl(repository, securityUtils, caseAccessClient);
+
+        when(repository.existsByCaseId(1234567890123456L)).thenReturn(true);
+        when(repository.existsByCaseId(2234567890123456L)).thenReturn(false);
+        when(securityUtils.getUserToken()).thenReturn("Bearer user-token");
+
+        service.assertUserHasAccessToExistingCases(List.of(
+            "1234567890123456",
+            "1234567890123456",
+            "2234567890123456"
+        ));
+
+        verify(caseAccessClient).assertCanAccessCase("Bearer user-token", "1234567890123456");
+        verifyNoMoreInteractions(caseAccessClient);
+    }
+
+    @Test
     @DisplayName("should resolve payment order ids to case ids before checking access")
     void shouldResolvePaymentOrderIdsToCaseIdsBeforeCheckingAccess() {
         CasePaymentOrdersRepository casePaymentOrdersRepository = mock(CasePaymentOrdersRepository.class);
