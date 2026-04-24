@@ -28,7 +28,9 @@ public class CasePaymentOrdersTestAutomationAdapter extends DefaultTestAutomatio
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {
         if (key.toString().equals("GenerateCaseId")) {
             String scenarioTag = getScenarioTag(scenarioContext);
-            return uniqueStringsPerTestData.computeIfAbsent(scenarioTag, ignored -> ccdCaseCreator.createCase());
+            String caseId = ccdCaseCreator.createCase();
+            uniqueStringsPerTestData.put(scenarioTag, caseId);
+            return caseId;
         } else if (key.toString().equals("GetGeneratedCaseId")) {
             String scenarioTag = getScenarioTag(scenarioContext);
             return Long.parseLong(uniqueStringsPerTestData.get(scenarioTag));
