@@ -117,8 +117,8 @@ public class CasePaymentOrdersController {
     @PreAuthorize("@securityUtils.hasCreatePermission()")
     public CasePaymentOrder createCasePaymentOrderRequest(@Valid @RequestBody CreateCasePaymentOrderRequest
                                                               requestPayload) {
-        caseAccessService.assertUserHasAccessToCase(requestPayload.getCaseId());
         log.info("DUPLICATE ISSUE - POST mapping id {} ", requestPayload.getCaseId());
+        caseAccessService.assertUserHasAccessToCase(requestPayload.getCaseId());
         return casePaymentOrdersService.createCasePaymentOrder(requestPayload);
     }
 
@@ -247,6 +247,7 @@ public class CasePaymentOrdersController {
                                             @ValidCaseId
                                             @RequestParam(name = CASE_IDS, required = false)
                                                 Optional<List<String>> caseIds) {
+        log.info("Delete endpoint called with ids={} and caseIds={}", ids, caseIds);
 
         final var casePaymentOrderQueryFilter = CasePaymentOrderQueryFilter.builder()
             .cpoIds(ids.orElse(emptyList()))
@@ -314,8 +315,8 @@ public class CasePaymentOrdersController {
     @PreAuthorize("@securityUtils.hasUpdatePermission()")
     public CasePaymentOrder updateCasePaymentOrderRequest(@Valid @RequestBody UpdateCasePaymentOrderRequest
                                                               requestPayload) {
-        caseAccessService.assertUserHasAccessToCase(requestPayload.getCaseId());
         log.info("DUPLICATE ISSUE - PUT mapping id {} ", requestPayload.getCaseId());
+        caseAccessService.assertUserHasAccessToCase(requestPayload.getCaseId());
         return casePaymentOrdersService.updateCasePaymentOrder(requestPayload);
     }
 
