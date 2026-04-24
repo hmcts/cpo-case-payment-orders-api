@@ -827,7 +827,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
 
             assertArrayEquals(response.getContent().toArray(), getDomainPages.getContent().toArray());
 
-            verify(caseAccessService).assertUserHasAccessToCases(casesIds);
+            verify(caseAccessService).assertUserHasAccessToExistingCases(casesIds);
         }
 
         @DisplayName("should check user access for payment order ids when getting case payment orders by ids")
