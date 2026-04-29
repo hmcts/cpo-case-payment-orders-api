@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,7 @@ public class AuditLogFormatter {
 
     private List<String> limitedList(List<String> list) {
         if (list == null) {
-            return null;
+            return List.of();
         }
         if (this.auditLogMaxListSize > 0) {
             return list.stream().limit(this.auditLogMaxListSize).toList();
@@ -63,7 +64,10 @@ public class AuditLogFormatter {
     }
 
     private void add(Map<String, Object> logEntry, String label, @Nullable Object value) {
-        if (value instanceof String && isBlank((String) value)) {
+        if (value instanceof String string && isBlank(string)) {
+            return;
+        }
+        if (value instanceof Collection<?> collection && collection.isEmpty()) {
             return;
         }
         if (value != null) {
