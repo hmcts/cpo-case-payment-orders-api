@@ -293,7 +293,7 @@ dependencies {
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
 
 
-  implementation group: 'com.auth0', name:'java-jwt', version:'4.5.1'
+  implementation group: 'com.auth0', name:'java-jwt', version:'4.5.2'
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.3'
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: versions.appInsights
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: versions.appInsights
