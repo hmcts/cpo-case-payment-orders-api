@@ -12,7 +12,7 @@
 
 Remove the hardcoded default OIDC OAuth2 client secret from main application configuration.
 
-The key finding is that this service validates inbound bearer JWTs as an OAuth2 resource server. No production code was found that uses the configured OAuth2 client registration to obtain outbound tokens, so the `client-secret: internal` value was unused configuration and could be removed with the unused OAuth2 client wiring. Existing IDAM user-info lookup using the caller's bearer token and S2S token validation/authorization wiring are unchanged.
+The key finding is that this service validates inbound bearer JWTs as an OAuth2 resource server. No production code was found that uses the configured OAuth2 client registration to obtain outbound tokens, so the `client-secret: internal` value was unused configuration and could be removed with the unused OAuth2 client wiring. Production IDAM user-info lookup using the caller's bearer token and S2S token validation/authorization wiring are unchanged.
 
 ## Changes Made
 
@@ -37,6 +37,8 @@ rg -n "client-secret: internal|spring-boot-starter-oauth2-client|\.oauth2Client\
 git diff --check
 ./gradlew testClasses integrationTestClasses --no-daemon
 ./gradlew test --tests uk.gov.hmcts.reform.cpo.config.SecurityConfigurationTest
+./gradlew test
+./gradlew checkstyleTest
 ```
 
 ## Verification Already Run
@@ -45,3 +47,5 @@ git diff --check
 - `git diff --check` passed.
 - `./gradlew testClasses integrationTestClasses --no-daemon` passed.
 - `./gradlew test --tests uk.gov.hmcts.reform.cpo.config.SecurityConfigurationTest` passed.
+- `./gradlew test` passed.
+- `./gradlew checkstyleTest` passed.

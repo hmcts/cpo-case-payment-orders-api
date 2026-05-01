@@ -14,7 +14,7 @@ Leaving a hardcoded default client secret in main application configuration crea
 
 The unused OAuth2 client registration was removed from application configuration. The unused OAuth2 client starter dependency, `oauth2Client` security configuration, and the test-only IDAM client registration shim were also removed.
 
-The service remains configured as an OAuth2 resource server for inbound bearer JWT validation. Existing IDAM user-info lookup using the caller's bearer token and S2S token validation/authorization wiring are unchanged. Test support for generating S2S tokens is also unchanged.
+The service remains configured as an OAuth2 resource server for inbound bearer JWT validation. Production IDAM user-info lookup using the caller's bearer token and S2S token validation/authorization wiring are unchanged. Test support for generating S2S tokens is also unchanged.
 
 ## Verification
 
