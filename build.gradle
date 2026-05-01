@@ -307,7 +307,7 @@ dependencies {
 
   compileOnly group: 'org.mapstruct', name: 'mapstruct', version: versions.mapstruct
   compileOnly group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: versions.lombokMapBinding
-  runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.7.10'
+  runtimeOnly group: 'org.postgresql', name: 'postgresql', version: '42.7.11'
   annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: versions.mapstruct
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: versions.lombokMapBinding
