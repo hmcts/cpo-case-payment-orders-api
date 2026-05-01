@@ -281,7 +281,6 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
   implementation group: 'org.springframework.security', name: 'spring-security-web'
   implementation group: 'org.springframework.security', name: 'spring-security-config'
@@ -321,7 +320,7 @@ dependencies {
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
-  
+
   integrationTestImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
 
   functionalTestImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.25.4'

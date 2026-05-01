@@ -33,7 +33,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.inject.Inject;
-import uk.gov.hmcts.reform.TestIdamConfiguration;
 import uk.gov.hmcts.reform.cpo.auditlog.AuditEntry;
 import uk.gov.hmcts.reform.cpo.auditlog.AuditOperationType;
 import uk.gov.hmcts.reform.cpo.auditlog.AuditRepository;
@@ -44,8 +43,7 @@ import static uk.gov.hmcts.reform.cpo.security.SecurityUtils.SERVICE_AUTHORIZATI
 import uk.gov.hmcts.reform.cpo.utils.KeyGenUtil;
 
 @SpringBootTest(classes = {
-    Application.class,
-    TestIdamConfiguration.class
+    Application.class
 })
 @AutoConfigureMockMvc() // NB: don't disable filters as they are needed to test authentication is enabled on endpoints
 @AutoConfigureWireMock(port = 0, stubs = "classpath:/wiremock-stubs")
