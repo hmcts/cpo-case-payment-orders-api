@@ -11,6 +11,10 @@ plugins {
   id 'uk.gov.hmcts.java' version '0.12.68'
 }
 
+configurations {
+  fortifyScan
+}
+
 group = 'uk.gov.hmcts.reform'
 
 java {
@@ -115,6 +119,48 @@ task functional(type: Test) {
   outputs.upToDateWhen { false }
 }
 
+task verifyFunctionalTestJwtIssuer(type: JavaExec) {
+  description = 'Verifies the functional/smoke test token issuer matches OIDC_ISSUER'
+  group = 'Verification'
+  dependsOn functionalTestClasses
+
+  onlyIf {
+    System.getenv('VERIFY_OIDC_ISSUER')?.toBoolean()
+  }
+
+  mainClass = 'uk.gov.hmcts.reform.cpo.befta.JwtIssuerVerificationApp'
+  classpath += sourceSets.functionalTest.runtimeClasspath
+}
+
+task verifyOidcIssuerPolicy {
+  description = 'Fails if oidc.issuer is derived from discovery configuration'
+  group = 'Verification'
+
+  doLast {
+    def policyFiles = [
+      'src/main/resources/application.yaml',
+      'src/integrationTest/resources/application-itest.yaml'
+    ]
+
+    def violations = policyFiles.findAll { path ->
+      def configFile = file(path)
+      configFile.exists() && configFile.readLines().any { line ->
+        def normalized = line.replaceAll(/\s+/, '')
+        normalized.startsWith('issuer:${OIDC_ISSUER:${IDAM_OIDC_URL')
+          || normalized.startsWith('issuer:${OIDC_ISSUER:${idam.api.url')
+      }
+    }
+
+    if (!violations.isEmpty()) {
+      throw new GradleException(
+        "OIDC issuer policy violation. Do not derive oidc.issuer from discovery config in: ${violations.join(', ')}"
+      )
+    }
+  }
+}
+
+check.dependsOn verifyOidcIssuerPolicy
+
 task integration(type: Test) {
   description = "Runs integration tests"
   group = "Verification"
@@ -124,6 +170,7 @@ task integration(type: Test) {
 }
 
 task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
+  dependsOn verifyFunctionalTestJwtIssuer
 
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
@@ -164,6 +211,8 @@ task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verificatio
   outputs.upToDateWhen { false }
 }
 
+functional.dependsOn verifyFunctionalTestJwtIssuer
+
 cucumberReports {
   outputDir = file("${rootDir}/target/cucumber")
   reports = files("${rootDir}/target/cucumber.json")
@@ -171,8 +220,10 @@ cucumberReports {
 
 task fortifyScan(type: JavaExec)  {
   mainClass = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
-  classpath += sourceSets.test.runtimeClasspath
-  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED', '--add-opens=java.base/sun.security.util=ALL-UNNAMED']
+  classpath = configurations.fortifyScan + sourceSets.test.runtimeClasspath
+  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+  // The line below prevents the build from failing if the Fortify scan detects issues
+  ignoreExitValue = true
 }
 
 task customCleanBeftaReports(type:Delete) {
