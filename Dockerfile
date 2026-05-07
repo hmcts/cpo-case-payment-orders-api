@@ -2,7 +2,7 @@
 ARG APP_INSIGHTS_AGENT_VERSION=3.7.8
 
 ARG PLATFORM=""
-FROM eclipse-temurin${PLATFORM}:21 as builder
+FROM eclipse-temurin${PLATFORM}:25 as builder
 
 ARG JAR_FILE=build/libs/cpo-case-payment-orders-api.jar
 COPY ${JAR_FILE} application.jar
