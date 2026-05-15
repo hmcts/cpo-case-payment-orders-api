@@ -49,9 +49,10 @@ This will start the API container exposing the application's port
 JWT/OIDC configuration is split across two settings:
 
 - `IDAM_OIDC_URL` is used for OIDC discovery and JWKS lookup. The app derives `spring.security.oauth2.client.provider.oidc.issuer-uri` as `${IDAM_OIDC_URL}/o`.
-- `OIDC_ISSUER` is the issuer claim the active `JwtDecoder` enforces on incoming bearer tokens.
+- `OIDC_ISSUER` is the primary issuer claim the active `JwtDecoder` enforces on incoming bearer tokens.
+- `OIDC_ALLOWED_ISSUERS` is an optional comma-separated additive list for confirmed secondary token issuers.
 
-Those values can differ in HMCTS environments. Discovery may use the public IDAM base URL, while issuer validation must match the issuer claim emitted in the token. Do not infer `OIDC_ISSUER` from discovery config alone. Set it only after decoding a real IDAM access token and copying the exact `iss` claim. Helm supplies an environment value in [charts/cpo-case-payment-orders-api/values.yaml](./charts/cpo-case-payment-orders-api/values.yaml), but each target environment should still be verified against a real token.
+Those values can differ in HMCTS environments. Discovery may use the public IDAM base URL, while issuer validation must match the issuer claim emitted in the token. Do not infer `OIDC_ISSUER` from discovery config alone. Set it only after decoding a real IDAM access token and copying the exact `iss` claim. Leave `OIDC_ALLOWED_ISSUERS` unset unless multiple real-token issuers are confirmed for the same runtime; values are exact matches, not wildcards or prefixes. Helm supplies an environment value in [charts/cpo-case-payment-orders-api/values.yaml](./charts/cpo-case-payment-orders-api/values.yaml), but each target environment should still be verified against a real token.
 
 Local runtime configs also need an explicit `OIDC_ISSUER`. `docker-compose.yml` and `cpo-docker/compose/cpo.yml` now set it so the running container does not fall back to the stale application default.
 
@@ -130,7 +131,7 @@ export TEST_URL=http://localhost:4457
 ./gradlew functional
 ```
 
-When `VERIFY_OIDC_ISSUER=true`, functional and smoke runs perform a JWT issuer pre-check using a real test token. This requires `OIDC_ISSUER` and the usual IDAM test credentials to be present.
+When `VERIFY_OIDC_ISSUER=true`, functional and smoke runs perform a JWT issuer pre-check using a real test token. This requires `OIDC_ISSUER` and the usual IDAM test credentials to be present. If `OIDC_ALLOWED_ISSUERS` is set for a confirmed multi-issuer runtime, the pre-check accepts those exact issuers as well.
 
 > Note: These are the tests run against an environment.
 > Please see [cpo-docker/README.md](./cpo-docker/README.md) for local environment testing.

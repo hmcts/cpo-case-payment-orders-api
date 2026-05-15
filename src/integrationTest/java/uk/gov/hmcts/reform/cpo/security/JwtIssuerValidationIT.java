@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.cpo.BaseTest;
@@ -19,8 +20,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH;
 
+@TestPropertySource(properties = "oidc.allowed-issuers=http://confirmed-secondary-issuer")
 class JwtIssuerValidationIT extends BaseTest {
 
+    private static final String CONFIRMED_SECONDARY_ISSUER = "http://confirmed-secondary-issuer";
     private static final String UNEXPECTED_ISSUER = "http://unexpected-issuer";
 
     @Autowired
@@ -43,6 +46,20 @@ class JwtIssuerValidationIT extends BaseTest {
     void setUp() {
         casePaymentOrdersJpaRepository.deleteAllInBatch();
         casePaymentOrdersAuditJpaRepository.deleteAllInBatch();
+    }
+
+    @Test
+    void shouldAcceptJwtFromConfirmedAllowedIssuer() throws Exception {
+        HttpHeaders headers = createHttpHeaders(AUTH_TOKEN_TTL,
+                                                AUTHORISED_CREATE_SERVICE,
+                                                AUTH_TOKEN_TTL,
+                                                CONFIRMED_SECONDARY_ISSUER);
+
+        mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+                            .headers(headers)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(createRequestBody()))
+            .andExpect(status().isCreated());
     }
 
     @Test
