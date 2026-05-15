@@ -59,6 +59,7 @@ Local runtime configs also need an explicit `OIDC_ISSUER`. `docker-compose.yml` 
 `Jenkinsfile_CNP` configures `IDAM_API_URL_BASE` and `S2S_URL_BASE` for BEFTA usage and now also exports `OIDC_ISSUER` for the build-integrated JWT issuer verifier. Deployment-time issuer settings still come from Helm/environment values.
 
 Smoke and functional runs enforce JWT issuer verification in CI, while local runs keep it disabled by default unless `VERIFY_OIDC_ISSUER=true` is set.
+If `OIDC_ALLOWED_ISSUERS` is absent, both the app and the build-integrated verifier accept `OIDC_ISSUER` only. Add `OIDC_ALLOWED_ISSUERS` to the target deployment environment, and to Jenkins for matching smoke/functional verification, only after confirming additional real-token issuers.
 
 ### Codex Workflow Docs
 Repo-local workflow docs are indexed in [AGENTS.md](./AGENTS.md).

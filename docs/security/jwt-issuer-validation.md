@@ -38,6 +38,17 @@ Do not rely on the fallback in `application.yaml` for any real runtime. Compose,
 Leave `OIDC_ALLOWED_ISSUERS` unset unless a target runtime has confirmed multiple valid token issuers.
 See [HMCTS Guidance](#hmcts-guidance) for the policy reference when deciding or reviewing service-level issuer configuration.
 
+## Runtime activation
+
+By default, runtime issuer validation is single-issuer:
+
+- `OIDC_ISSUER` must be present and is always the primary issuer.
+- `OIDC_ALLOWED_ISSUERS` is optional. If it is absent from the container environment, Spring injects an empty `oidc.allowed-issuers` value.
+- An empty `oidc.allowed-issuers` value means the accepted issuer set contains only `OIDC_ISSUER`.
+- To activate multi-issuer validation, add `OIDC_ALLOWED_ISSUERS` explicitly to that deployment environment with confirmed additional `iss` values.
+
+The same rule applies to the build-integrated functional/smoke issuer verifier. It reads `OIDC_ALLOWED_ISSUERS` directly from the process environment. If the verifier must accept the same additional issuer as the deployed runtime, Jenkins must export `OIDC_ALLOWED_ISSUERS` for that run as well.
+
 ## How to derive `OIDC_ISSUER`
 
 - Do not guess the issuer from the public discovery URL alone.
@@ -112,13 +123,15 @@ Examples:
 
 If local verification fails with a message like:
 
-`OIDC_ISSUER mismatch: expected http://localhost:5000/o but token iss was http://localhost:5556`
+```text
+OIDC issuer mismatch: expected one of `http://localhost:5000/o` but token iss was `http://localhost:5556`
+```
 
-then set `OIDC_ISSUER` to the actual token issuer and rerun the verification.
+then set `OIDC_ISSUER` to the actual primary token issuer and rerun the verification. If `http://localhost:5556` is a confirmed additional issuer for that same runtime, keep `OIDC_ISSUER` as the primary issuer and add `http://localhost:5556` to `OIDC_ALLOWED_ISSUERS`.
 
 ## Operational note
 
-If OIDC discovery succeeds but `OIDC_ISSUER` does not match the token `iss` claim, authentication fails with `401 Unauthorized`.
+If OIDC discovery succeeds but the token `iss` claim matches neither `OIDC_ISSUER` nor a configured `OIDC_ALLOWED_ISSUERS` value, authentication fails with `401 Unauthorized`.
 
 ## Acceptance Checklist
 
@@ -132,8 +145,8 @@ Before merging JWT issuer-validation changes, confirm all of the following:
 - `oidc.allowed-issuers` / `OIDC_ALLOWED_ISSUERS` is unset unless multiple token issuers are confirmed from real tokens.
 - Any allowed issuer value is matched exactly, with no wildcard, regex, prefix, or suffix behavior.
 - `OIDC_ISSUER` is explicitly configured and not guessed from the discovery URL.
-- The `OIDC_ISSUER` value for the target environment is aligned across the runtime config and any CI/verifier configuration used for that same environment.
-- If `OIDC_ISSUER` changed, it was verified against a real token for the target environment.
+- The accepted issuer set for the target environment is aligned across runtime config and any CI/verifier configuration used for that same environment.
+- If `OIDC_ISSUER` or `OIDC_ALLOWED_ISSUERS` changed, the values were verified against real tokens for the target environment.
 - There is a test that accepts a token with the expected issuer.
 - There is a test that accepts a token with a configured allowed issuer.
 - There is a test that rejects a token with an unexpected issuer.
@@ -142,7 +155,7 @@ Before merging JWT issuer-validation changes, confirm all of the following:
 - There is a test that rejects a token without a valid signature.
 - There is decoder-level coverage using a signed token, not only validator-only coverage.
 - At least one failure assertion clearly proves issuer rejection, for example by checking for `iss`.
-- CI or build verification checks that a real token issuer matches `OIDC_ISSUER`, or the repo documents why that does not apply.
+- CI or build verification checks that a real token issuer matches the accepted issuer set, or the repo documents why that does not apply.
 - Comments and docs do not describe the old insecure behavior.
 - Any repo-specific exception to the standard issuer-validation pattern is intentional and documented.
 

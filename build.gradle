@@ -120,7 +120,7 @@ task functional(type: Test) {
 }
 
 task verifyFunctionalTestJwtIssuer(type: JavaExec) {
-  description = 'Verifies the functional/smoke test token issuer matches OIDC_ISSUER'
+  description = 'Verifies the functional/smoke test token issuer matches OIDC issuer config'
   group = 'Verification'
   dependsOn functionalTestClasses
 
