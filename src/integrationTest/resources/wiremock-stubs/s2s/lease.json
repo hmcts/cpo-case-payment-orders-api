@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/s2s/lease"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "text/plain"
+    },
+    "transformers": [ "dynamic-s2s-lease-response-transformer" ]
+  }
+}

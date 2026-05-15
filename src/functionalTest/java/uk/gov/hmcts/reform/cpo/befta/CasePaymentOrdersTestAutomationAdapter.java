@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CasePaymentOrdersTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
     private static Map<String, String> uniqueStringsPerTestData = new ConcurrentHashMap<>();
+    private final CcdCaseCreator ccdCaseCreator = new CcdCaseCreator();
 
     @Override
     public BeftaTestDataLoader getDataLoader() {
@@ -26,32 +27,20 @@ public class CasePaymentOrdersTestAutomationAdapter extends DefaultTestAutomatio
 
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {
         if (key.toString().equals("GenerateCaseId")) {
-
-            String scenarioTag;
-            try {
-                scenarioTag = scenarioContext.getParentContext().getCurrentScenarioTag();
-            } catch (NullPointerException e) {
-                scenarioTag = scenarioContext.getCurrentScenarioTag();
-            }
-
-            String caseId = new CaseIdGenerator().generateValidCaseReference();
-            uniqueStringsPerTestData.put(scenarioTag,caseId);
+            String scenarioTag = getScenarioTag(scenarioContext);
+            String caseId = ccdCaseCreator.createCase();
+            uniqueStringsPerTestData.put(scenarioTag, caseId);
             return caseId;
         } else if (key.toString().equals("GetGeneratedCaseId")) {
-            String scenarioTag;
-            try {
-                scenarioTag = scenarioContext.getParentContext().getCurrentScenarioTag();
-            } catch (NullPointerException e) {
-                scenarioTag = scenarioContext.getCurrentScenarioTag();
-            }
+            String scenarioTag = getScenarioTag(scenarioContext);
             return Long.parseLong(uniqueStringsPerTestData.get(scenarioTag));
         } else if (key.toString().startsWith("approximately ")) {
             try {
-                String actualSizeFromHeaderStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
-                    "testData.actualResponse.headers.Content-Length");
+                String actualSizeFromHeaderStr = (String) ReflectionUtils.deepGetFieldInObject(
+                    scenarioContext, "testData.actualResponse.headers.Content-Length");
                 String expectedSizeStr = key.toString().replace("approximately ", "");
 
-                int actualSize =  Integer.parseInt(actualSizeFromHeaderStr);
+                int actualSize = Integer.parseInt(actualSizeFromHeaderStr);
                 int expectedSize = Integer.parseInt(expectedSizeStr);
 
                 if (Math.abs(actualSize - expectedSize) < (actualSize * 10 / 100)) {
@@ -63,8 +52,8 @@ public class CasePaymentOrdersTestAutomationAdapter extends DefaultTestAutomatio
             }
         } else if (key.toString().startsWith("contains ")) {
             try {
-                String actualValueStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
-                    "testData.actualResponse.body.__plainTextValue__");
+                String actualValueStr = (String) ReflectionUtils.deepGetFieldInObject(
+                    scenarioContext, "testData.actualResponse.body.__plainTextValue__");
                 String expectedValueStr = key.toString().replace("contains ", "");
 
                 if (actualValueStr.contains(expectedValueStr)) {
@@ -78,4 +67,11 @@ public class CasePaymentOrdersTestAutomationAdapter extends DefaultTestAutomatio
         return super.calculateCustomValue(scenarioContext, key);
     }
 
+    private String getScenarioTag(BackEndFunctionalTestScenarioContext scenarioContext) {
+        try {
+            return scenarioContext.getParentContext().getCurrentScenarioTag();
+        } catch (NullPointerException e) {
+            return scenarioContext.getCurrentScenarioTag();
+        }
+    }
 }

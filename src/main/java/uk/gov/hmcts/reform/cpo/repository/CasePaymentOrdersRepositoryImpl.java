@@ -76,6 +76,11 @@ public class CasePaymentOrdersRepositoryImpl implements CasePaymentOrdersReposit
     }
 
     @Override
+    public boolean existsByCaseId(Long caseId) {
+        return casePaymentOrdersJpaRepository.existsByCaseId(caseId);
+    }
+
+    @Override
     public Optional<CasePaymentOrderEntity> findById(UUID id) {
         return casePaymentOrdersJpaRepository.findById(id);
     }
