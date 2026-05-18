@@ -7,14 +7,11 @@ import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtException;
-import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.JwtValidationException;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import uk.gov.hmcts.reform.cpo.security.OidcIssuerValidator;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -108,10 +105,7 @@ class JwtDecoderIssuerValidationTest {
     }
 
     private OAuth2TokenValidator<Jwt> validator(String allowedIssuers) {
-        return new DelegatingOAuth2TokenValidator<>(
-            new JwtTimestampValidator(),
-            OidcIssuerValidator.exactIssuerValidator(VALID_ISSUER, allowedIssuers)
-        );
+        return SecurityConfiguration.jwtValidator(VALID_ISSUER, allowedIssuers);
     }
 
     private NimbusJwtDecoder decoder() {

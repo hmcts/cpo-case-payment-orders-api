@@ -66,12 +66,15 @@ public class SecurityConfiguration {
     JwtDecoder jwtDecoder() {
         NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromOidcIssuerLocation(issuerUri);
         // Discover metadata from issuer-uri, but enforce bearer token issuers via oidc.issuer first.
+        jwtDecoder.setJwtValidator(jwtValidator(issuerOverride, allowedIssuers));
+        return jwtDecoder;
+    }
+
+    static OAuth2TokenValidator<Jwt> jwtValidator(String issuerOverride, String allowedIssuers) {
         OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
         OAuth2TokenValidator<Jwt> withIssuer = OidcIssuerValidator.exactIssuerValidator(issuerOverride,
                                                                                         allowedIssuers);
-        OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withTimestamp, withIssuer);
-        jwtDecoder.setJwtValidator(validator);
-        return jwtDecoder;
+        return new DelegatingOAuth2TokenValidator<>(withTimestamp, withIssuer);
     }
 
     @Bean
