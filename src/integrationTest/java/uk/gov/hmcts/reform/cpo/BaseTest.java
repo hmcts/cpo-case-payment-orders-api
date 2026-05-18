@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.annotation.Value;
 import static org.mockito.Mockito.verify;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -89,16 +90,26 @@ public class BaseTest {
     @Inject
     protected AuditRepository auditRepository;
 
-    public static HttpHeaders createHttpHeaders(String serviceName) throws JOSEException {
+    @Value("${oidc.issuer}")
+    private String oidcIssuer;
+
+    public HttpHeaders createHttpHeaders(String serviceName) throws JOSEException {
         return createHttpHeaders(AUTH_TOKEN_TTL, serviceName, AUTH_TOKEN_TTL);
     }
 
-    public static HttpHeaders createHttpHeaders(long authTtlMillis,
-                                                String serviceName,
-                                                long s2sAuthTtlMillis) throws JOSEException {
+    public HttpHeaders createHttpHeaders(long authTtlMillis,
+                                         String serviceName,
+                                         long s2sAuthTtlMillis) throws JOSEException {
+        return createHttpHeaders(authTtlMillis, serviceName, s2sAuthTtlMillis, testOidcIssuer());
+    }
+
+    public HttpHeaders createHttpHeaders(long authTtlMillis,
+                                         String serviceName,
+                                         long s2sAuthTtlMillis,
+                                         String authIssuer) throws JOSEException {
         HttpHeaders headers = new HttpHeaders();
         // :: IDAM OAuth2 token
-        String authToken = BEARER + generateAuthToken(authTtlMillis);
+        String authToken = BEARER + generateAuthToken(authTtlMillis, authIssuer);
         headers.add(AUTHORIZATION, authToken);
         // :: S2S authentication token
         String s2SToken = generateS2SToken(serviceName, s2sAuthTtlMillis);
@@ -186,10 +197,11 @@ public class BaseTest {
         }
     }
 
-    private static String generateAuthToken(long ttlMillis) throws JOSEException  {
+    private static String generateAuthToken(long ttlMillis, String issuer) throws JOSEException  {
 
         JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder()
             .subject("CPO_Stub")
+            .issuer(issuer)
             .issueTime(new Date())
             .claim(TOKEN_NAME, ACCESS_TOKEN)
             .expirationTime(new Date(System.currentTimeMillis() + ttlMillis));
@@ -202,6 +214,10 @@ public class BaseTest {
         signedJWT.sign(new RSASSASigner(KeyGenUtil.getRsaJWK()));
 
         return signedJWT.serialize();
+    }
+
+    private String testOidcIssuer() {
+        return oidcIssuer;
     }
 
     private static String generateS2SToken(String serviceName, long ttlMillis) {
