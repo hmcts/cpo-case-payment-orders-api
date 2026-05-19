@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import uk.gov.hmcts.reform.cpo.security.OidcIssuerValidator;
+import uk.gov.hmcts.reform.cpo.security.OidcIssuerConfiguration;
 
 public final class JwtIssuerVerificationApp {
 
@@ -28,8 +28,8 @@ public final class JwtIssuerVerificationApp {
 
     static void verifyIssuerAlignment() throws Exception {
         String expectedIssuer = requireEnv("OIDC_ISSUER");
-        Set<String> expectedIssuers = OidcIssuerValidator.acceptedIssuers(expectedIssuer,
-                                                                          System.getenv("OIDC_ALLOWED_ISSUERS"));
+        Set<String> expectedIssuers = OidcIssuerConfiguration.allowedIssuers(expectedIssuer,
+                                                                             System.getenv("OIDC_ALLOWED_ISSUERS"));
         String accessToken = fetchAccessToken();
         String actualIssuer = decodeIssuer(accessToken);
 
