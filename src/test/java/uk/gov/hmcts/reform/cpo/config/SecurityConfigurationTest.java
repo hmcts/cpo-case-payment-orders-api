@@ -44,18 +44,19 @@ class SecurityConfigurationTest {
     private static final KeyPair RSA_KEY_PAIR = generateKeyPair();
 
     @Test
-    void jwtDecoderShouldAcceptJwtFromConfiguredAllowedIssuer() throws JOSEException {
+    void jwtDecoderShouldAcceptJwtFromConfiguredAllowedIssuer() {
         JwtDecoder jwtDecoder = jwtDecoder(SECONDARY_ISSUER);
+        String token = buildSignedToken(SECONDARY_ISSUER, VALID_TOKEN_EXPIRES_AT);
 
-        assertDoesNotThrow(() -> jwtDecoder.decode(buildSignedToken(SECONDARY_ISSUER, VALID_TOKEN_EXPIRES_AT)));
+        assertDoesNotThrow(() -> jwtDecoder.decode(token));
     }
 
     @Test
-    void jwtDecoderShouldRejectJwtFromUnexpectedIssuer() throws JOSEException {
+    void jwtDecoderShouldRejectJwtFromUnexpectedIssuer() {
         JwtDecoder jwtDecoder = jwtDecoder(SECONDARY_ISSUER);
+        String token = buildSignedToken(INVALID_ISSUER, VALID_TOKEN_EXPIRES_AT);
 
-        assertThrows(JwtValidationException.class,
-                     () -> jwtDecoder.decode(buildSignedToken(INVALID_ISSUER, VALID_TOKEN_EXPIRES_AT)));
+        assertThrows(JwtValidationException.class, () -> jwtDecoder.decode(token));
     }
 
     @Test
@@ -160,7 +161,7 @@ class SecurityConfigurationTest {
         );
     }
 
-    private String buildSignedToken(String issuer, Instant expiresAt) throws JOSEException {
+    private String buildSignedToken(String issuer, Instant expiresAt) {
         JWTClaimsSet claims = new JWTClaimsSet.Builder()
             .issuer(issuer)
             .subject("user")
@@ -168,8 +169,12 @@ class SecurityConfigurationTest {
             .expirationTime(Date.from(expiresAt))
             .build();
         SignedJWT signedJwt = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).build(), claims);
-        signedJwt.sign(new RSASSASigner((RSAPrivateKey) RSA_KEY_PAIR.getPrivate()));
-        return signedJwt.serialize();
+        try {
+            signedJwt.sign(new RSASSASigner((RSAPrivateKey) RSA_KEY_PAIR.getPrivate()));
+            return signedJwt.serialize();
+        } catch (JOSEException e) {
+            throw new IllegalStateException("Failed to sign JWT for test", e);
+        }
     }
 
     private static KeyPair generateKeyPair() {
