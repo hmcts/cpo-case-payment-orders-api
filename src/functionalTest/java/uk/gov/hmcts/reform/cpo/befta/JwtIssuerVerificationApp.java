@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.cpo.befta;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 
 import uk.gov.hmcts.reform.cpo.security.OidcIssuerConfiguration;
 
+@Slf4j
 public final class JwtIssuerVerificationApp {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -40,7 +42,7 @@ public final class JwtIssuerVerificationApp {
             );
         }
 
-        System.out.println("Verified functional test token iss is allowed by OIDC issuer config: " + actualIssuer);
+        log.info("Verified functional test token iss is allowed by OIDC issuer config: {}", actualIssuer);
     }
 
     static void verifyIssuerAlignmentIfEnabled() {

@@ -14,7 +14,6 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.JwtValidationException;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter;
 
@@ -39,74 +38,72 @@ class SecurityConfigurationTest {
     private static final String SECONDARY_ISSUER = "https://idam-web-public.aat.platform.hmcts.net/o";
     private static final String TERTIARY_ISSUER = "http://idam-api:5000/o";
     private static final String INVALID_ISSUER = "http://unexpected-issuer";
+    private static final Instant TOKEN_ISSUED_AT = Instant.parse("2024-01-01T00:00:00Z");
+    private static final Instant VALID_TOKEN_EXPIRES_AT = Instant.parse("2099-01-01T00:00:00Z");
+    private static final Instant EXPIRED_TOKEN_EXPIRES_AT = Instant.parse("2024-01-01T01:00:00Z");
     private static final KeyPair RSA_KEY_PAIR = generateKeyPair();
 
     @Test
-    void jwtDecoderShouldApplyConfiguredIssuerValidator() throws JOSEException {
-        SecurityConfiguration securityConfiguration = securityConfiguration();
-        NimbusJwtDecoder discoveredDecoder = NimbusJwtDecoder
-            .withPublicKey((RSAPublicKey) RSA_KEY_PAIR.getPublic())
-            .build();
+    void jwtDecoderShouldAcceptJwtFromConfiguredAllowedIssuer() throws JOSEException {
+        JwtDecoder jwtDecoder = jwtDecoder(SECONDARY_ISSUER);
 
-        try (MockedStatic<JwtDecoders> jwtDecoders = mockStatic(JwtDecoders.class)) {
-            jwtDecoders.when(() -> JwtDecoders.fromOidcIssuerLocation(ISSUER_URI)).thenReturn(discoveredDecoder);
+        assertDoesNotThrow(() -> jwtDecoder.decode(buildSignedToken(SECONDARY_ISSUER, VALID_TOKEN_EXPIRES_AT)));
+    }
 
-            JwtDecoder jwtDecoder = securityConfiguration.jwtDecoder();
+    @Test
+    void jwtDecoderShouldRejectJwtFromUnexpectedIssuer() throws JOSEException {
+        JwtDecoder jwtDecoder = jwtDecoder(SECONDARY_ISSUER);
 
-            assertDoesNotThrow(() -> jwtDecoder.decode(buildSignedToken(SECONDARY_ISSUER,
-                                                                        Instant.now().plusSeconds(300))));
-            assertThrows(JwtValidationException.class,
-                         () -> jwtDecoder.decode(buildSignedToken(INVALID_ISSUER, Instant.now().plusSeconds(300))));
-            jwtDecoders.verify(() -> JwtDecoders.fromOidcIssuerLocation(ISSUER_URI));
-        }
+        assertThrows(JwtValidationException.class,
+                     () -> jwtDecoder.decode(buildSignedToken(INVALID_ISSUER, VALID_TOKEN_EXPIRES_AT)));
     }
 
     @Test
     void shouldAcceptJwtFromConfiguredIssuerWhenAllowedIssuersAreNotSet() {
-        assertFalse(validator(null).validate(buildJwt(VALID_ISSUER, Instant.now().plusSeconds(300))).hasErrors());
+        assertFalse(validator(null).validate(buildJwt(VALID_ISSUER, VALID_TOKEN_EXPIRES_AT)).hasErrors());
     }
 
     @Test
     void shouldKeepPrimaryIssuerAcceptedWhenAllowedIssuersAreConfigured() {
         assertFalse(validator(SECONDARY_ISSUER)
-                        .validate(buildJwt(VALID_ISSUER, Instant.now().plusSeconds(300)))
+                        .validate(buildJwt(VALID_ISSUER, VALID_TOKEN_EXPIRES_AT))
                         .hasErrors());
     }
 
     @Test
-    void shouldAcceptJwtFromConfirmedAllowedIssuer() {
+    void shouldAcceptJwtFromTrimmedAllowedIssuer() {
         assertFalse(validator(" " + SECONDARY_ISSUER + " ")
-                        .validate(buildJwt(SECONDARY_ISSUER, Instant.now().plusSeconds(300)))
+                        .validate(buildJwt(SECONDARY_ISSUER, VALID_TOKEN_EXPIRES_AT))
                         .hasErrors());
     }
 
     @Test
     void shouldAcceptJwtFromCommaSeparatedAllowedIssuerList() {
         assertFalse(validator(SECONDARY_ISSUER + ", " + TERTIARY_ISSUER)
-                        .validate(buildJwt(TERTIARY_ISSUER, Instant.now().plusSeconds(300)))
+                        .validate(buildJwt(TERTIARY_ISSUER, VALID_TOKEN_EXPIRES_AT))
                         .hasErrors());
     }
 
     @Test
     void shouldRejectIssuerThatOnlyPartiallyMatchesAllowedIssuer() {
         assertTrue(validator(SECONDARY_ISSUER)
-                       .validate(buildJwt(SECONDARY_ISSUER + "/extra", Instant.now().plusSeconds(300)))
+                       .validate(buildJwt(SECONDARY_ISSUER + "/extra", VALID_TOKEN_EXPIRES_AT))
                        .hasErrors());
     }
 
     @Test
     void shouldRejectJwtFromUnexpectedIssuer() {
-        assertTrue(validator("").validate(buildJwt(INVALID_ISSUER, Instant.now().plusSeconds(300))).hasErrors());
+        assertTrue(validator("").validate(buildJwt(INVALID_ISSUER, VALID_TOKEN_EXPIRES_AT)).hasErrors());
     }
 
     @Test
     void shouldRejectJwtWithoutIssuer() {
-        assertTrue(validator("").validate(buildJwtWithoutIssuer(Instant.now().plusSeconds(300))).hasErrors());
+        assertTrue(validator("").validate(buildJwtWithoutIssuer(VALID_TOKEN_EXPIRES_AT)).hasErrors());
     }
 
     @Test
     void shouldRejectExpiredJwtEvenWhenIssuerMatches() {
-        assertTrue(validator("").validate(buildJwt(VALID_ISSUER, Instant.now().minusSeconds(60))).hasErrors());
+        assertTrue(validator("").validate(buildJwt(VALID_ISSUER, EXPIRED_TOKEN_EXPIRES_AT)).hasErrors());
     }
 
     @Test
@@ -123,7 +120,7 @@ class SecurityConfigurationTest {
             .header("alg", "RS256")
             .issuer(issuer)
             .subject("user")
-            .issuedAt(expiresAt.minusSeconds(60))
+            .issuedAt(TOKEN_ISSUED_AT)
             .expiresAt(expiresAt)
             .build();
     }
@@ -132,27 +129,42 @@ class SecurityConfigurationTest {
         return Jwt.withTokenValue("token")
             .header("alg", "RS256")
             .subject("user")
-            .issuedAt(expiresAt.minusSeconds(60))
+            .issuedAt(TOKEN_ISSUED_AT)
             .expiresAt(expiresAt)
             .build();
     }
 
-    private SecurityConfiguration securityConfiguration() {
-        SecurityConfiguration securityConfiguration = new SecurityConfiguration(
+    private JwtDecoder jwtDecoder(String allowedIssuers) {
+        SecurityConfiguration securityConfiguration = securityConfiguration(allowedIssuers);
+        NimbusJwtDecoder discoveredDecoder = NimbusJwtDecoder
+            .withPublicKey((RSAPublicKey) RSA_KEY_PAIR.getPublic())
+            .build();
+
+        try (MockedStatic<JwtDecoders> jwtDecoders = mockStatic(JwtDecoders.class)) {
+            jwtDecoders.when(() -> JwtDecoders.fromOidcIssuerLocation(ISSUER_URI)).thenReturn(discoveredDecoder);
+
+            JwtDecoder jwtDecoder = securityConfiguration.jwtDecoder();
+
+            jwtDecoders.verify(() -> JwtDecoders.fromOidcIssuerLocation(ISSUER_URI));
+            return jwtDecoder;
+        }
+    }
+
+    private SecurityConfiguration securityConfiguration(String allowedIssuers) {
+        return new SecurityConfiguration(
+            ISSUER_URI,
+            VALID_ISSUER,
+            allowedIssuers,
             mock(ServiceAuthFilter.class),
             mock(JwtGrantedAuthoritiesConverter.class)
         );
-        ReflectionTestUtils.setField(securityConfiguration, "issuerUri", ISSUER_URI);
-        ReflectionTestUtils.setField(securityConfiguration, "issuerOverride", VALID_ISSUER);
-        ReflectionTestUtils.setField(securityConfiguration, "allowedIssuers", SECONDARY_ISSUER);
-        return securityConfiguration;
     }
 
     private String buildSignedToken(String issuer, Instant expiresAt) throws JOSEException {
         JWTClaimsSet claims = new JWTClaimsSet.Builder()
             .issuer(issuer)
             .subject("user")
-            .issueTime(Date.from(expiresAt.minusSeconds(60)))
+            .issueTime(Date.from(TOKEN_ISSUED_AT))
             .expirationTime(Date.from(expiresAt))
             .build();
         SignedJWT signedJwt = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).build(), claims);
