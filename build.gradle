@@ -7,7 +7,7 @@ plugins {
   id 'org.owasp.dependencycheck' version '12.2.1'
   id 'com.github.ben-manes.versions' version '0.54.0'
   id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
-  id 'org.sonarqube' version '7.3.0.8198'
+  id 'org.sonarqube' version '7.3.1.8318'
   id 'uk.gov.hmcts.java' version '0.12.68'
 }
 
@@ -262,8 +262,8 @@ configurations {
 }
 
 def versions = [
-  junit           : '6.0.3',
-  junitPlatform   : '6.0.3',
+  junit           : '6.1.0',
+  junitPlatform   : '6.1.0',
   lombok          : '1.18.46',
   mapstruct       : '1.6.3',
   lombokMapBinding: '0.2.0',
@@ -341,7 +341,7 @@ dependencies {
 
   // HMCTS dependencies
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.5'
-  implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
+  implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.4'
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
 
 
@@ -352,9 +352,9 @@ dependencies {
   implementation group: 'commons-validator', name: 'commons-validator', version: '1.10.1'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.13.0'
   implementation group: 'org.dom4j', name: 'dom4j', version: '2.2.0'
-  implementation group: 'org.hibernate', name: 'hibernate-envers', version: '7.3.1.Final'
-  implementation group: 'org.flywaydb', name: 'flyway-core', version: '12.0.3'
-  implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '12.0.3'
+  implementation group: 'org.hibernate', name: 'hibernate-envers', version: '7.4.0.Final'
+  implementation group: 'org.flywaydb', name: 'flyway-core', version: '12.8.0'
+  implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '12.8.0'
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   implementation group: 'xerces', name: 'xercesImpl', version: '2.12.2'
 
@@ -379,7 +379,7 @@ dependencies {
 
   functionalTestImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.25.4'
   functionalTestImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.6'
-  functionalTestImplementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '4.0.8'
+  functionalTestImplementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '4.0.9'
   functionalTestImplementation 'com.github.hmcts:fortify-client:1.4.10:all'
   testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.10', classifier: 'all'
   functionalTestImplementation sourceSets.main.runtimeClasspath
