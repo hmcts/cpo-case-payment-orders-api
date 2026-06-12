@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -85,6 +86,9 @@ public class BaseTest {
     public static final String IDAM_MOCK_USER_ID = "e8275d41-7f22-4ee7-8ed3-14644d6db096";
 
     private static final String EXAMPLE_REQUEST_ID = "TEST REQUEST ID";
+    private static final Instant TOKEN_ISSUED_AT = Instant.parse("2024-01-01T00:00:00Z");
+    private static final Instant VALID_TOKEN_EXPIRES_AT = Instant.parse("2099-01-01T00:00:00Z");
+    private static final Instant EXPIRED_TOKEN_EXPIRES_AT = Instant.parse("2024-01-01T01:00:00Z");
 
     @MockitoSpyBean
     @Inject
@@ -197,14 +201,14 @@ public class BaseTest {
         }
     }
 
-    private static String generateAuthToken(long ttlMillis, String issuer) throws JOSEException  {
+    private static String generateAuthToken(long ttlMillis, String issuer) throws JOSEException {
 
         JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder()
             .subject("CPO_Stub")
             .issuer(issuer)
-            .issueTime(new Date())
+            .issueTime(Date.from(TOKEN_ISSUED_AT))
             .claim(TOKEN_NAME, ACCESS_TOKEN)
-            .expirationTime(new Date(System.currentTimeMillis() + ttlMillis));
+            .expirationTime(Date.from(tokenExpiresAt(ttlMillis)));
 
         SignedJWT signedJWT = new SignedJWT(
             new JWSHeader.Builder(JWSAlgorithm.RS256)
@@ -223,9 +227,13 @@ public class BaseTest {
     private static String generateS2SToken(String serviceName, long ttlMillis) {
         return Jwts.builder()
             .setSubject(serviceName)
-            .setExpiration(new Date(System.currentTimeMillis() + ttlMillis))
+            .setExpiration(Date.from(tokenExpiresAt(ttlMillis)))
             .signWith(SignatureAlgorithm.HS256, Keys.secretKeyFor(SignatureAlgorithm.HS256))
             .compact();
+    }
+
+    private static Instant tokenExpiresAt(long ttlMillis) {
+        return ttlMillis < 0 ? EXPIRED_TOKEN_EXPIRES_AT : VALID_TOKEN_EXPIRES_AT;
     }
 
 }

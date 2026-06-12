@@ -138,10 +138,6 @@ class JwtDecoderConfigurationTest {
         return buildSignedToken(issuer, expiresAt, true);
     }
 
-    private String buildSignedTokenWithoutIssuer(Instant expiresAt) {
-        return buildSignedToken(null, expiresAt, false);
-    }
-
     private String buildSignedToken(String issuer, Instant expiresAt, boolean includeIssuer) {
         JWTClaimsSet.Builder claims = new JWTClaimsSet.Builder()
             .subject("user")
@@ -158,6 +154,10 @@ class JwtDecoderConfigurationTest {
         } catch (JOSEException e) {
             throw new IllegalStateException("Failed to sign JWT for test", e);
         }
+    }
+
+    private String buildSignedTokenWithoutIssuer(Instant expiresAt) {
+        return buildSignedToken(null, expiresAt, false);
     }
 
     private static KeyPair generateKeyPair() {
