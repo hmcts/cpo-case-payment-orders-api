@@ -13,8 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtValidationException;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +27,6 @@ import java.time.Instant;
 import java.util.Date;
 
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -52,9 +48,6 @@ class JwtIssuerValidationIT extends BaseTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private JwtDecoder jwtDecoder;
 
     @Autowired
     private CasePaymentOrdersJpaRepository casePaymentOrdersJpaRepository;
@@ -96,18 +89,6 @@ class JwtIssuerValidationIT extends BaseTest {
                             .content(createRequestBody()))
             .andExpect(status().isUnauthorized())
             .andExpect(header().string(HttpHeaders.WWW_AUTHENTICATE, startsWith("Bearer")));
-    }
-
-    @Test
-    void jwtDecoderShouldAcceptJwtFromAllowedIssuerConfiguredInSpringContext() throws Exception {
-        assertDoesNotThrow(() -> jwtDecoder.decode(validAuthToken(CONFIRMED_SECONDARY_ISSUER)));
-    }
-
-    @Test
-    void jwtDecoderShouldRejectJwtFromUnexpectedIssuerConfiguredInSpringContext() throws Exception {
-        String token = validAuthToken(UNEXPECTED_ISSUER);
-
-        assertThrows(JwtValidationException.class, () -> jwtDecoder.decode(token));
     }
 
     private String validAuthToken(String issuer) throws JOSEException {

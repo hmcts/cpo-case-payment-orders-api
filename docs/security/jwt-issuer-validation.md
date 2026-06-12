@@ -22,7 +22,7 @@ This keeps key discovery separate from the trust boundary for issuer claims.
 ## Code path
 
 - Decoder wiring: `src/main/java/uk/gov/hmcts/reform/cpo/config/SecurityConfiguration.java`
-- Validator coverage: `src/test/java/uk/gov/hmcts/reform/cpo/config/SecurityConfigurationTest.java`
+- Decoder validator coverage: `src/test/java/uk/gov/hmcts/reform/cpo/config/JwtDecoderConfigurationTest.java`
 - Integration coverage: `src/integrationTest/java/uk/gov/hmcts/reform/cpo/security/JwtIssuerValidationIT.java`
 - Integration token generation: `src/integrationTest/java/uk/gov/hmcts/reform/cpo/BaseTest.java`
 

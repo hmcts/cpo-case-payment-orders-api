@@ -8,8 +8,6 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
-import org.springframework.security.oauth2.core.OAuth2TokenValidator;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.JwtValidationException;
@@ -25,13 +23,11 @@ import java.time.Instant;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
-class SecurityConfigurationTest {
+class JwtDecoderConfigurationTest {
 
     private static final String ISSUER_URI = "http://idam-discovery/o";
     private static final String VALID_ISSUER = "http://fr-am:8080/openam/oauth2/hmcts";
@@ -44,99 +40,76 @@ class SecurityConfigurationTest {
     private static final KeyPair RSA_KEY_PAIR = generateKeyPair();
 
     @Test
-    void jwtDecoderShouldAcceptJwtFromConfiguredAllowedIssuer() {
-        JwtDecoder jwtDecoder = jwtDecoder(SECONDARY_ISSUER);
+    void shouldAcceptJwtFromConfiguredIssuerWhenAllowedIssuersAreNotSet() {
+        JwtDecoder jwtDecoder = jwtDecoder(VALID_ISSUER, null);
+        String token = buildSignedToken(VALID_ISSUER, VALID_TOKEN_EXPIRES_AT);
+
+        assertDoesNotThrow(() -> jwtDecoder.decode(token));
+    }
+
+    @Test
+    void shouldKeepPrimaryIssuerAcceptedWhenAllowedIssuersAreConfigured() {
+        JwtDecoder jwtDecoder = jwtDecoder(VALID_ISSUER, SECONDARY_ISSUER);
+        String token = buildSignedToken(VALID_ISSUER, VALID_TOKEN_EXPIRES_AT);
+
+        assertDoesNotThrow(() -> jwtDecoder.decode(token));
+    }
+
+    @Test
+    void shouldAcceptJwtFromTrimmedAllowedIssuer() {
+        JwtDecoder jwtDecoder = jwtDecoder(VALID_ISSUER, " " + SECONDARY_ISSUER + " ");
         String token = buildSignedToken(SECONDARY_ISSUER, VALID_TOKEN_EXPIRES_AT);
 
         assertDoesNotThrow(() -> jwtDecoder.decode(token));
     }
 
     @Test
-    void jwtDecoderShouldRejectJwtFromUnexpectedIssuer() {
-        JwtDecoder jwtDecoder = jwtDecoder(SECONDARY_ISSUER);
+    void shouldAcceptJwtFromCommaSeparatedAllowedIssuerList() {
+        JwtDecoder jwtDecoder = jwtDecoder(VALID_ISSUER, SECONDARY_ISSUER + ", " + TERTIARY_ISSUER);
+        String token = buildSignedToken(TERTIARY_ISSUER, VALID_TOKEN_EXPIRES_AT);
+
+        assertDoesNotThrow(() -> jwtDecoder.decode(token));
+    }
+
+    @Test
+    void shouldRejectIssuerThatOnlyPartiallyMatchesAllowedIssuer() {
+        JwtDecoder jwtDecoder = jwtDecoder(VALID_ISSUER, SECONDARY_ISSUER);
+        String token = buildSignedToken(SECONDARY_ISSUER + "/extra", VALID_TOKEN_EXPIRES_AT);
+
+        assertThrows(JwtValidationException.class, () -> jwtDecoder.decode(token));
+    }
+
+    @Test
+    void shouldRejectJwtFromUnexpectedIssuer() {
+        JwtDecoder jwtDecoder = jwtDecoder(VALID_ISSUER, "");
         String token = buildSignedToken(INVALID_ISSUER, VALID_TOKEN_EXPIRES_AT);
 
         assertThrows(JwtValidationException.class, () -> jwtDecoder.decode(token));
     }
 
     @Test
-    void shouldAcceptJwtFromConfiguredIssuerWhenAllowedIssuersAreNotSet() {
-        assertFalse(validator(null).validate(buildJwt(VALID_ISSUER, VALID_TOKEN_EXPIRES_AT)).hasErrors());
-    }
-
-    @Test
-    void shouldKeepPrimaryIssuerAcceptedWhenAllowedIssuersAreConfigured() {
-        assertFalse(validator(SECONDARY_ISSUER)
-                        .validate(buildJwt(VALID_ISSUER, VALID_TOKEN_EXPIRES_AT))
-                        .hasErrors());
-    }
-
-    @Test
-    void shouldAcceptJwtFromTrimmedAllowedIssuer() {
-        assertFalse(validator(" " + SECONDARY_ISSUER + " ")
-                        .validate(buildJwt(SECONDARY_ISSUER, VALID_TOKEN_EXPIRES_AT))
-                        .hasErrors());
-    }
-
-    @Test
-    void shouldAcceptJwtFromCommaSeparatedAllowedIssuerList() {
-        assertFalse(validator(SECONDARY_ISSUER + ", " + TERTIARY_ISSUER)
-                        .validate(buildJwt(TERTIARY_ISSUER, VALID_TOKEN_EXPIRES_AT))
-                        .hasErrors());
-    }
-
-    @Test
-    void shouldRejectIssuerThatOnlyPartiallyMatchesAllowedIssuer() {
-        assertTrue(validator(SECONDARY_ISSUER)
-                       .validate(buildJwt(SECONDARY_ISSUER + "/extra", VALID_TOKEN_EXPIRES_AT))
-                       .hasErrors());
-    }
-
-    @Test
-    void shouldRejectJwtFromUnexpectedIssuer() {
-        assertTrue(validator("").validate(buildJwt(INVALID_ISSUER, VALID_TOKEN_EXPIRES_AT)).hasErrors());
-    }
-
-    @Test
     void shouldRejectJwtWithoutIssuer() {
-        assertTrue(validator("").validate(buildJwtWithoutIssuer(VALID_TOKEN_EXPIRES_AT)).hasErrors());
+        JwtDecoder jwtDecoder = jwtDecoder(VALID_ISSUER, "");
+        String token = buildSignedTokenWithoutIssuer(VALID_TOKEN_EXPIRES_AT);
+
+        assertThrows(JwtValidationException.class, () -> jwtDecoder.decode(token));
     }
 
     @Test
     void shouldRejectExpiredJwtEvenWhenIssuerMatches() {
-        assertTrue(validator("").validate(buildJwt(VALID_ISSUER, EXPIRED_TOKEN_EXPIRES_AT)).hasErrors());
+        JwtDecoder jwtDecoder = jwtDecoder(VALID_ISSUER, "");
+        String token = buildSignedToken(VALID_ISSUER, EXPIRED_TOKEN_EXPIRES_AT);
+
+        assertThrows(JwtValidationException.class, () -> jwtDecoder.decode(token));
     }
 
     @Test
     void shouldFailFastWhenPrimaryIssuerIsBlank() {
-        assertThrows(IllegalStateException.class, () -> SecurityConfiguration.jwtValidator(" ", ""));
+        assertThrows(IllegalStateException.class, () -> jwtDecoder(" ", ""));
     }
 
-    private OAuth2TokenValidator<Jwt> validator(String allowedIssuers) {
-        return SecurityConfiguration.jwtValidator(VALID_ISSUER, allowedIssuers);
-    }
-
-    private Jwt buildJwt(String issuer, Instant expiresAt) {
-        return Jwt.withTokenValue("token")
-            .header("alg", "RS256")
-            .issuer(issuer)
-            .subject("user")
-            .issuedAt(TOKEN_ISSUED_AT)
-            .expiresAt(expiresAt)
-            .build();
-    }
-
-    private Jwt buildJwtWithoutIssuer(Instant expiresAt) {
-        return Jwt.withTokenValue("token")
-            .header("alg", "RS256")
-            .subject("user")
-            .issuedAt(TOKEN_ISSUED_AT)
-            .expiresAt(expiresAt)
-            .build();
-    }
-
-    private JwtDecoder jwtDecoder(String allowedIssuers) {
-        SecurityConfiguration securityConfiguration = securityConfiguration(allowedIssuers);
+    private JwtDecoder jwtDecoder(String primaryIssuer, String allowedIssuers) {
+        SecurityConfiguration securityConfiguration = securityConfiguration(primaryIssuer, allowedIssuers);
         NimbusJwtDecoder discoveredDecoder = NimbusJwtDecoder
             .withPublicKey((RSAPublicKey) RSA_KEY_PAIR.getPublic())
             .build();
@@ -151,10 +124,10 @@ class SecurityConfigurationTest {
         }
     }
 
-    private SecurityConfiguration securityConfiguration(String allowedIssuers) {
+    private SecurityConfiguration securityConfiguration(String primaryIssuer, String allowedIssuers) {
         return new SecurityConfiguration(
             ISSUER_URI,
-            VALID_ISSUER,
+            primaryIssuer,
             allowedIssuers,
             mock(ServiceAuthFilter.class),
             mock(JwtGrantedAuthoritiesConverter.class)
@@ -162,13 +135,23 @@ class SecurityConfigurationTest {
     }
 
     private String buildSignedToken(String issuer, Instant expiresAt) {
-        JWTClaimsSet claims = new JWTClaimsSet.Builder()
-            .issuer(issuer)
+        return buildSignedToken(issuer, expiresAt, true);
+    }
+
+    private String buildSignedTokenWithoutIssuer(Instant expiresAt) {
+        return buildSignedToken(null, expiresAt, false);
+    }
+
+    private String buildSignedToken(String issuer, Instant expiresAt, boolean includeIssuer) {
+        JWTClaimsSet.Builder claims = new JWTClaimsSet.Builder()
             .subject("user")
             .issueTime(Date.from(TOKEN_ISSUED_AT))
-            .expirationTime(Date.from(expiresAt))
-            .build();
-        SignedJWT signedJwt = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).build(), claims);
+            .expirationTime(Date.from(expiresAt));
+        if (includeIssuer) {
+            claims.issuer(issuer);
+        }
+
+        SignedJWT signedJwt = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).build(), claims.build());
         try {
             signedJwt.sign(new RSASSASigner((RSAPrivateKey) RSA_KEY_PAIR.getPrivate()));
             return signedJwt.serialize();

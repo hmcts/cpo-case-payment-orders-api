@@ -40,7 +40,7 @@ description: Use for JWT issuer validation work in cpo-case-payment-orders-api i
    local runs keep it off by default unless explicitly enabled
    Jenkins must export `OIDC_ISSUER` because Helm env alone is not visible to the verifier process.
 7. Run the narrowest relevant Gradle targets before widening scope:
-   `./gradlew test --tests uk.gov.hmcts.reform.cpo.config.SecurityConfigurationTest`
+   `./gradlew test --tests uk.gov.hmcts.reform.cpo.config.JwtDecoderConfigurationTest`
    `./gradlew integration --tests uk.gov.hmcts.reform.cpo.security.JwtIssuerValidationIT`
    `./gradlew verifyFunctionalTestJwtIssuer`
    widen to `smoke` or `functional` only after focused checks are green.
