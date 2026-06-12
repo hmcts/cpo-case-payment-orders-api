@@ -10,6 +10,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -59,12 +60,16 @@ public final class JwtIssuerVerificationApp {
 
     private static String fetchAccessToken() throws Exception {
         HttpClient httpClient = HttpClient.newHttpClient();
+        CredentialValuePair credentials = firstAvailableCredentials(List.of(
+            new CredentialVariablePair("CCD_CASEWORKER_AUTOTEST_EMAIL", "CCD_CASEWORKER_AUTOTEST_PASSWORD"),
+            new CredentialVariablePair("DEFINITION_IMPORTER_USERNAME", "DEFINITION_IMPORTER_PASSWORD")
+        ));
         String requestBody = formUrlEncoded(Map.of(
             "client_id", requireEnv("OAUTH2_CLIENT_ID"),
             "client_secret", requireEnv("OAUTH2_CLIENT_SECRET"),
             "grant_type", "password",
-            "username", requireEnv("CCD_CASEWORKER_AUTOTEST_EMAIL"),
-            "password", requireEnv("CCD_CASEWORKER_AUTOTEST_PASSWORD"),
+            "username", credentials.username(),
+            "password", credentials.password(),
             "scope", requireEnv("OAUTH2_SCOPE_VARIABLES")
         ));
 
@@ -85,6 +90,25 @@ public final class JwtIssuerVerificationApp {
             throw new IllegalStateException("IDAM token response did not contain access_token");
         }
         return accessToken.asText();
+    }
+
+    private static CredentialValuePair firstAvailableCredentials(List<CredentialVariablePair> credentialVariablePairs) {
+        for (CredentialVariablePair credentialVariablePair : credentialVariablePairs) {
+            String username = System.getenv(credentialVariablePair.usernameVariable());
+            String password = System.getenv(credentialVariablePair.passwordVariable());
+            if (username != null && !username.isBlank() && password != null && !password.isBlank()) {
+                return new CredentialValuePair(username, password);
+            }
+        }
+
+        String expectedVariables = credentialVariablePairs.stream()
+            .map(pair -> pair.usernameVariable() + "/" + pair.passwordVariable())
+            .collect(Collectors.joining(", "));
+
+        throw new IllegalStateException(
+            "No credentials available for JWT issuer verification. "
+                + "Expected one of: " + expectedVariables
+        );
     }
 
     private static String decodeIssuer(String accessToken) throws Exception {
@@ -123,5 +147,11 @@ public final class JwtIssuerVerificationApp {
             throw new IllegalStateException("Missing required environment variable: " + name);
         }
         return value;
+    }
+
+    private record CredentialVariablePair(String usernameVariable, String passwordVariable) {
+    }
+
+    private record CredentialValuePair(String username, String password) {
     }
 }
