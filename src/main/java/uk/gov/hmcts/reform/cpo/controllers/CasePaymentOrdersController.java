@@ -9,16 +9,17 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -30,12 +31,12 @@ import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.security.AuthError;
+import uk.gov.hmcts.reform.cpo.service.CaseAccessService;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 
-import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -56,10 +57,13 @@ public class CasePaymentOrdersController {
     public static final String IDS = "ids";
 
     private final CasePaymentOrdersService casePaymentOrdersService;
+    private final CaseAccessService caseAccessService;
 
 
-    public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersService) {
+    public CasePaymentOrdersController(CasePaymentOrdersService casePaymentOrdersService,
+                                       CaseAccessService caseAccessService) {
         this.casePaymentOrdersService = casePaymentOrdersService;
+        this.caseAccessService = caseAccessService;
     }
 
     @PostMapping(path = CASE_PAYMENT_ORDERS_PATH, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
@@ -111,6 +115,7 @@ public class CasePaymentOrdersController {
     @PreAuthorize("@securityUtils.hasCreatePermission()")
     public CasePaymentOrder createCasePaymentOrderRequest(@Valid @RequestBody CreateCasePaymentOrderRequest
                                                               requestPayload) {
+        caseAccessService.assertUserHasAccessToCase(requestPayload.getCaseId());
         return casePaymentOrdersService.createCasePaymentOrder(requestPayload);
     }
 
@@ -180,6 +185,9 @@ public class CasePaymentOrdersController {
             return Page.empty();
         }
         casePaymentOrderQueryFilter.validateCasePaymentOrdersFiltering();
+        ids.ifPresent(caseAccessService::assertUserHasAccessToPaymentOrderIds);
+        caseIds.ifPresent(caseAccessService::assertUserHasAccessToExistingCases);
+
         return casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter);
     }
 
@@ -239,6 +247,9 @@ public class CasePaymentOrdersController {
             .caseIds(caseIds.orElse(emptyList()))
             .build();
 
+        ids.ifPresent(caseAccessService::assertUserHasAccessToPaymentOrderIds);
+        caseIds.ifPresent(caseAccessService::assertUserHasAccessToExistingCases);
+
         casePaymentOrdersService.deleteCasePaymentOrders(casePaymentOrderQueryFilter);
     }
 
@@ -297,6 +308,7 @@ public class CasePaymentOrdersController {
     @PreAuthorize("@securityUtils.hasUpdatePermission()")
     public CasePaymentOrder updateCasePaymentOrderRequest(@Valid @RequestBody UpdateCasePaymentOrderRequest
                                                               requestPayload) {
+        caseAccessService.assertUserHasAccessToCase(requestPayload.getCaseId());
         return casePaymentOrdersService.updateCasePaymentOrder(requestPayload);
     }
 
