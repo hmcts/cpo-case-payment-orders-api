@@ -14,7 +14,7 @@ jobs:
           ref: develop
 
       - name: Push Dummy Commit to develop branch
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           skip_dirty_check: true
           commit_message: "Trigger build"
