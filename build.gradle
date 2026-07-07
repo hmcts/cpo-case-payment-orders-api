@@ -304,11 +304,11 @@ dependencyManagement {
 
 repositories {
   mavenLocal()
+  mavenCentral()
   maven {
     name = "AzureArtifacts"
     url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
   }
-  mavenCentral()
 }
 
 ext.libraries = [
@@ -333,7 +333,6 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
   implementation group: 'org.springframework.security', name: 'spring-security-web'
   implementation group: 'org.springframework.security', name: 'spring-security-config'
@@ -352,9 +351,9 @@ dependencies {
   implementation group: 'commons-validator', name: 'commons-validator', version: '1.10.1'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.13.0'
   implementation group: 'org.dom4j', name: 'dom4j', version: '2.2.0'
-  implementation group: 'org.hibernate', name: 'hibernate-envers', version: '7.4.1.Final'
-  implementation group: 'org.flywaydb', name: 'flyway-core', version: '12.8.1'
-  implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '12.8.1'
+  implementation group: 'org.hibernate', name: 'hibernate-envers', version: '7.4.2.Final'
+  implementation group: 'org.flywaydb', name: 'flyway-core', version: '12.9.0'
+  implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '12.9.0'
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   implementation group: 'xerces', name: 'xercesImpl', version: '2.12.2'
 
@@ -374,7 +373,7 @@ dependencies {
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
-  
+
   integrationTestImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
 
   functionalTestImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.25.4'
