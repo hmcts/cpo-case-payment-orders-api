@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.annotation.Value;
 import static org.mockito.Mockito.verify;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -82,21 +84,34 @@ public class BaseTest {
     public static final String IDAM_MOCK_USER_ID = "e8275d41-7f22-4ee7-8ed3-14644d6db096";
 
     private static final String EXAMPLE_REQUEST_ID = "TEST REQUEST ID";
+    private static final Instant TOKEN_ISSUED_AT = Instant.parse("2024-01-01T00:00:00Z");
+    private static final Instant VALID_TOKEN_EXPIRES_AT = Instant.parse("2099-01-01T00:00:00Z");
+    private static final Instant EXPIRED_TOKEN_EXPIRES_AT = Instant.parse("2024-01-01T01:00:00Z");
 
     @MockitoSpyBean
     @Inject
     protected AuditRepository auditRepository;
 
-    public static HttpHeaders createHttpHeaders(String serviceName) throws JOSEException {
+    @Value("${oidc.issuer}")
+    private String oidcIssuer;
+
+    public HttpHeaders createHttpHeaders(String serviceName) throws JOSEException {
         return createHttpHeaders(AUTH_TOKEN_TTL, serviceName, AUTH_TOKEN_TTL);
     }
 
-    public static HttpHeaders createHttpHeaders(long authTtlMillis,
-                                                String serviceName,
-                                                long s2sAuthTtlMillis) throws JOSEException {
+    public HttpHeaders createHttpHeaders(long authTtlMillis,
+                                         String serviceName,
+                                         long s2sAuthTtlMillis) throws JOSEException {
+        return createHttpHeaders(authTtlMillis, serviceName, s2sAuthTtlMillis, testOidcIssuer());
+    }
+
+    public HttpHeaders createHttpHeaders(long authTtlMillis,
+                                         String serviceName,
+                                         long s2sAuthTtlMillis,
+                                         String authIssuer) throws JOSEException {
         HttpHeaders headers = new HttpHeaders();
         // :: IDAM OAuth2 token
-        String authToken = BEARER + generateAuthToken(authTtlMillis);
+        String authToken = BEARER + generateAuthToken(authTtlMillis, authIssuer);
         headers.add(AUTHORIZATION, authToken);
         // :: S2S authentication token
         String s2SToken = generateS2SToken(serviceName, s2sAuthTtlMillis);
@@ -184,13 +199,14 @@ public class BaseTest {
         }
     }
 
-    private static String generateAuthToken(long ttlMillis) throws JOSEException  {
+    private static String generateAuthToken(long ttlMillis, String issuer) throws JOSEException {
 
         JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder()
             .subject("CPO_Stub")
-            .issueTime(new Date())
+            .issuer(issuer)
+            .issueTime(Date.from(TOKEN_ISSUED_AT))
             .claim(TOKEN_NAME, ACCESS_TOKEN)
-            .expirationTime(new Date(System.currentTimeMillis() + ttlMillis));
+            .expirationTime(Date.from(tokenExpiresAt(ttlMillis)));
 
         SignedJWT signedJWT = new SignedJWT(
             new JWSHeader.Builder(JWSAlgorithm.RS256)
@@ -202,12 +218,20 @@ public class BaseTest {
         return signedJWT.serialize();
     }
 
+    private String testOidcIssuer() {
+        return oidcIssuer;
+    }
+
     private static String generateS2SToken(String serviceName, long ttlMillis) {
         return Jwts.builder()
             .setSubject(serviceName)
-            .setExpiration(new Date(System.currentTimeMillis() + ttlMillis))
+            .setExpiration(Date.from(tokenExpiresAt(ttlMillis)))
             .signWith(SignatureAlgorithm.HS256, Keys.secretKeyFor(SignatureAlgorithm.HS256))
             .compact();
+    }
+
+    private static Instant tokenExpiresAt(long ttlMillis) {
+        return ttlMillis < 0 ? EXPIRED_TOKEN_EXPIRES_AT : VALID_TOKEN_EXPIRES_AT;
     }
 
 }
