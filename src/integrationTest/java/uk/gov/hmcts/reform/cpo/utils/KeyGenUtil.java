@@ -6,19 +6,24 @@ import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 
 public class KeyGenUtil {
 
-    private static RSAKey rsaJWK;
     private static final String KEY_ID = "23456789";
+    private static final RSAKey RSA_JWK = generateKey();
 
     private KeyGenUtil() {
     }
 
-    public static RSAKey getRsaJWK() throws JOSEException {
-        if (rsaJWK == null) {
-            rsaJWK = new RSAKeyGenerator(2048)
+    public static RSAKey getRsaJWK() {
+        return RSA_JWK;
+    }
+
+    private static RSAKey generateKey() {
+        try {
+            return new RSAKeyGenerator(2048)
                 .keyID(KEY_ID)
                 .generate();
+        } catch (JOSEException exception) {
+            throw new IllegalStateException("Unable to generate integration-test RSA key", exception);
         }
-        return rsaJWK;
     }
 
 }
