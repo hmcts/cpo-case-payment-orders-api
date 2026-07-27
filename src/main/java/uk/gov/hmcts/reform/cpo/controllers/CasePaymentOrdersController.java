@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cpo.controllers;
 
-import com.microsoft.applicationinsights.core.dependencies.google.common.collect.Lists;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -36,6 +35,7 @@ import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
 import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 
 import jakarta.validation.Valid;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -301,7 +301,7 @@ public class CasePaymentOrdersController {
     }
 
     public static List<String> buildOptionalIds(Optional<List<String>> optionalIds) {
-        return optionalIds.orElseGet(Lists::newArrayList);
+        return optionalIds.orElseGet(ArrayList::new);
     }
 
 }

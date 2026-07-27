@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.cpo.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.hibernate.envers.RevisionType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -149,7 +149,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                 .andReturn();
 
             UUID id = UUID.fromString(
-                objectMapper.readTree(result.getResponse().getContentAsString()).get("id").asText()
+                objectMapper.readTree(result.getResponse().getContentAsString()).get("id").stringValue()
             );
             verifyDbCpoValues(id, createCasePaymentOrderRequest, beforeCreateTimestamp);
             verifyDbCpoAuditValues(id, createCasePaymentOrderRequest, beforeCreateTimestamp);
@@ -840,6 +840,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             // GIVEN
             CasePaymentOrderEntity originalEntity =
                 casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
+            LocalDateTime originalCreatedTimestamp = originalEntity.getCreatedTimestamp();
             UpdateCasePaymentOrderRequest request = new UpdateCasePaymentOrderRequest(
                 originalEntity.getId().toString(),
                 uidService.generateUID(),
@@ -857,8 +858,8 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             // THEN
             result.andExpect(status().isAccepted());
             verifyUpdateResponse(request, result);
-            verifyDbCpoValues(request, originalEntity.getCreatedTimestamp());
-            verifyDbCpoAuditValues(request, originalEntity.getCreatedTimestamp());
+            verifyDbCpoValues(request, originalCreatedTimestamp);
+            verifyDbCpoAuditValues(request, originalCreatedTimestamp);
             verifyUpdateLogAuditValues(request, result);
         }
 
@@ -1189,7 +1190,11 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             assertEquals(request.getOrderReference(), updatedEntity.get().getOrderReference());
             assertEquals(IDAM_MOCK_USER_ID, updatedEntity.get().getCreatedBy());
             assertNotNull(updatedEntity.get().getCreatedTimestamp());
-            assertTrue(previousCreatedTimestamp.isBefore(updatedEntity.get().getCreatedTimestamp()));
+            assertTrue(
+                previousCreatedTimestamp.isBefore(updatedEntity.get().getCreatedTimestamp()),
+                () -> "Expected updated timestamp " + updatedEntity.get().getCreatedTimestamp()
+                    + " to be after " + previousCreatedTimestamp
+            );
             assertEquals(HISTORY_EXISTS_UPDATED, updatedEntity.get().isHistoryExists());
         }
 

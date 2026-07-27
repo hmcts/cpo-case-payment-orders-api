@@ -36,7 +36,7 @@ class HttpErrorTest implements BaseTest {
 
         // GIVEN
         RuntimeException ex = new RuntimeException();
-        HttpStatus status = HttpStatus.I_AM_A_TEAPOT;
+        HttpStatus status = HttpStatus.NOT_ACCEPTABLE;
 
         // WHEN
         HttpError<String> httpError = new HttpError<>(ex, CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH, status);
@@ -132,18 +132,18 @@ class HttpErrorTest implements BaseTest {
         }
     }
 
-    @ResponseStatus(code = HttpStatus.I_AM_A_TEAPOT)
+    @ResponseStatus(code = HttpStatus.NOT_ACCEPTABLE)
     private static class TestResponseStatusWithCodeException extends ApiException {
-        public static final HttpStatus CODE = HttpStatus.I_AM_A_TEAPOT;
+        public static final HttpStatus CODE = HttpStatus.NOT_ACCEPTABLE;
 
         public TestResponseStatusWithCodeException(String message) {
             super(message);
         }
     }
 
-    @ResponseStatus(value = HttpStatus.I_AM_A_TEAPOT)
+    @ResponseStatus(value = HttpStatus.NOT_ACCEPTABLE)
     private static class TestResponseStatusWithValueException extends ApiException {
-        public static final HttpStatus VALUE = HttpStatus.I_AM_A_TEAPOT;
+        public static final HttpStatus VALUE = HttpStatus.NOT_ACCEPTABLE;
 
         public TestResponseStatusWithValueException(String message) {
             super(message);

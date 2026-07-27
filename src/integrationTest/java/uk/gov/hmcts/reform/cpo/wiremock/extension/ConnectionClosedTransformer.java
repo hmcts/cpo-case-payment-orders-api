@@ -1,15 +1,13 @@
 package uk.gov.hmcts.reform.cpo.wiremock.extension;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
-import com.github.tomakehurst.wiremock.common.FileSource;
-import com.github.tomakehurst.wiremock.extension.Parameters;
-import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformer;
-import com.github.tomakehurst.wiremock.http.Request;
+import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformerV2;
 import com.github.tomakehurst.wiremock.http.ResponseDefinition;
+import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
 import org.springframework.http.HttpHeaders;
 
 // Same issue as here https://github.com/tomakehurst/wiremock/issues/97
-public class ConnectionClosedTransformer extends ResponseDefinitionTransformer {
+public class ConnectionClosedTransformer implements ResponseDefinitionTransformerV2 {
 
     @Override
     public String getName() {
@@ -17,9 +15,8 @@ public class ConnectionClosedTransformer extends ResponseDefinitionTransformer {
     }
 
     @Override
-    public ResponseDefinition transform(Request request, ResponseDefinition responseDefinition,
-                                        FileSource files, Parameters parameters) {
-        return ResponseDefinitionBuilder.like(responseDefinition)
+    public ResponseDefinition transform(ServeEvent serveEvent) {
+        return ResponseDefinitionBuilder.like(serveEvent.getResponseDefinition())
             .withHeader(HttpHeaders.CONNECTION, "close")
             .build();
     }

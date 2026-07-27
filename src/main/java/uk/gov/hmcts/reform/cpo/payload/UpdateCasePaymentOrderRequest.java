@@ -15,7 +15,7 @@ public class UpdateCasePaymentOrderRequest extends BaseCasePaymentOrderRequest {
 
     @NotEmpty(message = ValidationError.ID_REQUIRED)
     @ValidCpoId
-    @Schema(name = "Case Payment Order ID to update", required = true,
+    @Schema(name = "Case Payment Order ID to update", requiredMode = Schema.RequiredMode.REQUIRED,
         example = "77d30e7f-ead9-4529-a499-6bf8b0f2d08e")
     private final String id;
 

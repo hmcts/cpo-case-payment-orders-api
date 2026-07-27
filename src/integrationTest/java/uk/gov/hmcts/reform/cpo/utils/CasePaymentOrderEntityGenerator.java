@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cpo.utils;
 
-import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cpo.data.CasePaymentOrderEntity;
@@ -10,8 +9,9 @@ import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class CasePaymentOrderEntityGenerator {
@@ -33,12 +33,13 @@ public class CasePaymentOrderEntityGenerator {
 
         for (int i = 0; i < numberToGenerate; i++) {
             CasePaymentOrder casePaymentOrder = CasePaymentOrder.builder()
-                .action("Action " + RandomUtils.nextInt())
+                .action("Action " + ThreadLocalRandom.current().nextInt())
                 .caseId(useSameCaseId ? caseId : Long.parseLong(generateUniqueCaseId()))
-                .createdBy("Created by " + Arrays.toString(RandomUtils.nextBytes(2)))
-                .orderReference("2021-" + RandomUtils.nextLong(1000000000000L, 9999999999999L))
+                .createdBy("Created by " + UUID.randomUUID())
+                .orderReference("2021-" + ThreadLocalRandom.current()
+                    .nextLong(1000000000000L, 9999999999999L))
                 .createdTimestamp(LocalDateTime.now())
-                .responsibleParty("ResponsibleParty" + Arrays.toString(RandomUtils.nextBytes(2)))
+                .responsibleParty("ResponsibleParty" + UUID.randomUUID())
                 .historyExists(false)
                 .build();
 

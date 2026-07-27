@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/s2s/health"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "status": "UP"
+    }
+  }
+}

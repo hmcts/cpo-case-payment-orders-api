@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cpo.repository;
 
-import com.microsoft.applicationinsights.core.dependencies.apachecommons.lang3.RandomStringUtils;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.RevisionType;
@@ -17,6 +16,7 @@ import uk.gov.hmcts.reform.cpo.service.mapper.CasePaymentOrderMapper;
 import jakarta.persistence.EntityManagerFactory;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,7 +48,7 @@ class CasePaymentOrdersAuditTest extends BaseTest {
     void setUp() {
         CasePaymentOrderEntity casePaymentOrderEntityToBePersisted =
                 casePaymentOrderMapper.toEntity(CasePaymentOrder.builder()
-                .orderReference(RandomStringUtils.random(10, true, true))
+                .orderReference(UUID.randomUUID().toString().replace("-", "").substring(0, 10))
                 .action(ACTION_VALUE)
                 .caseId(new Random().nextLong())
                 .createdBy("gsullivan")

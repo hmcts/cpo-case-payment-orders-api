@@ -122,18 +122,18 @@ export TEST_URL=http://localhost:4457
 >
 
 ### Code quality checks
-We use [checkstyle](http://checkstyle.sourceforge.net/) and [PMD](https://pmd.github.io/).
+We use [Checkstyle](https://checkstyle.org/).
 
 To run all checks execute the following command:
 
 ```bash
-./gradlew clean checkstyleMain checkstyleTest checkstyleIntegrationTest pmdMain pmdTest pmdIntegrationTest
+./gradlew clean checkstyleMain checkstyleTest checkstyleIntegrationTest checkstyleFunctionalTest
 ```
 
 To run all checks alongside the unit tests execute the following command:
 
 ```bash
-./gradlew checks
+./gradlew check
 ```
 
 or to run all checks, all tests and generate a code coverage report execute the following command:

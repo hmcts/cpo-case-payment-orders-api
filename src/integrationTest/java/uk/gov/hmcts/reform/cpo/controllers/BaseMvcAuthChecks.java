@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.cpo.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -364,7 +364,7 @@ class BaseMvcAuthChecks extends BaseTest {
 
         MockHttpServletRequestBuilder getHappyPathRequestBuilder(CasePaymentOrderEntityGenerator entityGenerator,
                                                                  ObjectMapper objectMapper)
-            throws JsonProcessingException;
+            throws JacksonException;
 
         String getHappyPathServiceName();
 

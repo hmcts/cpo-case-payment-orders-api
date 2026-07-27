@@ -1,13 +1,11 @@
 package uk.gov.hmcts.reform.cpo.auditlog;
 
-import com.microsoft.applicationinsights.core.dependencies.google.common.collect.Lists;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.PredicateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,19 +27,19 @@ public class AuditLogFormatter {
     }
 
     public String format(AuditEntry entry) {
-        List<String> formattedPairs = Lists.newArrayList(
-            getPair("dateTime", entry.getDateTime()),
-            getPair("operationType", entry.getOperationType()),
-            getPair("idamId", entry.getIdamId()),
-            getPair("invokingService", entry.getInvokingService()),
-            getPair("endpointCalled", entry.getHttpMethod() + " " + entry.getRequestPath()),
-            getPair("operationalOutcome", String.valueOf(entry.getHttpStatus())),
-            getPair("cpoId", commaSeparatedList(entry.getCpoIds())),
-            getPair("caseId", commaSeparatedList(entry.getCaseIds())),
-            getPair("X-Request-ID", entry.getRequestId())
-        );
-
-        CollectionUtils.filter(formattedPairs, PredicateUtils.notNullPredicate());
+        List<String> formattedPairs = Stream.of(
+                getPair("dateTime", entry.getDateTime()),
+                getPair("operationType", entry.getOperationType()),
+                getPair("idamId", entry.getIdamId()),
+                getPair("invokingService", entry.getInvokingService()),
+                getPair("endpointCalled", entry.getHttpMethod() + " " + entry.getRequestPath()),
+                getPair("operationalOutcome", String.valueOf(entry.getHttpStatus())),
+                getPair("cpoId", commaSeparatedList(entry.getCpoIds())),
+                getPair("caseId", commaSeparatedList(entry.getCaseIds())),
+                getPair("X-Request-ID", entry.getRequestId())
+            )
+            .filter(Objects::nonNull)
+            .toList();
 
         return TAG + " " + String.join(COMMA, formattedPairs);
     }

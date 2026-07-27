@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.cpo.security;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -163,9 +161,9 @@ class SecurityUtilsTest implements BaseTest {
 
     private static String generateDummyS2SToken(String serviceName) {
         return Jwts.builder()
-                .setSubject(serviceName)
-                .setIssuedAt(new Date())
-                .signWith(SignatureAlgorithm.HS256, Keys.secretKeyFor(SignatureAlgorithm.HS256))
+                .subject(serviceName)
+                .issuedAt(new Date())
+                .signWith(Jwts.SIG.HS256.key().build())
                 .compact();
     }
 
