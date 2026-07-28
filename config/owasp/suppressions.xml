@@ -10,41 +10,4 @@
     <cve>CVE-2026-54428</cve>
   </suppress>
 
-  <suppress until="2026-08-31Z">
-    <notes><![CDATA[
-      Temporary, version-specific suppression pending adoption of Jackson 2.21.5.
-      The vulnerable combination of per-property JsonIgnoreProperties and
-      ACCEPT_CASE_INSENSITIVE_PROPERTIES is not used by this application.
-    ]]></notes>
-    <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@2\.21\.4$</packageUrl>
-    <cve>CVE-2026-54515</cve>
-  </suppress>
-
-  <suppress until="2026-08-31Z">
-    <notes><![CDATA[
-      Temporary, version-specific suppression pending adoption of Log4j 2.25.5.
-      Log4j API is present only through the SLF4J-to-Logback bridge; this application
-      does not use MapMessage JSON serialization or JsonTemplateLayout.
-    ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.apache\.logging\.log4j/log4j-api@2\.25\.4$</packageUrl>
-    <cve>CVE-2026-49844</cve>
-  </suppress>
-
-  <suppress until="2026-08-31Z">
-    <notes><![CDATA[
-      Temporary, version-specific suppressions pending adoption of Tomcat 11.0.24.
-      The application does not configure the affected FFM connector, RewriteValve,
-      EncryptInterceptor, default-servlet web.xml constraints, or bundled examples.
-      CVE-2026-55276 concerns diagnostic logging of effective web.xml only.
-    ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-(core|websocket)@11\.0\.22$</packageUrl>
-    <cve>CVE-2026-53434</cve>
-    <cve>CVE-2026-55276</cve>
-    <cve>CVE-2026-59083</cve>
-    <cve>CVE-2026-59084</cve>
-    <cve>CVE-2026-53404</cve>
-    <cve>CVE-2026-55955</cve>
-    <cve>CVE-2026-55956</cve>
-    <cve>CVE-2026-50229</cve>
-  </suppress>
 </suppressions>

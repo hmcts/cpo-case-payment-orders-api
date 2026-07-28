@@ -13,6 +13,11 @@ plugins {
 
 group = 'uk.gov.hmcts.reform'
 
+// Remove these overrides when Spring Boot manages the same or newer fixed versions.
+ext['jackson-2-bom.version'] = '2.21.5'
+ext['log4j2.version'] = '2.25.5'
+ext['tomcat.version'] = '11.0.24'
+
 java {
   toolchain {
     languageVersion = JavaLanguageVersion.of(21)
