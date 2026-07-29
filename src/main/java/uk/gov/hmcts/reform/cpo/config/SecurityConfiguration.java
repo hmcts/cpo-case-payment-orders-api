@@ -21,7 +21,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter;
 
-import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
@@ -80,8 +79,7 @@ public class SecurityConfiguration {
             .authorizeHttpRequests((authHttp) -> authHttp.anyRequest().authenticated())
             .oauth2ResourceServer((oauth2) ->
                                       oauth2.jwt((jwt) ->
-                                                     jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)))
-            .oauth2Client(withDefaults());
+                                                     jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)));
         return http.build();
     }
 

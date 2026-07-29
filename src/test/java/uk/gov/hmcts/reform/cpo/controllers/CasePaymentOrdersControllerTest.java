@@ -11,7 +11,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
@@ -24,7 +23,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import uk.gov.hmcts.reform.BaseTest;
-import uk.gov.hmcts.reform.TestIdamConfiguration;
 import uk.gov.hmcts.reform.cpo.config.AuditConfiguration;
 import uk.gov.hmcts.reform.cpo.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.cpo.domain.CasePaymentOrder;
@@ -82,7 +80,6 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         excludeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes =
             {SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class, AuditConfiguration.class}))
     @AutoConfigureMockMvc(addFilters = false)
-    @ImportAutoConfiguration(TestIdamConfiguration.class)
     static class BaseMvcTest {
 
         @Autowired
