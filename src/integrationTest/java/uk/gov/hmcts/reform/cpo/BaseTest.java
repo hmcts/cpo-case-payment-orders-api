@@ -8,9 +8,10 @@ import org.apache.commons.lang3.StringUtils;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.mockito.ArgumentCaptor;
 import static org.mockito.Mockito.verify;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.wiremock.spring.ConfigureWireMock;
+import org.wiremock.spring.EnableWireMock;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpHeaders;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import org.springframework.http.HttpStatus;
@@ -30,8 +31,6 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import jakarta.inject.Inject;
 import uk.gov.hmcts.reform.cpo.auditlog.AuditEntry;
 import uk.gov.hmcts.reform.cpo.auditlog.AuditOperationType;
@@ -41,12 +40,24 @@ import static uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter.TO
 import static uk.gov.hmcts.reform.cpo.security.SecurityUtils.BEARER;
 import static uk.gov.hmcts.reform.cpo.security.SecurityUtils.SERVICE_AUTHORIZATION;
 import uk.gov.hmcts.reform.cpo.utils.KeyGenUtil;
+import uk.gov.hmcts.reform.cpo.wiremock.extension.ConnectionClosedTransformer;
+import uk.gov.hmcts.reform.cpo.wiremock.extension.DynamicOAuthJwkSetResponseTransformer;
+import uk.gov.hmcts.reform.cpo.wiremock.extension.DynamicS2sDetailsResponseTransformer;
 
 @SpringBootTest(classes = {
     Application.class
 })
 @AutoConfigureMockMvc() // NB: don't disable filters as they are needed to test authentication is enabled on endpoints
-@AutoConfigureWireMock(port = 0, stubs = "classpath:/wiremock-stubs")
+@EnableWireMock(@ConfigureWireMock(
+    port = 0,
+    portProperties = "wiremock.server.port",
+    filesUnderClasspath = "wiremock-stubs",
+    extensions = {
+        ConnectionClosedTransformer.class,
+        DynamicS2sDetailsResponseTransformer.class,
+        DynamicOAuthJwkSetResponseTransformer.class
+    }
+    ))
 @ActiveProfiles("itest")
 @SuppressWarnings({"squid:S2187"})
 public class BaseTest {
@@ -204,9 +215,9 @@ public class BaseTest {
 
     private static String generateS2SToken(String serviceName, long ttlMillis) {
         return Jwts.builder()
-            .setSubject(serviceName)
-            .setExpiration(new Date(System.currentTimeMillis() + ttlMillis))
-            .signWith(SignatureAlgorithm.HS256, Keys.secretKeyFor(SignatureAlgorithm.HS256))
+            .subject(serviceName)
+            .expiration(new Date(System.currentTimeMillis() + ttlMillis))
+            .signWith(Jwts.SIG.HS256.key().build())
             .compact();
     }
 

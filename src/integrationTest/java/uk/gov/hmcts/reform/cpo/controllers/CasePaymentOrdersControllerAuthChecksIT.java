@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.cpo.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -148,7 +148,7 @@ class CasePaymentOrdersControllerAuthChecksIT extends BaseMvcAuthChecks implemen
         @Override
         public MockHttpServletRequestBuilder getHappyPathRequestBuilder(CasePaymentOrderEntityGenerator entityGenerator,
                                                                         ObjectMapper objectMapper)
-            throws JsonProcessingException {
+            throws JacksonException {
 
             CreateCasePaymentOrderRequest createCasePaymentOrderRequest =
                 new CreateCasePaymentOrderRequest(entityGenerator.generateUniqueCaseId(),
@@ -192,7 +192,7 @@ class CasePaymentOrdersControllerAuthChecksIT extends BaseMvcAuthChecks implemen
         @Override
         public MockHttpServletRequestBuilder getHappyPathRequestBuilder(CasePaymentOrderEntityGenerator entityGenerator,
                                                                         ObjectMapper objectMapper)
-            throws JsonProcessingException {
+            throws JacksonException {
 
             CasePaymentOrderEntity originalEntity = entityGenerator.generateAndSaveEntities(1).get(0);
 

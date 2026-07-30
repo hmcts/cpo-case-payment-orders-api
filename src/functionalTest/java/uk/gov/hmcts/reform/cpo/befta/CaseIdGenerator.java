@@ -20,7 +20,7 @@ public class CaseIdGenerator {
     }
 
     public String generateInvalidCaseReference() {
-        return RandomStringUtils.randomNumeric(16);
+        return RandomStringUtils.secure().nextNumeric(16);
     }
 
     /**
@@ -34,7 +34,7 @@ public class CaseIdGenerator {
 
 
     private String genRandomFourNumbers() {
-        return RandomStringUtils.randomNumeric(4);
+        return RandomStringUtils.secure().nextNumeric(4);
     }
 
     private int getCheckDigit(String timestamp, String randomFour) {

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.method.HandlerMethod;
@@ -13,7 +14,6 @@ import uk.gov.hmcts.reform.BaseTest;
 import uk.gov.hmcts.reform.cpo.auditlog.aop.AuditContext;
 import uk.gov.hmcts.reform.cpo.auditlog.aop.AuditContextHolder;
 import uk.gov.hmcts.reform.cpo.config.AuditConfiguration;
-import wiremock.org.eclipse.jetty.http.HttpStatus;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -25,8 +25,8 @@ import static org.springframework.test.util.AssertionErrors.assertNull;
 
 class AuditInterceptorTest implements BaseTest {
 
-    private static final int STATUS_HIDDEN = HttpStatus.IM_A_TEAPOT_418;
-    private static final int STATUS_NOT_HIDDEN = HttpStatus.OK_200;
+    private static final int STATUS_HIDDEN = HttpStatus.NOT_ACCEPTABLE.value();
+    private static final int STATUS_NOT_HIDDEN = HttpStatus.OK.value();
     private static final String METHOD = "GET";
     private static final String REQUEST_URI = "/Test-URI";
 

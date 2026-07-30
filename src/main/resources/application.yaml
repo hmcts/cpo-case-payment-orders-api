@@ -32,11 +32,6 @@ management:
       enabled: false
 
 spring:
-  #CCD-3509 CVE-2021-22044 spring.mvc.pathmatch.matching-strategy = ant_path_matcher
-  #required to fix null pointers in integration tests, conflict in Springfox after Springboot 2.6.10 upgrade
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
   application:
     name: Case Payment Orders
   banner:
@@ -50,8 +45,6 @@ spring:
     import: "optional:configtree:/mnt/secrets/cpo/"
   jackson:
     property-naming-strategy: SNAKE_CASE
-  main:
-    allow-bean-definition-overriding: true
   cache:
     cache-names: userInfoCache
     caffeine:
@@ -70,8 +63,6 @@ spring:
     password: ${CPO_CASE_PAYMENT_ORDERS_DB_PASSWORD:cpo}
     type: com.zaxxer.hikari.HikariDataSource
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    database: postgresql
     show-sql: false
     hibernate:
       ddl-auto: none
@@ -89,7 +80,6 @@ spring:
 
   flyway:
     out-of-order: true
-    ignoreM-migration-patterns: true
   security:
     oauth2:
       client:
@@ -106,10 +96,6 @@ idam:
     services: ${CPO_S2S_AUTHORISED_SERVICES:xui_webapp,payment_app}
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
-
-azure:
-  application-insights:
-    instrumentation-key: ${cpo.AppInsightsInstrumentationKey:00000000-0000-0000-0000-000000000000}
 
 s2s:
   authorizations:

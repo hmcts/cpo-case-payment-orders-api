@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cpo.repository;
 
-import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,7 +46,7 @@ class CasePaymentOrdersRepositoryImplTest {
 
     private static final List<UUID> UUIDS = List.of(UUID.randomUUID(), UUID.randomUUID());
 
-    private static final List<Long> CASE_IDS = List.of(RandomUtils.nextLong(), RandomUtils.nextLong());
+    private static final List<Long> CASE_IDS = List.of(123L, 456L);
 
     @Test
     void testDeleteByUuids() {
@@ -131,7 +130,7 @@ class CasePaymentOrdersRepositoryImplTest {
                 .thenReturn(true);
         when(casePaymentOrdersJpaRepository.deleteByCaseIdIsIn(anyList())).thenReturn(3);
 
-        List<Long> caseIdToDelete = List.of(RandomUtils.nextLong());
+        List<Long> caseIdToDelete = List.of(789L);
         casePaymentOrdersRepository.deleteByCaseIds(caseIdToDelete);
 
         verify(casePaymentOrdersJpaRepository).deleteByCaseIdIsIn(casePaymentOrderCaseIdCaptor.capture());
