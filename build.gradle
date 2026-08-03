@@ -296,7 +296,7 @@ dependencies {
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.4'
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: versions.appInsights
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: versions.appInsights
-  implementation group: 'commons-validator', name: 'commons-validator', version: '1.10.1'
+  implementation group: 'commons-validator', name: 'commons-validator', version: '1.11.0'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.13.0'
   implementation group: 'org.dom4j', name: 'dom4j', version: '2.2.0'
   implementation group: 'org.hibernate', name: 'hibernate-envers', version: '7.4.5.Final'
