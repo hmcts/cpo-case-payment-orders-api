@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.cpo.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.cpo.service.CaseAccessService;
 import uk.gov.hmcts.reform.cpo.service.impl.CasePaymentOrdersServiceImpl;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -44,6 +45,9 @@ class RestExceptionHandlerTest implements BaseTest {
 
     @MockitoBean
     protected CasePaymentOrdersServiceImpl service;
+
+    @MockitoBean
+    protected CaseAccessService caseAccessService;
 
 
     @Autowired

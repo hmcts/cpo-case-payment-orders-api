@@ -3,8 +3,15 @@ idam:
     url: http://localhost:${wiremock.server.port:5000}
   s2s-auth:
     url: http://localhost:${wiremock.server.port:5000}/s2s
+    microservice: cpo_case_payment_orders_api
+    totp-secret: test-secret
+
   s2s-authorised:
     services: test_create_service,test_read_service,test_update_service,test_delete_service,test_crud_service
+
+ccd:
+  data-store:
+    url: http://localhost:${wiremock.server.port:5000}
 
 spring:
   security:

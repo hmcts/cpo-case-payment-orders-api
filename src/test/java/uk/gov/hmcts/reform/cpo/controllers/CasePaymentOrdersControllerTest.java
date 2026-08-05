@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrderQueryFilter;
 import uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.cpo.service.CaseAccessService;
 import uk.gov.hmcts.reform.cpo.service.CasePaymentOrdersService;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 
@@ -78,7 +79,8 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
     @WebMvcTest(controllers = CasePaymentOrdersController.class,
         includeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes = MapperConfig.class),
         excludeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes =
-            {SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class, AuditConfiguration.class}))
+            {SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class, AuditConfiguration.class}),
+        properties = "ccd.data-store.url=http://localhost")
     @AutoConfigureMockMvc(addFilters = false)
     static class BaseMvcTest {
 
@@ -87,6 +89,9 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
 
         @MockitoBean
         protected CasePaymentOrdersService casePaymentOrdersService;
+
+        @MockitoBean
+        protected CaseAccessService caseAccessService;
 
         @Autowired
         protected ObjectMapper objectMapper;
@@ -115,7 +120,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             given(casePaymentOrdersService.createCasePaymentOrder(createCasePaymentOrderRequest))
                 .willReturn(casePaymentOrder);
             CasePaymentOrdersController controller = new CasePaymentOrdersController(
-                casePaymentOrdersService
+                casePaymentOrdersService, caseAccessService
             );
             CasePaymentOrder response = controller.createCasePaymentOrderRequest(createCasePaymentOrderRequest);
             assertThat(response).isNotNull();
@@ -155,6 +160,20 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
                     .andExpect(content().string(containsString("Order Reference has invalid format.")));
         }
 
+        @DisplayName("should check user access before creating case payment order")
+        @Test
+        void shouldCheckUserAccessBeforeCreate() {
+            given(casePaymentOrdersService.createCasePaymentOrder(createCasePaymentOrderRequest))
+                .willReturn(casePaymentOrder);
+
+            CasePaymentOrdersController controller =
+                new CasePaymentOrdersController(casePaymentOrdersService, caseAccessService);
+
+            controller.createCasePaymentOrderRequest(createCasePaymentOrderRequest);
+
+            verify(caseAccessService).assertUserHasAccessToCase(createCasePaymentOrderRequest.getCaseId());
+        }
+
     }
 
 
@@ -181,13 +200,28 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         void directCallHappyPath() {
 
             // GIVEN
-            CasePaymentOrdersController controller = new CasePaymentOrdersController(casePaymentOrdersService);
+            CasePaymentOrdersController controller = new CasePaymentOrdersController(casePaymentOrdersService,
+                                                                                     caseAccessService);
 
             // WHEN
             CasePaymentOrder response = controller.updateCasePaymentOrderRequest(updateCasePaymentOrderRequest);
 
             // THEN
             assertThat(response).isNotNull().isEqualTo(casePaymentOrder);
+        }
+
+        @DisplayName("should check user access before updating case payment order")
+        @Test
+        void shouldCheckUserAccessBeforeUpdate() {
+            given(casePaymentOrdersService.updateCasePaymentOrder(updateCasePaymentOrderRequest))
+                .willReturn(casePaymentOrder);
+
+            CasePaymentOrdersController controller =
+                new CasePaymentOrdersController(casePaymentOrdersService, caseAccessService);
+
+            controller.updateCasePaymentOrderRequest(updateCasePaymentOrderRequest);
+
+            verify(caseAccessService).assertUserHasAccessToCase(updateCasePaymentOrderRequest.getCaseId());
         }
 
         @DisplayName("should delegate to service for a valid request")
@@ -541,7 +575,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         @Test
         void directCallHappyPath() {
             CasePaymentOrdersController controller
-                = new CasePaymentOrdersController(casePaymentOrdersService);
+                = new CasePaymentOrdersController(casePaymentOrdersService, caseAccessService);
 
             controller.deleteCasePaymentOrdersById(Optional.of(List.of(CPO_ID_VALID_1)),
                                                    Optional.of(List.of()));
@@ -575,6 +609,17 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
                                      .param(IDS, UUID.randomUUID().toString(), "123", UUID.randomUUID().toString()))
                 .andExpect(status().isBadRequest());
         }
+
+        @DisplayName("should check user access for payment order ids when deleting by ids")
+        @Test
+        void shouldCheckUserAccessForPaymentOrderIdsWhenDeletingByIds() throws Exception {
+            this.mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
+                                     .param(IDS, CPO_ID_VALID_1))
+                .andExpect(status().isNoContent());
+
+            verify(caseAccessService).assertUserHasAccessToPaymentOrderIds(List.of(CPO_ID_VALID_1));
+        }
+
     }
 
     @Nested
@@ -585,7 +630,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         @Test
         void directCallHappyPath() {
             CasePaymentOrdersController controller
-                = new CasePaymentOrdersController(casePaymentOrdersService);
+                = new CasePaymentOrdersController(casePaymentOrdersService, caseAccessService);
 
             controller.deleteCasePaymentOrdersById(Optional.of(Collections.emptyList()),
                                                    Optional.of(List.of(CASE_ID_VALID_1)));
@@ -596,6 +641,19 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             verify(casePaymentOrdersService).deleteCasePaymentOrders(captor.capture());
             assertTrue(captor.getValue().getCpoIds().isEmpty());
             assertTrue(captor.getValue().getCaseIds().contains(CASE_ID_VALID_1));
+        }
+
+        @DisplayName("should check user access before deleting case payment order")
+        @Test
+        void shouldCheckUserAccessBeforeDelete() {
+
+            CasePaymentOrdersController controller =
+                new CasePaymentOrdersController(casePaymentOrdersService, caseAccessService);
+
+            controller.deleteCasePaymentOrdersById(Optional.of(Collections.emptyList()),
+                                                   Optional.of(List.of(CASE_ID_VALID_1)));
+
+            verify(caseAccessService).assertUserHasAccessToExistingCases(List.of(CASE_ID_VALID_1));
         }
 
         @DisplayName("should delete case payment order specified by case id")
@@ -683,7 +741,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
 
             // GIVEN
             CasePaymentOrdersController controller = new CasePaymentOrdersController(
-                casePaymentOrdersService
+                casePaymentOrdersService, caseAccessService
             );
 
             // WHEN
@@ -714,7 +772,7 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
 
             // GIVEN
             CasePaymentOrdersController controller = new CasePaymentOrdersController(
-                casePaymentOrdersService
+                casePaymentOrdersService, caseAccessService
             );
 
             // WHEN
@@ -732,6 +790,50 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             );
 
             assertArrayEquals(response.getContent().toArray(), getDomainPages.getContent().toArray());
+        }
+
+        @DisplayName("should check user access before getting case payment order")
+        @Test
+        void shouldCheckUserAccessBeforeDelete() {
+
+
+            final Page<CasePaymentOrder> getDomainPages = getDomainPages();
+
+            when(casePaymentOrdersService.getCasePaymentOrders(any(CasePaymentOrderQueryFilter.class)))
+                .thenReturn(getDomainPages);
+
+            // GIVEN
+            CasePaymentOrdersController controller = new CasePaymentOrdersController(
+                casePaymentOrdersService, caseAccessService
+            );
+
+            // WHEN
+            Page<CasePaymentOrder> response = controller.getCasePaymentOrders(
+                Optional.empty(),
+                Optional.of(casesIds),
+                getPageRequest()
+            );
+
+            // THEN
+            assertEquals(
+                "The total of expected elements should be" + PAGE_SIZE,
+                PAGE_SIZE,
+                response.getContent().size()
+            );
+
+            assertArrayEquals(response.getContent().toArray(), getDomainPages.getContent().toArray());
+
+            verify(caseAccessService).assertUserHasAccessToExistingCases(casesIds);
+        }
+
+        @DisplayName("should check user access for payment order ids when getting case payment orders by ids")
+        @Test
+        void shouldCheckUserAccessForPaymentOrderIdsWhenGettingCasePaymentOrdersByIds() throws Exception {
+            this.mockMvc.perform(request(HttpMethod.GET, CASE_PAYMENT_ORDERS_PATH)
+                                     .param(IDS, CPO_ID_VALID_1))
+                .andExpect(status().isOk());
+
+            verify(caseAccessService).assertUserHasAccessToPaymentOrderIds(List.of(CPO_ID_VALID_1));
         }
 
 

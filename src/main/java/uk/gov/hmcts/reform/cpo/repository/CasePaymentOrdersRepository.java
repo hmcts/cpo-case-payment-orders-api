@@ -17,6 +17,8 @@ public interface CasePaymentOrdersRepository {
 
     void deleteAuditEntriesByCaseIds(List<Long> caseIds);
 
+    boolean existsByCaseId(Long caseId);
+
     Optional<CasePaymentOrderEntity> findById(UUID id);
 
     Page<CasePaymentOrderEntity> findByIdIn(List<UUID> ids, Pageable pageable);

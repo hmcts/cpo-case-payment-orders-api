@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.cpo.controllers;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.envers.RevisionType;
 import org.junit.jupiter.api.BeforeEach;
@@ -227,6 +229,23 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                                 AUTHORISED_CRUD_SERVICE,
                                                 null,
                                                 createCasePaymentOrderRequest.getCaseId()));
+        }
+
+        @DisplayName("Should fail with 403 Forbidden when user cannot access CCD case")
+        @Test
+        void shouldFailWith403ForbiddenWhenUserCannotAccessCcdCase() throws Exception {
+            StubMapping forbiddenCaseAccessStub = stubCcdCaseAccessForbidden();
+            try {
+                mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+                                    .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
+                    .andExpect(status().isForbidden());
+
+                assertTrue(casePaymentOrdersJpaRepository.findAll().isEmpty());
+            } finally {
+                WireMock.removeStub(forbiddenCaseAccessStub);
+            }
         }
 
         private void verifyDbCpoValues(UUID id,
@@ -1142,6 +1161,33 @@ class CasePaymentOrdersControllerIT extends BaseTest {
             verifyUpdateLogAuditValues(request, result);
         }
 
+        @DisplayName("should fail with 403 Forbidden when user cannot access CCD case")
+        @Test
+        void shouldFailWith403ForbiddenWhenUserCannotAccessCcdCase() throws Exception {
+            CasePaymentOrderEntity originalEntity =
+                casePaymentOrderEntityGenerator.generateAndSaveEntities(1).get(0);
+            UpdateCasePaymentOrderRequest request = new UpdateCasePaymentOrderRequest(
+                originalEntity.getId().toString(),
+                originalEntity.getCaseId().toString(),
+                ACTION,
+                RESPONSIBLE_PARTY,
+                ORDER_REFERENCE_VALID
+            );
+
+            StubMapping forbiddenCaseAccessStub = stubCcdCaseAccessForbidden();
+            try {
+                ResultActions result = mockMvc.perform(put(CASE_PAYMENT_ORDERS_PATH)
+                                                           .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                                           .contentType(MediaType.APPLICATION_JSON)
+                                                           .content(objectMapper.writeValueAsString(request)));
+
+                result.andExpect(status().isForbidden());
+                assertNotSame(RevisionType.MOD, getLatestAuditRevision(request.getUUID()).getRevisionType());
+            } finally {
+                WireMock.removeStub(forbiddenCaseAccessStub);
+            }
+        }
+
         private void assertBadRequestResponse(ResultActions result,
                                               String validationDetails) throws Exception {
 
@@ -1319,6 +1365,14 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         if (method.equals(HttpMethod.DELETE)) {
             assertEquals(savedEntities.size(), casePaymentOrdersJpaRepository.findAllById(savedEntitiesUuids).size());
         }
+    }
+
+    private StubMapping stubCcdCaseAccessForbidden() {
+        return WireMock.stubFor(
+            WireMock.get(WireMock.urlPathMatching("/cases/.*"))
+                .atPriority(1)
+                .willReturn(WireMock.aResponse().withStatus(HttpStatus.FORBIDDEN.value()))
+        );
     }
 
 }
