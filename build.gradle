@@ -241,6 +241,7 @@ dependencyUpdates {
 
 apply from: './gradle/suppress.gradle'
 dependencyCheck {
+  outputDirectory = "$buildDir/reports"
   suppressionFile = 'config/owasp/suppressions.xml'
 }
 
