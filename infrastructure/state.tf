@@ -8,9 +8,9 @@ provider "azurerm" {
 
 provider "azurerm" {
   features {}
-  skip_provider_registration = true
-  alias                      = "postgres_network"
-  subscription_id            = var.aks_subscription_id
+  resource_provider_registrations = "none"
+  alias                           = "postgres_network"
+  subscription_id                 = var.aks_subscription_id
 }
 
 terraform {
@@ -19,7 +19,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.0"
+      version = "~> 5.0"
     }
 
     azuread = {
