@@ -7,7 +7,7 @@ plugins {
   id 'org.owasp.dependencycheck' version '12.2.1'
   id 'com.github.ben-manes.versions' version '0.61.0'
   id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
-  id 'org.sonarqube' version '7.3.1.8318'
+  id 'org.sonarqube' version '7.5.0.8588'
   id 'uk.gov.hmcts.java' version '0.12.68'
 }
 
@@ -212,12 +212,12 @@ configurations {
 def versions = [
   junit           : '6.1.3',
   junitPlatform   : '6.1.3',
-  lombok          : '1.18.46',
+  lombok          : '1.18.48',
   mapstruct       : '1.6.3',
   lombokMapBinding: '0.2.0',
   reformLogging   : '8.0.0',
   appInsights     : '2.6.4',
-  springCloud     : '2025.0.0',
+  springCloud     : '2025.0.3',
   testcontainers  : '1.21.4',
 ]
 
@@ -299,9 +299,9 @@ dependencies {
   implementation group: 'commons-validator', name: 'commons-validator', version: '1.11.0'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.13.0'
   implementation group: 'org.dom4j', name: 'dom4j', version: '2.2.0'
-  implementation group: 'org.hibernate', name: 'hibernate-envers', version: '7.4.6.Final'
-  implementation group: 'org.flywaydb', name: 'flyway-core', version: '12.11.0'
-  implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '12.11.0'
+  implementation group: 'org.hibernate', name: 'hibernate-envers', version: '7.4.7.Final'
+  implementation group: 'org.flywaydb', name: 'flyway-core', version: '13.5.0'
+  implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '13.5.0'
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   implementation group: 'xerces', name: 'xercesImpl', version: '2.12.2'
 
