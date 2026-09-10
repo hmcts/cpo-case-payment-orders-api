@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.cpo.auditlog;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,10 +13,12 @@ import uk.gov.hmcts.reform.cpo.controllers.CasePaymentOrdersController;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 class AuditLogFormatterTest implements BaseTest {
 
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     private AuditLogFormatter logFormatter;
 
     @BeforeEach
@@ -26,7 +30,7 @@ class AuditLogFormatterTest implements BaseTest {
 
     @Test
     @DisplayName("Should have correct labels")
-    void shouldHaveCorrectLabels() {
+    void shouldHaveCorrectLabels() throws Exception {
 
         // GIVEN
         AuditEntry auditEntry = new AuditEntry();
@@ -43,25 +47,28 @@ class AuditLogFormatterTest implements BaseTest {
 
         // WHEN
         String result = logFormatter.format(auditEntry);
+        JsonNode json = objectMapper.readTree(result);
 
         // THEN
-        assertEquals("Should have correct labels in full log format",
-                     result,
-                     AuditLogFormatter.TAG + " "
-                         + "dateTime:2021-04-26 15:39:45,"
-                         + "operationType:TEST_OPERATION_TYPE,"
-                         + "idamId:test_idamId,"
-                         + "invokingService:test_invokingService,"
-                         + "endpointCalled:GET " + CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH + ","
-                         + "operationalOutcome:200,"
-                         + "cpoId:" + CPO_ID_VALID_1 + ","
-                         + "caseId:" + CASE_ID_VALID_1 + ","
-                         + "X-Request-ID:" + REQUEST_ID);
+        assertEquals("Should write tag", AuditLogFormatter.TAG, json.get("tag").asText());
+        assertEquals("Should write dateTime", "2021-04-26 15:39:45", json.get("dateTime").asText());
+        assertEquals("Should write operation type", "TEST_OPERATION_TYPE", json.get("operationType").asText());
+        assertEquals("Should write idamId", "test_idamId", json.get("idamId").asText());
+        assertEquals("Should write invokingService", "test_invokingService", json.get("invokingService").asText());
+        assertEquals("Should write endpoint",
+                     "GET " + CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH,
+                     json.get("endpointCalled").asText());
+        assertEquals("Should write status", 200, json.get("operationalOutcome").asInt());
+        assertThat(json.get("cpoId").size()).isEqualTo(1);
+        assertEquals("Should write cpoId", CPO_ID_VALID_1, json.get("cpoId").get(0).asText());
+        assertThat(json.get("caseId").size()).isEqualTo(1);
+        assertEquals("Should write caseId", CASE_ID_VALID_1, json.get("caseId").get(0).asText());
+        assertEquals("Should write request id", REQUEST_ID, json.get("X-Request-ID").asText());
     }
 
     @Test
     @DisplayName("Should not log pair if empty")
-    void shouldNotLogPairIfEmpty() {
+    void shouldNotLogPairIfEmpty() throws Exception {
 
         // GIVEN
         AuditEntry auditEntry = new AuditEntry();
@@ -72,19 +79,22 @@ class AuditLogFormatterTest implements BaseTest {
 
         // WHEN
         String result = logFormatter.format(auditEntry);
+        JsonNode json = objectMapper.readTree(result);
 
         // THEN
-        assertEquals("Should only log supplied pairs",
-                     result,
-                     AuditLogFormatter.TAG + " "
-                         + "dateTime:2021-04-26 15:39:45,"
-                         + "endpointCalled:GET " + CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH + ","
-                         + "operationalOutcome:200");
+        assertEquals("Should write tag", AuditLogFormatter.TAG, json.get("tag").asText());
+        assertEquals("Should write dateTime", "2021-04-26 15:39:45", json.get("dateTime").asText());
+        assertEquals("Should write endpoint",
+                     "GET " + CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH,
+                     json.get("endpointCalled").asText());
+        assertEquals("Should write status", 200, json.get("operationalOutcome").asInt());
+        assertThat(json.has("operationType")).isFalse();
+        assertThat(json.has("idamId")).isFalse();
     }
 
     @Test
     @DisplayName("Should handle lists with comma")
-    void shouldHandleListsWithComma() {
+    void shouldHandleListsWithComma() throws Exception {
 
         // GIVEN
         AuditEntry auditEntry = new AuditEntry();
@@ -97,21 +107,20 @@ class AuditLogFormatterTest implements BaseTest {
 
         // WHEN
         String result = logFormatter.format(auditEntry);
+        JsonNode json = objectMapper.readTree(result);
 
         // THEN
-        assertEquals("Should handle ID lists with comma",
-                     result,
-                     AuditLogFormatter.TAG + " "
-                         + "dateTime:2021-04-26 15:39:45,"
-                         + "endpointCalled:GET " + CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH + ","
-                         + "operationalOutcome:200,"
-                         + "cpoId:" + CPO_ID_VALID_1 + "," + CPO_ID_VALID_2 + ","
-                         + "caseId:" + CASE_ID_VALID_1 + "," + CASE_ID_VALID_2);
+        assertThat(json.get("cpoId").size()).isEqualTo(2);
+        assertEquals("Should keep first cpoId", CPO_ID_VALID_1, json.get("cpoId").get(0).asText());
+        assertEquals("Should keep second cpoId", CPO_ID_VALID_2, json.get("cpoId").get(1).asText());
+        assertThat(json.get("caseId").size()).isEqualTo(2);
+        assertEquals("Should keep first caseId", CASE_ID_VALID_1, json.get("caseId").get(0).asText());
+        assertEquals("Should keep second caseId", CASE_ID_VALID_2, json.get("caseId").get(1).asText());
     }
 
     @Test
     @DisplayName("Should handle lists with limit")
-    void shouldHandleListsWithLimit() {
+    void shouldHandleListsWithLimit() throws Exception {
 
         // GIVEN
         AuditEntry auditEntry = new AuditEntry();
@@ -127,16 +136,15 @@ class AuditLogFormatterTest implements BaseTest {
 
         // WHEN
         String result = logFormatter.format(auditEntry);
+        JsonNode json = objectMapper.readTree(result);
 
         // THEN
-        assertEquals("Should apply limit to ID lists",
-                     result,
-                     AuditLogFormatter.TAG + " "
-                         + "dateTime:2021-04-26 15:39:45,"
-                         + "endpointCalled:GET " + CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH + ","
-                         + "operationalOutcome:200,"
-                         + "cpoId:" + CPO_ID_VALID_1 + "," + CPO_ID_VALID_2 + ","
-                         + "caseId:" + CASE_ID_VALID_1 + "," + CASE_ID_VALID_2);
+        assertThat(json.get("cpoId").size()).isEqualTo(2);
+        assertEquals("Should keep first cpoId", CPO_ID_VALID_1, json.get("cpoId").get(0).asText());
+        assertEquals("Should keep second cpoId", CPO_ID_VALID_2, json.get("cpoId").get(1).asText());
+        assertThat(json.get("caseId").size()).isEqualTo(2);
+        assertEquals("Should keep first caseId", CASE_ID_VALID_1, json.get("caseId").get(0).asText());
+        assertEquals("Should keep second caseId", CASE_ID_VALID_2, json.get("caseId").get(1).asText());
     }
 
 }
