@@ -48,7 +48,7 @@ import static uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter.TO
 })
 @TestPropertySource(properties = {
     "spring.security.oauth2.client.provider.oidc.issuer-uri=http://localhost/o",
-    "oidc.issuer=http://localhost/o"
+    "idam.security.allowed-issuers=http://localhost/o"
 })
 class SecurityConfigurationTest {
 
