@@ -189,6 +189,7 @@ public class BaseTest {
         JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder()
             .subject("CPO_Stub")
             .issueTime(new Date())
+            .issuer("http://localhost/o")
             .claim(TOKEN_NAME, ACCESS_TOKEN)
             .expirationTime(new Date(System.currentTimeMillis() + ttlMillis));
 
