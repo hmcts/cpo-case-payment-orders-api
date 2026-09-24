@@ -98,6 +98,8 @@ spring:
             issuer-uri: ${IDAM_OIDC_URL:http://localhost:5000}/o
 
 idam:
+  oidc:
+    url: ${IDAM_OIDC_HOST:localhost:5000}
   api:
     url: ${IDAM_API_URL:http://localhost:5000}
   s2s-auth:
