@@ -28,7 +28,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class SecurityConfigurationIT {
 
     private static final String ISSUER = "http://localhost:%s/o";
-    private static RSAKey rsaJwk;
 
     @Autowired
     private JwtDecoder jwtDecoder;
