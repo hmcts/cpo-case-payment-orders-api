@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cpo.config;
 
-import com.nimbusds.jose.jwk.RSAKey;
 import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
