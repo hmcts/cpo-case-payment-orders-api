@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.cpo.config;
 
+import com.nimbusds.jose.jwk.RSAKey;
 import io.jsonwebtoken.Jwts;
-import uk.gov.hmcts.reform.cpo.Application;
-import uk.gov.hmcts.reform.cpo.utils.KeyGenUtil;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,16 +11,14 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtValidationException;
 import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.reform.cpo.Application;
+import uk.gov.hmcts.reform.cpo.utils.KeyGenUtil;
 
 import java.time.Instant;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 
 @SpringBootTest(classes = Application.class, properties = {
     "idam.security.allowed-issuers=http://localhost:${wiremock.server.port}/o,http://alternate.issuer/o"
