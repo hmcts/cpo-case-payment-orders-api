@@ -47,7 +47,6 @@ env.OAUTH2_ACCESS_TOKEN_TYPE = "OIDC"
 env.OAUTH2_SCOPE_VARIABLES = "profile openid roles manage-user create-user"
 
 // IDAM client and S2S auth
-env.IDAM_API_URL_BASE = "https://idam-api.aat.platform.hmcts.net"
 env.S2S_URL_BASE = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
 
 env.CCD_API_GATEWAY_OAUTH2_CLIENT_ID = "ccd_gateway"
@@ -103,6 +102,15 @@ withPipeline(type, product, component) {
   loadVaultSecrets(secrets)
   enableAksStagingDeployment()
   disableLegacyDeployment()
+
+  // Set IDAM_API_URL_BASE post high-level data setup where it would have been overridden
+  before('smoketest:preview') {
+      env.IDAM_API_URL_BASE = "https://idam-web-public.aat.platform.hmcts.net"
+  }
+  
+  before('smoketest:aat') {
+      env.IDAM_API_URL_BASE = "https://idam-web-public.aat.platform.hmcts.net"
+  }
 
   afterAlways('smoketest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'

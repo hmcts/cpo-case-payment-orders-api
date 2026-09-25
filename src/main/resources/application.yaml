@@ -95,17 +95,17 @@ spring:
       client:
         provider:
           oidc:
-            issuer-uri: ${IDAM_OIDC_URL:http://localhost:5000}/o
+            issuer-uri: ${IDAM_OIDC_URL:http://localhost:9002}/o
 
 idam:
   api:
-    url: ${IDAM_API_URL:http://localhost:5000}
+    url: ${IDAM_API_URL:http://localhost:9002}
   s2s-auth:
     url: ${S2S_URL:http://localhost:4502}
   s2s-authorised:
     services: ${CPO_S2S_AUTHORISED_SERVICES:xui_webapp,payment_app}
-oidc:
-  issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
+  security:
+    allowed-issuers: ${OIDC_ALLOWED_ISSUERS:http://idam-web-public:9002/o,http://fr-am:8080/openam/oauth2/hmcts}
 
 azure:
   application-insights:
