@@ -23,6 +23,7 @@ public final class CasePaymentOrdersBeftaRunner {
 
     @BeforeAll
     public static void setUp() {
+        JwtIssuerVerificationApp.verifyIssuerAlignmentIfEnabled();
         BeftaMain.setUp(new CasePaymentOrdersTestAutomationAdapter());
     }
 

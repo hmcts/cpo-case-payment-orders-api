@@ -4,6 +4,12 @@ export BEFTA_OAUTH2_CLIENT_SECRET_OF_XUIWEBAPP=OOOOOOOOOOOOOOOO
 export BEFTA_OAUTH2_REDIRECT_URI_OF_XUIWEBAPP=http://localhost:3333/oauth2/callback
 export BEFTA_OAUTH2_SCOPE_VARIABLES_OF_XUIWEBAPP="profile openid roles"
 
+# Variables used by verifyFunctionalTestJwtIssuer
+export OAUTH2_CLIENT_ID=xuiwebapp
+export OAUTH2_CLIENT_SECRET=OOOOOOOOOOOOOOOO
+export OAUTH2_SCOPE_VARIABLES="profile openid roles"
+export VERIFY_OIDC_ISSUER=true
+
 export BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP=xui_webapp
 export BEFTA_S2S_CLIENT_SECRET_OF_XUI_WEBAPP=OOOOOOOOOOOOOOOO
 export BEFTA_S2S_CLIENT_ID_OF_PAYMENT_APP=payment_app
@@ -14,7 +20,9 @@ export CCD_CASEWORKER_AUTOTEST_PASSWORD=Pa55word11
 
 export TEST_URL=http://localhost:4457
 export IDAM_URL=http://localhost:5000
+export IDAM_API_URL_BASE=http://localhost:5000
 export S2S_URL=http://localhost:4502
+export OIDC_ISSUER=http://localhost:5000/o
 
 # override default 'xui_webapp' permissions with values that support the FTA tests
 export S2S_AUTHORIZATIONS_XUI_ID="xui_webapp"
