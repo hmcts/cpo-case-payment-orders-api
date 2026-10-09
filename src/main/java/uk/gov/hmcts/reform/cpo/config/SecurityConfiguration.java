@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cpo.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +10,6 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
-import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -20,18 +18,16 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.cpo.security.OidcIssuerValidator;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
 public class SecurityConfiguration {
 
-    @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
-    private String issuerUri;
-
-    @Value("${oidc.issuer}")
-    private String issuerOverride;
-
+    private final String issuerUri;
+    private final String expectedIssuer;
+    private final String allowedIssuers;
     private final ServiceAuthFilter serviceAuthFilter;
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
 
@@ -50,9 +46,16 @@ public class SecurityConfiguration {
         "/"
     };
 
-    @Autowired
-    public SecurityConfiguration(final ServiceAuthFilter serviceAuthFilter,
-            final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter) {
+    public SecurityConfiguration(
+        @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}") final String issuerUri,
+        @Value("${oidc.issuer}") final String expectedIssuer,
+        @Value("${oidc.allowed-issuers:}") final String allowedIssuers,
+        final ServiceAuthFilter serviceAuthFilter,
+        final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter
+    ) {
+        this.issuerUri = issuerUri;
+        this.expectedIssuer = expectedIssuer;
+        this.allowedIssuers = allowedIssuers;
         this.serviceAuthFilter = serviceAuthFilter;
         jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
@@ -61,11 +64,16 @@ public class SecurityConfiguration {
     @Bean
     JwtDecoder jwtDecoder() {
         NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromOidcIssuerLocation(issuerUri);
-        OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
-        OAuth2TokenValidator<Jwt> withIssuer = new JwtIssuerValidator(issuerOverride);
-        OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withTimestamp);
-        jwtDecoder.setJwtValidator(validator);
+        // Discover metadata from issuer-uri, but enforce bearer token issuers via oidc.issuer first.
+        jwtDecoder.setJwtValidator(jwtValidator(expectedIssuer, allowedIssuers));
         return jwtDecoder;
+    }
+
+    static OAuth2TokenValidator<Jwt> jwtValidator(String expectedIssuer, String allowedIssuers) {
+        OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
+        OAuth2TokenValidator<Jwt> withIssuer = OidcIssuerValidator.exactIssuerValidator(expectedIssuer,
+                                                                                        allowedIssuers);
+        return new DelegatingOAuth2TokenValidator<>(withTimestamp, withIssuer);
     }
 
     @Bean
