@@ -274,6 +274,21 @@ ext.libraries = [
 
 dependencies {
 
+  constraints {
+    implementation('org.eclipse.angus:angus-activation:2.0.4') {
+      because 'Fix CVE-2025-7962'
+    }
+    testImplementation('org.eclipse.angus:angus-activation:2.0.4') {
+      because 'Fix CVE-2025-7962'
+    }
+    integrationTestImplementation('org.eclipse.angus:angus-activation:2.0.4') {
+      because 'Fix CVE-2025-7962'
+    }
+    functionalTestImplementation('org.eclipse.angus:angus-activation:2.0.4') {
+      because 'Fix CVE-2025-7962'
+    }
+  }
+
   // Spring dependencies
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
