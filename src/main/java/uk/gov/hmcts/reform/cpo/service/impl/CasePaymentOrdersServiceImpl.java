@@ -104,7 +104,8 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         try {
             return securityUtils.getUserInfo().getUid();
         } catch (Exception e) {
-            log.error(IDAM_ID_RETRIEVE_ERROR, e);
+            log.error(IDAM_ID_RETRIEVE_ERROR);
+            log.debug("Original IDAM user ID retrieval failure", e);
             throw new IdAMIdCannotBeRetrievedException(IDAM_ID_RETRIEVE_ERROR);
         }
     }

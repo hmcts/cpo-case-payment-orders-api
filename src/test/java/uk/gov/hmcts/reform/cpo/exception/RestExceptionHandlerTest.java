@@ -70,7 +70,7 @@ class RestExceptionHandlerTest implements BaseTest {
                                                          .content(objectMapper.writeValueAsString(request)));
 
         // THEN
-        assertHttpErrorResponse(result, HttpStatus.INTERNAL_SERVER_ERROR, expectedException.getMessage());
+        assertHttpErrorResponse(result, HttpStatus.INTERNAL_SERVER_ERROR, HttpError.DEFAULT_ERROR);
 
     }
 
@@ -91,7 +91,7 @@ class RestExceptionHandlerTest implements BaseTest {
                                                         .content(objectMapper.writeValueAsString(request)));
 
         // THEN
-        assertHttpErrorResponse(result, HttpStatus.CONFLICT, expectedException.getMessage());
+        assertHttpErrorResponse(result, HttpStatus.CONFLICT, HttpStatus.CONFLICT.getReasonPhrase());
 
     }
 
@@ -112,7 +112,7 @@ class RestExceptionHandlerTest implements BaseTest {
                                                         .content(objectMapper.writeValueAsString(request)));
 
         // THEN
-        assertHttpErrorResponse(result, HttpStatus.NOT_FOUND, expectedException.getMessage());
+        assertHttpErrorResponse(result, HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.getReasonPhrase());
 
     }
 
@@ -133,7 +133,7 @@ class RestExceptionHandlerTest implements BaseTest {
                                                          .content(objectMapper.writeValueAsString(request)));
 
         // THEN
-        assertHttpErrorResponse(result, HttpStatus.BAD_REQUEST, expectedException.getMessage());
+        assertHttpErrorResponse(result, HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase());
 
     }
 
@@ -154,7 +154,7 @@ class RestExceptionHandlerTest implements BaseTest {
                                                          .content(objectMapper.writeValueAsString(request)));
 
         // THEN
-        assertHttpErrorResponse(result, HttpStatus.BAD_REQUEST, expectedException.getMessage());
+        assertHttpErrorResponse(result, HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase());
 
     }
 
@@ -176,7 +176,9 @@ class RestExceptionHandlerTest implements BaseTest {
             .andExpect(status().is(expectedStatus.value()))
             .andExpect(jsonPath(ERROR_PATH_STATUS).value(expectedStatus.value()))
             .andExpect(jsonPath(ERROR_PATH_ERROR).value(reasonPhrase))
-            .andExpect(jsonPath(ERROR_PATH_MESSAGE).value(expectedMessage));
+            .andExpect(jsonPath(ERROR_PATH_MESSAGE).value(expectedMessage))
+            .andExpect(jsonPath("$.exception").doesNotExist())
+            .andExpect(jsonPath("$.trace").doesNotExist());
     }
 
 }

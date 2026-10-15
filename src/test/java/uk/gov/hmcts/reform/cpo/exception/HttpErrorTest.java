@@ -23,7 +23,6 @@ class HttpErrorTest implements BaseTest {
         HttpError<String> httpError = new HttpError<>(ex, CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH, null);
 
         // THEN
-        assertEquals("Should record exception name", RuntimeException.class.getName(), httpError.getException());
         assertNotNull("Should record a date & time", httpError.getTimestamp());
         assertEquals("Should record path", CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH, httpError.getPath());
         assertEquals("Should record DEFAULT status", HttpError.DEFAULT_STATUS, httpError.getStatus());

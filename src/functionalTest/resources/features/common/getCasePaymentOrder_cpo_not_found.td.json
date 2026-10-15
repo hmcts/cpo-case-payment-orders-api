@@ -14,8 +14,8 @@
     "expectedResponse" : {
       "_extends_": "Common_404_Response",
       "body": {
-        "exception": "uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException",
-        "message": "[[ANYTHING_PRESENT]]",
+        "code": "RESOURCE_NOT_FOUND",
+        "message": "Not Found",
         "path": "/case-payment-orders",
         "details": null
       }

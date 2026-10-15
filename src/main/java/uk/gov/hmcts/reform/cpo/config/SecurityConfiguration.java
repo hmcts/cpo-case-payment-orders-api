@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import uk.gov.hmcts.reform.cpo.security.SafeAuthenticationErrors;
 
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter;
@@ -77,9 +78,10 @@ public class SecurityConfiguration {
             .formLogin((formLogin) -> formLogin.disable())
             .logout((logout) -> logout.disable())
             .authorizeHttpRequests((authHttp) -> authHttp.anyRequest().authenticated())
-            .oauth2ResourceServer((oauth2) ->
-                                      oauth2.jwt((jwt) ->
-                                                     jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)));
+            .oauth2ResourceServer(oauth -> oauth
+                .authenticationEntryPoint(new SafeAuthenticationErrors())
+                .accessDeniedHandler(new SafeAuthenticationErrors())
+                .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)));
         return http.build();
     }
 

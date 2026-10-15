@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cpo.exception;
 
 import lombok.Getter;
+import uk.gov.hmcts.reform.cpo.security.ErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -20,10 +21,10 @@ public class HttpError<T extends Serializable> implements Serializable {
     public static final Integer DEFAULT_STATUS = HttpStatus.INTERNAL_SERVER_ERROR.value();
     public static final String DEFAULT_ERROR = "Unexpected Error";
 
-    private final String exception;
     private final transient LocalDateTime timestamp;
     private final Integer status;
     private final String error;
+    private final ErrorCode code;
     private String message;
     private final String path;
     private T details;
@@ -31,11 +32,11 @@ public class HttpError<T extends Serializable> implements Serializable {
     public HttpError(Exception exception, String path, HttpStatus status) {
         final var responseStatus = exception.getClass().getAnnotation(ResponseStatus.class);
 
-        this.exception = exception.getClass().getName();
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
         this.status = getStatusFromResponseStatus(responseStatus, status);
         this.error = getErrorReason(responseStatus, status);
-        this.message = exception.getMessage();
+        this.code = ErrorCode.fromStatus(this.status);
+        this.message = this.error;
         this.path = UriUtils.encodePath(path, StandardCharsets.UTF_8);
     }
 

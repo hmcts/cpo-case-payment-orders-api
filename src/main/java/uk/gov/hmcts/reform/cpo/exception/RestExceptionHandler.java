@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cpo.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.cpo.security.ErrorCode;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -27,8 +28,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseBody
     public ResponseEntity<HttpError<Serializable>> handleApiException(final HttpServletRequest request,
                                                                       final Exception exception) {
-        log.error(exception.getMessage(), exception);
         final HttpError<Serializable> error = new HttpError<>(exception, request);
+        logFailure(exception, error.getStatus());
         return ResponseEntity
             .status(error.getStatus())
             .body(error);
@@ -41,9 +42,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseBody
     public ResponseEntity<HttpError<Serializable>> handleCommonExceptionsAsBadRequest(final HttpServletRequest request,
                                                                                       final Exception exception) {
-        log.error(exception.getMessage(), exception);
-        final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
-            .withDetails(exception.getCause());
+        final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST);
+        logFailure(exception, HttpStatus.BAD_REQUEST.value());
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(error);
@@ -57,13 +57,43 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         String[] errors = exception.getBindingResult().getFieldErrors().stream()
             .map(DefaultMessageSourceResolvable::getDefaultMessage)
             .toArray(String[]::new);
-        log.debug("MethodArgumentNotValidException:{}", exception.getLocalizedMessage());
         final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
             .withMessage(ValidationError.ARGUMENT_NOT_VALID)
             .withDetails(errors);
+        logFailure(exception, HttpStatus.BAD_REQUEST.value());
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(error);
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseBody
+    public ResponseEntity<HttpError<Serializable>> handleUnexpectedException(HttpServletRequest request,
+                                                                            Exception exception) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        if (exception instanceof org.springframework.security.access.AccessDeniedException) {
+            status = HttpStatus.FORBIDDEN;
+        } else if (exception instanceof org.springframework.security.core.AuthenticationException) {
+            status = HttpStatus.UNAUTHORIZED;
+        }
+        logFailure(exception, status.value());
+        return ResponseEntity.status(status).body(new HttpError<>(exception, request, status));
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(Exception exception, Object body,
+                                                              HttpHeaders headers, HttpStatusCode status,
+                                                              WebRequest request) {
+        // Never forward Spring ProblemDetail text, rejected values or parser diagnostics.
+        final HttpError<Serializable> error = new HttpError<>(exception, request,
+            HttpStatus.valueOf(status.value()));
+        logFailure(exception, status.value());
+        return super.handleExceptionInternal(exception, error, headers, status, request);
+    }
+
+    private void logFailure(Exception exception, int status) {
+        log.error("Request failed: code={} status={}", ErrorCode.fromStatus(status), status);
+        log.debug("Original request failure: code={} status={}", ErrorCode.fromStatus(status), status, exception);
     }
 
 }
