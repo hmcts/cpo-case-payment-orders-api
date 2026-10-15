@@ -82,8 +82,9 @@ public class CasePaymentOrdersController {
                 + "\n7) " + ValidationError.IDAM_ID_RETRIEVE_ERROR,
             content = @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(
                 value = "{\n"
-                    + "   \"status\": \"400\",\n"
+                    + "   \"status\": 400,\n"
                     + "   \"error\": \"Bad Request\",\n"
+                    + "   \"code\": \"INVALID_REQUEST\",\n"
                     + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
                     + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
                     + "   \"details\": [ \"" + ValidationError.CASE_ID_INVALID + "\" ]\n"
@@ -126,11 +127,12 @@ public class CasePaymentOrdersController {
                 + "\n3) " + ValidationError.ID_INVALID,
             content = @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(
                 value = "{\n"
-                    + "   \"status\": \"400\",\n"
+                    + "   \"status\": 400,\n"
                     + "   \"error\": \"Bad Request\",\n"
-                    + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
+                    + "   \"code\": \"INVALID_REQUEST\",\n"
+                    + "   \"message\": \"Bad Request\",\n"
                     + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
-                    + "   \"details\": [ \"" + ValidationError.CASE_ID_INVALID + "\" ]\n"
+                    + "   \"details\": null\n"
                     + "}"
             ))
             ),
@@ -199,11 +201,12 @@ public class CasePaymentOrdersController {
                 + "\n3) " + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS,
             content = @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(
                 value = "{\n"
-                    + "   \"status\": \"400\",\n"
+                    + "   \"status\": 400,\n"
                     + "   \"error\": \"Bad Request\",\n"
-                    + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
+                    + "   \"code\": \"INVALID_REQUEST\",\n"
+                    + "   \"message\": \"Bad Request\",\n"
                     + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
-                    + "   \"details\": [ \"" + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS + "\" ]\n"
+                    + "   \"details\": null\n"
                     + "}"
             ))
             ),
@@ -264,8 +267,9 @@ public class CasePaymentOrdersController {
                 + "\n9) " + ValidationError.IDAM_ID_RETRIEVE_ERROR,
             content = @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(
                 value = "{\n"
-                    + "   \"status\": \"400\",\n"
+                    + "   \"status\": 400,\n"
                     + "   \"error\": \"Bad Request\",\n"
+                    + "   \"code\": \"INVALID_REQUEST\",\n"
                     + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
                     + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
                     + "   \"details\": [ \"" + ValidationError.ID_REQUIRED + "\" ]\n"
