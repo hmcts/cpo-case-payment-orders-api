@@ -3,7 +3,6 @@
     <notes><![CDATA[
         Temporary Suppression
         CVE-2025-48924 refer [Ticket]
-        CVE-2025-68161 refer [Ticket]
         CVE-2026-22732 refer [Ticket]
         CVE-2026-22735 refer [Ticket]
         CVE-2026-22737 refer [Ticket]
@@ -16,10 +15,7 @@
         CVE-2026-32990 refer [Ticket]
         CVE-2026-33117 refer [Ticket]
         CVE-2026-34477 refer [Ticket]
-        CVE-2026-34478 refer [Ticket]
         CVE-2026-34479 refer [Ticket]
-        CVE-2026-34480 refer [Ticket]
-        CVE-2026-34481 refer [Ticket]
         CVE-2026-40988 refer [Ticket]
         CVE-2026-41003 refer [Ticket]
         CVE-2026-41694 refer [Ticket]
@@ -91,7 +87,6 @@
         ]]>
         CVE-2026-41707 refer [Ticket]</notes>
     <cve>CVE-2025-48924</cve>
-    <cve>CVE-2025-68161</cve>
     <cve>CVE-2026-22732</cve>
     <cve>CVE-2026-22735</cve>
     <cve>CVE-2026-22737</cve>
@@ -104,10 +99,7 @@
     <cve>CVE-2026-32990</cve>
     <cve>CVE-2026-33117</cve>
     <cve>CVE-2026-34477</cve>
-    <cve>CVE-2026-34478</cve>
     <cve>CVE-2026-34479</cve>
-    <cve>CVE-2026-34480</cve>
-    <cve>CVE-2026-34481</cve>
     <cve>CVE-2026-40988</cve>
     <cve>CVE-2026-41003</cve>
     <cve>CVE-2026-41694</cve>
