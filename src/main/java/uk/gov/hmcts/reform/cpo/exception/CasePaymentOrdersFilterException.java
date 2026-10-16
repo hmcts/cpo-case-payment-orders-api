@@ -11,4 +11,8 @@ public class CasePaymentOrdersFilterException extends ApiException {
     public CasePaymentOrdersFilterException(String message) {
         super(message);
     }
+
+    public CasePaymentOrdersFilterException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

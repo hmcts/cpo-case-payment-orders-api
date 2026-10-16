@@ -1,4 +1,11 @@
 server:
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
+    include-exception: false
+    whitelabel:
+      enabled: false
   port: 4457
 
 logging:
@@ -19,7 +26,7 @@ management:
     health:
       probes:
         enabled: true
-      show-details: "always"
+      show-details: "never"
       cache:
         time-to-live: 1000ms
   endpoints:
