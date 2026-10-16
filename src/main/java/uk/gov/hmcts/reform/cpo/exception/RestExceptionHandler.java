@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
@@ -84,6 +85,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleExceptionInternal(Exception exception, Object body,
                                                               HttpHeaders headers, HttpStatusCode status,
                                                               WebRequest request) {
+        if (request instanceof ServletWebRequest servletRequest
+            && servletRequest.getResponse() != null && servletRequest.getResponse().isCommitted()) {
+            logFailure(exception, status.value());
+            return null;
+        }
         // Never forward Spring ProblemDetail text, rejected values or parser diagnostics.
         final HttpError<Serializable> error = new HttpError<>(exception, request,
             HttpStatus.valueOf(status.value()));

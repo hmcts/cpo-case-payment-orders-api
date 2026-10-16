@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.server.resource.BearerTokenError;
 import org.springframework.security.access.AccessDeniedException;
@@ -14,7 +16,8 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 
 /** Keeps authentication diagnostics in server logs, not in the Bearer challenge. */
 @Slf4j
-public class SafeAuthenticationErrors implements AuthenticationEntryPoint, AccessDeniedHandler {
+public class SafeAuthenticationErrors
+    implements AuthenticationEntryPoint, AccessDeniedHandler, AuthenticationFailureHandler {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
@@ -29,6 +32,18 @@ public class SafeAuthenticationErrors implements AuthenticationEntryPoint, Acces
         log.debug("Original authentication failure: code={} status={}", code, status.value(), exception);
         response.setHeader(HttpHeaders.WWW_AUTHENTICATE, "Bearer");
         response.setStatus(status.value());
+    }
+
+    @Override
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
+                                        AuthenticationException exception) {
+        if (exception instanceof AuthenticationServiceException) {
+            log.error("Authentication service failed: code={} status=500", ErrorCode.INTERNAL_ERROR);
+            log.debug("Original authentication service failure", exception);
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        } else {
+            commence(request, response, exception);
+        }
     }
 
     @Override

@@ -128,8 +128,8 @@ Reference: [Microsoft Java agent logging configuration](https://learn.microsoft.
   Keep generic operational events at ERROR/WARN. This does not change HTTP status or authentication checks.
 - Update functional response fixtures to assert safe codes/messages instead of exception classes,
   internal messages or identifiers. Keep existing status expectations and fixed user-facing validation details.
-- Third-party ServiceAuthFilter and unrelated audit/operational logging are outside these handler changes;
-  do not interpret handler log tests as a guarantee that all application/dependency logs are sanitized.
+- The shared ServiceAuthFilter is replaced with an owned filter using the same validator/allowlist
+  and 401/403 semantics. Audit failure diagnostics and operational identifiers are available only at DEBUG.
 
 Functional tests require the services and dependencies used by BEFTA. Fixture updates and local unit
 checks are not a deployed functional-test pass; run the functional suites in the target test environment.
@@ -147,3 +147,86 @@ logging:
 Review-fix validation: **73 tests passed**, no failures or skips; Checkstyle and functional-test
 Java compilation/resource processing passed. **13 functional JSON fixtures** were updated and
 parsed successfully. Functional suites were not executed against deployed services.
+
+## Complete request-path fixes — 16 October 2026
+
+Public health endpoints retain their availability and status codes but use `show-details: never`,
+so failed indicators cannot publish exception text through health JSON. Detailed audit exceptions,
+service-authentication exceptions and operational user/case/document/service identifiers are moved
+from ERROR/WARN into DEBUG; normal events use generic summaries or fixed codes.
+
+The shared S2S auto-configuration bean (`serviceAuthFiler`) is replaced after initialization by
+`SafeServiceAuthFilter`, retaining the same ServiceAuthTokenValidator implementation and configured service allowlist,
+Bearer normalization, empty 401/403 responses and downstream exception handling semantics.
+Filter overrides with distinct bean names remain intact. This wiring depends on the shared bean name and
+has a regression test; review it when upgrading the service-auth library.
+
+Request parsing failures remain 400/INVALID_REQUEST. Response serialization failures in translation
+and CDAM now return 500/INTERNAL_ERROR before commitment, correcting the earlier broad conversion
+exception mapping. This is a deliberate status correction; existing client-validation status
+expectations stay unchanged. Once a streaming response is committed, its HTTP status/body cannot
+be replaced; deployment checks must include aborted downloads and telemetry behaviour.
+
+For temporary diagnosis, enable DEBUG only for the relevant owned security, audit, controller or
+service logger, together with the App Insights collection threshold described above. Restore both
+thresholds after diagnosis. Full deployed BEFTA execution and App Insights ingestion remain
+separate release checks. These changes do not promise that every third-party/framework logger
+will suppress diagnostics; those still require environment verification.
+
+Additional logger overrides for the complete-path fixes (use only those needed):
+
+```yaml
+logging:
+  level:
+    uk.gov.hmcts.reform.cpo.security.SafeServiceAuthFilter: DEBUG
+    uk.gov.hmcts.reform.cpo.auditlog.AuditInterceptor: DEBUG
+    uk.gov.hmcts.reform.cpo.auditlog.aop.AuditAspect: DEBUG
+```
+
+### Verified local results — 16 October 2026
+
+**148 affected tests passed**, zero failures/errors/skips. `checkstyleMain`, `checkstyleTest`,
+`compileIntegrationTestJava` and `compileFunctionalTestJava` passed. Regression coverage includes
+public health UP/DOWN response redaction (200/503), S2S 401/403/allowlist/Bearer handling and actual
+shared-bean replacement, INFO/DEBUG diagnostic separation, response serialization as 500, and
+preserved 405 Allow / 415 Accept headers. Translation/CPO also cover whole security-chain logging
+and committed error handling; CPO/CDAM cover audit interceptor and SpEL failures with log capture.
+
+Health functional fixtures now expect status without component diagnostics. Existing error fixtures
+retain their HTTP statuses except the documented serialization correction. Integration/functional
+sources were compiled; deployed BEFTA execution, real interrupted downloads, secret mounts,
+upstream gateways and App Insights capture/sampling still need environment verification.
+Changes are uncommitted; no deployment configuration was applied to a running environment.
+
+## Framework failure-path follow-up — 16 October 2026
+
+Health indicators can log their own exceptions at WARN even when public health details are hidden.
+`SafeHealthLoggingConfiguration` registers an owned Logback filter for health-indicator logger classes.
+It replaces their WARN/ERROR events with a fixed summary, preserving severity, and routes original
+messages/throwables to `logging.SafeHealthDiagnosticsFilter` at DEBUG. The filter is removed when
+its Spring context closes. Health results and HTTP statuses are unchanged. This application uses
+Logback; custom contributors that log through unrelated logger names need separate verification.
+
+Bearer authentication now has an explicit failure handler. AuthenticationServiceException (including
+IDAM outages) remains 500, with an empty body and no Bearer challenge. The original exception is
+logged at DEBUG only, preventing Spring's default rethrow from reaching container ERROR logs.
+Normal invalid-token/invalid-request handling continues through the existing safe entry point.
+
+For temporary diagnosis, add the following alongside the previously documented App Insights
+collection threshold, then restore the prior level:
+
+```yaml
+logging:
+  level:
+    uk.gov.hmcts.reform.cpo.logging.SafeHealthDiagnosticsFilter: DEBUG
+```
+
+IDAM failure diagnostics use the existing `uk.gov.hmcts.reform.cpo.security.SafeAuthenticationErrors` DEBUG setting.
+
+Framework-path regression results: **150 affected tests passed**, no failures/errors/skips.
+Tests now use real AbstractHealthIndicator implementations (including nested composite contributors)
+and capture propagated INFO/DEBUG logs. Translation/CPO also simulate IDAM failures through the
+full bearer chain, verifying empty 500 responses, no WWW-Authenticate header, no normal-level
+throwables, and DEBUG-only causes. Public health status/body and existing bearer checks remain green.
+Checkstyle and integration/functional compilation are checked separately; deployed functional tests
+and App Insights ingestion are still outstanding.

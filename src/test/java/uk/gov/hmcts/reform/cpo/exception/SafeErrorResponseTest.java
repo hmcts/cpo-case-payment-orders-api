@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class SafeErrorResponseTest {
@@ -75,9 +76,11 @@ class SafeErrorResponseTest {
     void retainsUnsupportedMediaAndMethodStatuses() throws Exception {
         mvc.perform(post("/error-probe").contentType(MediaType.TEXT_PLAIN).content("invalid"))
             .andExpect(status().isUnsupportedMediaType())
+            .andExpect(header().string("Accept", containsString("application/json")))
             .andExpect(jsonPath("$.exception").doesNotExist());
         mvc.perform(get("/error-probe"))
             .andExpect(status().isMethodNotAllowed())
+            .andExpect(header().string("Allow", "POST"))
             .andExpect(jsonPath("$.exception").doesNotExist());
     }
 
@@ -133,6 +136,15 @@ class SafeErrorResponseTest {
         mvc.perform(get("/error-probe/failure"))
             .andExpect(status().isForbidden())
             .andExpect(jsonPath("$.code").value("ACCESS_DENIED"))
+            .andExpect(content().string(not(containsString(DIAGNOSTIC))));
+    }
+
+    @Test
+    void responseSerializationFailuresAreServerErrors() throws Exception {
+        controller.failure = new org.springframework.http.converter.HttpMessageNotWritableException(DIAGNOSTIC);
+        mvc.perform(get("/error-probe/failure"))
+            .andExpect(status().isInternalServerError())
+            .andExpect(jsonPath("$.code").value("INTERNAL_ERROR"))
             .andExpect(content().string(not(containsString(DIAGNOSTIC))));
     }
 
