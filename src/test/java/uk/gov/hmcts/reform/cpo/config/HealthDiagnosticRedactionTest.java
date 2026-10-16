@@ -87,7 +87,7 @@ class HealthDiagnosticRedactionTest {
                         assertThat(appender.list).hasSize(1);
                         assertThat(appender.list.get(0).getLevel()).isEqualTo(Level.WARN);
                         assertThat(appender.list.get(0).getFormattedMessage())
-                            .isEqualTo("Health check failed: code=INTERNAL_ERROR");
+                            .isEqualTo("Health diagnostic: code=REQUEST_FAILED");
                         assertThat(appender.list.get(0).getThrowableProxy()).isNull();
                         appender.list.clear();
                         logger.setLevel(Level.DEBUG);
@@ -103,6 +103,46 @@ class HealthDiagnosticRedactionTest {
                     }
                 });
         }
+    }
+
+    @Test
+    void slowHealthyIndicatorsDoNotExposeTheirNames() {
+        new WebApplicationContextRunner().withUserConfiguration(SafeHealthLoggingConfiguration.class)
+            .withConfiguration(AutoConfigurations.of(EndpointAutoConfiguration.class,
+                WebEndpointAutoConfiguration.class, HealthEndpointAutoConfiguration.class))
+            .withPropertyValues("management.endpoint.health.logging.slow-indicator-threshold=1ms",
+                "management.endpoint.health.show-details=never")
+            .withBean("private-case-123", HealthIndicator.class, () -> () -> {
+                java.util.concurrent.locks.LockSupport.parkNanos(5_000_000);
+                return Health.up().build();
+            })
+            .run(context -> {
+                assertThat(context).hasNotFailed();
+                Logger boundary = (Logger) LoggerFactory.getLogger(SafeHealthDiagnosticsFilter.class);
+                Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+                Level previousLevel = boundary.getLevel();
+                ListAppender<ILoggingEvent> appender = new ListAppender<>();
+                appender.start();
+                root.addAppender(appender);
+                try {
+                    boundary.setLevel(Level.INFO);
+                    var response = context.getBean(HealthEndpointWebExtension.class)
+                        .health(ApiVersion.V3, WebServerNamespace.SERVER, SecurityContext.NONE);
+                    assertThat(response.getStatus()).isEqualTo(200);
+                    assertThat(new ObjectMapper().writeValueAsString(response.getBody()))
+                        .doesNotContain("private-case-123");
+                    assertThat(appender.list).filteredOn(event -> event.getLevel().isGreaterOrEqual(Level.WARN))
+                        .singleElement().satisfies(event -> {
+                            assertThat(event.getFormattedMessage())
+                                .isEqualTo("Health diagnostic: code=REQUEST_FAILED");
+                            assertThat(event.getThrowableProxy()).isNull();
+                        });
+                } finally {
+                    boundary.setLevel(previousLevel);
+                    root.detachAppender(appender);
+                    appender.stop();
+                }
+            });
     }
 
     static class DiagnosticHealthIndicator extends AbstractHealthIndicator {

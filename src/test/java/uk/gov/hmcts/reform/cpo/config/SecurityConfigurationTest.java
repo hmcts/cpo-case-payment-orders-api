@@ -80,7 +80,7 @@ class SecurityConfigurationTest {
             .andExpect(status().isUnauthorized())
             .andExpect(content().string(""))
             .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header()
-                .string("WWW-Authenticate", "Bearer"));
+                .string("WWW-Authenticate", "Bearer error=\"invalid_token\""));
     }
 
     @Test
@@ -151,7 +151,7 @@ class SecurityConfigurationTest {
     }
 
     @Test
-    void idamOutagesStay500AndDoNotEscapeTheSecurityChain() throws Exception {
+    void idamOutagesStay401AndDoNotEscapeTheSecurityChain() throws Exception {
         Jwt jwt = Jwt.withTokenValue(TOKEN).header("alg", "none").claim(TOKEN_NAME, "access_token").build();
         when(jwtDecoder.decode(TOKEN)).thenReturn(jwt);
         when(jwtGrantedAuthoritiesConverter.convert(any(Jwt.class))).thenThrow(
@@ -174,14 +174,14 @@ class SecurityConfigurationTest {
                 mockMvc.perform(get("/test-secured")
                         .header("Authorization", "Bearer " + TOKEN)
                         .header(ServiceAuthFilter.AUTHORISATION, "service-token"))
-                    .andExpect(status().isInternalServerError())
+                    .andExpect(status().isUnauthorized())
                     .andExpect(content().string(""))
                     .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header()
-                        .doesNotExist("WWW-Authenticate"));
+                        .string("WWW-Authenticate", "Bearer"));
                 assertThat(appender.list).extracting(ILoggingEvent::getFormattedMessage)
-                    .contains("Authentication service failed: code=INTERNAL_ERROR status=500");
+                    .contains("Authentication failed: code=AUTHENTICATION_REQUIRED status=401");
                 assertThat(appender.list).filteredOn(event -> event.getLevel().isGreaterOrEqual(Level.WARN))
-                    .allSatisfy(event -> {
+                    .singleElement().satisfies(event -> {
                         assertThat(event.getFormattedMessage()).doesNotContain("Synthetic private IDAM detail");
                         assertThat(event.getThrowableProxy()).isNull();
                     });

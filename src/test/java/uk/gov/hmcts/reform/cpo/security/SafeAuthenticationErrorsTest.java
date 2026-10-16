@@ -40,7 +40,7 @@ class SafeAuthenticationErrorsTest {
             new SafeAuthenticationErrors().commence(new MockHttpServletRequest(), response,
                 new OAuth2AuthenticationException(BearerTokenErrors.invalidRequest("Synthetic bearer diagnostic")));
             assertThat(response.getStatus()).isEqualTo(400);
-            assertThat(response.getHeader("WWW-Authenticate")).isEqualTo("Bearer");
+            assertThat(response.getHeader("WWW-Authenticate")).isEqualTo("Bearer error=\"invalid_request\"");
             assertThat(response.getContentAsString()).isEmpty();
             assertThat(appender.list).hasSize(1);
             assertThat(appender.list.get(0).getFormattedMessage())
@@ -59,6 +59,8 @@ class SafeAuthenticationErrorsTest {
         new SafeAuthenticationErrors().handle(new MockHttpServletRequest(), response,
             new AccessDeniedException("Internal access rule details"));
         assertThat(response.getStatus()).isEqualTo(403);
+        assertThat(response.getHeader("WWW-Authenticate"))
+            .isEqualTo(SafeAuthenticationErrors.ACCESS_DENIED_CHALLENGE);
         assertThat(response.getContentAsString()).isEmpty();
     }
 

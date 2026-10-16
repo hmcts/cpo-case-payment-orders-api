@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.cpo.config;
 
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.LoggerContextListener;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.DisposableBean;
@@ -20,15 +23,53 @@ public class SafeHealthLoggingConfiguration {
         return new HealthLoggingPostProcessor();
     }
 
-    private static final class HealthLoggingPostProcessor implements BeanPostProcessor, DisposableBean {
+    static final class HealthLoggingPostProcessor implements BeanPostProcessor, DisposableBean {
 
-        private final LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+        private final LoggerContext context;
         private final SafeHealthDiagnosticsFilter filter = new SafeHealthDiagnosticsFilter();
+        private final LoggerContextListener listener = new LoggerContextListener() {
+            @Override
+            public boolean isResetResistant() {
+                return true;
+            }
+
+            @Override
+            public void onStart(LoggerContext loggerContext) {
+                installFilter();
+            }
+
+            @Override
+            public void onReset(LoggerContext loggerContext) {
+                installFilter();
+            }
+
+            @Override
+            public void onStop(LoggerContext loggerContext) {
+                // Spring context destruction removes the listener and filter.
+            }
+
+            @Override
+            public void onLevelChange(Logger logger, Level level) {
+                // The filter respects each source logger's effective level.
+            }
+        };
 
         private HealthLoggingPostProcessor() {
+            this((LoggerContext) LoggerFactory.getILoggerFactory());
+        }
+
+        HealthLoggingPostProcessor(LoggerContext context) {
+            this.context = context;
+            context.addListener(listener);
+            installFilter();
+        }
+
+        private void installFilter() {
             filter.setContext(context);
             filter.start();
-            context.addTurboFilter(filter);
+            if (!context.getTurboFilterList().contains(filter)) {
+                context.addTurboFilter(filter);
+            }
         }
 
         @Override
@@ -50,6 +91,7 @@ public class SafeHealthLoggingConfiguration {
 
         @Override
         public void destroy() {
+            context.removeListener(listener);
             context.getTurboFilterList().remove(filter);
             filter.stop();
         }

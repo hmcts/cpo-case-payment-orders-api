@@ -86,7 +86,6 @@ public class CasePaymentOrdersController {
                     + "   \"error\": \"Bad Request\",\n"
                     + "   \"code\": \"INVALID_REQUEST\",\n"
                     + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
-                    + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
                     + "   \"details\": [ \"" + ValidationError.CASE_ID_INVALID + "\" ]\n"
                     + "}"
             ))
@@ -131,7 +130,6 @@ public class CasePaymentOrdersController {
                     + "   \"error\": \"Bad Request\",\n"
                     + "   \"code\": \"INVALID_REQUEST\",\n"
                     + "   \"message\": \"Bad Request\",\n"
-                    + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
                     + "   \"details\": null\n"
                     + "}"
             ))
@@ -205,7 +203,6 @@ public class CasePaymentOrdersController {
                     + "   \"error\": \"Bad Request\",\n"
                     + "   \"code\": \"INVALID_REQUEST\",\n"
                     + "   \"message\": \"Bad Request\",\n"
-                    + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
                     + "   \"details\": null\n"
                     + "}"
             ))
@@ -271,7 +268,6 @@ public class CasePaymentOrdersController {
                     + "   \"error\": \"Bad Request\",\n"
                     + "   \"code\": \"INVALID_REQUEST\",\n"
                     + "   \"message\": \"" + ValidationError.ARGUMENT_NOT_VALID + "\",\n"
-                    + "   \"path\": \"" + CASE_PAYMENT_ORDERS_PATH + "\",\n"
                     + "   \"details\": [ \"" + ValidationError.ID_REQUIRED + "\" ]\n"
                     + "}"
             ))

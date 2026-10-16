@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -16,6 +17,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
+import uk.gov.hmcts.reform.cpo.security.SafeAuthenticationErrors;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
@@ -78,7 +80,19 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             status = HttpStatus.UNAUTHORIZED;
         }
         logFailure(exception, status.value());
-        return ResponseEntity.status(status).body(new HttpError<>(exception, request, status));
+        ResponseEntity.BodyBuilder response = ResponseEntity.status(status);
+        if (status == HttpStatus.FORBIDDEN) {
+            response.header(HttpHeaders.WWW_AUTHENTICATE, SafeAuthenticationErrors.ACCESS_DENIED_CHALLENGE);
+        }
+        return response.body(new HttpError<>(exception, request, status));
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
+        HttpRequestMethodNotSupportedException exception, HttpHeaders headers, HttpStatusCode status,
+        WebRequest request) {
+        // The superclass logs the rejected method at WARN before delegating.
+        return handleExceptionInternal(exception, null, headers, status, request);
     }
 
     @Override

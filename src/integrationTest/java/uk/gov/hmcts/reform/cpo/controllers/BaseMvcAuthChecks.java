@@ -303,7 +303,7 @@ class BaseMvcAuthChecks extends BaseTest {
             .andExpect(jsonPath("$.exception")
                 .doesNotExist())
             .andExpect(header()
-                .doesNotExist(HttpHeaders.WWW_AUTHENTICATE));
+                .string(HttpHeaders.WWW_AUTHENTICATE, "Bearer error=\"insufficient_scope\""));
     }
 
     /*

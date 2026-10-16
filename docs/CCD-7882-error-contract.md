@@ -1,6 +1,6 @@
 # CCD-7882: controlled error responses
 
-API responses no longer include exception class names or raw exception messages. Standard HTTP status descriptions replace diagnostic messages. Existing fixed validation messages remain where already defined. Payment validation details contain user-facing validation messages, never exception causes. Advice error bodies include a stable category `code` derived only from the HTTP status, for example `INVALID_REQUEST` or `INTERNAL_ERROR`. Advice/security-handler error/warn logs contain the same code without exception messages or stack traces. Original exceptions are logged only at DEBUG, which can be enabled for the advice/security handler package when needed; log access must stay restricted through the existing platform controls. No existing non-identifying reference was found in these handlers, so no reference is added. Empty security responses and Spring Boot fallback responses retain their existing shapes.
+API responses no longer include exception class names or raw exception messages. Standard HTTP status descriptions replace diagnostic messages. Existing fixed validation messages remain where already defined. Payment validation details contain user-facing validation messages, never exception causes. Advice error bodies include a stable category `code` derived only from the HTTP status, for example `INVALID_REQUEST` or `INTERNAL_ERROR`. Advice/security-handler error/warn logs contain the same code without exception messages or stack traces. Original exceptions are logged only at DEBUG, which can be enabled for the advice/security handler package when needed; log access must stay restricted through the existing platform controls. No existing non-identifying reference was found in these handlers, so no reference is added. Security-filter responses remain empty. Advice and Spring Boot fallback JSON omit request paths.
 
 Spring Boot fallback responses explicitly exclude exception, message, binding errors and stack traces, including when a caller requests them with query parameters. HTML error responses use a fixed generic page. Invalid bearer credentials return an empty 401; OAuth invalid-request errors retain 400. Both use a generic `WWW-Authenticate: Bearer` challenge; denied access returns 403 without diagnostic text. Token validation, endpoint permissions and document access checks are unchanged.
 
@@ -23,7 +23,7 @@ Result: **45 tests passed**, no failures or skips; `checkstyleMain` and `checkst
 ## Support use of error codes
 
 HTTP status remains unchanged. Advice JSON includes `code`; security filters continue to return empty
-401/403 bodies with the code in handler logs. Spring Boot fallback responses retain their existing shape.
+401/403 bodies with the code in handler logs. Spring Boot fallback responses omit reflected paths.
 These backend changes do not make a frontend display the code automatically.
 
 | Status | Code | Support action |
@@ -208,7 +208,7 @@ its Spring context closes. Health results and HTTP statuses are unchanged. This 
 Logback; custom contributors that log through unrelated logger names need separate verification.
 
 Bearer authentication now has an explicit failure handler. AuthenticationServiceException (including
-IDAM outages) remains 500, with an empty body and no Bearer challenge. The original exception is
+IDAM outages) retains the existing 401 contract, with an empty body and a generic Bearer challenge. The original exception is
 logged at DEBUG only, preventing Spring's default rethrow from reaching container ERROR logs.
 Normal invalid-token/invalid-request handling continues through the existing safe entry point.
 
@@ -226,7 +226,89 @@ IDAM failure diagnostics use the existing `uk.gov.hmcts.reform.cpo.security.Safe
 Framework-path regression results: **150 affected tests passed**, no failures/errors/skips.
 Tests now use real AbstractHealthIndicator implementations (including nested composite contributors)
 and capture propagated INFO/DEBUG logs. Translation/CPO also simulate IDAM failures through the
-full bearer chain, verifying empty 500 responses, no WWW-Authenticate header, no normal-level
+full bearer chain, verifying empty 401 responses, a generic WWW-Authenticate header, no normal-level
 throwables, and DEBUG-only causes. Public health status/body and existing bearer checks remain green.
 Checkstyle and integration/functional compilation are checked separately; deployed functional tests
 and App Insights ingestion are still outstanding.
+
+## SQL diagnostics and authentication compatibility
+
+IDAM outages retain the existing 401/empty-body/`WWW-Authenticate: Bearer` contract.
+The authentication boundary owns the normal-level failure event; converter and service layers
+preserve causes for the boundary's DEBUG diagnostic without duplicate ERROR events.
+
+Hibernate's `org.hibernate.engine.jdbc.spi.SqlExceptionHelper` WARN/ERROR messages are redirected to
+owned DEBUG logging because they can include constraint names, case IDs and order references.
+Request failures produce the advice's single safe code/status event. Original SQL exceptions, including
+translated 409 conflicts, remain attached as causes and are available through the advice's DEBUG logger.
+A real PostgreSQL duplicate-key integration test captures root logs and checks the safe event.
+
+
+## Ticket-description confirmation — 16 October 2026
+
+The source review identified reflected paths, inherited 405 warnings, dependency/health logging,
+logging reloads, access-denied challenges and duplicate IDAM DEBUG events. These source gaps are
+addressed in the follow-up below; deployed compliance still requires environment verification.
+
+All three checked-out branches are `CCD-7882_Verbose_Error_Messages`. Their ErrorCode enum bodies
+and mappings are identical to the proposed table. Generic advice/HTML responses, disabled Boot
+exception/message/trace/binding output and DEBUG diagnostics implement the main remediation.
+This is a source/documentation review, not evidence of deployment, administrator-only log access,
+retesting the reported ITHC URLs, or stakeholder approval of the shared code names. See the README
+for the concise contract and unresolved branch-specific gaps. No implementation changes or test
+reruns were made for this documentation confirmation.
+
+## Access-denied challenges and complete diagnostic paths
+
+Authenticated access denials retain `WWW-Authenticate: Bearer error="insufficient_scope"`
+without diagnostic descriptions or URIs, including method-security denials handled by the advice.
+Error JSON omits request paths in both advice and Spring Boot fallback responses. Functional
+fixtures use local error-response bases without inherited path expectations; request status codes remain unchanged.
+Spring 405 handling preserves Allow headers while avoiding the superclass's rejected-method WARN.
+
+The context-managed Logback filter also controls dependency WARN/ERROR events, including connection
+pools, servlet/framework errors and slow-health contributor warnings. Normal events keep severity
+and fixed categories; logger names, messages and causes are available only at the owned
+`uk.gov.hmcts.reform.cpo.logging.SafeHealthDiagnosticsFilter` DEBUG logger. Events below a source
+logger's configured threshold remain disabled. This protection applies after filter installation;
+pre-context startup output, container access logs and agent collection require deployment checks.
+
+IDAM converter and service layers preserve exception causes without logging duplicates. The security
+handler or advice logs the original cause once at DEBUG. Deployed functional verification and App
+Insights checks remain outstanding.
+
+The diagnostic filter is reset-resistant: logging reloads reinstall it without duplicate registration,
+and closing the owning Spring context removes it and its listener. Regression tests cover disabled
+source levels, logging resets, dependency causes, and a real slow healthy indicator (HTTP 200).
+
+
+## Final branch requirement review — 16 October 2026
+
+Reviewed controller/security/fallback paths, unchanged callers, dependency diagnostics and the supplied
+error-code table. All normal owned failure logs use safe summaries; original causes remain available
+through the documented DEBUG loggers. Production acceptance requires deployed ITHC/BEFTA retesting,
+upstream error-page checks, administrator-only log access and App Insights/agent verification.
+The README remains support/maintenance guidance without ticket or branch history.
+
+An isolated executable probe of pre-change advice (9b8a457^) confirmed inherited response-writing 500,
+method 405, media 415 and upload-size 413 mappings; these are preserved. IDAM outages remain empty 401.
+Bearer challenges now retain allowlisted protocol error codes without descriptions/URIs/scopes.
+Annotation reason text is excluded from generic JSON. Query failure wrappers retain the original cause
+for boundary DEBUG logging while retaining 400. Intermediate JDBC/transaction/MVC diagnostics defer
+normal failure summaries to the terminal boundary. SqlExceptionHelper no longer needs OFF: its original
+messages are routed to owned DEBUG without duplicate WARN/ERROR events.
+
+
+Final local validation: **224 unit tests and 109 integration tests passed**, no failures,
+errors or skips. Main/unit/integration/functional Checkstyle and functional Java compilation passed;
+`git diff --check` passed. Integration tests include the configured authentication filters and actual
+request paths. All 97 functional feature JSON files parsed successfully.
+
+```sh
+./gradlew test integration --offline checkstyleMain checkstyleTest checkstyleIntegrationTest checkstyleFunctionalTest compileFunctionalTestJava --console=plain
+```
+
+Deployed functional/ITHC retesting, upstream/container responses, administrator-only log access and
+App Insights/independent agent instrumentation remain environment acceptance checks. Shared code
+names are suitable categories; stakeholder approval is not established by the local tests.
+Changes remain uncommitted.

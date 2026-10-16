@@ -6,11 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.util.UriUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
@@ -26,7 +24,6 @@ public class HttpError<T extends Serializable> implements Serializable {
     private final String error;
     private final ErrorCode code;
     private String message;
-    private final String path;
     private T details;
 
     public HttpError(Exception exception, String path, HttpStatus status) {
@@ -37,7 +34,6 @@ public class HttpError<T extends Serializable> implements Serializable {
         this.error = getErrorReason(responseStatus, status);
         this.code = ErrorCode.fromStatus(this.status);
         this.message = this.error;
-        this.path = UriUtils.encodePath(path, StandardCharsets.UTF_8);
     }
 
     public HttpError(Exception exception, HttpServletRequest request, HttpStatus status) {
@@ -78,10 +74,6 @@ public class HttpError<T extends Serializable> implements Serializable {
 
     private String getErrorReason(ResponseStatus responseStatus, HttpStatus status) {
         if (null != responseStatus) {
-            if (!responseStatus.reason().isEmpty()) {
-                return responseStatus.reason();
-            }
-
             final var httpStatus = getHttpStatus(responseStatus);
             if (null != httpStatus) {
                 return httpStatus.getReasonPhrase();

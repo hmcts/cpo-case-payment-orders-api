@@ -57,6 +57,7 @@ class SafeErrorResponseTest {
         mvc.perform(get("/error-probe/id/not-a-uuid"))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.code").value("INVALID_REQUEST"))
+            .andExpect(jsonPath("$.path").doesNotExist())
             .andExpect(content().string(not(containsString("java.util.UUID"))))
             .andExpect(jsonPath("$.exception").doesNotExist())
             .andExpect(jsonPath("$.details").doesNotExist());
@@ -67,6 +68,7 @@ class SafeErrorResponseTest {
         mvc.perform(post("/error-probe").contentType(MediaType.APPLICATION_JSON).content("{invalid"))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.code").value("INVALID_REQUEST"))
+            .andExpect(jsonPath("$.path").doesNotExist())
             .andExpect(content().string(not(containsString("JsonParseException"))))
             .andExpect(content().string(not(containsString("invalid"))))
             .andExpect(jsonPath("$.exception").doesNotExist());
@@ -82,6 +84,30 @@ class SafeErrorResponseTest {
             .andExpect(status().isMethodNotAllowed())
             .andExpect(header().string("Allow", "POST"))
             .andExpect(jsonPath("$.exception").doesNotExist());
+    }
+
+    @Test
+    void unsupportedMethodsDoNotLogTheRejectedMethod() throws Exception {
+        Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        rootLogger.addAppender(appender);
+        try {
+            mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request(
+                    "PRIVATE_METHOD_123", java.net.URI.create("/error-probe/failure")))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(header().string("Allow", containsString("GET")))
+                .andExpect(jsonPath("$.path").doesNotExist());
+            assertThat(appender.list).filteredOn(event -> event.getLevel().isGreaterOrEqual(Level.WARN))
+                .singleElement().satisfies(event -> {
+                    assertThat(event.getFormattedMessage())
+                        .isEqualTo("Request failed: code=METHOD_NOT_ALLOWED status=405");
+                    assertThat(event.getThrowableProxy()).isNull();
+                });
+        } finally {
+            rootLogger.detachAppender(appender);
+            appender.stop();
+        }
     }
 
     @Test
@@ -136,6 +162,7 @@ class SafeErrorResponseTest {
         mvc.perform(get("/error-probe/failure"))
             .andExpect(status().isForbidden())
             .andExpect(jsonPath("$.code").value("ACCESS_DENIED"))
+            .andExpect(header().string("WWW-Authenticate", "Bearer error=\"insufficient_scope\""))
             .andExpect(content().string(not(containsString(DIAGNOSTIC))));
     }
 

@@ -1,6 +1,11 @@
 package uk.gov.hmcts.reform.cpo.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import org.slf4j.LoggerFactory;
 import org.hibernate.envers.RevisionType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,6 +44,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -216,20 +222,37 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                                                               RESPONSIBLE_PARTY,
                                                                               savedEntity.getOrderReference());
 
-            mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
-                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath(ERROR_PATH_MESSAGE).value(HttpStatus.CONFLICT.getReasonPhrase()))
-                .andExpect(jsonPath("$.code").value(ErrorCode.REQUEST_FAILED.name()))
-                .andExpect(jsonPath("$.exception").doesNotExist())
-                .andExpect(jsonPath("$.details").doesNotExist())
+            Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+            ListAppender<ILoggingEvent> appender = new ListAppender<>();
+            appender.start();
+            rootLogger.addAppender(appender);
+            try {
+                MvcResult result = mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+                                    .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath(ERROR_PATH_MESSAGE).value(HttpStatus.CONFLICT.getReasonPhrase()))
+                    .andExpect(jsonPath("$.code").value(ErrorCode.REQUEST_FAILED.name()))
+                    .andExpect(jsonPath("$.exception").doesNotExist())
+                    .andExpect(jsonPath("$.details").doesNotExist())
 
-                .andExpect(hasGeneratedLogAudit(AuditOperationType.CREATE_CASE_PAYMENT_ORDER,
-                                                AUTHORISED_CRUD_SERVICE,
-                                                null,
-                                                createCasePaymentOrderRequest.getCaseId()));
+                    .andExpect(hasGeneratedLogAudit(AuditOperationType.CREATE_CASE_PAYMENT_ORDER,
+                                                    AUTHORISED_CRUD_SERVICE,
+                                                    null,
+                                                    createCasePaymentOrderRequest.getCaseId())).andReturn();
+                assertThat(result.getResolvedException()).hasCauseInstanceOf(
+                    org.springframework.dao.DataIntegrityViolationException.class);
+                assertThat(appender.list).filteredOn(event -> event.getLevel().isGreaterOrEqual(Level.WARN))
+                    .singleElement().satisfies(event -> {
+                        assertThat(event.getFormattedMessage())
+                            .isEqualTo("Request failed: code=REQUEST_FAILED status=409");
+                        assertThat(event.getThrowableProxy()).isNull();
+                    });
+            } finally {
+                rootLogger.detachAppender(appender);
+                appender.stop();
+            }
         }
 
         private void verifyDbCpoValues(UUID id,

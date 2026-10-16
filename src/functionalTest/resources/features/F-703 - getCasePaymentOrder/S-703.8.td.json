@@ -16,11 +16,10 @@
   },
 
   "expectedResponse" : {
-    "_extends_" : "Common_400_Response",
+    "_extends_" : "CPO_400_Response",
     "body" : {
       "code": "INVALID_REQUEST",
       "message" : "Bad Request",
-      "path" : "/case-payment-orders",
       "details" : null
     }
   }

@@ -24,7 +24,6 @@ class HttpErrorTest implements BaseTest {
 
         // THEN
         assertNotNull("Should record a date & time", httpError.getTimestamp());
-        assertEquals("Should record path", CasePaymentOrdersController.CASE_PAYMENT_ORDERS_PATH, httpError.getPath());
         assertEquals("Should record DEFAULT status", HttpError.DEFAULT_STATUS, httpError.getStatus());
         assertEquals("Should record DEFAULT error", HttpError.DEFAULT_ERROR, httpError.getError());
     }
@@ -62,8 +61,8 @@ class HttpErrorTest implements BaseTest {
     }
 
     @Test
-    @DisplayName("Should initialise HttpError from defaults and exception's ResponseStatus Reason")
-    void shouldInitialiseHttpErrorFromDefaultStatusAndExceptionsResponseStatusReason() {
+    @DisplayName("Should omit exception ResponseStatus reason text")
+    void shouldOmitExceptionsResponseStatusReason() {
 
         // GIVEN
         TestResponseStatusWithReasonException ex = new TestResponseStatusWithReasonException("test");
@@ -75,8 +74,7 @@ class HttpErrorTest implements BaseTest {
         // THEN
         assertEquals("Should record DEFAULT status",
                      HttpError.DEFAULT_STATUS, httpError.getStatus());
-        assertEquals("Should record exception's ResponseStatus.Reason",
-                     TestResponseStatusWithReasonException.REASON, httpError.getError());
+        assertEquals("Should use generic error text", HttpError.DEFAULT_ERROR, httpError.getError());
     }
 
     @Test

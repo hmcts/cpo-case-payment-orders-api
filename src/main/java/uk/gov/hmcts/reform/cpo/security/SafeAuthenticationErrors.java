@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.server.resource.BearerTokenError;
@@ -19,37 +18,40 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 public class SafeAuthenticationErrors
     implements AuthenticationEntryPoint, AccessDeniedHandler, AuthenticationFailureHandler {
 
+    public static final String ACCESS_DENIED_CHALLENGE = "Bearer error=\"insufficient_scope\"";
+
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException exception) {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
-        if (exception instanceof OAuth2AuthenticationException oauthException
-            && oauthException.getError() instanceof BearerTokenError bearerError) {
-            status = bearerError.getHttpStatus();
+        String challenge = "Bearer";
+        if (exception instanceof OAuth2AuthenticationException oauthException) {
+            if (oauthException.getError() instanceof BearerTokenError bearerError) {
+                status = bearerError.getHttpStatus();
+            }
+            String error = oauthException.getError().getErrorCode();
+            if (java.util.Set.of("invalid_request", "invalid_token", "insufficient_scope").contains(error)) {
+                challenge += " error=\"" + error + "\"";
+            }
         }
         ErrorCode code = ErrorCode.fromStatus(status.value());
         log.warn("Authentication failed: code={} status={}", code, status.value());
         log.debug("Original authentication failure: code={} status={}", code, status.value(), exception);
-        response.setHeader(HttpHeaders.WWW_AUTHENTICATE, "Bearer");
+        response.setHeader(HttpHeaders.WWW_AUTHENTICATE, challenge);
         response.setStatus(status.value());
     }
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) {
-        if (exception instanceof AuthenticationServiceException) {
-            log.error("Authentication service failed: code={} status=500", ErrorCode.INTERNAL_ERROR);
-            log.debug("Original authentication service failure", exception);
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        } else {
-            commence(request, response, exception);
-        }
+        commence(request, response, exception);
     }
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception) {
         log.warn("Access denied: code={} status=403", ErrorCode.ACCESS_DENIED);
         log.debug("Original access denial: code={} status=403", ErrorCode.ACCESS_DENIED, exception);
+        response.setHeader(HttpHeaders.WWW_AUTHENTICATE, ACCESS_DENIED_CHALLENGE);
         response.setStatus(HttpStatus.FORBIDDEN.value());
     }
 }

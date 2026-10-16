@@ -18,11 +18,10 @@
   },
 
   "expectedResponse" : {
-    "_extends_" : "Common_409_Response",
+    "_extends_" : "CPO_409_Response",
     "body" : {
       "code": "REQUEST_FAILED",
       "message" : "Conflict",
-      "path" : "/case-payment-orders",
       "details" : null
     }
   }
