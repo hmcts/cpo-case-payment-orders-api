@@ -311,4 +311,16 @@ request paths. All 97 functional feature JSON files parsed successfully.
 Deployed functional/ITHC retesting, upstream/container responses, administrator-only log access and
 App Insights/independent agent instrumentation remain environment acceptance checks. Shared code
 names are suitable categories; stakeholder approval is not established by the local tests.
-Changes remain uncommitted.
+The implementation and local validation above are included in commit `33e9c72`.
+
+## Functional fixture fixes
+
+- Local `CPO_400_Response`, `CPO_404_Response` and `CPO_409_Response` bases avoid inheriting
+  request-path expectations from BEFTA's shared error bodies.
+- `CPO_403_Response` expects safe `ACCESS_DENIED` JSON and the required
+  `WWW-Authenticate: Bearer error="insufficient_scope"` challenge, without diagnostic descriptions.
+- Error scenarios expect safe messages and codes rather than exception names or reflected identifiers.
+  HTTP status expectations remain unchanged.
+
+Fixture JSON validation and Java compilation passed locally; these do not establish a deployed
+functional-test pass. Rerun BEFTA in Jenkins to verify the deployed responses against the fixtures.
