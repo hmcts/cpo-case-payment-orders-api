@@ -221,11 +221,13 @@ def versions = [
   testcontainers  : '1.21.4',
 ]
 
-ext['spring-security.version'] = '6.5.7'
-ext['spring-framework.version'] = '6.2.14'
-ext['log4j2.version'] = '2.23.1'
+ext['spring-security.version'] = '6.5.11'
+ext['spring-framework.version'] = '6.2.19'
+ext['tomcat.version'] = '10.1.60'
+ext['log4j2.version'] = '2.26.1'
 ext['snakeyaml.version'] = '2.4'
-ext['jackson.version'] = '2.19.4'
+ext['jackson.version'] = '2.22.3'
+ext['commons-lang3.version'] = '3.21.0'
 
 // before committing a change, make sure task still works
 dependencyUpdates {
