@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cpo.config;
 
+import jakarta.servlet.DispatcherType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -78,7 +79,10 @@ public class SecurityConfiguration {
             .csrf((csrf) -> csrf.disable())
             .formLogin((formLogin) -> formLogin.disable())
             .logout((logout) -> logout.disable())
-            .authorizeHttpRequests((authHttp) -> authHttp.anyRequest().authenticated())
+            .authorizeHttpRequests(authHttp -> authHttp
+                // Render container errors without replacing their original status with an authentication failure.
+                .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+                .anyRequest().authenticated())
             .oauth2ResourceServer(oauth -> oauth
                 .withObjectPostProcessor(new ObjectPostProcessor<BearerTokenAuthenticationFilter>() {
                     @Override

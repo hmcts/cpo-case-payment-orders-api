@@ -324,3 +324,33 @@ The implementation and local validation above are included in commit `33e9c72`.
 
 Fixture JSON validation and Java compilation passed locally; these do not establish a deployed
 functional-test pass. Rerun BEFTA in Jenkins to verify the deployed responses against the fixtures.
+
+## Real local HTTP verification — 19 October 2026
+
+`UnauthenticatedHttpIT` adds seven tests using an embedded server, loopback HTTP and a raw TCP request.
+Existing MockMvc/direct-controller tests did not exercise these container dispatches. The fixture
+imports production security/error/logging configuration and the real public root/health/info endpoints;
+IDAM/S2S clients are mocked and verified unused. No credentials, database or remote services are needed.
+
+Coverage includes public health UP/DOWN (200/503), anonymous protected requests, safe access-denied
+challenges, malformed JSON and request targets, 405 Allow headers, missing public resources, and
+JSON/HTML servlet/filter failures with diagnostic query parameters. WARN/ERROR logs are captured.
+Test-only probes are excluded from application component scanning.
+
+These tests exposed internal ERROR dispatches replacing a servlet 500 with an authentication 401.
+Security now permits container ERROR dispatches to render the safe error page with the original status.
+Direct anonymous requests to `/error` and protected application endpoints still return 401.
+
+```sh
+./gradlew integration --tests '*UnauthenticatedHttpIT' --console=plain
+./gradlew check integration --console=plain
+```
+
+Validation: **224 unit tests and 115 integration tests passed**, no failures/errors/skips; all
+Checkstyle checks passed and functional JSON parsed successfully. Deployed BEFTA/ITHC retesting,
+real IDAM/S2S integration, gateway/native container responses, pre-context startup logs, administrator
+log access and App Insights/independent agent behaviour remain deployment checks.
+
+XML-only fallback negotiation was also verified over loopback HTTP: a servlet 500 retains status 500
+with an empty body and no Content-Type when XML cannot be produced. HTML fallback still returns
+the fixed generic error page. This is content negotiation, not a guarantee of a JSON body for every Accept header.
