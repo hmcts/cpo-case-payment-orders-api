@@ -35,8 +35,7 @@ public class SafeAuthenticationErrors
             }
         }
         ErrorCode code = ErrorCode.fromStatus(status.value());
-        log.warn("Authentication failed: code={} status={}", code, status.value());
-        log.debug("Original authentication failure: code={} status={}", code, status.value(), exception);
+        log.warn("Authentication failed: code={} status={}", code, status.value(), exception);
         response.setHeader(HttpHeaders.WWW_AUTHENTICATE, challenge);
         response.setStatus(status.value());
     }
@@ -49,8 +48,7 @@ public class SafeAuthenticationErrors
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception) {
-        log.warn("Access denied: code={} status=403", ErrorCode.ACCESS_DENIED);
-        log.debug("Original access denial: code={} status=403", ErrorCode.ACCESS_DENIED, exception);
+        log.warn("Access denied: code={} status=403", ErrorCode.ACCESS_DENIED, exception);
         response.setHeader(HttpHeaders.WWW_AUTHENTICATE, ACCESS_DENIED_CHALLENGE);
         response.setStatus(HttpStatus.FORBIDDEN.value());
     }

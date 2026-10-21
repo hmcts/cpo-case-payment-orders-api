@@ -1,5 +1,19 @@
 # CCD-7882: controlled error responses
 
+## Current support logging policy
+
+Public error responses remain generic. Detailed request failures, including exception causes
+and stack traces, are retained at normal WARN/ERROR levels in server logs; DEBUG is optional
+additional troubleshooting. Dependency and health diagnostics retain their originating severity
+and respect the source logger threshold. Support must not need to enable DEBUG and reproduce
+an incident to obtain its original failure details.
+
+This policy supersedes the DEBUG-only descriptions and test expectations in earlier verification
+entries below. Those entries describe historical checks. Deployment acceptance still requires
+administrator-only log access, suitable retention and verification of logging/Application Insights
+collection. Local tests do not establish those infrastructure controls.
+
+
 API responses no longer include exception class names or raw exception messages. Standard HTTP status descriptions replace diagnostic messages. Existing fixed validation messages remain where already defined. Payment validation details contain user-facing validation messages, never exception causes. Advice error bodies include a stable category `code` derived only from the HTTP status, for example `INVALID_REQUEST` or `INTERNAL_ERROR`. Advice/security-handler error/warn logs contain the same code without exception messages or stack traces. Original exceptions are logged only at DEBUG, which can be enabled for the advice/security handler package when needed; log access must stay restricted through the existing platform controls. No existing non-identifying reference was found in these handlers, so no reference is added. Security-filter responses remain empty. Advice and Spring Boot fallback JSON omit request paths.
 
 Spring Boot fallback responses explicitly exclude exception, message, binding errors and stack traces, including when a caller requests them with query parameters. HTML error responses use a fixed generic page. Invalid bearer credentials return an empty 401; OAuth invalid-request errors retain 400. Both use a generic `WWW-Authenticate: Bearer` challenge; denied access returns 403 without diagnostic text. Token validation, endpoint permissions and document access checks are unchanged.
@@ -161,11 +175,9 @@ Bearer normalization, empty 401/403 responses and downstream exception handling 
 Filter overrides with distinct bean names remain intact. This wiring depends on the shared bean name and
 has a regression test; review it when upgrading the service-auth library.
 
-Request parsing failures remain 400/INVALID_REQUEST. Response serialization failures in translation
-and CDAM now return 500/INTERNAL_ERROR before commitment, correcting the earlier broad conversion
-exception mapping. This is a deliberate status correction; existing client-validation status
-expectations stay unchanged. Once a streaming response is committed, its HTTP status/body cannot
-be replaced; deployment checks must include aborted downloads and telemetry behaviour.
+Request parsing failures remain 400/INVALID_REQUEST. Once a streaming response is committed,
+its HTTP status/body cannot be replaced; deployment checks must include aborted downloads
+and telemetry behaviour.
 
 For temporary diagnosis, enable DEBUG only for the relevant owned security, audit, controller or
 service logger, together with the App Insights collection threshold described above. Restore both
@@ -189,8 +201,7 @@ logging:
 `compileIntegrationTestJava` and `compileFunctionalTestJava` passed. Regression coverage includes
 public health UP/DOWN response redaction (200/503), S2S 401/403/allowlist/Bearer handling and actual
 shared-bean replacement, INFO/DEBUG diagnostic separation, response serialization as 500, and
-preserved 405 Allow / 415 Accept headers. Translation/CPO also cover whole security-chain logging
-and committed error handling; CPO/CDAM cover audit interceptor and SpEL failures with log capture.
+preserved 405 Allow / 415 Accept headers.
 
 Health functional fixtures now expect status without component diagnostics. Existing error fixtures
 retain their HTTP statuses except the documented serialization correction. Integration/functional
@@ -225,7 +236,7 @@ IDAM failure diagnostics use the existing `uk.gov.hmcts.reform.cpo.security.Safe
 
 Framework-path regression results: **150 affected tests passed**, no failures/errors/skips.
 Tests now use real AbstractHealthIndicator implementations (including nested composite contributors)
-and capture propagated INFO/DEBUG logs. Translation/CPO also simulate IDAM failures through the
+and capture propagated INFO/DEBUG logs. Tests also simulate IDAM failures through the
 full bearer chain, verifying empty 401 responses, a generic WWW-Authenticate header, no normal-level
 throwables, and DEBUG-only causes. Public health status/body and existing bearer checks remain green.
 Checkstyle and integration/functional compilation are checked separately; deployed functional tests
@@ -250,11 +261,11 @@ The source review identified reflected paths, inherited 405 warnings, dependency
 logging reloads, access-denied challenges and duplicate IDAM DEBUG events. These source gaps are
 addressed in the follow-up below; deployed compliance still requires environment verification.
 
-All three checked-out branches are `CCD-7882_Verbose_Error_Messages`. Their ErrorCode enum bodies
-and mappings are identical to the proposed table. Generic advice/HTML responses, disabled Boot
+The reviewed branch is `CCD-7882_Verbose_Error_Messages`. Its ErrorCode enum
+and mappings were checked against the proposed table. Generic advice/HTML responses, disabled Boot
 exception/message/trace/binding output and DEBUG diagnostics implement the main remediation.
 This is a source/documentation review, not evidence of deployment, administrator-only log access,
-retesting the reported ITHC URLs, or stakeholder approval of the shared code names. See the README
+retesting the reported ITHC URLs, or stakeholder approval of the error category names. See the README
 for the concise contract and unresolved branch-specific gaps. No implementation changes or test
 reruns were made for this documentation confirmation.
 
@@ -309,7 +320,7 @@ request paths. All 97 functional feature JSON files parsed successfully.
 ```
 
 Deployed functional/ITHC retesting, upstream/container responses, administrator-only log access and
-App Insights/independent agent instrumentation remain environment acceptance checks. Shared code
+App Insights/independent agent instrumentation remain environment acceptance checks. Error category
 names are suitable categories; stakeholder approval is not established by the local tests.
 The implementation and local validation above are included in commit `33e9c72`.
 
@@ -354,3 +365,38 @@ log access and App Insights/independent agent behaviour remain deployment checks
 XML-only fallback negotiation was also verified over loopback HTTP: a servlet 500 retains status 500
 with an empty body and no Content-Type when XML cannot be produced. HTML fallback still returns
 the fixed generic error page. This is content negotiation, not a guarantee of a JSON body for every Accept header.
+
+## Authoritative remediation and support requirement
+
+The supplied CCD-7882 finding concerns unauthenticated disclosure of implementation details
+through HTTP error responses. This note covers the remediation and verification for this service.
+
+The remediation requires generic public error pages/responses and states: "The server should
+still log the detailed information, but access to the log will be restricted to administrators."
+An event reference is optional. It does not prescribe DEBUG-only logging or require support
+to restart a service to obtain diagnostics.
+
+Response sanitisation and administrator diagnostics are separate requirements. DEBUG-only
+implementation details described elsewhere in this note record the implementation, not an
+acceptance criterion from the finding. If production DEBUG is disabled and no other approved
+mechanism records the detailed failure, that is a support/acceptance gap: enabling DEBUG after
+an incident cannot recover its missing diagnostics. A safe category/status summary alone does
+not satisfy the detailed-log requirement.
+
+Before release, verify that detailed failures are recorded and accessible only to administrators,
+including the deployed logging/Application Insights configuration, while public responses stay
+generic. Preserve useful validation responses and existing protocol behaviour. Select and test
+the logging policy against these requirements; do not assume that moving every diagnostic to
+ERROR, or enabling DEBUG globally, is the required solution. Existing local test results do not
+establish this deployed acceptance. This requirement also applies to the current support logging policy above.
+
+## Support logging verification — 21 October 2026
+
+34 focused tests passed, zero failures/errors/skips. Checks cover the applicable request/error
+paths and confirm that public responses remain sanitised while original exception diagnostics
+are retained without enabling DEBUG. Java main/test Checkstyle passed.
+Administrator-only log access, retention and deployed collection remain environment acceptance checks.
+
+## Logging uniqueness review — 21 October 2026
+
+34 focused tests and main/test Checkstyle passed. Redundant DEBUG exception events have been removed. The regressions require one owned exception event at INFO and DEBUG.

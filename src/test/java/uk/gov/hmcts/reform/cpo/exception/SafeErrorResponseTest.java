@@ -102,7 +102,7 @@ class SafeErrorResponseTest {
                 .singleElement().satisfies(event -> {
                     assertThat(event.getFormattedMessage())
                         .isEqualTo("Request failed: code=METHOD_NOT_ALLOWED status=405");
-                    assertThat(event.getThrowableProxy()).isNull();
+                    assertThat(event.getThrowableProxy()).isNotNull();
                 });
         } finally {
             rootLogger.detachAppender(appender);
@@ -117,7 +117,7 @@ class SafeErrorResponseTest {
     }
 
     @Test
-    void logsSafeCodesAndKeepsOriginalExceptionsAtDebug() throws Exception {
+    void logsSafeCodesAndRetainsOriginalExceptionsAtInfo() throws Exception {
         Logger logger = (Logger) LoggerFactory.getLogger(RestExceptionHandler.class);
         Level previousLevel = logger.getLevel();
         ListAppender<ILoggingEvent> appender = new ListAppender<>();
@@ -133,16 +133,16 @@ class SafeErrorResponseTest {
                 "Request failed: code=INVALID_REQUEST status=400");
             assertThat(appender.list).allSatisfy(event -> {
                 assertThat(event.getLevel()).isEqualTo(Level.ERROR);
-                assertThat(event.getThrowableProxy()).isNull();
+                assertThat(event.getThrowableProxy()).isNotNull();
             });
             appender.list.clear();
             logger.setLevel(Level.DEBUG);
             mvc.perform(get("/error-probe/failure")).andExpect(status().isInternalServerError());
-            assertThat(appender.list).hasSize(2);
-            ILoggingEvent diagnostic = appender.list.get(1);
-            assertThat(diagnostic.getLevel()).isEqualTo(Level.DEBUG);
+            assertThat(appender.list).hasSize(1);
+            ILoggingEvent diagnostic = appender.list.get(0);
+            assertThat(diagnostic.getLevel()).isEqualTo(Level.ERROR);
             assertThat(diagnostic.getFormattedMessage()).isEqualTo(
-                "Original request failure: code=INTERNAL_ERROR status=500");
+                "Request failed: code=INTERNAL_ERROR status=500");
             assertThat(diagnostic.getThrowableProxy().getMessage()).isEqualTo(DIAGNOSTIC);
         } finally {
             logger.setLevel(previousLevel);

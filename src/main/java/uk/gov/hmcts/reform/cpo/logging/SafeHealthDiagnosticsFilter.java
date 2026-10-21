@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.cpo.security.ErrorCode;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** Keeps health and dependency diagnostics behind an owned DEBUG logger. */
+/** Retains health and dependency diagnostics in administrator-controlled server logs. */
 @Slf4j
 public class SafeHealthDiagnosticsFilter extends TurboFilter {
 
@@ -38,26 +38,18 @@ public class SafeHealthDiagnosticsFilter extends TurboFilter {
         if (!health && logger.getName().startsWith("uk.gov.hmcts.reform.cpo.")) {
             return FilterReply.NEUTRAL;
         }
-        String name = logger.getName();
-        boolean boundaryLogsFailure = name.equals("org.hibernate.engine.jdbc.spi.SqlExceptionHelper")
-            || name.startsWith("org.hibernate.orm.jdbc.batch")
-            || name.startsWith("org.springframework.transaction.interceptor.")
-            || name.equals("org.springframework.transaction.support.TransactionTemplate")
-            || name.equals("org.springframework.web.servlet.PageNotFound")
-            || name.startsWith("org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver")
-            || name.equals("org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver");
-        // Intermediate JDBC/transaction/MVC diagnostics precede the terminal failure summary.
-        if (!boundaryLogsFailure) {
-            String summary = health ? "Health diagnostic" : "Dependency diagnostic";
-            if (level == Level.ERROR) {
-                log.error("{}: code={}", summary, ErrorCode.INTERNAL_ERROR);
-            } else {
-                log.warn("{}: code={}", summary, ErrorCode.REQUEST_FAILED);
-            }
-        }
         FormattingTuple diagnostic = MessageFormatter.arrayFormat(format, arguments);
-        log.debug("Original diagnostic: component={} message={}", logger.getName(),
-            diagnostic.getMessage(), exception != null ? exception : diagnostic.getThrowable());
+        Throwable cause = exception != null ? exception : diagnostic.getThrowable();
+        if (level == Level.ERROR) {
+            log.error("Dependency diagnostic: code={} logger={} message={}",
+                ErrorCode.INTERNAL_ERROR, logger.getName(), diagnostic.getMessage(), cause);
+        } else if (level == Level.INFO) {
+            log.info("Dependency diagnostic: code={} logger={} message={}",
+                ErrorCode.REQUEST_FAILED, logger.getName(), diagnostic.getMessage(), cause);
+        } else {
+            log.warn("Dependency diagnostic: code={} logger={} message={}",
+                ErrorCode.REQUEST_FAILED, logger.getName(), diagnostic.getMessage(), cause);
+        }
         return FilterReply.DENY;
     }
 }
