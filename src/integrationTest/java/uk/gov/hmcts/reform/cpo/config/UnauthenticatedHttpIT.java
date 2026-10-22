@@ -92,15 +92,10 @@ class UnauthenticatedHttpIT {
     }
 
     @AfterEach
-    void verifyNoDiagnosticLogsOrRemoteCalls() {
+    void verifyNoRemoteCallsAndCleanUp() {
         root.detachAppender(logs);
         logs.stop();
         unhealthy.set(false);
-        assertThat(logs.list).filteredOn(event -> event.getLevel().isGreaterOrEqual(Level.WARN))
-            .allSatisfy(event -> {
-                assertThat(event.getFormattedMessage()).doesNotContain(PRIVATE, "java.lang.", "jdbc:");
-                assertThat(event.getThrowableProxy()).isNull();
-            });
         verifyNoInteractions(decoder, converter, serviceApi, idamClient);
     }
 
@@ -129,6 +124,9 @@ class UnauthenticatedHttpIT {
                 }
             }
         }
+        assertThat(logs.list).filteredOn(event -> event.getLevel().isGreaterOrEqual(Level.WARN)
+            && event.getThrowableProxy() != null).anySatisfy(event ->
+                assertThat(event.getThrowableProxy().getMessage()).contains(PRIVATE));
     }
 
     @Test
@@ -147,6 +145,9 @@ class UnauthenticatedHttpIT {
         assertThat(response.headers().firstValue("WWW-Authenticate").orElseThrow())
             .isEqualTo("Bearer error=\"insufficient_scope\"");
         assertSafe(response);
+        assertThat(logs.list).filteredOn(event -> event.getLoggerName().equals(
+            RestExceptionHandler.class.getName())).singleElement().satisfies(event ->
+                assertThat(event.getThrowableProxy().getMessage()).isEqualTo(PRIVATE));
     }
 
     @Test

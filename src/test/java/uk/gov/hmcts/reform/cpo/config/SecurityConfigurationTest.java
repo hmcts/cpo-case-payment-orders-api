@@ -141,8 +141,10 @@ class SecurityConfigurationTest {
             assertThat(appender.list).filteredOn(event -> event.getLevel().isGreaterOrEqual(Level.WARN))
                 .allSatisfy(event -> {
                     assertThat(event.getFormattedMessage()).doesNotContain("Synthetic", "private-service-id");
-                    assertThat(event.getThrowableProxy()).isNull();
                 });
+            assertThat(appender.list).filteredOn(event -> event.getThrowableProxy() != null)
+                .singleElement().satisfies(event -> assertThat(event.getThrowableProxy().getMessage())
+                    .isEqualTo("Synthetic internal S2S diagnostic"));
         } finally {
             logger.setLevel(previousLevel);
             rootLogger.detachAppender(appender);
@@ -183,14 +185,12 @@ class SecurityConfigurationTest {
                 assertThat(appender.list).filteredOn(event -> event.getLevel().isGreaterOrEqual(Level.WARN))
                     .singleElement().satisfies(event -> {
                         assertThat(event.getFormattedMessage()).doesNotContain("Synthetic private IDAM detail");
-                        assertThat(event.getThrowableProxy()).isNull();
+                        assertThat(event.getThrowableProxy()).isNotNull();
+                        assertThat(event.getThrowableProxy().getCause().getMessage())
+                            .isEqualTo("Synthetic private IDAM detail");
                     });
-                if (level == Level.DEBUG) {
-                    assertThat(appender.list).filteredOn(event -> event.getLoggerName().equals(logger.getName())
-                        && event.getLevel() == Level.DEBUG).anySatisfy(event ->
-                            assertThat(event.getThrowableProxy().getCause().getMessage())
-                                .isEqualTo("Synthetic private IDAM detail"));
-                }
+                assertThat(appender.list).filteredOn(event -> event.getLoggerName().equals(logger.getName()))
+                    .hasSize(1);
             }
         } finally {
             logger.setLevel(previousLevel);

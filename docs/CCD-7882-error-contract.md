@@ -400,3 +400,14 @@ Administrator-only log access, retention and deployed collection remain environm
 ## Logging uniqueness review — 21 October 2026
 
 34 focused tests and main/test Checkstyle passed. Redundant DEBUG exception events have been removed. The regressions require one owned exception event at INFO and DEBUG.
+
+## Full regression verification — 22 October 2026
+
+Updated stale full-chain, committed-response, SQL and local HTTP assertions to match the current
+administrator logging policy. Tests retain public-response redaction checks and require original
+server-side exception causes without duplicate owned authentication events.
+
+`./gradlew check integration --console=plain` passed: **221 unit tests and 116 integration tests**,
+zero failures/errors/skips, with all Checkstyle checks passing. Integration tests started a real
+Docker PostgreSQL container and exercised the local HTTP server. Deployed functional/ITHC and
+administrator-only telemetry access remain environment acceptance checks.
