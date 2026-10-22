@@ -1,11 +1,20 @@
 {
   "_guid_": "CPO_403_Response",
-  "_extends_": "Common_403_Response",
+  "_extends_": "Common_Response",
+  "responseCode": 403,
+  "responseMessage": "Forbidden",
 
   "headers": {
     "_extends_": "Common_400_Response_Headers",
-    "WWW-Authenticate": "Bearer error=\"insufficient_scope\", error_description=\"The request requires higher privileges than provided by the access token.\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+    "WWW-Authenticate": "Bearer error=\"insufficient_scope\""
   },
 
-  "body": null
+  "body": {
+    "status": 403,
+    "error": "Forbidden",
+    "code": "ACCESS_DENIED",
+    "message": "Forbidden",
+    "details": null,
+    "timestamp": "[[ANYTHING_PRESENT]]"
+  }
 }

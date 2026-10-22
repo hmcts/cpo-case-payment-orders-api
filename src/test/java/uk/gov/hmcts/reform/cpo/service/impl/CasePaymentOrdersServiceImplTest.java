@@ -156,7 +156,8 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
             given(securityUtils.getUserInfo()).willThrow(new RuntimeException());
             assertThatThrownBy(() -> casePaymentOrdersService.createCasePaymentOrder(createCasePaymentOrderRequest))
                 .isInstanceOf(IdAMIdCannotBeRetrievedException.class)
-                .hasMessageContaining(IDAM_ID_RETRIEVE_ERROR);
+                .hasMessageContaining(IDAM_ID_RETRIEVE_ERROR)
+                .hasCauseInstanceOf(RuntimeException.class);
         }
     }
 
@@ -288,11 +289,12 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
                 .pageable(getPageRequest())
                 .build();
 
+            IllegalArgumentException cause = new IllegalArgumentException("Synthetic private query failure");
             when(casePaymentOrdersRepository.findByIdIn(anyList(), any())).thenThrow(
-                new IllegalArgumentException());
+                cause);
 
             assertThatThrownBy(() -> casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter))
-                .isInstanceOf(CasePaymentOrdersFilterException.class);
+                .isInstanceOf(CasePaymentOrdersFilterException.class).hasCause(cause);
         }
 
         @Test
@@ -304,11 +306,12 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
                 .caseIds(casesIds)
                 .build();
 
+            IllegalArgumentException cause = new IllegalArgumentException("Synthetic private query failure");
             when(casePaymentOrdersRepository.findByCaseIdIn(anyList(), any())).thenThrow(
-                new IllegalArgumentException());
+                cause);
 
             assertThatThrownBy(() -> casePaymentOrdersService.getCasePaymentOrders(casePaymentOrderQueryFilter))
-                .isInstanceOf(CasePaymentOrdersFilterException.class);
+                .isInstanceOf(CasePaymentOrdersFilterException.class).hasCause(cause);
         }
 
         private Page<CasePaymentOrderEntity> getEntityPages() {
@@ -516,7 +519,8 @@ class CasePaymentOrdersServiceImplTest implements BaseTest {
             // WHEN / THEN
             assertThatThrownBy(() -> casePaymentOrdersService.updateCasePaymentOrder(updateCasePaymentOrderRequest))
                 .isInstanceOf(IdAMIdCannotBeRetrievedException.class)
-                .hasMessageContaining(IDAM_ID_RETRIEVE_ERROR);
+                .hasMessageContaining(IDAM_ID_RETRIEVE_ERROR)
+                .hasCauseInstanceOf(RuntimeException.class);
         }
 
     }

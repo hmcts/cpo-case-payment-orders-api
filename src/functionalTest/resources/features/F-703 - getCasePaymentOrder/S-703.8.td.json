@@ -16,11 +16,10 @@
   },
 
   "expectedResponse" : {
-    "_extends_" : "Common_400_Response",
+    "_extends_" : "CPO_400_Response",
     "body" : {
-      "exception" : "uk.gov.hmcts.reform.cpo.exception.CasePaymentOrdersFilterException",
-      "message" : "Case payment orders cannot be filtered by both id and case id.",
-      "path" : "/case-payment-orders",
+      "code": "INVALID_REQUEST",
+      "message" : "Bad Request",
       "details" : null
     }
   }
