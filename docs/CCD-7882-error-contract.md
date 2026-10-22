@@ -411,3 +411,11 @@ server-side exception causes without duplicate owned authentication events.
 zero failures/errors/skips, with all Checkstyle checks passing. Integration tests started a real
 Docker PostgreSQL container and exercised the local HTTP server. Deployed functional/ITHC and
 administrator-only telemetry access remain environment acceptance checks.
+
+## Dependency logging fallback — 22 October 2026
+
+The diagnostic filter now preserves the original event when its replacement logger would suppress
+that severity. Regression coverage checks INFO, DEBUG, WARN, ERROR and OFF configurations, retaining
+the original message/cause exactly once and respecting the source logger's threshold.
+`./gradlew check integration --console=plain` passed: 221 unit tests, 116 integration tests and all
+Checkstyle checks. This closes the reproduced P2 diagnostic-loss issue; deployment checks remain outstanding.

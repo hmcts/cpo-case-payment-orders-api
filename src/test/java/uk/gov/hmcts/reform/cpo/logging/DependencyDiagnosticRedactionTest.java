@@ -30,12 +30,14 @@ class DependencyDiagnosticRedactionTest {
         root.addAppender(appender);
         try {
             source.setLevel(Level.WARN);
-            for (Level configured : new Level[] {Level.INFO, Level.DEBUG}) {
+            for (Level configured : new Level[] {Level.INFO, Level.DEBUG, Level.WARN, Level.ERROR, Level.OFF}) {
                 output.setLevel(configured);
                 appender.list.clear();
                 source.warn("PRIVATE diagnostic {}", "argument", new IllegalStateException("PRIVATE cause"));
                 assertThat(appender.list).singleElement().satisfies(event -> {
                     assertThat(event.getLevel()).isEqualTo(Level.WARN);
+                    assertThat(event.getLoggerName()).isEqualTo(
+                        configured == Level.ERROR || configured == Level.OFF ? source.getName() : output.getName());
                     assertThat(event.getFormattedMessage()).contains("PRIVATE diagnostic argument");
                     assertThat(event.getThrowableProxy().getMessage()).isEqualTo("PRIVATE cause");
                 });
@@ -43,6 +45,8 @@ class DependencyDiagnosticRedactionTest {
                 source.error("PRIVATE failure", new IllegalStateException("PRIVATE error cause"));
                 assertThat(appender.list).singleElement().satisfies(event -> {
                     assertThat(event.getLevel()).isEqualTo(Level.ERROR);
+                    assertThat(event.getLoggerName()).isEqualTo(
+                        configured == Level.OFF ? source.getName() : output.getName());
                     assertThat(event.getFormattedMessage()).contains("PRIVATE failure");
                     assertThat(event.getThrowableProxy().getMessage()).isEqualTo("PRIVATE error cause");
                 });

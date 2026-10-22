@@ -38,14 +38,15 @@ public class SafeHealthDiagnosticsFilter extends TurboFilter {
         if (!health && logger.getName().startsWith("uk.gov.hmcts.reform.cpo.")) {
             return FilterReply.NEUTRAL;
         }
+        // Preserve the native event if the replacement logger would suppress it.
+        if (level == Level.ERROR ? !log.isErrorEnabled() : !log.isWarnEnabled()) {
+            return FilterReply.NEUTRAL;
+        }
         FormattingTuple diagnostic = MessageFormatter.arrayFormat(format, arguments);
         Throwable cause = exception != null ? exception : diagnostic.getThrowable();
         if (level == Level.ERROR) {
             log.error("Dependency diagnostic: code={} logger={} message={}",
                 ErrorCode.INTERNAL_ERROR, logger.getName(), diagnostic.getMessage(), cause);
-        } else if (level == Level.INFO) {
-            log.info("Dependency diagnostic: code={} logger={} message={}",
-                ErrorCode.REQUEST_FAILED, logger.getName(), diagnostic.getMessage(), cause);
         } else {
             log.warn("Dependency diagnostic: code={} logger={} message={}",
                 ErrorCode.REQUEST_FAILED, logger.getName(), diagnostic.getMessage(), cause);
