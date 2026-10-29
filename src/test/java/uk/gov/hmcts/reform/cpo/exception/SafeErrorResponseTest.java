@@ -7,6 +7,9 @@ import ch.qos.logback.core.read.ListAppender;
 import org.slf4j.LoggerFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -50,6 +53,40 @@ class SafeErrorResponseTest {
             .andExpect(content().string(not(containsString(DIAGNOSTIC))))
             .andExpect(jsonPath("$.exception").doesNotExist())
             .andExpect(jsonPath("$.trace").doesNotExist());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {ValidationError.CPO_FILTER_ERROR, ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS,
+        ValidationError.CPO_PAGE_ERROR})
+    void preservesApprovedFilterGuidanceWithoutCause(String message) throws Exception {
+        controller.failure = new CasePaymentOrdersFilterException(message, new IllegalArgumentException(DIAGNOSTIC));
+        mvc.perform(get("/error-probe/failure"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message").value(message))
+            .andExpect(jsonPath("$.code").value("INVALID_REQUEST"))
+            .andExpect(content().string(not(containsString(DIAGNOSTIC))))
+            .andExpect(jsonPath("$.exception").doesNotExist())
+            .andExpect(jsonPath("$.details").doesNotExist());
+    }
+
+    @Test
+    void hidesUnapprovedFilterMessages() throws Exception {
+        controller.failure = new CasePaymentOrdersFilterException(DIAGNOSTIC);
+        mvc.perform(get("/error-probe/failure"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message").value("Bad Request"))
+            .andExpect(content().string(not(containsString(DIAGNOSTIC))));
+    }
+
+    @Test
+    void returnsFixedConflictGuidanceWithoutDatabaseDiagnostics() throws Exception {
+        controller.failure = new CaseIdOrderReferenceUniqueConstraintException(
+            DIAGNOSTIC, new IllegalStateException(DIAGNOSTIC));
+        mvc.perform(get("/error-probe/failure"))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.message").value(ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE))
+            .andExpect(content().string(not(containsString(DIAGNOSTIC))))
+            .andExpect(jsonPath("$.details").doesNotExist());
     }
 
     @Test

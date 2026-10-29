@@ -129,7 +129,7 @@ public class CasePaymentOrdersController {
                     + "   \"status\": 400,\n"
                     + "   \"error\": \"Bad Request\",\n"
                     + "   \"code\": \"INVALID_REQUEST\",\n"
-                    + "   \"message\": \"Bad Request\",\n"
+                    + "   \"message\": \"" + ValidationError.CPO_FILTER_ERROR + "\",\n"
                     + "   \"details\": null\n"
                     + "}"
             ))
@@ -202,7 +202,7 @@ public class CasePaymentOrdersController {
                     + "   \"status\": 400,\n"
                     + "   \"error\": \"Bad Request\",\n"
                     + "   \"code\": \"INVALID_REQUEST\",\n"
-                    + "   \"message\": \"Bad Request\",\n"
+                    + "   \"message\": \"" + ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS + "\",\n"
                     + "   \"details\": null\n"
                     + "}"
             ))

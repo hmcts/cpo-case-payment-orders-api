@@ -419,3 +419,41 @@ that severity. Regression coverage checks INFO, DEBUG, WARN, ERROR and OFF confi
 the original message/cause exactly once and respecting the source logger's threshold.
 `./gradlew check integration --console=plain` passed: 221 unit tests, 116 integration tests and all
 Checkstyle checks. This closes the reproduced P2 diagnostic-loss issue; deployment checks remain outstanding.
+
+## Paired application-container verification — 22 October 2026
+
+No production change was needed in this verification pass; the current support/authentication logging policy passed both container modes.
+
+Both INFO (DEBUG off) and DEBUG runs passed all six checks: anonymous JSON/HTML,
+invalid user bearer or invalid service credentials as appropriate, authenticated dependency failure,
+health-detail redaction and retained original server diagnostics. This is 12 checks for this service.
+Different services retain their existing HTTP status and validation contracts; diagnostic redaction
+is consistent. Support logging is the policy; authentication logging is one covered failure category.
+Neither requires enabling DEBUG to retain original failures.
+
+The shared local driver is review-reports/CCD-7882/verify_docker.py in the parent workspace.
+Run from the workspace root with --repo cpo-case-payment-orders-api (both modes are the default).
+Fresh Java bootJars or the current Node application source/dependencies were used, with synthetic
+OIDC/S2S/services and PostgreSQL where applicable. Some database fixtures deliberately omit tables
+for controlled infrastructure errors; definition-store uses its migrations for startup.
+Java used the cached HMCTS Java 21 runtime; Node used public node:22-alpine as non-root node.
+These are substitute runtimes, not builds of each exact production Dockerfile.
+Artifact hashes and per-check results are in review-reports/CCD-7882/docker-results.json.
+Scripts allow repeat runs and results identify what was checked; retaining them is evidence,
+not an extra production runtime dependency. Synthetic raw logs are local diagnostics.
+
+Production image/ingress verification, deployed BEFTA/ITHC, actual Azure ingestion, retention
+and administrator-only access remain release gates. The local telemetry collector proves the
+specific agent/SDK path tested, not production collection settings.
+
+## Safe validation guidance restored — 29 October 2026
+
+Approved fixed messages for incompatible GET/DELETE filters, the existing page-error
+exception and duplicate order references are preserved. Query constraint violations
+return fixed guidance for the public `ids` and `case_ids` parameters, without rejected
+values or Java method names. Unknown exception messages and underlying causes remain
+excluded from responses. HTTP statuses and status-derived category codes are unchanged.
+
+Validation: 63 focused unit tests and 39 controller integration tests passed.
+Main, unit and integration Checkstyle checks passed. Functional fixture JSON parsed
+successfully; deployed functional execution was not performed.

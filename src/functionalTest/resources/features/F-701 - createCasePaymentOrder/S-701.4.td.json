@@ -21,7 +21,7 @@
     "_extends_" : "CPO_409_Response",
     "body" : {
       "code": "REQUEST_FAILED",
-      "message" : "Conflict",
+      "message" : "A case payment order with the specified Order Reference already exists on the case.",
       "details" : null
     }
   }

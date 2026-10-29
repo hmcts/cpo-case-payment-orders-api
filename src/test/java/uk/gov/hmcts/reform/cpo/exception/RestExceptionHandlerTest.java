@@ -91,7 +91,8 @@ class RestExceptionHandlerTest implements BaseTest {
                                                         .content(objectMapper.writeValueAsString(request)));
 
         // THEN
-        assertHttpErrorResponse(result, HttpStatus.CONFLICT, HttpStatus.CONFLICT.getReasonPhrase());
+        assertHttpErrorResponse(result, HttpStatus.CONFLICT,
+                                uk.gov.hmcts.reform.cpo.validators.ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE);
 
     }
 

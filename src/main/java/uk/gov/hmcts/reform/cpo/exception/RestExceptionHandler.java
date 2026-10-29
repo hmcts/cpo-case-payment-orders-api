@@ -17,6 +17,8 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
+import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
+import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
 import uk.gov.hmcts.reform.cpo.security.SafeAuthenticationErrors;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,6 +48,24 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<HttpError<Serializable>> handleCommonExceptionsAsBadRequest(final HttpServletRequest request,
                                                                                       final Exception exception) {
         final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST);
+        if (exception instanceof ConstraintViolationException violations) {
+            String[] details = violations.getConstraintViolations().stream()
+                .map(violation -> violation.getConstraintDescriptor().getAnnotation().annotationType())
+                .map(annotation -> {
+                    if (annotation == ValidCaseId.class) {
+                        return "case_ids: " + ValidationError.CASE_ID_INVALID;
+                    }
+                    if (annotation == ValidCpoId.class) {
+                        return "ids: " + ValidationError.ID_INVALID;
+                    }
+                    return null;
+                })
+                .filter(java.util.Objects::nonNull)
+                .distinct().sorted().toArray(String[]::new);
+            if (details.length > 0) {
+                error.withMessage(ValidationError.ARGUMENT_NOT_VALID).withDetails(details);
+            }
+        }
         logFailure(exception, HttpStatus.BAD_REQUEST.value());
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)

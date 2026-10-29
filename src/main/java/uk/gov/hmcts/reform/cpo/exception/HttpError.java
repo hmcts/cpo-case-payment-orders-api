@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cpo.exception;
 
 import lombok.Getter;
+import uk.gov.hmcts.reform.cpo.validators.ValidationError;
 import uk.gov.hmcts.reform.cpo.security.ErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -34,6 +35,14 @@ public class HttpError<T extends Serializable> implements Serializable {
         this.error = getErrorReason(responseStatus, status);
         this.code = ErrorCode.fromStatus(this.status);
         this.message = this.error;
+        if (exception instanceof CaseIdOrderReferenceUniqueConstraintException) {
+            this.message = ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE;
+        } else if (exception instanceof CasePaymentOrdersFilterException
+            && (ValidationError.CPO_FILTER_ERROR.equals(exception.getMessage())
+                || ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS.equals(exception.getMessage())
+                || ValidationError.CPO_PAGE_ERROR.equals(exception.getMessage()))) {
+            this.message = exception.getMessage();
+        }
     }
 
     public HttpError(Exception exception, HttpServletRequest request, HttpStatus status) {

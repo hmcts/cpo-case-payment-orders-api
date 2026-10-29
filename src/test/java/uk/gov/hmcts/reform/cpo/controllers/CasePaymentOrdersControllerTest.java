@@ -610,10 +610,10 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         void shouldFailWithBadRequestWhenIdIsNotValidLengthCaseId() throws Exception {
             this.mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).param(CASE_IDS, "123"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value(ValidationError.ARGUMENT_NOT_VALID))
                 .andExpect(jsonPath("$.code").value("INVALID_REQUEST"))
                 .andExpect(jsonPath("$.exception").doesNotExist())
-                .andExpect(jsonPath("$.details").doesNotExist());
+                .andExpect(jsonPath("$.details[0]").value("case_ids: " + ValidationError.CASE_ID_INVALID));
         }
 
         @DisplayName("should Fail With 400 BadRequest When Case Id Is Not a valid Luhn")
@@ -621,10 +621,10 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
         void shouldFailWithBadRequestWhenCaseIdIsNotValidLuhn() throws Exception {
             this.mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).param(CASE_IDS, CASE_ID_INVALID_LUHN))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value(ValidationError.ARGUMENT_NOT_VALID))
                 .andExpect(jsonPath("$.code").value("INVALID_REQUEST"))
                 .andExpect(jsonPath("$.exception").doesNotExist())
-                .andExpect(jsonPath("$.details").doesNotExist());
+                .andExpect(jsonPath("$.details[0]").value("case_ids: " + ValidationError.CASE_ID_INVALID));
         }
 
         @DisplayName("should Fail With 400 BadRequest When IDs are mix of valid and invalid LUHNs")
@@ -633,10 +633,10 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             this.mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH)
                                      .param(CASE_IDS, CASE_ID_VALID_1, CASE_ID_INVALID_LUHN, CASE_ID_VALID_2))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value(ValidationError.ARGUMENT_NOT_VALID))
                 .andExpect(jsonPath("$.code").value("INVALID_REQUEST"))
                 .andExpect(jsonPath("$.exception").doesNotExist())
-                .andExpect(jsonPath("$.details").doesNotExist());
+                .andExpect(jsonPath("$.details[0]").value("case_ids: " + ValidationError.CASE_ID_INVALID));
         }
     }
 
@@ -749,8 +749,8 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
                     .param(CASE_IDS, "1574419234651640,1574932009200070")
             );
             // THEN
-            assertGetCopPResponse(HttpStatus.BAD_REQUEST.getReasonPhrase(), response);
-            response.andExpect(jsonPath("$.message").value("Bad Request"))
+            assertGetCopPResponse(ValidationError.CPO_FILTER_ERROR, response);
+            response.andExpect(jsonPath("$.message").value(ValidationError.CPO_FILTER_ERROR))
                 .andExpect(jsonPath("$.code").value("INVALID_REQUEST"))
                 .andExpect(jsonPath("$.exception").doesNotExist())
                 .andExpect(jsonPath("$.details").doesNotExist());
@@ -765,11 +765,11 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
                     .param(IDS, "XXXX")
             );
             // THEN
-            assertGetCopPResponse(HttpStatus.BAD_REQUEST.getReasonPhrase(), response);
-            response.andExpect(jsonPath("$.message").value("Bad Request"))
+            assertGetCopPResponse(ValidationError.ARGUMENT_NOT_VALID, response);
+            response.andExpect(jsonPath("$.message").value(ValidationError.ARGUMENT_NOT_VALID))
                 .andExpect(jsonPath("$.code").value("INVALID_REQUEST"))
                 .andExpect(jsonPath("$.exception").doesNotExist())
-                .andExpect(jsonPath("$.details").doesNotExist());
+                .andExpect(jsonPath("$.details[0]").value("ids: " + ValidationError.ID_INVALID));
         }
 
         @DisplayName("fail for case-ids only")
@@ -782,11 +782,11 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
                     .param(CASE_IDS, "XXXX")
             );
             // THEN
-            assertGetCopPResponse(HttpStatus.BAD_REQUEST.getReasonPhrase(), response);
-            response.andExpect(jsonPath("$.message").value("Bad Request"))
+            assertGetCopPResponse(ValidationError.ARGUMENT_NOT_VALID, response);
+            response.andExpect(jsonPath("$.message").value(ValidationError.ARGUMENT_NOT_VALID))
                 .andExpect(jsonPath("$.code").value("INVALID_REQUEST"))
                 .andExpect(jsonPath("$.exception").doesNotExist())
-                .andExpect(jsonPath("$.details").doesNotExist());
+                .andExpect(jsonPath("$.details[0]").value("case_ids: " + ValidationError.CASE_ID_INVALID));
         }
     }
 
