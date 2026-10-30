@@ -104,8 +104,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
         try {
             return securityUtils.getUserInfo().getUid();
         } catch (Exception e) {
-            log.error(IDAM_ID_RETRIEVE_ERROR, e);
-            throw new IdAMIdCannotBeRetrievedException(IDAM_ID_RETRIEVE_ERROR);
+            throw new IdAMIdCannotBeRetrievedException(IDAM_ID_RETRIEVE_ERROR, e);
         }
     }
 
@@ -138,7 +137,7 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
             }
             return getPageOfCasePaymentOrder(casePaymentOrderEntities);
         } catch (IllegalArgumentException exception) {
-            throw new CasePaymentOrdersFilterException(ValidationError.CPO_PAGE_ERROR);
+            throw new CasePaymentOrdersFilterException(ValidationError.CPO_PAGE_ERROR, exception);
         }
     }
 
@@ -159,7 +158,8 @@ public class CasePaymentOrdersServiceImpl implements CasePaymentOrdersService {
             if (exception.getCause() instanceof ConstraintViolationException
                 && isDuplicateCaseIdOrderRefPairing(exception)) {
 
-                throw new CaseIdOrderReferenceUniqueConstraintException(ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE);
+                throw new CaseIdOrderReferenceUniqueConstraintException(
+                    ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE, exception);
             } else {
                 throw exception;
             }

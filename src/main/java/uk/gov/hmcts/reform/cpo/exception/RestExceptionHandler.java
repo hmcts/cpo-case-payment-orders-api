@@ -1,19 +1,25 @@
 package uk.gov.hmcts.reform.cpo.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.cpo.security.ErrorCode;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.cpo.validators.ValidationError;
+import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCaseId;
+import uk.gov.hmcts.reform.cpo.validators.annotation.ValidCpoId;
+import uk.gov.hmcts.reform.cpo.security.SafeAuthenticationErrors;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
@@ -27,8 +33,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseBody
     public ResponseEntity<HttpError<Serializable>> handleApiException(final HttpServletRequest request,
                                                                       final Exception exception) {
-        log.error(exception.getMessage(), exception);
         final HttpError<Serializable> error = new HttpError<>(exception, request);
+        logFailure(exception, error.getStatus());
         return ResponseEntity
             .status(error.getStatus())
             .body(error);
@@ -41,9 +47,26 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseBody
     public ResponseEntity<HttpError<Serializable>> handleCommonExceptionsAsBadRequest(final HttpServletRequest request,
                                                                                       final Exception exception) {
-        log.error(exception.getMessage(), exception);
-        final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
-            .withDetails(exception.getCause());
+        final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST);
+        if (exception instanceof ConstraintViolationException violations) {
+            String[] details = violations.getConstraintViolations().stream()
+                .map(violation -> violation.getConstraintDescriptor().getAnnotation().annotationType())
+                .map(annotation -> {
+                    if (annotation == ValidCaseId.class) {
+                        return "case_ids: " + ValidationError.CASE_ID_INVALID;
+                    }
+                    if (annotation == ValidCpoId.class) {
+                        return "ids: " + ValidationError.ID_INVALID;
+                    }
+                    return null;
+                })
+                .filter(java.util.Objects::nonNull)
+                .distinct().sorted().toArray(String[]::new);
+            if (details.length > 0) {
+                error.withMessage(ValidationError.ARGUMENT_NOT_VALID).withDetails(details);
+            }
+        }
+        logFailure(exception, HttpStatus.BAD_REQUEST.value());
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(error);
@@ -57,13 +80,59 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         String[] errors = exception.getBindingResult().getFieldErrors().stream()
             .map(DefaultMessageSourceResolvable::getDefaultMessage)
             .toArray(String[]::new);
-        log.debug("MethodArgumentNotValidException:{}", exception.getLocalizedMessage());
         final HttpError<Serializable> error = new HttpError<>(exception, request, HttpStatus.BAD_REQUEST)
             .withMessage(ValidationError.ARGUMENT_NOT_VALID)
             .withDetails(errors);
+        logFailure(exception, HttpStatus.BAD_REQUEST.value());
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(error);
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseBody
+    public ResponseEntity<HttpError<Serializable>> handleUnexpectedException(HttpServletRequest request,
+                                                                            Exception exception) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        if (exception instanceof org.springframework.security.access.AccessDeniedException) {
+            status = HttpStatus.FORBIDDEN;
+        } else if (exception instanceof org.springframework.security.core.AuthenticationException) {
+            status = HttpStatus.UNAUTHORIZED;
+        }
+        logFailure(exception, status.value());
+        ResponseEntity.BodyBuilder response = ResponseEntity.status(status);
+        if (status == HttpStatus.FORBIDDEN) {
+            response.header(HttpHeaders.WWW_AUTHENTICATE, SafeAuthenticationErrors.ACCESS_DENIED_CHALLENGE);
+        }
+        return response.body(new HttpError<>(exception, request, status));
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
+        HttpRequestMethodNotSupportedException exception, HttpHeaders headers, HttpStatusCode status,
+        WebRequest request) {
+        // The superclass logs the rejected method at WARN before delegating.
+        return handleExceptionInternal(exception, null, headers, status, request);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(Exception exception, Object body,
+                                                              HttpHeaders headers, HttpStatusCode status,
+                                                              WebRequest request) {
+        if (request instanceof ServletWebRequest servletRequest
+            && servletRequest.getResponse() != null && servletRequest.getResponse().isCommitted()) {
+            logFailure(exception, status.value());
+            return null;
+        }
+        // Never forward Spring ProblemDetail text, rejected values or parser diagnostics.
+        final HttpError<Serializable> error = new HttpError<>(exception, request,
+            HttpStatus.valueOf(status.value()));
+        logFailure(exception, status.value());
+        return super.handleExceptionInternal(exception, error, headers, status, request);
+    }
+
+    private void logFailure(Exception exception, int status) {
+        log.error("Request failed: code={} status={}", ErrorCode.fromStatus(status), status, exception);
     }
 
 }

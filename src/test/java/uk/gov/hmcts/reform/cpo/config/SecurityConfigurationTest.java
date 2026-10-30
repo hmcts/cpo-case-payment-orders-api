@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.cpo.config;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import org.slf4j.LoggerFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -21,10 +22,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
+import uk.gov.hmcts.reform.authorisation.exceptions.InvalidTokenException;
+import uk.gov.hmcts.reform.cpo.security.SafeServiceAuthFilter;
 import uk.gov.hmcts.reform.authorisation.validators.AuthTokenValidator;
 import uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 
@@ -68,6 +70,27 @@ class SecurityConfigurationTest {
     private Environment environment;
 
     @Test
+    void invalidJwtDoesNotExposeDecoderDiagnostics() throws Exception {
+        when(jwtDecoder.decode(TOKEN)).thenThrow(
+            new org.springframework.security.oauth2.jwt.BadJwtException("decoder at http://internal-service/jwks"));
+        mockMvc.perform(get("/test-secured")
+                .header(ServiceAuthFilter.AUTHORISATION, "s2s-token")
+                .header("Authorization", "Bearer " + TOKEN)
+                .header("ServiceAuthorization", "service-token"))
+            .andExpect(status().isUnauthorized())
+            .andExpect(content().string(""))
+            .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header()
+                .string("WWW-Authenticate", "Bearer error=\"invalid_token\""));
+    }
+
+    @Test
+    void missingJwtStillRequiresAuthentication() throws Exception {
+        mockMvc.perform(get("/test-secured").header("ServiceAuthorization", "service-token"))
+            .andExpect(status().isUnauthorized())
+            .andExpect(content().string(""));
+    }
+
+    @Test
     void shouldAcceptAuthenticatedBearerJwtWithoutOAuth2ClientRegistration() throws Exception {
         Jwt jwt = Jwt.withTokenValue(TOKEN)
             .header("alg", "none")
@@ -84,6 +107,7 @@ class SecurityConfigurationTest {
         assertThat(environment.getProperty("spring.security.oauth2.client.registration.oidc.client-secret")).isNull();
 
         mockMvc.perform(get("/test-secured")
+                .header(ServiceAuthFilter.AUTHORISATION, "s2s-token")
                             .header(HttpHeaders.AUTHORIZATION, "Bearer " + TOKEN)
                             .header(ServiceAuthFilter.AUTHORISATION, "s2s-token"))
             .andExpect(status().isOk())
@@ -91,6 +115,89 @@ class SecurityConfigurationTest {
 
         verify(jwtDecoder).decode(TOKEN);
         verify(jwtGrantedAuthoritiesConverter).convert(jwt);
+    }
+
+    @Test
+    void serviceFailuresAreSafeThroughTheCompleteSecurityChain() throws Exception {
+        Logger logger = (Logger) LoggerFactory.getLogger(SafeServiceAuthFilter.class);
+        Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        Level previousLevel = logger.getLevel();
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        rootLogger.addAppender(appender);
+        try {
+            logger.setLevel(Level.INFO);
+            mockMvc.perform(get("/test-secured")
+                    .header("Authorization", "Bearer " + TOKEN)
+                    .header(ServiceAuthFilter.AUTHORISATION, "invalid-service-token"))
+                .andExpect(status().isUnauthorized()).andExpect(content().string(""));
+            mockMvc.perform(get("/test-secured")
+                    .header("Authorization", "Bearer " + TOKEN)
+                    .header(ServiceAuthFilter.AUTHORISATION, "denied-service-token"))
+                .andExpect(status().isForbidden()).andExpect(content().string(""));
+            assertThat(appender.list).extracting(ILoggingEvent::getFormattedMessage).contains(
+                "Service authentication failed: code=AUTHENTICATION_REQUIRED status=401",
+                "Service access denied: code=ACCESS_DENIED status=403");
+            assertThat(appender.list).filteredOn(event -> event.getLevel().isGreaterOrEqual(Level.WARN))
+                .allSatisfy(event -> {
+                    assertThat(event.getFormattedMessage()).doesNotContain("Synthetic", "private-service-id");
+                });
+            assertThat(appender.list).filteredOn(event -> event.getThrowableProxy() != null)
+                .singleElement().satisfies(event -> assertThat(event.getThrowableProxy().getMessage())
+                    .isEqualTo("Synthetic internal S2S diagnostic"));
+        } finally {
+            logger.setLevel(previousLevel);
+            rootLogger.detachAppender(appender);
+            appender.stop();
+        }
+    }
+
+    @Test
+    void idamOutagesStay401AndDoNotEscapeTheSecurityChain() throws Exception {
+        Jwt jwt = Jwt.withTokenValue(TOKEN).header("alg", "none").claim(TOKEN_NAME, "access_token").build();
+        when(jwtDecoder.decode(TOKEN)).thenReturn(jwt);
+        when(jwtGrantedAuthoritiesConverter.convert(any(Jwt.class))).thenThrow(
+            new org.springframework.security.authentication.AuthenticationServiceException("IDAM error",
+                new IllegalStateException("Synthetic private IDAM detail")));
+        Logger logger = (Logger) LoggerFactory.getLogger(
+            uk.gov.hmcts.reform.cpo.security.SafeAuthenticationErrors.class);
+        Logger converterLogger = (Logger) LoggerFactory.getLogger(JwtGrantedAuthoritiesConverter.class);
+        Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        Level previousLevel = logger.getLevel();
+        Level previousConverterLevel = converterLogger.getLevel();
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        rootLogger.addAppender(appender);
+        try {
+            converterLogger.setLevel(Level.INFO);
+            for (Level level : List.of(Level.INFO, Level.DEBUG)) {
+                logger.setLevel(level);
+                appender.list.clear();
+                mockMvc.perform(get("/test-secured")
+                        .header("Authorization", "Bearer " + TOKEN)
+                        .header(ServiceAuthFilter.AUTHORISATION, "service-token"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(content().string(""))
+                    .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header()
+                        .string("WWW-Authenticate", "Bearer"));
+                assertThat(appender.list).extracting(ILoggingEvent::getFormattedMessage)
+                    .contains("Authentication failed: code=AUTHENTICATION_REQUIRED status=401");
+                assertThat(appender.list).filteredOn(event -> event.getLevel().isGreaterOrEqual(Level.WARN))
+                    .singleElement().satisfies(event -> {
+                        assertThat(event.getFormattedMessage()).doesNotContain("Synthetic private IDAM detail");
+                        assertThat(event.getThrowableProxy()).isNotNull();
+                        assertThat(event.getThrowableProxy().getCause().getMessage())
+                            .isEqualTo("Synthetic private IDAM detail");
+                    });
+                assertThat(appender.list).filteredOn(event -> event.getLoggerName().equals(logger.getName()))
+                    .hasSize(1);
+            }
+        } finally {
+            logger.setLevel(previousLevel);
+            converterLogger.setLevel(previousConverterLevel);
+            rootLogger.detachAppender(appender);
+            appender.stop();
+        }
     }
 
     @RestController
@@ -106,15 +213,15 @@ class SecurityConfigurationTest {
 
         @Bean
         ServiceAuthFilter serviceAuthFilter() {
-            return new ServiceAuthFilter(mock(AuthTokenValidator.class), List.of("test_service")) {
-                @Override
-                protected void doFilterInternal(HttpServletRequest request,
-                                                HttpServletResponse response,
-                                                FilterChain filterChain)
-                    throws ServletException, IOException {
-                    filterChain.doFilter(request, response);
+            AuthTokenValidator validator = mock(AuthTokenValidator.class);
+            when(validator.getServiceName(org.mockito.ArgumentMatchers.anyString())).thenAnswer(invocation -> {
+                String token = invocation.getArgument(0);
+                if (token.equals("Bearer invalid-service-token")) {
+                    throw new InvalidTokenException("Synthetic internal S2S diagnostic");
                 }
-            };
+                return token.equals("Bearer denied-service-token") ? "private-service-id" : "test_service";
+            });
+            return new SafeServiceAuthFilter(validator, List.of("test_service"));
         }
     }
 }

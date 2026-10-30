@@ -1,5 +1,10 @@
 package uk.gov.hmcts.reform.cpo.auditlog;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import org.slf4j.LoggerFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,13 +20,13 @@ import uk.gov.hmcts.reform.cpo.auditlog.aop.AuditContextHolder;
 import uk.gov.hmcts.reform.cpo.config.AuditConfiguration;
 import wiremock.org.eclipse.jetty.http.HttpStatus;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
-import static org.springframework.test.util.AssertionErrors.assertNull;
 
 class AuditInterceptorTest implements BaseTest {
 
@@ -158,16 +163,34 @@ class AuditInterceptorTest implements BaseTest {
     @Test
     @DisplayName("Should always clear audit context")
     void shouldClearAuditContextAlways() {
-
-        // GIVEN
         given(handler.hasMethodAnnotation(LogAudit.class)).willReturn(true);
-        doThrow(new RuntimeException("audit failure")).when(auditService).audit(auditContext);
-
-        // WHEN
-        interceptor.afterCompletion(request, response, handler, null);
-
-        // THEN
-        assertNull("Should clear audit context on completion", AuditContextHolder.getAuditContext());
+        doThrow(new RuntimeException("Synthetic audit diagnostic")).when(auditService).audit(auditContext);
+        Logger logger = (Logger) LoggerFactory.getLogger(AuditInterceptor.class);
+        Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        Level previousLevel = logger.getLevel();
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        rootLogger.addAppender(appender);
+        try {
+            logger.setLevel(Level.INFO);
+            interceptor.afterCompletion(request, response, handler, null);
+            assertThat(AuditContextHolder.getAuditContext()).isNull();
+            assertThat(appender.list).hasSize(1);
+            assertThat(appender.list.get(0).getFormattedMessage()).isEqualTo("Request audit failed");
+            assertThat(appender.list.get(0).getThrowableProxy()).isNotNull();
+            AuditContextHolder.setAuditContext(auditContext);
+            appender.list.clear();
+            logger.setLevel(Level.DEBUG);
+            interceptor.afterCompletion(request, response, handler, null);
+            assertThat(AuditContextHolder.getAuditContext()).isNull();
+            assertThat(appender.list).hasSize(1);
+            assertThat(appender.list.get(0).getLevel()).isEqualTo(Level.ERROR);
+            assertThat(appender.list.get(0).getThrowableProxy().getMessage()).isEqualTo("Synthetic audit diagnostic");
+        } finally {
+            logger.setLevel(previousLevel);
+            rootLogger.detachAppender(appender);
+            appender.stop();
+        }
     }
 
     @Test
