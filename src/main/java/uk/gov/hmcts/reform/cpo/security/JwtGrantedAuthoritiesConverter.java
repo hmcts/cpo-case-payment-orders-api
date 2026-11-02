@@ -37,7 +37,7 @@ public class JwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection
                 userInfo = idamRepository.getUserInfo(BEARER + jwt.getTokenValue());
 
             } catch (Exception ex) {
-                // The authentication boundary logs this cause once, at DEBUG.
+                // The authentication boundary retains this cause once at WARN.
                 throw new AuthenticationServiceException("IDAM error", ex);
             }
             return extractAuthorityFromClaims(userInfo.getRoles());

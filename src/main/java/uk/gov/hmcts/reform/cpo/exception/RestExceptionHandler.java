@@ -103,6 +103,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ResponseEntity.BodyBuilder response = ResponseEntity.status(status);
         if (status == HttpStatus.FORBIDDEN) {
             response.header(HttpHeaders.WWW_AUTHENTICATE, SafeAuthenticationErrors.ACCESS_DENIED_CHALLENGE);
+        } else if (exception instanceof org.springframework.security.core.AuthenticationException authentication) {
+            response.header(HttpHeaders.WWW_AUTHENTICATE,
+                SafeAuthenticationErrors.authenticationChallenge(authentication));
         }
         return response.body(new HttpError<>(exception, request, status));
     }

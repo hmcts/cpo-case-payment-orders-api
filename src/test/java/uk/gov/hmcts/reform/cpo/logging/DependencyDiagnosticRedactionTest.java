@@ -5,7 +5,8 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.LoggerFactory;
 
 
@@ -13,14 +14,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class DependencyDiagnosticRedactionTest {
 
-    @Test
-    void retainsDetailedFailuresAtNormalLevelsAndRespectsSourceThresholds() {
+    @ParameterizedTest
+    @ValueSource(strings = {"org.postgresql.supportProbe", "com.zaxxer.hikari.pool.SupportProbe"})
+    void retainsDetailedFailuresAtNormalLevelsAndRespectsSourceThresholds(String loggerName) {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
         SafeHealthDiagnosticsFilter filter = new SafeHealthDiagnosticsFilter();
 
         filter.start();
         context.addTurboFilter(filter);
-        Logger source = context.getLogger("org.postgresql.supportProbe");
+        Logger source = context.getLogger(loggerName);
         Logger output = context.getLogger(SafeHealthDiagnosticsFilter.class);
         Logger root = context.getLogger(Logger.ROOT_LOGGER_NAME);
         Level previousSource = source.getLevel();
@@ -37,7 +39,7 @@ class DependencyDiagnosticRedactionTest {
                 assertThat(appender.list).singleElement().satisfies(event -> {
                     assertThat(event.getLevel()).isEqualTo(Level.WARN);
                     assertThat(event.getLoggerName()).isEqualTo(
-                        configured == Level.ERROR || configured == Level.OFF ? source.getName() : output.getName());
+                        source.getName());
                     assertThat(event.getFormattedMessage()).contains("PRIVATE diagnostic argument");
                     assertThat(event.getThrowableProxy().getMessage()).isEqualTo("PRIVATE cause");
                 });
@@ -46,7 +48,7 @@ class DependencyDiagnosticRedactionTest {
                 assertThat(appender.list).singleElement().satisfies(event -> {
                     assertThat(event.getLevel()).isEqualTo(Level.ERROR);
                     assertThat(event.getLoggerName()).isEqualTo(
-                        configured == Level.OFF ? source.getName() : output.getName());
+                        source.getName());
                     assertThat(event.getFormattedMessage()).contains("PRIVATE failure");
                     assertThat(event.getThrowableProxy().getMessage()).isEqualTo("PRIVATE error cause");
                 });
@@ -64,8 +66,5 @@ class DependencyDiagnosticRedactionTest {
             context.getTurboFilterList().remove(filter);
             filter.stop();
         }
-    }
-
-    private static class Probe {
     }
 }

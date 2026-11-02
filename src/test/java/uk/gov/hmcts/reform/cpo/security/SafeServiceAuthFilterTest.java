@@ -7,6 +7,8 @@ import ch.qos.logback.core.read.ListAppender;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -37,6 +39,37 @@ class SafeServiceAuthFilterTest {
     private final AuthTokenValidator validator = mock(AuthTokenValidator.class);
     private final SafeServiceAuthFilter filter = new SafeServiceAuthFilter(validator, List.of("ALLOWED"));
     private final FilterChain chain = mock(FilterChain.class);
+
+    @ParameterizedTest
+    @ValueSource(strings = {"missing", "allowed", "bearer", "denied", "invalid", "unavailable"})
+    void matchesPinnedSharedFilterBehaviour(String scenario) throws Exception {
+        AuthTokenValidator sharedValidator = mock(AuthTokenValidator.class);
+        when(sharedValidator.getServiceName(anyString())).thenAnswer(invocation -> {
+            assertThat(invocation.<String>getArgument(0)).isEqualTo("Bearer token");
+            return switch (scenario) {
+                case "invalid" -> throw new InvalidTokenException("private diagnostic");
+                case "unavailable" -> throw new ServiceException("private diagnostic", null);
+                case "denied" -> "other";
+                default -> "allowed";
+            };
+        });
+        MockHttpServletResponse expected = new MockHttpServletResponse();
+        MockHttpServletResponse actual = new MockHttpServletResponse();
+        java.util.concurrent.atomic.AtomicInteger calls = new java.util.concurrent.atomic.AtomicInteger();
+        for (ServiceAuthFilter candidate : List.of(new ServiceAuthFilter(sharedValidator, List.of("ALLOWED")),
+                new SafeServiceAuthFilter(sharedValidator, List.of("ALLOWED")))) {
+            MockHttpServletRequest request = new MockHttpServletRequest("GET", "/resource");
+            if (!"missing".equals(scenario)) {
+                request.addHeader(ServiceAuthFilter.AUTHORISATION,
+                    "bearer".equals(scenario) ? "Bearer token" : "token");
+            }
+            candidate.doFilter(request, candidate instanceof SafeServiceAuthFilter ? actual : expected,
+                (req, res) -> calls.incrementAndGet());
+        }
+        assertThat(actual.getStatus()).isEqualTo(expected.getStatus());
+        assertThat(actual.getContentAsString()).isEqualTo(expected.getContentAsString());
+        assertThat(calls.get()).isEqualTo("allowed".equals(scenario) || "bearer".equals(scenario) ? 2 : 0);
+    }
 
     @Test
     void preservesAuthorisationAndBearerNormalization() throws Exception {

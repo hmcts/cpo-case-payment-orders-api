@@ -35,7 +35,8 @@ public class SafeHealthDiagnosticsFilter extends TurboFilter {
         }
         boolean health = indicatorLoggers.contains(logger.getName())
             || logger.getName().startsWith("org.springframework.boot.actuate.health.");
-        if (!health && logger.getName().startsWith("uk.gov.hmcts.reform.cpo.")) {
+        // Leave dependency events on their original logger for category-based monitoring.
+        if (!health) {
             return FilterReply.NEUTRAL;
         }
         // Preserve the native event if the replacement logger would suppress it.

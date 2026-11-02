@@ -193,6 +193,7 @@ class SafeErrorResponseTest {
         controller.failure = new org.springframework.security.authentication.BadCredentialsException(DIAGNOSTIC);
         mvc.perform(get("/error-probe/failure"))
             .andExpect(status().isUnauthorized())
+            .andExpect(header().string("WWW-Authenticate", "Bearer"))
             .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"))
             .andExpect(content().string(not(containsString(DIAGNOSTIC))));
         controller.failure = new org.springframework.security.access.AccessDeniedException(DIAGNOSTIC);

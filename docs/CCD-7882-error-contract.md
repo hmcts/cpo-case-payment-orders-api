@@ -14,9 +14,9 @@ administrator-only log access, suitable retention and verification of logging/Ap
 collection. Local tests do not establish those infrastructure controls.
 
 
-API responses no longer include exception class names or raw exception messages. Standard HTTP status descriptions replace diagnostic messages. Existing fixed validation messages remain where already defined. Payment validation details contain user-facing validation messages, never exception causes. Advice error bodies include a stable category `code` derived only from the HTTP status, for example `INVALID_REQUEST` or `INTERNAL_ERROR`. Advice/security-handler error/warn logs contain the same code without exception messages or stack traces. Original exceptions are logged only at DEBUG, which can be enabled for the advice/security handler package when needed; log access must stay restricted through the existing platform controls. No existing non-identifying reference was found in these handlers, so no reference is added. Security-filter responses remain empty. Advice and Spring Boot fallback JSON omit request paths.
+API responses no longer include exception class names or raw exception messages. Standard HTTP status descriptions replace diagnostic messages. Existing fixed validation messages remain where already defined. Payment validation details contain user-facing validation messages, never exception causes. Advice error bodies include a stable category `code` derived only from the HTTP status, for example `INVALID_REQUEST` or `INTERNAL_ERROR`. Advice/security-handler WARN/ERROR logs contain the same code and retain original exceptions and stack traces under the current support logging policy above; log access must stay restricted through the existing platform controls. No existing non-identifying reference was found in these handlers, so no reference is added. Security-filter responses remain empty. Advice and Spring Boot fallback JSON omit request paths.
 
-Spring Boot fallback responses explicitly exclude exception, message, binding errors and stack traces, including when a caller requests them with query parameters. HTML error responses use a fixed generic page. Invalid bearer credentials return an empty 401; OAuth invalid-request errors retain 400. Both use a generic `WWW-Authenticate: Bearer` challenge; denied access returns 403 without diagnostic text. Token validation, endpoint permissions and document access checks are unchanged.
+Spring Boot fallback responses explicitly exclude exception, message, binding errors and stack traces, including when a caller requests them with query parameters. HTML error responses use a fixed generic page. Invalid bearer credentials return an empty 401; OAuth invalid-request errors retain 400. Bearer challenges retain only approved OAuth error codes, excluding descriptions and URIs; denied access returns 403 without diagnostic text. Token validation, endpoint permissions and document access checks are unchanged.
 
 ## Verification and release handoff
 
@@ -457,3 +457,15 @@ excluded from responses. HTTP statuses and status-derived category codes are unc
 Validation: 63 focused unit tests and 39 controller integration tests passed.
 Main, unit and integration Checkstyle checks passed. Functional fixture JSON parsed
 successfully; deployed functional execution was not performed.
+
+## Review follow-up — 2 November 2026
+
+Functional response fixtures share a CPO error-response base for headers and timestamp
+assertions. Original message wildcards are preserved, alongside status-derived codes
+and sanitised messages where master exposed identifiers or diagnostics.
+
+Dependency WARN/ERROR events now retain their original logger category, message and
+throwable, preserving category-based monitoring and logger thresholds. Health events
+continue through the existing health diagnostic boundary. The service-authentication
+override remains necessary for controlled summaries; compatibility tests compare its
+status, response body and downstream invocation with the pinned shared filter.

@@ -24,20 +24,25 @@ public class SafeAuthenticationErrors
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException exception) {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
-        String challenge = "Bearer";
         if (exception instanceof OAuth2AuthenticationException oauthException) {
             if (oauthException.getError() instanceof BearerTokenError bearerError) {
                 status = bearerError.getHttpStatus();
             }
-            String error = oauthException.getError().getErrorCode();
-            if (java.util.Set.of("invalid_request", "invalid_token", "insufficient_scope").contains(error)) {
-                challenge += " error=\"" + error + "\"";
-            }
         }
         ErrorCode code = ErrorCode.fromStatus(status.value());
         log.warn("Authentication failed: code={} status={}", code, status.value(), exception);
-        response.setHeader(HttpHeaders.WWW_AUTHENTICATE, challenge);
+        response.setHeader(HttpHeaders.WWW_AUTHENTICATE, authenticationChallenge(exception));
         response.setStatus(status.value());
+    }
+
+    public static String authenticationChallenge(AuthenticationException exception) {
+        if (exception instanceof OAuth2AuthenticationException oauthException) {
+            String error = oauthException.getError().getErrorCode();
+            if (java.util.Set.of("invalid_request", "invalid_token", "insufficient_scope").contains(error)) {
+                return "Bearer error=\"" + error + "\"";
+            }
+        }
+        return "Bearer";
     }
 
     @Override
