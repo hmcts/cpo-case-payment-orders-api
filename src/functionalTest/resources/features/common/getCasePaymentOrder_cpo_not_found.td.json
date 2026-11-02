@@ -15,7 +15,7 @@
       "_extends_": "CPO_404_Response",
       "body": {
         "code": "RESOURCE_NOT_FOUND",
-        "message": "Not Found",
+        "message": "[[ANYTHING_PRESENT]]",
         "details": null
       }
     }
