@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.cpo.config;
 
+import jakarta.servlet.DispatcherType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
@@ -17,6 +19,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import uk.gov.hmcts.reform.cpo.security.SafeAuthenticationErrors;
 
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.cpo.security.JwtGrantedAuthoritiesConverter;
@@ -76,10 +79,21 @@ public class SecurityConfiguration {
             .csrf((csrf) -> csrf.disable())
             .formLogin((formLogin) -> formLogin.disable())
             .logout((logout) -> logout.disable())
-            .authorizeHttpRequests((authHttp) -> authHttp.anyRequest().authenticated())
-            .oauth2ResourceServer((oauth2) ->
-                                      oauth2.jwt((jwt) ->
-                                                     jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)));
+            .authorizeHttpRequests(authHttp -> authHttp
+                // Render container errors without replacing their original status with an authentication failure.
+                .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+                .anyRequest().authenticated())
+            .oauth2ResourceServer(oauth -> oauth
+                .withObjectPostProcessor(new ObjectPostProcessor<BearerTokenAuthenticationFilter>() {
+                    @Override
+                    public <O extends BearerTokenAuthenticationFilter> O postProcess(O filter) {
+                        filter.setAuthenticationFailureHandler(new SafeAuthenticationErrors());
+                        return filter;
+                    }
+                })
+                .authenticationEntryPoint(new SafeAuthenticationErrors())
+                .accessDeniedHandler(new SafeAuthenticationErrors())
+                .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)));
         return http.build();
     }
 

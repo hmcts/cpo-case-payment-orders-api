@@ -10,4 +10,8 @@ public class IdAMIdCannotBeRetrievedException extends ApiException {
     public IdAMIdCannotBeRetrievedException(String message) {
         super(message);
     }
+
+    public IdAMIdCannotBeRetrievedException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

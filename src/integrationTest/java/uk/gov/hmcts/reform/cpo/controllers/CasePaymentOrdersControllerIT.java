@@ -1,6 +1,10 @@
 package uk.gov.hmcts.reform.cpo.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import org.slf4j.LoggerFactory;
 import org.hibernate.envers.RevisionType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,6 +28,7 @@ import uk.gov.hmcts.reform.cpo.payload.CreateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.payload.UpdateCasePaymentOrderRequest;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersAuditJpaRepository;
 import uk.gov.hmcts.reform.cpo.repository.CasePaymentOrdersJpaRepository;
+import uk.gov.hmcts.reform.cpo.security.ErrorCode;
 import uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderAuditUtils;
 import uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderEntityGenerator;
 import uk.gov.hmcts.reform.cpo.utils.UIDService;
@@ -38,7 +43,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -216,17 +221,39 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                                                               RESPONSIBLE_PARTY,
                                                                               savedEntity.getOrderReference());
 
-            mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
-                                .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath(ERROR_PATH_MESSAGE, is(ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE)))
+            Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+            ListAppender<ILoggingEvent> appender = new ListAppender<>();
+            appender.start();
+            rootLogger.addAppender(appender);
+            try {
+                MvcResult result = mockMvc.perform(post(CASE_PAYMENT_ORDERS_PATH)
+                                    .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath(ERROR_PATH_MESSAGE).value(ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE))
+                    .andExpect(jsonPath("$.code").value(ErrorCode.REQUEST_FAILED.name()))
+                    .andExpect(jsonPath("$.exception").doesNotExist())
+                    .andExpect(jsonPath("$.details").doesNotExist())
 
-                .andExpect(hasGeneratedLogAudit(AuditOperationType.CREATE_CASE_PAYMENT_ORDER,
-                                                AUTHORISED_CRUD_SERVICE,
-                                                null,
-                                                createCasePaymentOrderRequest.getCaseId()));
+                    .andExpect(hasGeneratedLogAudit(AuditOperationType.CREATE_CASE_PAYMENT_ORDER,
+                                                    AUTHORISED_CRUD_SERVICE,
+                                                    null,
+                                                    createCasePaymentOrderRequest.getCaseId())).andReturn();
+                assertThat(result.getResolvedException()).hasCauseInstanceOf(
+                    org.springframework.dao.DataIntegrityViolationException.class);
+                assertThat(appender.list).filteredOn(event -> event.getLoggerName().equals(
+                    uk.gov.hmcts.reform.cpo.exception.RestExceptionHandler.class.getName()))
+                    .singleElement().satisfies(event -> {
+                        assertThat(event.getFormattedMessage())
+                            .isEqualTo("Request failed: code=REQUEST_FAILED status=409");
+                        assertThat(event.getThrowableProxy()).isNotNull();
+                        assertThat(event.getThrowableProxy().getCause()).isNotNull();
+                    });
+            } finally {
+                rootLogger.detachAppender(appender);
+                appender.stop();
+            }
         }
 
         private void verifyDbCpoValues(UUID id,
@@ -359,10 +386,9 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                 .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
                                 .queryParam(IDS, invalidUuid))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath(ERROR_PATH_MESSAGE,
-                            containsString("deleteCasePaymentOrdersById.ids: These ids: "
-                                    + invalidUuid
-                                    + " are incorrect.")))
+                    .andExpect(safeErrorResponse(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST,
+                    ValidationError.ARGUMENT_NOT_VALID,
+                    "ids: " + ValidationError.ID_INVALID))
 
                     .andExpect(hasGeneratedLogAudit(AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
                                                     AUTHORISED_CRUD_SERVICE,
@@ -381,8 +407,8 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                 .queryParam(IDS, cpoId)
                                 .queryParam(CASE_IDS, caseId))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath(ERROR_PATH_MESSAGE,
-                            is(ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS)))
+                    .andExpect(safeErrorResponse(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST,
+                    ValidationError.CANNOT_DELETE_USING_IDS_AND_CASE_IDS))
 
                     .andExpect(hasGeneratedLogAudit(AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
                                                     AUTHORISED_CRUD_SERVICE,
@@ -513,9 +539,9 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                 .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
                                 .queryParam(CASE_IDS, invalidCaseId))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath(ERROR_PATH_MESSAGE, containsString("These caseIDs: "
-                            + invalidCaseId
-                            + " are incorrect")))
+                    .andExpect(safeErrorResponse(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST,
+                    ValidationError.ARGUMENT_NOT_VALID,
+                    "case_ids: " + ValidationError.CASE_ID_INVALID))
 
                     .andExpect(hasGeneratedLogAudit(AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
                                                     AUTHORISED_CRUD_SERVICE,
@@ -531,9 +557,9 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                 .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
                                 .queryParam(CASE_IDS, invalidLuhn))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath(ERROR_PATH_MESSAGE, containsString("These caseIDs: "
-                            + invalidLuhn
-                            + " are incorrect")))
+                    .andExpect(safeErrorResponse(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST,
+                    ValidationError.ARGUMENT_NOT_VALID,
+                    "case_ids: " + ValidationError.CASE_ID_INVALID))
 
                     .andExpect(hasGeneratedLogAudit(AuditOperationType.DELETE_CASE_PAYMENT_ORDER,
                                                     AUTHORISED_CRUD_SERVICE,
@@ -620,10 +646,9 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                 .queryParam(IDS, invalidUuid))
                 // THEN
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(ERROR_PATH_MESSAGE,
-                                    containsString("getCasePaymentOrders.ids: These ids: "
-                                                       + invalidUuid
-                                                       + " are incorrect.")))
+                .andExpect(safeErrorResponse(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST,
+                    ValidationError.ARGUMENT_NOT_VALID,
+                    "ids: " + ValidationError.ID_INVALID))
 
                 .andExpect(hasGeneratedLogAudit(AuditOperationType.GET_CASE_PAYMENT_ORDER,
                                                 AUTHORISED_READ_SERVICE,
@@ -652,8 +677,8 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                 .queryParam(CASE_IDS, caseId))
                 // THEN
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(ERROR_PATH_MESSAGE,
-                                    is(ValidationError.CPO_FILTER_ERROR)))
+                .andExpect(safeErrorResponse(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST,
+                    ValidationError.CPO_FILTER_ERROR))
 
                 .andExpect(hasGeneratedLogAudit(AuditOperationType.GET_CASE_PAYMENT_ORDER,
                                                 AUTHORISED_READ_SERVICE,
@@ -785,9 +810,9 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                 .queryParam(CASE_IDS, invalidCaseId))
                 // THEN
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(ERROR_PATH_MESSAGE, containsString("These caseIDs: "
-                                                                           + invalidCaseId
-                                                                           + " are incorrect")))
+                .andExpect(safeErrorResponse(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST,
+                    ValidationError.ARGUMENT_NOT_VALID,
+                    "case_ids: " + ValidationError.CASE_ID_INVALID))
 
                 .andExpect(hasGeneratedLogAudit(AuditOperationType.GET_CASE_PAYMENT_ORDER,
                                                 AUTHORISED_READ_SERVICE,
@@ -808,9 +833,9 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                 .queryParam(CASE_IDS, invalidLuhn))
                 // THEN
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(ERROR_PATH_MESSAGE, containsString("These caseIDs: "
-                                                                           + invalidLuhn
-                                                                           + " are incorrect")))
+                .andExpect(safeErrorResponse(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST,
+                    ValidationError.ARGUMENT_NOT_VALID,
+                    "case_ids: " + ValidationError.CASE_ID_INVALID))
 
                 .andExpect(hasGeneratedLogAudit(AuditOperationType.GET_CASE_PAYMENT_ORDER,
                                                 AUTHORISED_READ_SERVICE,
@@ -1109,7 +1134,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                                         .content(objectMapper.writeValueAsString(request)));
 
             // THEN
-            assertHttpErrorResponse(result, HttpStatus.CONFLICT, ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE);
+            assertHttpErrorResponse(result, HttpStatus.CONFLICT, ErrorCode.REQUEST_FAILED);
             // check latest audit does not show update (i.e. modified)
             assertNotSame(RevisionType.MOD, getLatestAuditRevision(request.getUUID()).getRevisionType());
             verifyUpdateLogAuditValues(request, result);
@@ -1137,7 +1162,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                                         .content(objectMapper.writeValueAsString(request)));
 
             // THEN
-            assertHttpErrorResponse(result, HttpStatus.NOT_FOUND, ValidationError.CPO_NOT_FOUND);
+            assertHttpErrorResponse(result, HttpStatus.NOT_FOUND, ErrorCode.RESOURCE_NOT_FOUND);
             assertTrue(auditUtils.getAuditRevisions(request.getUUID()).isEmpty());
             verifyUpdateLogAuditValues(request, result);
         }
@@ -1154,14 +1179,15 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         }
 
         private void assertHttpErrorResponse(ResultActions result,
-                                             HttpStatus expectedStatus,
-                                             String expectedMessage) throws Exception {
+                                             HttpStatus expectedStatus, ErrorCode expectedCode) throws Exception {
 
             result
                 .andExpect(status().is(expectedStatus.value()))
                 .andExpect(jsonPath(ERROR_PATH_STATUS).value(expectedStatus.value()))
                 .andExpect(jsonPath(ERROR_PATH_ERROR).value(expectedStatus.getReasonPhrase()))
-                .andExpect(jsonPath(ERROR_PATH_MESSAGE).value(expectedMessage));
+                .andExpect(safeErrorResponse(expectedStatus, expectedCode,
+                    expectedStatus == HttpStatus.CONFLICT ? ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE
+                        : expectedStatus.getReasonPhrase()));
         }
 
         private void verifyUpdateResponse(UpdateCasePaymentOrderRequest request,
@@ -1231,6 +1257,25 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         return auditRevisions.get(auditRevisions.size() - 1);
     }
 
+    private ResultMatcher safeErrorResponse(HttpStatus status, ErrorCode expectedCode) {
+        return safeErrorResponse(status, expectedCode, status.getReasonPhrase());
+    }
+
+    private ResultMatcher safeErrorResponse(HttpStatus status, ErrorCode expectedCode,
+                                            String message, String... details) {
+        return result -> {
+            jsonPath(ERROR_PATH_MESSAGE).value(message).match(result);
+            jsonPath("$.code").value(expectedCode.name()).match(result);
+            jsonPath("$.exception").doesNotExist().match(result);
+            jsonPath("$.trace").doesNotExist().match(result);
+            if (details.length == 0) {
+                jsonPath(ERROR_PATH_DETAILS).doesNotExist().match(result);
+            } else {
+                jsonPath(ERROR_PATH_DETAILS, org.hamcrest.Matchers.contains(details)).match(result);
+            }
+        };
+    }
+
     private void assert404ResponseWhenSpecifiedIdentifierNotFound(HttpMethod method, String parameterName)
             throws Exception {
         // GIVEN
@@ -1260,7 +1305,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
         String queryParamName = null;
         String[] queryParamValue = null;
         ResultMatcher hasGeneratedLogAuditRequestMatcher = null;
-        String expectedErrorMessage = null;
 
         switch (parameterName) {
             case IDS:
@@ -1276,10 +1320,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                         AUTHORISED_CRUD_SERVICE,
                         Arrays.asList(savedEntitiesUuidsString),
                         null);
-                expectedErrorMessage = ValidationError.CPOS_NOT_FOUND
-                        + nonExistentUuids.get(0).toString()
-                        + ","
-                        + nonExistentUuids.get(1).toString();
                 break;
             case CASE_IDS:
                 List<String> savedEntitiesCaseIds = savedEntities.stream()
@@ -1297,10 +1337,6 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                         AUTHORISED_CRUD_SERVICE,
                         null,
                         savedEntitiesCaseIds);
-                expectedErrorMessage = ValidationError.CPOS_NOT_FOUND
-                        + nonExistentCpoIdentifiers.get(0)
-                        + ","
-                        + nonExistentCpoIdentifiers.get(1);
                 break;
             default:
                 fail("Invalid query parameter name supplied");
@@ -1312,8 +1348,7 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                         .headers(createHttpHeaders(AUTHORISED_CRUD_SERVICE))
                         .queryParam(queryParamName, queryParamValue))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath(ERROR_PATH_MESSAGE,
-                        is(Objects.requireNonNull(expectedErrorMessage))))
+                .andExpect(safeErrorResponse(HttpStatus.NOT_FOUND, ErrorCode.RESOURCE_NOT_FOUND))
                 .andExpect(hasGeneratedLogAuditRequestMatcher);
 
         if (method.equals(HttpMethod.DELETE)) {

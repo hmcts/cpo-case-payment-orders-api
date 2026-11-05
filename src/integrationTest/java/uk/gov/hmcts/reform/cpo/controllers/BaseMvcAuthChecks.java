@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import uk.gov.hmcts.reform.cpo.BaseTest;
+import uk.gov.hmcts.reform.cpo.security.ErrorCode;
 import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
 import uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderEntityGenerator;
 
@@ -21,6 +22,8 @@ import java.util.Objects;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import lombok.extern.slf4j.Slf4j;
@@ -292,7 +295,15 @@ class BaseMvcAuthChecks extends BaseTest {
         // WHEN
         mockMvc.perform(happyPathRequestBuilder.headers(headers))
             // THEN
-            .andExpect(status().isForbidden());
+            .andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.code")
+                .value(ErrorCode.ACCESS_DENIED.name()))
+            .andExpect(jsonPath("$.message")
+                .value(HttpStatus.FORBIDDEN.getReasonPhrase()))
+            .andExpect(jsonPath("$.exception")
+                .doesNotExist())
+            .andExpect(header()
+                .string(HttpHeaders.WWW_AUTHENTICATE, "Bearer error=\"insufficient_scope\""));
     }
 
     /*

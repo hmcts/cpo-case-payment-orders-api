@@ -17,11 +17,10 @@
   },
 
   "expectedResponse" : {
-    "_extends_" : "Common_404_Response",
+    "_extends_" : "CPO_404_Response",
     "body" : {
-      "exception" : "uk.gov.hmcts.reform.cpo.exception.CasePaymentOrderCouldNotBeFoundException",
-      "message" : "Case Payment Order does not exist.",
-      "path" : "/case-payment-orders",
+      "code": "RESOURCE_NOT_FOUND",
+      "message" : "Not Found",
       "details" : null
     }
   }
