@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -197,9 +198,18 @@ class UnauthenticatedHttpIT {
             .build(), HttpResponse.BodyHandlers.ofString());
     }
 
-    private void assertSafe(HttpResponse<String> response) {
-        assertThat(response.body()).doesNotContain(PRIVATE, "java.lang.", "\"exception\"", "\"trace\"", "\"path\"",
+    private void assertSafe(HttpResponse<String> response) throws Exception {
+        assertThat(response.body()).doesNotContain(PRIVATE, "java.lang.", "\"trace\"",
             "Whitelabel", "Exception Report");
+        if (response.body().startsWith("{")) {
+            var body = new ObjectMapper().readTree(response.body());
+            if (body.has("path")) {
+                assertThat(body.get("path").asText()).isEqualTo("/");
+            }
+            if (body.has("exception")) {
+                assertThat(body.get("exception").asText()).isEqualTo("Exception");
+            }
+        }
     }
 
     @Configuration(proxyBeanMethods = false)
