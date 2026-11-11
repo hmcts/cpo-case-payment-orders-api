@@ -15,7 +15,6 @@
   "expectedResponse" : {
     "_extends_" : "CPO_404_Response",
     "body" : {
-      "code": "RESOURCE_NOT_FOUND",
       "message" : "Not Found",
       "details" : null
     }

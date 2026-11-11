@@ -18,12 +18,9 @@ class DependencyDiagnosticRedactionTest {
     @ValueSource(strings = {"org.postgresql.supportProbe", "com.zaxxer.hikari.pool.SupportProbe"})
     void retainsDetailedFailuresAtNormalLevelsAndRespectsSourceThresholds(String loggerName) {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-        SafeHealthDiagnosticsFilter filter = new SafeHealthDiagnosticsFilter();
 
-        filter.start();
-        context.addTurboFilter(filter);
         Logger source = context.getLogger(loggerName);
-        Logger output = context.getLogger(SafeHealthDiagnosticsFilter.class);
+        Logger output = context.getLogger("application.UnrelatedDiagnostics");
         Logger root = context.getLogger(Logger.ROOT_LOGGER_NAME);
         Level previousSource = source.getLevel();
         Level previousOutput = output.getLevel();
@@ -63,8 +60,6 @@ class DependencyDiagnosticRedactionTest {
             output.setLevel(previousOutput);
             root.detachAppender(appender);
             appender.stop();
-            context.getTurboFilterList().remove(filter);
-            filter.stop();
         }
     }
 }

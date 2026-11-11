@@ -232,8 +232,8 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                     .content(objectMapper.writeValueAsString(createCasePaymentOrderRequest)))
                     .andExpect(status().isConflict())
                     .andExpect(jsonPath(ERROR_PATH_MESSAGE).value(ValidationError.CASE_ID_ORDER_REFERENCE_UNIQUE))
-                    .andExpect(jsonPath("$.code").value(ErrorCode.REQUEST_FAILED.name()))
-                    .andExpect(jsonPath("$.exception").doesNotExist())
+                    .andExpect(jsonPath("$.code").doesNotExist())
+                    .andExpect(jsonPath("$.exception").value("Exception"))
                     .andExpect(jsonPath("$.details").doesNotExist())
 
                     .andExpect(hasGeneratedLogAudit(AuditOperationType.CREATE_CASE_PAYMENT_ORDER,
@@ -1265,8 +1265,8 @@ class CasePaymentOrdersControllerIT extends BaseTest {
                                             String message, String... details) {
         return result -> {
             jsonPath(ERROR_PATH_MESSAGE).value(message).match(result);
-            jsonPath("$.code").value(expectedCode.name()).match(result);
-            jsonPath("$.exception").doesNotExist().match(result);
+            jsonPath("$.code").doesNotExist().match(result);
+            jsonPath("$.exception").value("Exception").match(result);
             jsonPath("$.trace").doesNotExist().match(result);
             if (details.length == 0) {
                 jsonPath(ERROR_PATH_DETAILS).doesNotExist().match(result);

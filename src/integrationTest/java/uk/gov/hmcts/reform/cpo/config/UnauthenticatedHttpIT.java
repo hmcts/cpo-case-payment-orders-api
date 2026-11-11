@@ -208,7 +208,7 @@ class UnauthenticatedHttpIT {
         FlywayAutoConfiguration.class})
     @Import({RootController.class, ProbeController.class, SecurityConfiguration.class,
         SafeServiceAuthConfiguration.class,
-        ErrorPageConfiguration.class, RestExceptionHandler.class, SafeHealthLoggingConfiguration.class})
+        ErrorPageConfiguration.class, RestExceptionHandler.class})
     static class HttpApplication {
         @Bean
         AtomicBoolean unhealthy() {

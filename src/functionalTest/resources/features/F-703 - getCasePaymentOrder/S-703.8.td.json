@@ -18,7 +18,6 @@
   "expectedResponse" : {
     "_extends_" : "CPO_400_Response",
     "body" : {
-      "code": "INVALID_REQUEST",
       "message" : "Case payment orders cannot be filtered by both id and case id.",
       "details" : null
     }

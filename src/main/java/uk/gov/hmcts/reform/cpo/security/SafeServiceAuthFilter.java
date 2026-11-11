@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.cpo.security;
 
+import uk.gov.hmcts.reform.cpo.logging.FailureDiagnostics;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,11 +41,16 @@ public class SafeServiceAuthFilter extends ServiceAuthFilter {
             if (authorisedServices.contains(serviceName)) {
                 chain.doFilter(request, response);
             } else {
-                log.warn("Service access denied: code={} status=403", ErrorCode.ACCESS_DENIED);
+                try (var diagnostics = FailureDiagnostics.open(null, 403, "AUTHORISATION_DENIED")) {
+                    log.warn("Service access denied: code={} status=403", ErrorCode.ACCESS_DENIED);
+                }
                 response.setStatus(HttpStatus.FORBIDDEN.value());
             }
         } catch (InvalidTokenException | ServiceException exception) {
-            log.warn("Service authentication failed: code={} status=401", ErrorCode.AUTHENTICATION_REQUIRED, exception);
+            try (var diagnostics = FailureDiagnostics.open(exception, 401, "AUTHENTICATION_FAILED")) {
+                log.warn("Service authentication failed: code={} status=401",
+                    ErrorCode.AUTHENTICATION_REQUIRED, exception);
+            }
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         }
     }

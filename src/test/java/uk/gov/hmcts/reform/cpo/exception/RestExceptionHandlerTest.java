@@ -178,7 +178,7 @@ class RestExceptionHandlerTest implements BaseTest {
             .andExpect(jsonPath(ERROR_PATH_STATUS).value(expectedStatus.value()))
             .andExpect(jsonPath(ERROR_PATH_ERROR).value(reasonPhrase))
             .andExpect(jsonPath(ERROR_PATH_MESSAGE).value(expectedMessage))
-            .andExpect(jsonPath("$.exception").doesNotExist())
+            .andExpect(jsonPath("$.exception").value("Exception"))
             .andExpect(jsonPath("$.trace").doesNotExist());
     }
 

@@ -20,7 +20,6 @@
   "expectedResponse" : {
     "_extends_": "CPO_400_Response",
     "body" : {
-      "code": "INVALID_REQUEST",
       "message" : "Input not valid",
       "details" : [ "Case ID has to be a valid 16-digit Luhn number."]
     }

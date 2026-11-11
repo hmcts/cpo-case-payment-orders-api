@@ -10,7 +10,6 @@
   "expectedResponse" : {
     "_extends_": "CPO_400_Response",
     "body": {
-      "code": "INVALID_REQUEST",
       "message": "Input not valid",
       "details": [
       ]

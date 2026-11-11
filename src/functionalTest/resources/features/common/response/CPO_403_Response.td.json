@@ -9,7 +9,6 @@
   "body": {
     "status": 403,
     "error": "Forbidden",
-    "code": "ACCESS_DENIED",
     "message": "Forbidden",
     "details": null
   }

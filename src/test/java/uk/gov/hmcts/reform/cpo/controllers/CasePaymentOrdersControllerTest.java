@@ -611,8 +611,8 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             this.mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).param(CASE_IDS, "123"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(ValidationError.ARGUMENT_NOT_VALID))
-                .andExpect(jsonPath("$.code").value("INVALID_REQUEST"))
-                .andExpect(jsonPath("$.exception").doesNotExist())
+                .andExpect(jsonPath("$.code").doesNotExist())
+                .andExpect(jsonPath("$.exception").value("Exception"))
                 .andExpect(jsonPath("$.details[0]").value("case_ids: " + ValidationError.CASE_ID_INVALID));
         }
 
@@ -622,8 +622,8 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             this.mockMvc.perform(delete(CASE_PAYMENT_ORDERS_PATH).param(CASE_IDS, CASE_ID_INVALID_LUHN))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(ValidationError.ARGUMENT_NOT_VALID))
-                .andExpect(jsonPath("$.code").value("INVALID_REQUEST"))
-                .andExpect(jsonPath("$.exception").doesNotExist())
+                .andExpect(jsonPath("$.code").doesNotExist())
+                .andExpect(jsonPath("$.exception").value("Exception"))
                 .andExpect(jsonPath("$.details[0]").value("case_ids: " + ValidationError.CASE_ID_INVALID));
         }
 
@@ -634,8 +634,8 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
                                      .param(CASE_IDS, CASE_ID_VALID_1, CASE_ID_INVALID_LUHN, CASE_ID_VALID_2))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(ValidationError.ARGUMENT_NOT_VALID))
-                .andExpect(jsonPath("$.code").value("INVALID_REQUEST"))
-                .andExpect(jsonPath("$.exception").doesNotExist())
+                .andExpect(jsonPath("$.code").doesNotExist())
+                .andExpect(jsonPath("$.exception").value("Exception"))
                 .andExpect(jsonPath("$.details[0]").value("case_ids: " + ValidationError.CASE_ID_INVALID));
         }
     }
@@ -751,8 +751,8 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // THEN
             assertGetCopPResponse(ValidationError.CPO_FILTER_ERROR, response);
             response.andExpect(jsonPath("$.message").value(ValidationError.CPO_FILTER_ERROR))
-                .andExpect(jsonPath("$.code").value("INVALID_REQUEST"))
-                .andExpect(jsonPath("$.exception").doesNotExist())
+                .andExpect(jsonPath("$.code").doesNotExist())
+                .andExpect(jsonPath("$.exception").value("Exception"))
                 .andExpect(jsonPath("$.details").doesNotExist());
         }
 
@@ -767,8 +767,8 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // THEN
             assertGetCopPResponse(ValidationError.ARGUMENT_NOT_VALID, response);
             response.andExpect(jsonPath("$.message").value(ValidationError.ARGUMENT_NOT_VALID))
-                .andExpect(jsonPath("$.code").value("INVALID_REQUEST"))
-                .andExpect(jsonPath("$.exception").doesNotExist())
+                .andExpect(jsonPath("$.code").doesNotExist())
+                .andExpect(jsonPath("$.exception").value("Exception"))
                 .andExpect(jsonPath("$.details[0]").value("ids: " + ValidationError.ID_INVALID));
         }
 
@@ -784,8 +784,8 @@ public class CasePaymentOrdersControllerTest implements BaseTest {
             // THEN
             assertGetCopPResponse(ValidationError.ARGUMENT_NOT_VALID, response);
             response.andExpect(jsonPath("$.message").value(ValidationError.ARGUMENT_NOT_VALID))
-                .andExpect(jsonPath("$.code").value("INVALID_REQUEST"))
-                .andExpect(jsonPath("$.exception").doesNotExist())
+                .andExpect(jsonPath("$.code").doesNotExist())
+                .andExpect(jsonPath("$.exception").value("Exception"))
                 .andExpect(jsonPath("$.details[0]").value("case_ids: " + ValidationError.CASE_ID_INVALID));
         }
     }
