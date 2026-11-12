@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import uk.gov.hmcts.reform.cpo.BaseTest;
-import uk.gov.hmcts.reform.cpo.security.ErrorCode;
 import uk.gov.hmcts.reform.cpo.security.SecurityUtils;
 import uk.gov.hmcts.reform.cpo.utils.CasePaymentOrderEntityGenerator;
 
@@ -297,10 +296,14 @@ class BaseMvcAuthChecks extends BaseTest {
             // THEN
             .andExpect(status().isForbidden())
             .andExpect(jsonPath("$.code")
-                .value(ErrorCode.ACCESS_DENIED.name()))
+                .doesNotExist())
             .andExpect(jsonPath("$.message")
                 .value(HttpStatus.FORBIDDEN.getReasonPhrase()))
             .andExpect(jsonPath("$.exception")
+                .value("Exception"))
+            .andExpect(jsonPath("$.path")
+                .value("/"))
+            .andExpect(jsonPath("$.trace")
                 .doesNotExist())
             .andExpect(header()
                 .string(HttpHeaders.WWW_AUTHENTICATE, "Bearer error=\"insufficient_scope\""));
