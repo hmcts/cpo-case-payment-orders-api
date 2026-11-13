@@ -12,4 +12,8 @@ public class CaseIdOrderReferenceUniqueConstraintException extends ApiException 
         super(message);
     }
 
+    public CaseIdOrderReferenceUniqueConstraintException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 }

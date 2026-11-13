@@ -1,0 +1,10 @@
+{
+  "_guid_": "CPO_400_Response",
+  "_extends_": "CPO_Error_Response",
+  "responseCode": 400,
+  "responseMessage": "Bad Request",
+  "body": {
+    "status": 400,
+    "error": "Bad Request"
+  }
+}
