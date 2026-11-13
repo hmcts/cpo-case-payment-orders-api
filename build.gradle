@@ -218,6 +218,7 @@ def versions = [
   reformLogging   : '8.0.0',
   appInsights     : '2.6.4',
   springCloud     : '2025.0.3',
+  springCloudContract: '4.3.4',
   testcontainers  : '1.21.4',
 ]
 
@@ -319,7 +320,7 @@ dependencies {
   testImplementation libraries.junit5
   testImplementation group: 'org.apache.groovy', name: 'groovy', version: '4.0.33'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-  testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner'
+  testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: versions.springCloudContract
   testImplementation group: 'com.google.guava', name: 'guava', version: '33.7.2-jre' // Needed for BEFTA
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
