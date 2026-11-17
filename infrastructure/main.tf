@@ -74,12 +74,12 @@ module "postgresql_v15" {
       value = "pg_stat_statements,pg_buffercache,hypopg"
     }
   ]
-  pgsql_version    = "15"
-  product          = var.product
-  name             = "${local.app_full_name}-postgres-db-v15"
-  pgsql_sku        = var.pgsql_sku
-  pgsql_storage_mb = var.pgsql_storage_mb
-
+  pgsql_version                  = "15"
+  product                        = var.product
+  name                           = "${local.app_full_name}-postgres-db-v15"
+  pgsql_sku                      = var.pgsql_sku
+  pgsql_storage_mb               = var.pgsql_storage_mb
+  service_criticality            = var.service_criticality
   force_user_permissions_trigger = "2"
 
   public_access = false
