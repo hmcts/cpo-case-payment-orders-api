@@ -12,11 +12,9 @@
   },
 
   "expectedResponse" : {
-    "_extends_" : "Common_400_Response",
+    "_extends_" : "CPO_400_Response",
     "body" : {
-      "exception": "org.springframework.web.bind.MethodArgumentNotValidException",
       "message": "Input not valid",
-      "path": "/case-payment-orders",
       "details": [
       ]
     }
