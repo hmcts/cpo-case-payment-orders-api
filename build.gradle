@@ -217,8 +217,8 @@ def versions = [
   lombokMapBinding: '0.2.0',
   reformLogging   : '8.0.0',
   appInsights     : '2.6.4',
-  springCloud     : '2025.0.3',
-  springCloudContract: '4.3.4',
+  springCloud     : '2026.0.0',
+  springCloudContract: '5.0.3',
   testcontainers  : '1.21.4',
 ]
 
