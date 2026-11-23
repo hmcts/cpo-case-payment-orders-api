@@ -29,6 +29,7 @@
       "groupName": "all major dependencies",
       "groupSlug": "all-major-dependencies",
       "schedule": ["* 16-19 * * 1"],
+      "updateNotScheduled": false,
       "automerge": false
     }
   ]
