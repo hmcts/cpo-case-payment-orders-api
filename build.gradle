@@ -270,6 +270,7 @@ def versions = [
   reformLogging   : '8.0.0',
   appInsights     : '2.6.4',
   springCloud     : '2025.0.3',
+  springCloudContract: '4.3.4',
   testcontainers  : '1.21.4',
 ]
 
@@ -354,9 +355,9 @@ dependencies {
   implementation group: 'commons-validator', name: 'commons-validator', version: '1.11.0'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.13.0'
   implementation group: 'org.dom4j', name: 'dom4j', version: '2.2.0'
-  implementation group: 'org.hibernate', name: 'hibernate-envers', version: '7.4.14.Final'
-  implementation group: 'org.flywaydb', name: 'flyway-core', version: '13.12.1'
-  implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '13.12.1'
+  implementation group: 'org.hibernate', name: 'hibernate-envers', version: '7.4.16.Final'
+  implementation group: 'org.flywaydb', name: 'flyway-core', version: '13.12.2'
+  implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '13.12.2'
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   implementation group: 'xerces', name: 'xercesImpl', version: '2.12.2'
 
@@ -371,7 +372,7 @@ dependencies {
   testImplementation libraries.junit5
   testImplementation group: 'org.apache.groovy', name: 'groovy', version: '4.0.33'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-  testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner'
+  testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: versions.springCloudContract
   testImplementation group: 'com.google.guava', name: 'guava', version: '33.7.2-jre' // Needed for BEFTA
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
