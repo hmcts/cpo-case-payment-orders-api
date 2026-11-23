@@ -3,7 +3,7 @@ plugins {
   id 'idea'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.1.7'
-  id 'org.springframework.boot' version '3.5.16'
+  id 'org.springframework.boot' version '4.2.0'
   id 'org.owasp.dependencycheck' version '13.0.0'
   id 'com.github.ben-manes.versions' version '0.67.0'
   id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
@@ -217,8 +217,8 @@ def versions = [
   lombokMapBinding: '0.2.0',
   reformLogging   : '8.0.0',
   appInsights     : '2.6.4',
-  springCloud     : '2025.0.3',
-  springCloudContract: '4.3.4',
+  springCloud     : '2026.0.0',
+  springCloudContract: '5.0.3',
   testcontainers  : '1.21.4',
 ]
 
@@ -288,11 +288,11 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
   implementation group: 'org.springframework.security', name: 'spring-security-web'
   implementation group: 'org.springframework.security', name: 'spring-security-config'
-  implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.10.0'
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '3.2.1'
 
   // HMCTS dependencies
-  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.1.0'
-  implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.5'
+  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '4.1.0-CCD-8220'
+  implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '6.1.2'
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
 
 
@@ -318,7 +318,7 @@ dependencies {
 
 
   testImplementation libraries.junit5
-  testImplementation group: 'org.apache.groovy', name: 'groovy', version: '4.0.33'
+  testImplementation group: 'org.apache.groovy', name: 'groovy', version: '6.0.0'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
   testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: versions.springCloudContract
   testImplementation group: 'com.google.guava', name: 'guava', version: '33.7.2-jre' // Needed for BEFTA
@@ -328,7 +328,7 @@ dependencies {
 
   integrationTestImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
 
-  functionalTestImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.26.12'
+  functionalTestImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '97merge'
   functionalTestImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.12_CCD-8388'
   functionalTestImplementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '4.0.9'
   functionalTestImplementation 'com.github.hmcts:fortify-client:1.4.10:all'

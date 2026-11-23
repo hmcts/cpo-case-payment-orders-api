@@ -21,7 +21,7 @@ services:
       - cpo-db
 
   cpo-db:
-    image: postgres:18
+    image: postgres:19
     restart: always
     environment:
       - POSTGRES_DB=${DB_NAME}

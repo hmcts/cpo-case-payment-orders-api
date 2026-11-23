@@ -2,13 +2,13 @@
 ARG APP_INSIGHTS_AGENT_VERSION=3.7.10
 
 ARG PLATFORM=""
-FROM eclipse-temurin${PLATFORM}:21 as builder
+FROM eclipse-temurin${PLATFORM}:25 as builder
 
 ARG JAR_FILE=build/libs/cpo-case-payment-orders-api.jar
 COPY ${JAR_FILE} application.jar
 RUN java -Djarmode=layertools -jar application.jar extract
 
-FROM hmctsprod.azurecr.io/base/java${PLATFORM}:21-distroless
+FROM hmctsprod.azurecr.io/base/java${PLATFORM}:25-distroless
 USER hmcts
 
 COPY lib/applicationinsights.json /opt/app/
