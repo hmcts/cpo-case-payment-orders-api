@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.cpo.befta;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.Date;
 
+@Slf4j
 public class CaseIdGenerator {
 
     public static void main(String[] args) {
@@ -15,7 +17,7 @@ public class CaseIdGenerator {
         String randomFour = genRandomFourNumbers();
         int checkedDigit = getCheckDigit(timestamp,randomFour);
         String uid = timestamp + randomFour + checkedDigit;
-        System.out.println(uid);
+        log.info("Generated case reference {}", uid);
         return uid;
     }
 
