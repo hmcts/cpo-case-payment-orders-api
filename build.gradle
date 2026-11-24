@@ -7,7 +7,7 @@ plugins {
   id 'org.owasp.dependencycheck' version '13.0.0'
   id 'com.github.ben-manes.versions' version '0.67.0'
   id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
-  id 'org.sonarqube' version '7.5.0.8588'
+  id 'org.sonarqube' version '7.6.0.18749'
   id 'uk.gov.hmcts.java' version '0.12.70'
 }
 
@@ -303,7 +303,7 @@ dependencies {
   implementation group: 'commons-validator', name: 'commons-validator', version: '1.11.0'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.13.0'
   implementation group: 'org.dom4j', name: 'dom4j', version: '2.2.0'
-  implementation group: 'org.hibernate', name: 'hibernate-envers', version: '7.4.16.Final'
+  implementation group: 'org.hibernate', name: 'hibernate-envers', version: '7.4.17.Final'
   implementation group: 'org.flywaydb', name: 'flyway-core', version: '13.12.2'
   implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '13.12.2'
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok

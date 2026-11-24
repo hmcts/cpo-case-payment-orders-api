@@ -16,14 +16,21 @@
         "ccd-test-definitions",
         "befta-fw"
       ],
-      "matchCurrentValue": "!/^[0-9]+\\.[0-9]+\\.[0-9]+$/",
-      "enabled": false,
       "allowedVersions": "/^[0-9]+\\.[0-9]+\\.[0-9]+$/",
       "prPriority": 100,
       "schedule": ["at any time"],
       "automerge": true,
       "dependencyDashboardApproval": false,
       "minimumReleaseAge": null
+    },
+    {
+      "description": "Group all major dependency updates into one weekly PR bundle for QA",
+      "matchUpdateTypes": ["major"],
+      "groupName": "all major dependencies",
+      "groupSlug": "all-major-dependencies",
+      "schedule": ["* 16-19 * * 1"],
+      "updateNotScheduled": false,
+      "automerge": false
     }
   ]
 }
