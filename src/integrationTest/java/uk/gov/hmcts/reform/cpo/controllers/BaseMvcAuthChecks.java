@@ -21,6 +21,8 @@ import java.util.Objects;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import lombok.extern.slf4j.Slf4j;
@@ -292,7 +294,19 @@ class BaseMvcAuthChecks extends BaseTest {
         // WHEN
         mockMvc.perform(happyPathRequestBuilder.headers(headers))
             // THEN
-            .andExpect(status().isForbidden());
+            .andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.code")
+                .doesNotExist())
+            .andExpect(jsonPath("$.message")
+                .value(HttpStatus.FORBIDDEN.getReasonPhrase()))
+            .andExpect(jsonPath("$.exception")
+                .value("Exception"))
+            .andExpect(jsonPath("$.path")
+                .value("/"))
+            .andExpect(jsonPath("$.trace")
+                .doesNotExist())
+            .andExpect(header()
+                .string(HttpHeaders.WWW_AUTHENTICATE, "Bearer error=\"insufficient_scope\""));
     }
 
     /*

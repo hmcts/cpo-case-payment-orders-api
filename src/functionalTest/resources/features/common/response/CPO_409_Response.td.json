@@ -1,0 +1,10 @@
+{
+  "_guid_": "CPO_409_Response",
+  "_extends_": "CPO_Error_Response",
+  "responseCode": 409,
+  "responseMessage": "Conflict",
+  "body": {
+    "status": 409,
+    "error": "Conflict"
+  }
+}
